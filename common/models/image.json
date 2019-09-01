@@ -1,0 +1,181 @@
+{
+  "name": "Image",
+  "http":{
+    "path": "Images"
+  },
+  "listViewWidget":"ImageGallery",
+  "crud": {
+    "metaFunctions": {},
+    "fields": {
+      "id": {
+        "type": "Number"
+      },
+      "title": {
+        "editable": "true",
+        "type": "String",
+        "displayName": "Title"
+      },
+      "created": {
+        "type": "datetimePicker"
+      },
+      "modified": {
+        "type": "datetimePicker",
+        "width": "160"
+      },
+      "imageCategory": {
+        "type":"enum",
+        "editable": "true",
+        "options": [
+          "people", "family", "view", "animals", "boys", "girls", "icons", "nature"
+        ],
+        "displayName": "Image category"
+      },
+      "description":{
+        "type": "string",
+        "editable": true,
+        "displayName": "Description"
+      },
+      "imageFormat": {
+        "type": "enum"
+      }
+    }
+  },
+  "options": {
+    "idInjection": false,
+    "mysql": {
+      "schema": "myproject",
+      "table": "Image"
+    },
+    "relations": {
+      "games":{
+        "model": "Games",
+        "type": "hasMany",
+        "foreignKey": "imgId"
+      }
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "Number",
+      "required": false,
+      "generated": true,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "id": 1,
+      "mysql": {
+        "columnName": "id",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
+      }
+    },
+    "title": {
+      "type": "String",
+      "required": false,
+      "length": 200,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "title",
+        "dataType": "varchar",
+        "dataLength": 200,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "created": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "created",
+        "dataType": "datetime",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "modified": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "modified",
+        "dataType": "datetime",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "imageCategory": {
+      "type": "String",
+      "required": false,
+      "length": 100,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "image_category",
+        "dataType": "varchar",
+        "dataLength": 100,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "description": {
+      "type": "String",
+      "required": false,
+      "length": 65535,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "description",
+        "dataType": "text",
+        "dataLength": 65535,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "imageFormat": {
+      "type": "String",
+      "required": false,
+      "length": 4,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "image_format",
+        "dataType": "enum",
+        "dataLength": 4,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
+    },
+    "owner": {
+      "type": "Number",
+      "required": false,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "owner",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "Y"
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+storage/container/*
+!storage/container/emptyfile.txt

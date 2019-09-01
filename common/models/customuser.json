@@ -1,0 +1,79 @@
+{
+  "name": "CustomUser",
+  "pathLink": "CustomUsers",
+  "base": "User",
+  "idInjection": true,
+  "strict": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "crud": {
+    "metaFunctions": {},
+    "fields": {
+      "id": {
+        "type": "Number"
+      },
+      "username": {
+        "editable": "true",
+        "type": "String"
+      },
+      "email": {
+        "type": "String",
+        "editable": "true"
+      },
+      "emailVerified": {
+        "type": "Number",
+        "editable": "true"
+      },
+      "mainImageId": {
+        "type": "image",
+        "editable": true,
+        "related": "Images",
+        "relationName": "mainImageId",
+        "displayName": "Image"
+      },
+      "published": {
+        "type": "datetimePicker",
+        "width": "160"
+      }
+    }
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "accessTokens": {
+      "type": "hasMany",
+      "model": "AccessToken",
+      "foreignKey": "userId",
+      "options": {
+        "disableInclude": true
+      }
+    },
+    "mainImageId": {
+      "model": "Image",
+      "type": "belongsTo",
+      "foreignKey": "mainImageId"
+    }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "extendedLogin"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "find"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "getUsersList"
+    }
+  ],
+  "methods": {}
+}

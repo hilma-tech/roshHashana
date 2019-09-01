@@ -1,0 +1,40 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "msql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "boilerplate",
+    "password": "Exploited121",
+    "name": "msql",
+    "user": "root",
+    "connector": "mysql"
+  },
+  "myEmailDataSource": {
+    "connector": "mail",
+    "transports": [
+      {
+        "service":"gmail",
+        "type": "smtp",
+        "host": "smtp.gmail.com",
+        "secure": true,
+        "port": 465,
+        "tls": {
+          "rejectUnauthorized": false
+        },
+        "auth": {
+          "user": "videoscarmel@gmail.com",
+          "pass": "carmel!!2000"
+        }
+      }
+    ]
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/storage"
+  }
+}

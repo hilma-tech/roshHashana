@@ -1,0 +1,40 @@
+<div class="notification">    
+    <!-- <div class="notification-thumbnail-image">   
+        <img ng-src="{{{notificationImgPath}}}" alt="{{{notificationImgTitle}}}" title="{{{notificationImgTitle}}}">
+    </div>  -->
+    <span class="title">        
+        <span class="issue-hyperlink"
+            data-magic-box-generator 
+            data-is-page-template='true' 
+            data-magic-type='issue' 
+            data-magic-id='{{notificationId}}'>
+            {{notificationTitle}}
+            
+        </span> ,&nbsp;
+       
+        <span class="sage-hyperlink"
+            data-magic-box-generator 
+            data-is-page-template='true' 
+            data-magic-type='sage' 
+            data-magic-id='{{notificationId}}'>
+            {{userName}}
+        
+        </span> &nbsp;
+        
+        <span>has just added a &nbsp;</span>
+        <span 
+            class="discussion-hyperlink"
+            data-scroll-if-exist='true'
+            data-magic-box-generator 
+            data-is-page-template='true' 
+            data-magic-type='discussion' 
+            data-magic-id='{{notificationId}}'
+            data-opinion-id='{{notificationId}}'>
+            <span>new game!</span>
+        </span>&nbsp;
+       <!--span>[~ "newOpinion" | translate ~] </span-->
+    </span><!--/.title-->
+</div><!--/.feed-activity-row-->   
+
+
+

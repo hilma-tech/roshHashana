@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "msql",
+    "options": {
+      "emailVerificationRequired": true
+    }
+  },
+  "CustomUser": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "AccessToken": {
+    "dataSource": "msql",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "msql",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "msql",
+    "public": true,
+    "options": {
+      "strictObjectIDCoercion": true
+    }
+  },
+  "Role": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": false
+  },
+  "Email": {
+    "dataSource": "myEmailDataSource"
+  },
+  "container": {
+    "dataSource": "storage",
+    "public": true
+  },
+  "Image": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "Notification": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "Notificationsmap": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "Games": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "School": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": true
+  },
+  "SchoolsGames": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": false
+  }
+}
