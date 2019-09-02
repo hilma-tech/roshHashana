@@ -3,9 +3,11 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var path=require('path');
+const express=require('express');
 
 
 var app = module.exports = loopback();
+app.use(express.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 require('./routes')(app);

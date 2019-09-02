@@ -4,7 +4,7 @@ import React from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
-import DashboardMain from "./modules/dashboard/DashboardMain";
+import DashboardMain from "./modules/newdashboard/DashboardMain";
 import Login from "./modules/auth/Login.jsx";
 import { observer, inject } from 'mobx-react';
 // import { observe,observable,autorun,intercept,when } from 'mobx';

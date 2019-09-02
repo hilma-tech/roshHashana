@@ -4,7 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 var dsConfig = require('../datasources.json');
-var path = require('path');
 
 module.exports = function(app) {
   var User = app.models.user;
@@ -90,4 +89,9 @@ module.exports = function(app) {
         req.accessToken.id
     });
   });
-};
+
+
+};  
+
+
+
