@@ -8,17 +8,11 @@ module.exports = function (CustomUser) {
 		NOROLE:0,
 		ADMIN: 1,
 		SUPERADMIN: 2,
-		TEACHER: 3,
-		STUDENT: 4
-
 	}
 	const rolesEncodes = {
 		NOROLE: "miremerijfgivn238svnsdfsdf",
 		ADMIN: "gmrkipgm$2300femkFSFKeo375",
 		SUPERADMIN: "spf%#kfpoFFAa2234adAA244asZZv",
-		TEACHER: "fkoewpAQEK345FF2&&grkoBV[]&*437*",
-		STUDENT: "ccNgfs45KMNddojip##zzmMMqlpa"
-
 	}
 	/** This call adds custom behaviour to the standard Loopback login.
 	 *

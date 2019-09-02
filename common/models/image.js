@@ -196,3 +196,23 @@ module.exports = function (Image) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 };
+
+
+
+
+
+// ~~~~ EXAMPLE OF USAGE ~~~~ 
+
+// Model.saveImage = function (form, cb) {
+//     console.log("image-id", form.profile_image);
+//     cb(null, { success: 1 });
+// }
+
+// Model.remoteMethod('saveImage', {
+//     verb: "post",
+//     accepts: [
+//         { arg: 'form', type: 'object' },
+//     ],
+//     returns: { arg: 'res', type: 'object', root: true },
+//     description: "check."
+// });

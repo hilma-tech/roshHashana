@@ -1,5 +1,5 @@
 {
-  "name": "new-boilerplate",
+  "name": "pumba",
   "version": "0.1.0",
   "main": "server/server.js",
   "proxy": "http://127.0.0.1:8080",
@@ -73,5 +73,5 @@
     "last 1 firefox version",
     "last 1 safari version"
   ],
-  "description": "dashboard-example"
+  "description": "Proffesional Updated Main Boilerplate Again! "
 }

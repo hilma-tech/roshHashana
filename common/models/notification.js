@@ -60,9 +60,7 @@ module.exports = function (Notifications) {
     }
 
     Notifications.remoteMethod('newActivity', {
-        http: {
-            verb: 'post'
-        },
+        http: {verb: 'post'},
         accepts: { arg: 'data', type: 'object' },
         returns: { arg: 'res', type: 'object', root: true }
     });

@@ -65,20 +65,5 @@
     "dataSource": "msql",
     "public": true,
     "expose": true
-  },
-  "Games": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
-  },
-  "School": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
-  },
-  "SchoolsGames": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": false
   }
 }

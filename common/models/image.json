@@ -1,9 +1,9 @@
 {
   "name": "Image",
-  "http":{
+  "http": {
     "path": "Images"
   },
-  "listViewWidget":"ImageGallery",
+  "listViewWidget": "ImageGallery",
   "crud": {
     "metaFunctions": {},
     "fields": {
@@ -12,8 +12,7 @@
       },
       "title": {
         "editable": "true",
-        "type": "String",
-        "displayName": "Title"
+        "type": "String"
       },
       "created": {
         "type": "datetimePicker"
@@ -23,17 +22,22 @@
         "width": "160"
       },
       "imageCategory": {
-        "type":"enum",
+        "type": "enum",
         "editable": "true",
         "options": [
-          "people", "family", "view", "animals", "boys", "girls", "icons", "nature"
-        ],
-        "displayName": "Image category"
+          "people",
+          "family",
+          "view",
+          "animals",
+          "boys",
+          "girls",
+          "icons",
+          "nature"
+        ]
       },
-      "description":{
+      "description": {
         "type": "string",
-        "editable": true,
-        "displayName": "Description"
+        "editable": "true"
       },
       "imageFormat": {
         "type": "enum"
@@ -46,13 +50,7 @@
       "schema": "myproject",
       "table": "Image"
     },
-    "relations": {
-      "games":{
-        "model": "Games",
-        "type": "hasMany",
-        "foreignKey": "imgId"
-      }
-    }
+    "relations": {}
   },
   "properties": {
     "id": {
@@ -176,6 +174,47 @@
         "dataScale": 0,
         "nullable": "Y"
       }
+    },
+    "originUrl": {
+      "type": "String",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "origin_url",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      }
     }
-  }
+  },
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "user",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "superadmin",
+      "permission": "ALLOW"
+    }
+  ]
 }
