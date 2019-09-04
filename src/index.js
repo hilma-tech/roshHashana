@@ -10,9 +10,6 @@ import '@material-ui/icons';
 //font awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-//mobx
-import { Provider } from 'mobx-react';
-import AllStores from "./modules/newdashboard/storeMobx/AllStores" ;
 //rtl material
 import { create } from 'jss';
 import rtl from 'jss-rtl';
@@ -24,9 +21,7 @@ library.add(fas)
 //ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
 <StylesProvider jss={jss}>
-    <Provider {...AllStores}>
         <App />
-    </Provider>    
 </StylesProvider>
     , document.getElementById('root'));
 // If you want your app to work offline and load faster, you can change

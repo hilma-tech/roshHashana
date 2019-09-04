@@ -10,7 +10,7 @@ import Login from "./modules/auth/Login.jsx";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
-    Auth.isAuthenticated() === true ? <Component auth={Auth} {...props} /> : <Redirect to='/login' />
+    Auth.isAuthenticated() ? <Component auth={Auth} {...props} /> : <Redirect to='/login' />
   )} />
 )
 

@@ -47,10 +47,6 @@
   "Email": {
     "dataSource": "myEmailDataSource"
   },
-  "container": {
-    "dataSource": "storage",
-    "public": true
-  },
   "Image": {
     "dataSource": "msql",
     "public": true,
