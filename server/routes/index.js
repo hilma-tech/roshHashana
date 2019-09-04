@@ -63,7 +63,7 @@ module.exports = function (app) {
                     let table = {
                         fields: modelMetaJson.fields,
                         data: tableData,
-                        tableActions: modelMetaJson.tableActions
+                        tableActions: modelMetaJson.tableActions ? modelMetaJson.tableActions: null
                     }
                     res.setHeader('Content-Type', 'application/json');
                     res.send(JSON.stringify(table));
