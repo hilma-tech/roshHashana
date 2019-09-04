@@ -4,11 +4,8 @@ import React from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
-import DashboardMain from "./modules/newdashboard/DashboardMain";
+import DashboardMain from "./modules/dashboard/dashboard-main";
 import Login from "./modules/auth/Login.jsx";
-import { observer, inject } from 'mobx-react';
-// import { observe,observable,autorun,intercept,when } from 'mobx';
-
 
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
@@ -40,4 +37,4 @@ class Routing extends React.Component {
   }
 }
 
-export default inject('ConfigStore') (observer (Routing));
+export default Routing;
