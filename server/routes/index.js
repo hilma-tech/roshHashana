@@ -46,13 +46,20 @@ module.exports = function (app) {
 
     ///////// GETS THE FORM/TABLE DATA ////////
     app.get('/api/meta/:type/:model', function (req, res) {
-        let params = req.params.model.charAt(0).toUpperCase() + req.params.model.slice(1);;
-        let Model = app.models[params];
-
+        // the name of the json file  
+        // 
+        // let params = req.params.model.charAt(0).toUpperCase() + req.params.model.slice(1);;
+        
         const modelMeta = fs.readFileSync('common/models/' + req.params.model + ".json", 'utf-8');
         const modelMetaJson = JSON.parse(modelMeta).crud;
+        const modelRelations = JSON.parse(modelMeta).options.relations;
+        const modelInfo = { fields: modelMetaJson.fields, relations: modelRelations};
+        console.log(modelInfo); 
+        let params = JSON.parse(modelMeta).name;
+        let Model = app.models[params];
+
         if (req.params.type === "form") {
-            res.send(JSON.stringify(modelMetaJson));
+            res.send(JSON.stringify(modelInfo));
         } else if (req.params.type === "table") {
             let fields = {};
             Object.keys(modelMetaJson.fields).map(e => (fields[e] = true));
@@ -61,8 +68,9 @@ module.exports = function (app) {
                 if (err) console.log(err)
                 else {
                     let table = {
-                        fields: modelMetaJson.fields,
                         data: tableData,
+                        fields: modelMetaJson.fields,
+                        relations: modelRelations,
                         tableActions: modelMetaJson.tableActions ? modelMetaJson.tableActions: null
                     }
                     res.setHeader('Content-Type', 'application/json');
