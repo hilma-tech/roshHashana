@@ -46,15 +46,10 @@ module.exports = function (app) {
 
     ///////// GETS THE FORM/TABLE DATA ////////
     app.get('/api/meta/:type/:model', function (req, res) {
-        // the name of the json file  
-        // 
-        // let params = req.params.model.charAt(0).toUpperCase() + req.params.model.slice(1);;
-        
         const modelMeta = fs.readFileSync('common/models/' + req.params.model + ".json", 'utf-8');
         const modelMetaJson = JSON.parse(modelMeta).crud;
         const modelRelations = JSON.parse(modelMeta).options.relations;
         const modelInfo = { fields: modelMetaJson.fields, relations: modelRelations};
-        console.log(modelInfo); 
         let params = JSON.parse(modelMeta).name;
         let Model = app.models[params];
 
