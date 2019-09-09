@@ -57,8 +57,12 @@ module.exports = function (app) {
             res.send(JSON.stringify(modelInfo));
         } else if (req.params.type === "table") {
             let fields = {};
+            let relations =[];
+
             Object.keys(modelMetaJson.fields).map(e => (fields[e] = true));
-            Model.find({ fields: fields }, function (err, tableData) {
+            Object.keys(modelRelations).map(r => (relations.push(r)));
+
+            Model.find({ fields: fields, include: relations }, function (err, tableData) {
 
                 if (err) console.log(err)
                 else {
