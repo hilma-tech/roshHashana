@@ -50,6 +50,7 @@ module.exports = function (app) {
         const modelMetaJson = JSON.parse(modelMeta).crud;
         const modelRelations = JSON.parse(modelMeta).options.relations;
         const modelInfo = { fields: modelMetaJson.fields, relations: modelRelations};
+        const modelFilter = req.body.where;
         let params = JSON.parse(modelMeta).name;
         let Model = app.models[params];
 
@@ -62,7 +63,7 @@ module.exports = function (app) {
             Object.keys(modelMetaJson.fields).map(e => (fields[e] = true));
             Object.keys(modelRelations).map(r => (relations.push(r)));
 
-            Model.find({ fields: fields, include: relations }, function (err, tableData) {
+            Model.find({ fields: fields, include: relations, where: modelFilter }, function (err, tableData) {
 
                 if (err) console.log(err)
                 else {
