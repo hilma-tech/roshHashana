@@ -28,48 +28,45 @@
     "jss-rtl": "^0.2.3",
     "bootstrap": "^4.1.3",
     "classnames": "^2.2.6",
-    "jquery": "^3.3.1",
     "material-table": "^1.50.0",
     "mustache": "^3.0.1",
     "moment": "^2.22.2",
     "node-sass": "^4.12.0",
-    "popper.js": "^1.14.3",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-image-crop": "^8.2.2",
     "react-loadable": "^5.5.0",
-    "react-mobx": "0.0.4",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "3.0.1",
+    "react-scripts": "3.1.1",
     "uniqid": "^5.0.3",
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
-    "eslint": "^5.12.0",
+    "eslint": "^6.1.0",
     "eslint-config-loopback": "^8.0.0",
     "nsp": "^2.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "license": "UNLICENSED",
-  "development": [
-    "last 1 chrome version",
-    "last 1 firefox version",
-    "last 1 safari version"
-  ],
-  "description": "Proffesional Updated Main Boilerplate Again! "
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "description": "Professional Updated Main Boilerplate App!"
 }

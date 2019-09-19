@@ -46,20 +46,5 @@
   },
   "Email": {
     "dataSource": "myEmailDataSource"
-  },
-  "Image": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
-  },
-  "Notification": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
-  },
-  "Notificationsmap": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
   }
 }

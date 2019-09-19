@@ -15,7 +15,7 @@
     "helmet#frameguard": {
       "params": [
         "deny"
-       ]
+      ]
     },
     "helmet#hsts": {
       "params": {
@@ -33,15 +33,15 @@
   "session": {},
   "auth": {},
   "parse": {
-   "body-parser#json": {
-    "params: { 
-     "limit": "50mb"  
+    "body-parser#json": {
+      "params": {
+        "limit": "50mb" 
       }
-   }, 
-  "body-parser#urlencoded": {
-    "params": {
+    },
+    "body-parser#urlencoded": {
+      "params": {
         "limit": "50mb",
-        "extended" true
+        "extended": true
       }
     }
   },
@@ -52,11 +52,10 @@
       ]
     }
   },
-  
   "files": {
-     "loopback#static":{
-          "params":"$!../build"
-     }
+    "loopback#static": {
+      "params": "$!../build"
+    }
   },
   "final": {
     "loopback#urlNotFound": {}

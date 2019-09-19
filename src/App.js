@@ -1,12 +1,10 @@
-/* our App.js fire (renamed) */
-
 import React from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
 import DashboardMain from "./modules/dashboard/dashboard-main";
-import Login from "./modules/auth/Login.jsx";
-
+import Login from "./modules/auth/Login.jsx.js";
+import Home from './scenes/Home'
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
@@ -14,27 +12,23 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   )} />
 )
 
-
-class Routing extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { navHeader: Auth.isAuthenticated() ? true : false }
-  }
+function App() {
+  [login, setLogin] = React.useState( Auth.isAuthenticated() ? true : false )
 
   updateNav = () => {
     this.setState({ navHeader: true })
   }
 
-  render() {
-    return (
-        <Router>
-          <div>
-            <PrivateRoute path="/admin" component={DashboardMain} />
-            <Route path="/login" render={(props) => <Login {...props} navHeader={this.updateNav} />} />
-          </div>
-        </Router>
-    );
-  }
+  return (
+    <Router>
+      <div className="App">
+        <PrivateRoute path="/" component={Home} />
+        <PrivateRoute path="/admin" component={DashboardMain} />
+        <Route path="/login" render={(props) => <Login {...props} navHeader={this.updateNav} />} />
+      </div>
+    </Router>
+
+  );
 }
 
-export default Routing;
+export default App;
