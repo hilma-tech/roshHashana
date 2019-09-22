@@ -18,5 +18,6 @@
       "limit": "5mb"
     },
     "cors": false
-  }
+  },
+  "cookieSecret": "TopSecretM33ssageVeryOmporanteAndWeTryT0beUnCl3ar"
 }

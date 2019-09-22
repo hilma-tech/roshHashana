@@ -30,12 +30,24 @@
       "enabled": false
     }
   },
+  "session:before": {
+    "cookie-parser": {
+      "params": "${cookieSecret}"
+    }
+  },
   "session": {},
-  "auth": {},
+  "auth": {
+    "loopback#token": {
+      "cookies": [
+        "access_token",
+        "authorization"
+      ]
+    }
+  },
   "parse": {
     "body-parser#json": {
       "params": {
-        "limit": "50mb" 
+        "limit": "50mb"
       }
     },
     "body-parser#urlencoded": {

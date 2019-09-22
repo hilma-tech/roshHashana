@@ -5,7 +5,7 @@ var path = require('path');
 
 module.exports = function (CustomUser) {
 	const rolesEnum = {
-		NOROLE:0,
+		NOROLE: 0,
 		ADMIN: 1,
 		SUPERADMIN: 2,
 	}
@@ -22,6 +22,14 @@ module.exports = function (CustomUser) {
 
 	var senderAddress = 'videoscarmel@gmail.com';
 
+	CustomUser.afterRemote('extendedLogin', function (ctx) {
+		ctx.res.cookie('access_token', ctx.result.id, { signed: true, maxAge: 1000 * 60 * 60 * 5 });
+		return Promise.resolve();
+	});
+	CustomUser.afterRemote('logout', function (ctx) {
+		ctx.res.clearCookie('access_token');
+		return Promise.resolve();
+	});
 
 	//send verification email after registration 
 	CustomUser.afterRemote('create', function (context, user, next) {
@@ -48,35 +56,35 @@ module.exports = function (CustomUser) {
 				redirectToLinkText: 'Log in'
 			});
 			CustomUser.app.models.RoleMapping.upsert(
-				{principalType:"USER",principalId:user.id,roleId:4},
-				(err,content)=>{
+				{ principalType: "USER", principalId: user.id, roleId: 4 },
+				(err, content) => {
 					if (err) console.error("couldn'r write role")
-					else console.log("user signed",content);
+					else console.log("user signed", content);
 				}
 			)
 		});
 	});
 
-	CustomUser.afterRemote('prototype.verify', function(context, user, next) {
+	CustomUser.afterRemote('prototype.verify', function (context, user, next) {
 		context.res.render('response', {
-		  title: 'A Link to reverify your identity has been sent '+
-			'to your email successfully',
-		  content: 'Please check your email and click on the verification link '+
-			'before logging in',
-		  redirectTo: 'localhost:3000/home',
-		  redirectToLinkText: 'Log in'
+			title: 'A Link to reverify your identity has been sent ' +
+				'to your email successfully',
+			content: 'Please check your email and click on the verification link ' +
+				'before logging in',
+			redirectTo: 'localhost:3000/home',
+			redirectToLinkText: 'Log in'
 		});
-	  });
+	});
 
 	CustomUser.getUsersList = function (callback) {
-		
+
 		return CustomUser.find({}, function (errorrr, data) {
 			if (errorrr) {
 				logUser("error in find")
 				console.log("ERROR!");
 				return callback(errorrr)
 			}
-			
+
 			let payload = data.map((item, index) => {
 				return { id: item.id, username: item.username }
 			})
@@ -103,13 +111,13 @@ module.exports = function (CustomUser) {
 			rolemap.find({ where: { principalId: loginToken.userId } }, (err, userrole) => {
 				if (err)
 					return callback(err, null);
-				
-				if (!userrole || userrole.length==0){
+
+				if (!userrole || userrole.length == 0) {
 					loginToken.role = rolesEnum.NOROLE;
-				}else{
-					loginToken.role = userrole[0].roleId;	
+				} else {
+					loginToken.role = userrole[0].roleId;
 				}
-				
+
 
 				switch (loginToken.role) {
 					case rolesEnum.STUDENT:
