@@ -2,7 +2,7 @@ import React from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
-import DashboardMain from "./modules/dashboard/dashboard-main";
+// import DashboardMain from "./modules/dashboard/dashboard-main";
 import Login from "./modules/auth/Login";
 import Home from './scenes/Home'
 
@@ -23,7 +23,7 @@ function App() {
     <Router>
       <div className="App">
         <PrivateRoute path="/" component={Home} />
-        <PrivateRoute path="/admin" component={DashboardMain} />
+        {/* <PrivateRoute path="/admin" component={DashboardMain} /> */}
         <Route path="/login" render={(props) => <Login {...props} navHeader={updateNav} />} />
       </div>
     </Router>
