@@ -3,7 +3,7 @@ import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
 import DashboardMain from "./modules/dashboard/dashboard-main";
-import Login from "./modules/auth/Login.jsx.js";
+import Login from "./modules/auth/Login";
 import Home from './scenes/Home'
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
@@ -13,10 +13,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 )
 
 function App() {
-  [login, setLogin] = React.useState( Auth.isAuthenticated() ? true : false )
+  let [login, setLogin] = React.useState( Auth.isAuthenticated() ? true : false )
 
-  updateNav = () => {
-    this.setState({ navHeader: true })
+ const updateNav = () => {
+    setLogin(true)
   }
 
   return (
@@ -24,7 +24,7 @@ function App() {
       <div className="App">
         <PrivateRoute path="/" component={Home} />
         <PrivateRoute path="/admin" component={DashboardMain} />
-        <Route path="/login" render={(props) => <Login {...props} navHeader={this.updateNav} />} />
+        <Route path="/login" render={(props) => <Login {...props} navHeader={updateNav} />} />
       </div>
     </Router>
 

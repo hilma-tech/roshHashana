@@ -1,10 +1,9 @@
 import React from 'react';
-import './App.scss';
 
 export default function Home() {
   return (
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <img src="favicon.ico" className="App-logo" alt="logo" />
         <p>
           ברוכות הבאות לאפליקציית <code>carmel6000</code> חדשה.
         </p>
