@@ -4,12 +4,12 @@
     "connector": "memory"
   },
   "msql": {
-    "host": "68.66.253.184",
+    "host": "localhost",
     "port": 3306,
-    "database": "smartbell",
-    "password": "z10mz10m))",
+    "database": "websocket",
+    "password": "z10mz10m",
     "name": "msql",
-    "user": "monty",
+    "user": "root",
     "connector": "mysql"
   },
   "myEmailDataSource": {
