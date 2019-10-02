@@ -12,27 +12,21 @@
   "crud": {
     "metaFunctions": {},
     "fields": {
-      "id": {
-        "type": "Number"
-      },
+      "id": {},
       "username": {
-        "editable": "true",
-        "type": "String"
+          "title": "user name"
       },
       "email": {
-        "type": "String",
-        "editable": "true"
+        "title": "email"
       },
       "emailVerified": {
         "type": "Number",
         "editable": "true"
       },
       "mainImageId": {
-        "type": "image",
-        "editable": true,
-        "related": "Images",
-        "relationName": "mainImageId",
-        "displayName": "Image"
+        "formatter": "related-pattern",
+        "pattern": "image",
+        "title": "image"
       },
       "published": {
         "type": "datetimePicker",
@@ -50,11 +44,6 @@
       "options": {
         "disableInclude": true
       }
-    },
-    "mainImageId": {
-      "model": "Image",
-      "type": "belongsTo",
-      "foreignKey": "mainImageId"
     }
   },
   "acls": [

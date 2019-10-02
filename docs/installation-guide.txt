@@ -1,0 +1,88 @@
+1. Make sure /server/datasources.json holds the right database/password for your specific project
+
+2. As Default, there should be only one user (with role 'admin') in the sytem, which have these access details:
+   * default user: admin@carmel6000.amitnet.org, E2PSzAmJ-5-ldKnl  
+
+3. Run both server and react client: (terminal 1): node . (terminal 2): npm start
+
+
+4. Navigate your browser to localhost:3000/admin/home, It should prompt you with the login page
+
+5. Login as admin user, this step should work properly.
+
+6. Once login is successfull, remove remote repository of this boilerplate: git remote rm origin
+
+7. Hook in your project's repository as following:
+       - Create a new repository in github/eran-correlor (keys find with Eran, Miri, Sam ...)
+       - git init
+       - git add .
+       - git remote add origin https://github.com/eran-correlor/PROJECT_NAME.git
+       - git commit -am "first commit for this project"  
+
+
+* Debugging:
+
+  Debug MySQL queries:                                 DEBUG=loopback:datasource node .
+  Debug CustomUser model (login, authentication, etc): DEBUG=model:user node .
+         
+       
+* Handling Users 
+
+User table in database should be empty
+All users data should be included only into CustomUser only
+
+
+* Model guide additionals to dashboard
+
+1. pathLink - corresponds to loopback url path for that table.
+2. listViewWidget - Two options:  null for just table / ImageGallery - to image gallery 
+3. crud -     1. metaFunctions: {},
+              2. fields: {
+                     key(columnName): {
+                          "type": columnType, ** note 1
+                          "editable": boolean if the column is edited,
+                          required: boolean if the column is required,
+                          displayName: the header of the column just in the dashboard.
+                     }
+              }
+
+
+** note 1 :
+ TYPES:
+ - String
+ - Number
+ - Date || datetimePicker
+ - enum : { type "enum", options: array of string e.g: ["JSX", "JS", "HTML"].}
+ - single-item-select: { type : "single-item-select", 
+                         valueType:  Array of strings of which we want to display as a tags list from the related model.
+                                   e.g: tagView:["title","phone_number"],
+                                        related:"CustomUser"
+                                 This will show "Moshe Ufnik, 0873453234 | Kipi ben Kipod 2839742" on the grid list view!,
+                         related: the related model name
+                              e.g: "CustomUser",
+                         relationName : the relation name as you see in options.relations
+                                        e.g : "custom_user_ibfk_1"
+                        }
+ - tag-view: { type : "tag-view", 
+               tagView: Array of strings of which we want to display as a tags list from the related model.
+                              e.g: tagView:["title","phone_number"],
+                                   related:"CustomUser"
+                                 This will show "Moshe Ufnik, 0873453234 | Kipi ben Kipod 2839742" on the grid list view!ת 
+
+               related: the related model name as through in the relation hasMany,
+               relationName : the relation name  as you see in options.relations
+                               e.g : "custom_user_ibfk_1"
+               relationModel: the related model name as model in the relations
+                              e.g: "CustomUser"
+             }
+- tag-view-insert: { type : "tag-view-insert", 
+                    tagView:  Array of strings of which we want to display as a tags list from the related model.
+                               e.g: tagView:["title","phone_number"],
+                                 related:"CustomUser"
+                                 This will show "Moshe Ufnik, 0873453234 | Kipi ben Kipod 2839742" on the grid list view!,
+                    related: the related model name as through in the relation hasMany,
+                    relationName : the relation name  as you see in options.relations
+                               e.g : "custom_user_ibfk_1",
+                    relationModel: the related model name as model in the relations
+                              e.g: "CustomUser",
+             }

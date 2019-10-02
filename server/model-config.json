@@ -46,5 +46,10 @@
   },
   "Email": {
     "dataSource": "myEmailDataSource"
+  },
+  "Games":{
+    "dataSource":"msql",
+    "public":true,
+    "expose":true
   }
 }
