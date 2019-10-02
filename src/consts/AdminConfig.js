@@ -5,8 +5,8 @@ import { validationTypes } from "./../modules/dashboard/enums/validationTypes";
 
 const AdminConfig = {
     theme: {
-        mainHeading: "פעמון חכם",
-        secondaryHeading: "הדסה הר הצופים",
+        mainHeading: "פרויקט חדש",
+        secondaryHeading: "כותרת משנה",
         logo: "https://getbootstrap.com/docs/4.3/assets/brand/bootstrap-solid.svg",
         palette: {
             primary: "#008DFA",
@@ -32,8 +32,32 @@ const AdminConfig = {
                                     builtIn: builtInTypes.TABLE,
                                     props: {
                                         model: "customuser",
-                                        filter: '{"where":{"patient_code":null}}',
                                         pluralized: "CustomUsers"
+                                    }
+
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            title: "Games",
+            route: "games",
+            icon: ["fas", "birthday-cake"],
+            layouts: [
+                {
+                    grid: "col",
+                    heading: "לוח העבודה",
+                    content: [
+                        {
+                            components: [
+                                {
+                                    builtIn: builtInTypes.TABLE,
+                                    props: {
+                                        model: "games",
+                                        // pluralized: "CustomUsers"
                                     }
 
                                 }
