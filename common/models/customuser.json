@@ -1,9 +1,11 @@
 {
   "name": "CustomUser",
+  "mixins": {
+    "FilesHandler": true
+  },
   "pathLink": "CustomUsers",
   "base": "User",
   "idInjection": true,
-  "strict": true,
   "options": {
     "validateUpsert": true
   },

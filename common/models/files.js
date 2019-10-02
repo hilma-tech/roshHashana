@@ -1,14 +1,13 @@
 
 var fs = require('fs');
 var path = require('path');
-var logImage = require('debug')('model:image');
+var logFile = require('debug')('model:file');
 const https = require('https');
 
-const IMAGES_DIR = 'public/images/';
-module.exports = function (Image) {
+const FILES_DIR = 'public/files/';
 
-
-    Image.observe('loaded', function (ctx, next) {
+module.exports = function (File) {
+    File.observe('loaded', function (ctx, next) {
 
         var fData;
         if (ctx.instance) {    //for first upload
@@ -18,15 +17,16 @@ module.exports = function (Image) {
         else {
             // logImage("CTX.instance does not exist",ctx);
             fData = ctx.data;
-            fData.path = `/images/${fData.category}/${fData.id}.${fData.format}`;
+            fData.path = `/files/${fData.category}/${fData.id}.${fData.format}`;
         };
         ctx.data = fData;
         next();
     });
 
 
-    Image.observe('before save', function (ctx, next) {
+    File.observe('before save', function (ctx, next) {
         // if no owner specified, mark uploader as owner.
+
         if (ctx.options.accessToken) {
             if (ctx.instance) {
                 if (!ctx.instance.owner)
@@ -36,30 +36,30 @@ module.exports = function (Image) {
                 ctx.data.owner = ctx.options.accessToken.userId;
             };
         }
-        else console.log("No owner for this image.")
+        else console.log("No owner for this file.")
         next();
     });
 
 
-    Image.observe('after save', function (ctx, next) { //call next, dont forget!!
-        logImage("after dave");
+    File.observe('after save', function (ctx, next) { //call next, dont forget!!
+        logFile("after dave");
         var fData;
         if (ctx.instance) {    //for first upload
-            //  logImage("CTX.instance exists",ctx);
+            //console.log("CTX.instance exists",ctx);
             fData = ctx.instance;
-            logImage("fdata", fData);
+            logFile("fdata", fData);
         }
         else {
-            // logImage("CTX.instance does not exist",ctx);
+            //console.log("CTX.instance does not exist",ctx);
             fData = ctx.data;
-            logImage("fdata", fData);
+            logFile("fdata", fData);
         };
-        console.log("fData", fData);
+        // console.log("fData", fData);
 
         if (fData.dontSave)// if we dont want the remote to work.
             return next();
 
-        //only if there is new image upload event
+        //only if there is new file upload event
         if (fData.fileName && path.extname(fData.fileName)) {
             fData.fileBasename = path.basename(fData.fileName);
             fData.extention = path.extname(fData.fileName);
@@ -68,43 +68,43 @@ module.exports = function (Image) {
             var srcPath = storagePath + "/" + fData.fileName;
             //    fData.category='sages';        
 
-            var savDir = path.join(__dirname, '../', '../', IMAGES_DIR + fData.category);
+            var savDir = path.join(__dirname, '../', '../', FILES_DIR);
 
             var distPath =
                 savDir + "/" + fData.id + fData.extention;
 
             //chehck if file exists
-            logImage("src dist", srcPath, distPath);
+            logFile("src dist", srcPath, distPath);
 
             if (fs.existsSync(srcPath)) {
-                logImage("file exist!")
+                logFile("file exist!")
                 fData.fileName = fData.id;
                 if (!fs.existsSync(savDir)) {
-                    logImage("no dir");
+                    logFile("no dir");
                     fs.mkdirSync(savDir, { recursive: true }, (error) => {
                         if (error) {
-                            logImage("Error while mkdir:", error)
+                            logFile("Error while mkdir:", error)
                             throw error;
                         }
-                        logImage("creating dir ", savDir);
+                        logFile("creating dir ", savDir);
                         fs.createReadStream(srcPath).pipe(fs.createWriteStream(distPath).on('end', function () {
-                            logImage("done writing file.");
+                            logFile("done writing file.");
                             return next();
                         }));
                     });
                 }
                 else {
-                    logImage("folder exists");
+                    logFile("folder exists.");
                     return fs.createReadStream(srcPath).pipe(fs.createWriteStream(distPath).on('close', function () {
-                        logImage("done writing file.");
+                        logFile("done writing file.");
                         return next();
                     }));
                 }
             } else {
-                logImage("file was not uploaded")
+                logFile("file was not uploaded")
                 return next();
                 //general after save is called when personal after saves are done
-                //Image.beforeSaveProcess(ctx,next);
+                //File.beforeSaveProcess(ctx,next);
             }
         } else {
             //for regular upsert
@@ -113,28 +113,27 @@ module.exports = function (Image) {
             }
             next();
             //general after save is called when personal after saves are done
-            //Image.beforeSaveProcess(ctx,next);
+            //File.beforeSaveProcess(ctx,next);
         }
     });
 
 
     /** 
-    This function gets url and data of online image, and copies this image to our server.
-    It also register this image to Image table.
+    This function gets url and data of online file, and copies this file to our server.
+    It also register this file to File table.
     **/
-    Image.downloadToServer = function (data, options, cb) {
-        let saveDir = path.join(__dirname, '../', '../', IMAGES_DIR, data.category);
+    File.downloadToServer = function (data, options, cb) {
+        let saveDir = path.join(__dirname, '../', '../', FILES_DIR);
         let extention = path.extname(data.url).substr(1);
         console.log("data!!", data)
-        let imgObj = {
-            category: data.category,
+        let fileObj = {
             owner: options.accessToken ? options.accessToken.userId : null,
             format: extention,
             created: Date.now(),
             dontSave: true,// dont let afterSave remote do anything
             title: data.title
         };
-        Image.create(imgObj, (err, res) => {
+        File.create(fileObj, (err, res) => {
             if (err) {
                 console.log("error on create record!", err);
                 return cb(err.message);
@@ -156,24 +155,7 @@ module.exports = function (Image) {
         });
     };
 
-    Image.getUsersImages = function (filter, options, cb) {
-        try {
-            let userId = options.accessToken.userId;
-            filter = filter ? JSON.parse(filter) : {};
-            return Image.find({ where: { owner: userId }, ...filter }, options, (err, res) => {
-                if (err) return cb(err)
-                res.forEach(image => {
-                    image.owner = null; `   `
-                });
-                return cb(null, res);
-            });
-        }
-        catch (err) {
-            return cb(null, []); //no userid return empty
-        }
-    }
-
-    Image.remoteMethod('downloadToServer', {
+    File.remoteMethod('downloadToServer', {
         http: {
             verb: 'post'
         },
@@ -184,35 +166,4 @@ module.exports = function (Image) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    Image.remoteMethod('getUsersImages', {
-        http: {
-            verb: 'get'
-        },
-        description: "***REMOTE*** filter images to user",
-        accepts: [
-            { arg: 'filter', type: 'string' },
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
-        ],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
 };
-
-
-
-
-
-// ~~~~ EXAMPLE OF USAGE ~~~~ 
-
-// Model.saveImage = function (form, cb) {
-//     console.log("image-id", form.profile_image);
-//     cb(null, { success: 1 });
-// }
-
-// Model.remoteMethod('saveImage', {
-//     verb: "post",
-//     accepts: [
-//         { arg: 'form', type: 'object' },
-//     ],
-//     returns: { arg: 'res', type: 'object', root: true },
-//     description: "check."
-// });

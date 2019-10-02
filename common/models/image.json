@@ -21,7 +21,7 @@
         "type": "datetimePicker",
         "width": "160"
       },
-      "imageCategory": {
+      "category": {
         "type": "enum",
         "editable": "true",
         "options": [
@@ -39,7 +39,7 @@
         "type": "string",
         "editable": "true"
       },
-      "imageFormat": {
+      "format": {
         "type": "enum"
       }
     }
@@ -50,7 +50,13 @@
       "schema": "myproject",
       "table": "Image"
     },
-    "relations": {}
+    "relations": {
+      "customUser": {
+        "model": "CustomUser",
+        "type": "hasMany",
+        "foreignKey": "mainImageId"
+      }
+    }
   },
   "properties": {
     "id": {
@@ -115,14 +121,14 @@
         "nullable": "Y"
       }
     },
-    "imageCategory": {
+    "category": {
       "type": "String",
       "required": false,
       "length": 100,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "image_category",
+        "columnName": "category",
         "dataType": "varchar",
         "dataLength": 100,
         "dataPrecision": null,
@@ -145,14 +151,14 @@
         "nullable": "Y"
       }
     },
-    "imageFormat": {
+    "format": {
       "type": "String",
       "required": false,
       "length": 4,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "image_format",
+        "columnName": "format",
         "dataType": "enum",
         "dataLength": 4,
         "dataPrecision": null,
