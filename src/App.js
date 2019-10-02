@@ -22,7 +22,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <PrivateRoute path="/" component={Home} />
+        <PrivateRoute exact path="/" component={Home} />
         { <PrivateRoute path="/admin" component={DashboardMain} /> }
         <Route path="/login" render={(props) => <Login {...props} navHeader={updateNav} />} />
       </div>

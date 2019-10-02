@@ -85,7 +85,6 @@ module.exports = function (app) {
         const modelRelations = JSON.parse(modelMeta).options.relations || JSON.parse(modelMeta).relations;
         const modelInfo = { fields: modelMetaJson.fields, relations: modelRelations };
         let params = JSON.parse(modelMeta).name;
-        console.log("params", params);
         let Model = app.models[params];
 
         if (req.params.type === "form") {

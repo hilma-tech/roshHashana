@@ -26,9 +26,6 @@ const AdminConfig = {
                         {
                             components: [
                                 {
-                                    custom: customTypes.DESKTOP
-                                },
-                                {
                                     builtIn: builtInTypes.TABLE,
                                     props: {
                                         model: "customuser",
@@ -57,6 +54,7 @@ const AdminConfig = {
                                     builtIn: builtInTypes.TABLE,
                                     props: {
                                         model: "games",
+                                        title:"t"
                                         // pluralized: "CustomUsers"
                                     }
 
