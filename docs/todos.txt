@@ -1,0 +1,12 @@
+Todos
+~~~~
+* Intergrate MobX
+* Integrate server+client for a single launch
+* Apply login/registration popups
+* Apply ElementsHandler
+* Integrate notifications 
+* Overview auth.js
+
+* Samples:
+	Image uploader
+	Notifications+Service worker
