@@ -54,7 +54,7 @@ const AdminConfig = {
                                     builtIn: builtInTypes.TABLE,
                                     props: {
                                         model: "games",
-                                        title:"t"
+                                        title:"games"
                                         // pluralized: "CustomUsers"
                                     }
 

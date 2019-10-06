@@ -86,3 +86,4 @@ All users data should be included only into CustomUser only
                     relationModel: the related model name as model in the relations
                               e.g: "CustomUser",
              }
+
