@@ -14,13 +14,13 @@ const FILE_TYPE_IMAGE = 'image';
 
 module.exports = function FilesHandler(Model) {
 
-    Model.saveFile = async function (file, FileModel, ownerId = null, instanceId = null) {
+    Model.saveFile = async function (file, FileModel, ownerId = null, fileId = null) {
         let saveDir = getSaveDir(file.type);
         let extension = getFileExtension(file.src);
         if (!extension) return false;
         let base64Data = file.src.replace(/^data:[a-z]+\/[a-z]+\d?;base64,/, "");
 
-        // console.log("ownerId", ownerId);
+        // console.log("\nownerId", ownerId);
         let fileObj = {
             category: file.category ? file.category : 'uploaded',
             owner: ownerId,
@@ -32,8 +32,8 @@ module.exports = function FilesHandler(Model) {
 
         // If we are posting to and from the same model,
         // the instance was already created in the remote so we just update it 
-        if (Model === FileModel)
-            fileObj.id = instanceId;
+        if (Model === FileModel && fileId !== null)
+            fileObj.id = fileId;
 
         let specificSaveDir = saveDir + fileObj.category + "/";
         let [err, newFile] = await AsyncTools.to(FileModel.upsert(fileObj));
@@ -70,9 +70,9 @@ module.exports = function FilesHandler(Model) {
                     key = dataKeys[j];
                     if (typeof data[key] !== "object" || !data[key]) continue;
 
-                    let filesToSave = ctx.args[field].myFiles || {};
+                    let filesToSave = ctx.args[field].filesToSave || {};
                     filesToSave[key] = data[key];
-                    ctx.args[field]["myFiles"] = filesToSave;
+                    ctx.args[field]["filesToSave"] = filesToSave;
                     ctx.args[field][key] = null;
                 };
             }
@@ -83,7 +83,7 @@ module.exports = function FilesHandler(Model) {
     Model.afterRemote('*', function (ctx, modelInstance, next) {
         // console.log("\nmixinss AFTER REMOTE");
         if (ctx.req.method !== "POST" && ctx.req.method !== "PUT" /*&& !modelInstance.id*/)
-            return next()
+            return next();
 
         let args = ctx.args;
 
@@ -93,8 +93,8 @@ module.exports = function FilesHandler(Model) {
             for (let i = 0; i < argsKeys.length; i++) { // we are not using map func, because we cannot put async inside it.
                 let field = argsKeys[i];
                 if (field === "options") continue;
-                if (!args[field] || !args[field].myFiles) return next();
-                let filesToSave = args[field].myFiles;
+                if (!args[field] || !args[field].filesToSave) return next();
+                let filesToSave = args[field].filesToSave;
 
                 for (let fileKey in filesToSave) {
                     const file = filesToSave[fileKey];
@@ -119,20 +119,32 @@ module.exports = function FilesHandler(Model) {
                             modelInstance.id :
                             null);
 
-                    if (!fileOwnerId) { console.log("no owner id for file, aborting..."); continue; }
-                    let newFileId = await Model.saveFile(file, ModelToSave, fileOwnerId, modelInstance.id);
+                    if (!fileOwnerId) {
+                        console.log("no owner id for file, aborting... (and deleting file if was created)");
+                        if (Model === ModelToSave)
+                            ModelToSave.deleteById(modelInstance.id);
+                        continue;
+                    }
+
+                    // If we are posting to and from the same model more than 1 file.. 
+                    // Example: posting from Files (table) to Files (table) 2 files
+                    let index = Object.keys(filesToSave).indexOf(fileKey);
+                    let fileId = null;
+                    if (index === 0 /*&& Model === ModelToSave*/) fileId = modelInstance.id;
+
+                    let newFileId = await Model.saveFile(file, ModelToSave, fileOwnerId, fileId);
                     if (!newFileId) { console.log("couldn't create your file dude, aborting..."); continue; }
 
-                    // If we are posting to Files then it doesnt need the id of the file too
-                    if (Model === ModelToSave) continue;
-
-                    // TODO Shira - make sure that if [fileKey] doesnt exist in Model then dont upsert
+                    // If [fileKey] doesnt exist in Model then dont upsert
+                    let [findErr, findRes] = await AsyncTools.to(Model.findOne({ where: { id: modelInstance.id } }));
+                    if (findErr || !findRes) { console.error("error finding field, aborting...", findErr); continue; }
+                    if (!(fileKey in findRes)) { console.error(`The field "${fileKey}" doesnt exist in model, skipping upsert to that field...`); continue; }
 
                     // Updating the row to include the id of the file added
-                    let [err, updatedField] = await AsyncTools.to(Model.upsert(
+                    let [upsertErr, upsertRes] = await AsyncTools.to(Model.upsert(
                         { id: fileOwnerId, [fileKey]: newFileId }
                     ));
-                    if (err) { console.error("error updating field, aborting...", err); continue; }
+                    if (upsertErr) { console.error("error upserting field, aborting...", upsertErr); continue; }
                 };
             }
             return next();
@@ -141,7 +153,11 @@ module.exports = function FilesHandler(Model) {
 }
 
 function getSaveDir(type) {
-    return path.join(__dirname, `../../public/${type}s/`);
+    const saveDir = path.join(__dirname, `../../public/${type}s/`);
+    if (!fs.existsSync(saveDir)) {//create dir if dosent exist.
+        fs.mkdirSync(saveDir, { recursive: true });
+    }
+    return saveDir;
 }
 
 function getFileExtension(fileSrc) {

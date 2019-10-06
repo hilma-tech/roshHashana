@@ -51,5 +51,20 @@
     "dataSource":"msql",
     "public":true,
     "expose":true
+  },
+  "Image":{
+    "dataSource":"msql",
+    "public":true,
+    "expose":true
+  },
+  "Files":{
+    "dataSource":"msql",
+    "public":true,
+    "expose":true
+  },
+  "RecordsPermissions": {
+    "dataSource": "msql",
+    "public": true,
+    "expose": false
   }
 }

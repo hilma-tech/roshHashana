@@ -1,6 +1,7 @@
 const squel = require('squel');
 const { exeQuery } = require('../../server/common/db/queries');
 
+// TODO Shira --Can this be just a regular array?!?
 const rolesEnum = {
     0: 'NOROLE',
     1: 'ADMIN',
@@ -44,7 +45,7 @@ module.exports = class PermissionsFilter {
 
         //extract access token and find out user id
         let userId = this.request.accessToken && this.request.accessToken.userId;
-        if (!userId) { console.log("no user id --> user is logged out"); return; }
+        if (!userId) { console.log("no user id (user is logged out), aborting..."); return; }
 
         let fileId = fileName.split('.')[0]; //principalId
 
