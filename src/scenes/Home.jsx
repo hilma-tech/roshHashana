@@ -8,6 +8,7 @@ export default function Home() {
           Welcome to Carmel 6000's Proffesional Updated Main Boilerplate App
         </p>
         <a className="App-link" href="/admin" target="_blank" rel="noopener noreferrer">Access Dashboard</a>
+        <a className="App-link" href="/samples" target="_blank" rel="noopener noreferrer">View Samples</a>
       </header>
   );
 }
