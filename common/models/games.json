@@ -42,15 +42,15 @@
     "mysql": {
       "schema": "myproject",
       "table": "games"
-    },
-    "relations": {
+    }
+  },
+  "relations": {
       "User": {
         "model": "CustomUser",
         "type": "belongsTo",
         "foreignKey": "ownerId"
       }
-    }
-  },
+   },
   "properties": {
     "id": {
       "type": "Number",
