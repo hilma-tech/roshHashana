@@ -1,18 +1,39 @@
 {
   "name": "Games",
   "crud": {
+  	"tableActions":{
+  		"addNewRow":true,
+  		"deleteRow":true,
+  		"editRow":true
+  	},
     "fields": {
 	      "title":{
-	      	"title":"title"
+	      	"title":"title",
+	      	"displayInForm":{
+	      		"type":"text",
+	      		"margin": "normal"
+	      	}
 	      },
 	      "played_num":{
-	      	"title":"played_num"
+	      	"title":"played_num",
+	      	"displayInForm":{
+	      		"type":"number",
+	      		"margin": "normal"
+	      	}
 	      },
 	      "description":{
-	      	"title":"description"
+	      	"title":"description",
+	      	"displayInForm":{
+	      		"margin": "normal",
+	      		"type":"text"
+	      	}
 	      },
 	      "school_name":{
-	      	"title":"school name"
+	      	"title":"school name",
+	      	"displayInForm":{
+	      		"margin": "normal",
+	      		"type":"text"
+	      	}
 	      }
       }
   },
@@ -21,15 +42,15 @@
     "mysql": {
       "schema": "myproject",
       "table": "games"
-    },
-    "relations": {
+    }
+  },
+  "relations": {
       "User": {
         "model": "CustomUser",
         "type": "belongsTo",
         "foreignKey": "ownerId"
       }
-    }
-  },
+   },
   "properties": {
     "id": {
       "type": "Number",

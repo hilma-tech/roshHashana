@@ -5,18 +5,19 @@
 
 3. Run both server and react client: (terminal 1): node . (terminal 2): npm start
 
-
 4. Navigate your browser to localhost:3000/admin/home, It should prompt you with the login page
 
 5. Login as admin user, this step should work properly.
 
 6. Once login is successfull, remove remote repository of this boilerplate: git remote rm origin
+   Check there is no remote origin linked: git remote -v
 
 7. Hook in your project's repository as following:
-       - Create a new repository in github/eran-correlor (keys find with Eran, Miri, Sam ...)
+       
+       - Create a new repository in github/carmel-6000 (keys find with Eran, Miri, Sam ...)
        - git init
        - git add .
-       - git remote add origin https://github.com/eran-correlor/PROJECT_NAME.git
+       - git remote add origin https://github.com/carmel-6000/PROJECT_NAME.git
        - git commit -am "first commit for this project"  
 
 
@@ -86,3 +87,4 @@ All users data should be included only into CustomUser only
                     relationModel: the related model name as model in the relations
                               e.g: "CustomUser",
              }
+

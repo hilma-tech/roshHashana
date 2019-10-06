@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.26, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
 --
--- Host: localhost    Database: boilerplate2
+-- Host: localhost    Database: pumba
 -- ------------------------------------------------------
--- Server version	5.7.26-0ubuntu0.18.04.1
+-- Server version	5.7.27-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -66,6 +66,7 @@ CREATE TABLE `AccessToken` (
 
 LOCK TABLES `AccessToken` WRITE;
 /*!40000 ALTER TABLE `AccessToken` DISABLE KEYS */;
+INSERT INTO `AccessToken` VALUES ('Q66Hl91lyVRBO3bFRnFcQJ7YnyHuV37u3uzvdd1vfWTm7mFaA4jCo673z03ZCv3j',1209600,'2019-10-02 08:47:45',1,NULL);
 /*!40000 ALTER TABLE `AccessToken` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -238,6 +239,61 @@ LOCK TABLES `RoleMapping` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `Schools`
+--
+
+DROP TABLE IF EXISTS `Schools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Schools` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `school_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Schools`
+--
+
+LOCK TABLES `Schools` WRITE;
+/*!40000 ALTER TABLE `Schools` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Schools` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `SchoolsGames`
+--
+
+DROP TABLE IF EXISTS `SchoolsGames`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `SchoolsGames` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `school_id` int(11) DEFAULT NULL,
+  `game_id` int(11) unsigned DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `school_id` (`school_id`),
+  KEY `game_id` (`game_id`),
+  CONSTRAINT `SchoolsGames_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`id`),
+  CONSTRAINT `SchoolsGames_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `SchoolsGames`
+--
+
+LOCK TABLES `SchoolsGames` WRITE;
+/*!40000 ALTER TABLE `SchoolsGames` DISABLE KEYS */;
+/*!40000 ALTER TABLE `SchoolsGames` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `User`
 --
 
@@ -258,7 +314,7 @@ CREATE TABLE `User` (
   `created` datetime DEFAULT NULL,
   `lastUpdated` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -294,35 +350,6 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
-DROP TABLE IF EXISTS `Schools`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Schools` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `school_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
-DROP TABLE IF EXISTS `SchoolsGames`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `SchoolsGames` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `school_id` int(11) DEFAULT NULL,
-  `game_id` int(11) unsigned DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `school_id` (`school_id`),
-  KEY `game_id` (`game_id`),
-  FOREIGN KEY (`school_id`) REFERENCES `Schools` (`id`),
-  FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 --
 -- Dumping data for table `games`
 --
@@ -342,4 +369,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-01 11:30:51
+-- Dump completed on 2019-10-06 13:34:36
