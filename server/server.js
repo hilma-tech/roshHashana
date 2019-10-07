@@ -9,7 +9,7 @@ const express=require('express');
 var app = module.exports = loopback();
 app.use(express.json());
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/views'));
+app.set('views', path.join(__dirname, '../build'));
 require('./routes')(app);
 
 app.start = function() {
@@ -30,6 +30,8 @@ app.start = function() {
 
 boot(app, __dirname, function(err) {
   if (err) throw err;
+
+  app.use(express.static(__dirname + '../build'));	
     
   if (require.main === module){
 
