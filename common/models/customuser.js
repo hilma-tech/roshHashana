@@ -76,6 +76,22 @@ module.exports = function (CustomUser) {
 		});
 	});
 
+	CustomUser.authenticate = function (options, cb) {
+
+		//console.log("authenticate is launched?!");
+
+		const token = options && options.accessToken;
+        const userId = token && token.userId;
+        
+        if (!userId){
+            //console.log("No authentication");
+            return cb(null,{isAuthenticated:false});
+        }else{
+        	//console.log("Authenticated");
+        	return cb(null,{isAuthenticated:true});
+        }
+
+	}
 	CustomUser.getUsersList = function (callback) {
 
 		return CustomUser.find({}, function (errorrr, data) {
@@ -142,6 +158,19 @@ module.exports = function (CustomUser) {
 			});
 		});
 	};
+	CustomUser.remoteMethod(
+		'authenticate',
+		{
+			http: { verb: 'get'},
+			description: 'Confirm a user authentication',
+			accepts: [
+				{ arg: "options", type: "object", http: "optionsFromRequest" }
+			],
+			returns: { type: 'object',root:true }
+			
+		}
+	);
+
 	CustomUser.remoteMethod('getUsersList', {
 		http: {
 			verb: 'get'
