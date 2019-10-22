@@ -25,6 +25,7 @@
 
   Debug MySQL queries:                                 DEBUG=loopback:datasource node .
   Debug CustomUser model (login, authentication, etc): DEBUG=model:user node .
+  More info here: https://loopback.io/doc/en/lb3/Setting-debug-strings.html
          
        
 * Handling Users 

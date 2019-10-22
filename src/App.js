@@ -56,5 +56,5 @@ class App extends Component {
     }
 }
 
-//export default inject('TextStore')(observer(App));
+//export default inject('ExampleStore')(observer(App));
 export default App;

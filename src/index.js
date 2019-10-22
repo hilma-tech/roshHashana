@@ -13,15 +13,20 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { create } from 'jss';
 import rtl from 'jss-rtl';
 import { StylesProvider, jssPreset } from '@material-ui/styles';
+import { Provider } from 'mobx-react';
+import stores from './stores';
+
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
 
 library.add(fas)
 
 //ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
-<StylesProvider jss={jss}>
+<Provider {...stores}>
+	<StylesProvider jss={jss}>
         <App />
-</StylesProvider>
+	</StylesProvider>
+</Provider>
     , document.getElementById('root'));
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

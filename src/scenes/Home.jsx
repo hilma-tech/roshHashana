@@ -1,14 +1,19 @@
 import React from 'react';
+import { observer,inject } from 'mobx-react';
 
-export default function Home() {
+function Home(props) {
   return (
       <header className="App-header">
         <img src="favicon.ico" className="App-logo" alt="logo" />
         <p>
           Welcome to Carmel 6000's Proffesional Updated Main Boilerplate App
         </p>
+        <p>{props.ExampleStore.first} from ExampleStore</p>
         <a className="App-link" href="/admin" target="_blank" rel="noopener noreferrer">Access Dashboard</a>
         <a className="App-link" href="/samples" target="_blank" rel="noopener noreferrer">View Samples</a>
+
       </header>
   );
 }
+
+export default inject('ExampleStore')(observer(Home));
