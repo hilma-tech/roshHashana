@@ -8,21 +8,12 @@ var dsConfig = require('../datasources.json');
 module.exports = function(app) {
   var User = app.models.user;
 
-  //login page
-  app.get('/', function(req, res) {
-    var credentials = dsConfig.emailDs.transports[0].auth;
-    res.render('login', {
-      email: credentials.user,
-      password: credentials.pass
-    });
-  });
 
   //verified
   app.get('/verified', function(req, res) {
     res.render('verified');
   });
 
-  //log a user in
   app.post('/login', function(req, res) {
     User.login({
       email: req.body.email,
