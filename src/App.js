@@ -1,12 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
-import DashboardMain from "./modules/dashboard/dashboard-main";
 import Login from "./modules/auth/Login";
-import Home from './scenes/Home'
+import Home from './scenes/Home';
 import Samples from './modules/samples/Samples';
-import PrivateRoute from './modules/auth/PrivateRoute';
+import {PrivateRoute} from './modules/auth/PrivateRoute';
+import {HomeRoute} from './modules/auth/PrivateRoute';
+import loadable from '@loadable/component';
+
+const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
+const SimpleUserHome = loadable(() => import('./scenes/SimpleUserHome'));
 
 class App extends Component {
 
@@ -20,39 +24,25 @@ class App extends Component {
         
         this.isAuth=await Auth.isAuthenticated();
         this.setState({isAuth:this.isAuth});
-
-        
     }
 
     render() {
-        //console.log("hello mobx",this.props.ExampleStore.first); //an example to access mobx!
 
+        const homePages={SimpleUserHome};
         
-        if (!this.state.isAuth){
-            return(
-            <Router>
-                <div className="App">
-                    <Route exact path="/" component={Home} />                    
-                    <Route path="*" render={(props) => <Login {...props} />} />
-                </div>
-            </Router>
-            );
-        }
-
-        
-
         return (
+
+        <Suspense fallback={<div>Loading...</div>}>
           <Router>
             <div className="App">
-              <Route exact path="/" component={Home} />
-              <PrivateRoute path="/admin" component={DashboardMain} />
+              <HomeRoute exact path="/" component={Home} comps={homePages} />
+              <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} />
               <Route path="/login" render={(props) => <Login {...props} />} />
               <Route path="/samples" component={Samples} />         
             </div>
           </Router>
-
+          </Suspense>
         );
-
     }
 }
 

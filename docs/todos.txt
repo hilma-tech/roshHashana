@@ -4,15 +4,12 @@
 -- How to work with ImageUploader+other components
 -- Install IDM Module
 
-
-
-
 Todos
 ~~~~
-* Intergrate MobX
-* Integrate server+client for a single launch
+* Intergrate MobX [ok]
+* Integrate server+client for a single launch [ok]
 * Apply login/registration popups
-* Apply ElementsHandler
+* Apply ElementsHandler [ok]
 * Integrate notifications 
 * Overview auth.js
 
@@ -20,4 +17,80 @@ Todos
 	Image uploader
 	Notifications+Service worker
 
+--------------------------------------------------
 
+Separation between CustomUser, mixin 
+
+* CommonModels
+* auth/CarmelUser.js/json
+* Eliminate json mysql details
+* USE lb acl
+* USE lb relation
+* Use create table with template
+
+--Enhance Auth.authenticate (name should be login...), to accept username/email and password and other places as well...
+
+
+Modules as projects:
+--------------------
+* Dashboard [4]
+* Login,Registeration,Auth [2]
+* Files/Images/Audio Uploader [2]
+* Security+Performance [4]
+
+
+------------------------------------------------------------------------
+
+Table : files does not exist !!
+
+/routes/index.js -- delete app.get(/files/*)
+
+
+-----------------------------------------------------
+FilesHandler - 
+
+common/models/recordspermission.json
+common/models/recordspermission.js
+common/models/file.js (should be changed to basefile.js)
+common/models/file.json (should be changed to basefile.json)
+common/models/image.js (should be changed to baseimage.js)
+common/models/image.json (should be changed to baseimage.json)
+common/mixins/FilesHandler.js
+src/modules/dashboard/components/ImageUploader
+server/routes/index.js
+
+src/modules/fileshandler
+	server/models/basefile.js
+	server/models/basefile.json
+	server/models/baseimage.json
+	server/models/baseimage.js
+	server/routes/static-filter.js (server/routes/index.js)
+	server/mixins/FilesHandler.js
+	src/components/ImageUploader.js
+	
+src/modules/auth
+	auth.js
+	user.js
+	user.json
+	PrivateRoute.js
+----------------------------
+
+* Finish this version - test files handler, auth, routing 
+	don't forget login with username not email
+	don't forget category field
+	lock permissions!
+
+
+-----------------------------
+
+fileshandler/server/routes/index.js 
+	* Fix PermissionFilter imports and paths
+
+
+server/routes/index.js - apply restrictions on these requests...
+
+fileshandler/server/models/basefiles
+BaseFiles.downloadToServer -- this is open to anyone...
+
+
+futuer/index.js what is this one?

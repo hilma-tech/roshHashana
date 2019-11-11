@@ -1,0 +1,43 @@
+
+Uploading Images/Files to the system
+------------------------------
+
+
+1. Saving the image
+
+We are saving the image inside the save procedure of other models different than "image.js"
+
+The save process takes place into a form for a specific model (e.g: games)
+
+2.
+There is a mixin that launches everytime any request takes place on the server : mixin/FilesHandler.js
+
+This mixin's role is to detect if we have inside the data fields any field of type File 
+
+The field type file could be of three diferent types: Audio, Files, Images.
+
+3. If FilesHandler detects any of the three types, example to a data set:
+
+we want to save data set into model :Games
+{
+	gameName:"best game on earth",
+	numOfPlayers:4,
+	gameImage:{
+		type:"image" (this value is a const!),
+		src:"SDFJSDIFJSDFIJWEIFJEWIFJWEFIJEWIJWEFIWEJF (base 64 content for the image)",
+	},
+	anotherImage:{
+		type:"image" (this value is a const!),
+		src:"SDFJSDIFJSDFIJWEIFJEWIFJWEFIJEWIJWEFIWEJF (base 64 content for the image)",
+		category:"people"
+	}
+}
+
+If the type is Image, the fileHandler launches image save hook.
+common/models/image.js
+
+a. Additional entry will be added to Files/Images models with ownerId (current user id)
+
+b. The image will be saved into /public/images/CATEGORY/[IMAGE_ID].jpg/png/gif
+
+c. in the specific model (in our example it is games), only the relation will be saved, e.g: anotherImage:6

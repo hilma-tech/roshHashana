@@ -1,0 +1,39 @@
+{
+  "name": "Images",
+  "http": {"path": "Images"},
+  "base": "BaseImages",
+  "listViewWidget": "ImageGallery",
+  "crud": {
+    "metaFunctions": {},
+    "fields": {
+      "id": {
+        "type": "Number"
+      },
+      "title": {
+        "editable": "true",
+        "type": "String"
+      },
+      "created": {
+        "type": "datetimePicker"
+      },
+      "modified": {
+        "type": "datetimePicker",
+        "width": "160"
+      },
+      "category": {
+        "type": "enum",
+        "editable": "true",
+        "options": ["people","family","view","animals","boys","girls","icons","nature"]
+      },
+      "description": {
+        "type": "string",
+        "editable": "true"
+      },
+      "format": {
+        "type": "enum"
+      }
+    }
+  },
+  "properties": {},
+  "acls": []
+}

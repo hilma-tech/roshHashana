@@ -1,70 +1,32 @@
 {
   "_meta": {
     "sources": [
-      "loopback/common/models",
       "loopback/server/models",
+      "../src/modules/auth",
       "../common/models",
-      "./models"
+      "./models",
+      "../src/modules/fileshandler/server/models",
+      "../src/modules/auth/server/models"
     ],
     "mixins": [
       "loopback/common/mixins",
       "loopback/server/mixins",
       "../common/mixins",
-      "./mixins"
+      "./mixins",
+      "../src/modules/fileshandler/server/mixins"
     ]
   },
-  "User": {
-    "dataSource": "msql",
-    "options": {
-      "emailVerificationRequired": true
-    }
-  },
-  "CustomUser": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": true
-  },
-  "AccessToken": {
-    "dataSource": "msql",
-    "public": false
-  },
-  "ACL": {
-    "dataSource": "msql",
-    "public": false
-  },
-  "RoleMapping": {
-    "dataSource": "msql",
-    "public": true,
-    "options": {
-      "strictObjectIDCoercion": true
-    }
-  },
-  "Role": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": false
-  },
-  "Email": {
-    "dataSource": "myEmailDataSource"
-  },
-  "Games":{
-    "dataSource":"msql",
-    "public":true,
-    "expose":true
-  },
-  "Image":{
-    "dataSource":"msql",
-    "public":true,
-    "expose":true
-  },
-  "Files":{
-    "dataSource":"msql",
-    "public":true,
-    "expose":true
-  },
-  "RecordsPermissions": {
-    "dataSource": "msql",
-    "public": true,
-    "expose": false
-  }
+  "User": {"dataSource": "msql","options": {"emailVerificationRequired": true}},
+  "CustomUser": {"dataSource": "msql","public": true},
+  "AccessToken": {"dataSource": "msql","public": false},
+  "ACL": {"dataSource": "msql","public": false},
+  "RoleMapping": {"dataSource": "msql","public": true,"options": {"strictObjectIDCoercion": true}},
+  "Role": {"dataSource": "msql","public": true},
+  "Email": {"dataSource": "myEmailDataSource"},
+  "Games":{"dataSource":"msql","public":true},
+  "BaseImages":{"dataSource":"msql","public":true},
+  "BaseFiles":{"dataSource":"msql","public":true},
+  "Images":{"dataSource":"msql","public":true},
+  "Files":{"dataSource":"msql","public":true},
+  "RecordsPermissions": {"dataSource": "msql","public": true}
 }
