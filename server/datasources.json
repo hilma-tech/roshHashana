@@ -7,7 +7,7 @@
     "host": "localhost",
     "port": 3306,
     "database": "myproject",
-    "password": "z10mz10m",
+    "password": "****",
     "name": "msql",
     "user": "root",
     "connector": "mysql"
@@ -26,7 +26,7 @@
         },
         "auth": {
           "user": "videoscarmel@gmail.com",
-          "pass": "carmel!!2000"
+          "pass": "****"
         }
       }
     ]
