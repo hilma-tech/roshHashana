@@ -26,7 +26,7 @@ const AdminConfig = {
                         {
                             components: [
                                 {
-                                    builtIn: builtInTypes.TABLE,
+                                    builtIn: builtInTypes.DATA_FROM_SERVER.TABLE,
                                     props: {
                                         model: "customuser",
                                         pluralized: "CustomUsers"
@@ -51,7 +51,7 @@ const AdminConfig = {
                         {
                             components: [
                                 {
-                                    builtIn: builtInTypes.TABLE,
+                                    builtIn: builtInTypes.DATA_FROM_SERVER.TABLE,
                                     props: {
                                         model: "games",
                                         title:"games"
