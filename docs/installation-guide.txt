@@ -45,7 +45,7 @@ However, you cannot modify /src/modules/auth/server/models/CustomUser.js or Cust
 The system comes with three different roles as an example:
 * ADMIN: Every user that has SOME access to dashboard and administration options
 * SUPERADMIN: A single user that can do everything 
-* NOROLE: Temporary, should not be used...
+* SIMPLEUSER
 
 Each role should have a secret code so that it won't be exposed on the client side.
 Never check roles on the client side like this: "if userRole=='ADMIN' {} " or anything similar to this.

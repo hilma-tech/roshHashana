@@ -11,6 +11,7 @@ function Home(props) {
         <p>{props.ExampleStore.first} from ExampleStore</p>
         <a className="App-link" href="/admin" rel="noopener noreferrer">Access Dashboard</a>
         <a className="App-link" href="/samples" rel="noopener noreferrer">View Samples</a>
+        <a className="App-link" href="/login" rel="noopener noreferrer">Login</a>
 
       </header>
   );

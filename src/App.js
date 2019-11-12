@@ -1,6 +1,6 @@
 import React, { Component, Suspense } from 'react';
 import './App.scss';
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import Auth from "./modules/auth/Auth";
 import Login from "./modules/auth/Login";
 import Home from './scenes/Home';
@@ -33,14 +33,16 @@ class App extends Component {
         return (
 
         <Suspense fallback={<div>Loading...</div>}>
-          <Router>
-            <div className="App">
-              <HomeRoute exact path="/" component={Home} comps={homePages} />
-              <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} />
-              <Route path="/login" render={(props) => <Login {...props} />} />
-              <Route path="/samples" component={Samples} />         
-            </div>
-          </Router>
+            <Router>
+                <Switch>
+                    <div className="App">
+                      <HomeRoute exact path="/" component={Home} comps={homePages} />
+                      <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} />
+                      <Route path="/login" render={(props) => <Login {...props} />} />
+                      <Route path="/samples" component={Samples} />         
+                    </div>
+                </Switch>
+            </Router>
           </Suspense>
         );
     }
