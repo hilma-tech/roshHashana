@@ -7,13 +7,13 @@
         "routes": "server/routes",
         "mixins": "server/mixins",
         "models": "server/models",
-        "github":"https://github.com/carmel-6000/fileshandler"
+        "github": "https://github.com/carmel-6000/fileshandler"
       },
       {
         "name": "auth",
         "path": "../src/modules/auth",
         "models": "server/models",
-        "github":"https://github.com/carmel-6000/carmel-react-auth"
+        "github": "https://github.com/carmel-6000/carmel-react-auth"
       }
     ],
     "sources": [

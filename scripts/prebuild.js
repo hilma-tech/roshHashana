@@ -12,7 +12,7 @@ const path = require('path');
 	const loadModuleModels=(rPath,module,configObj)=>{
 
 		try{
-		console.log("predefined models paths",configObj._meta.sources);
+		console.log("loadModuleModels, Predefined models paths",configObj._meta.sources);
 		//"../src/modules/fileshandler/server/mixins"
 		let modelsPath=path.join(module.path,rPath);
 		console.log("modelsPath",modelsPath);
@@ -31,7 +31,7 @@ const path = require('path');
 
 
 		let allFiles=fs.readdirSync(path.join(__dirname,modelsPath),{encoding:'utf8'});
-		console.log("allFiles",allFiles);
+		//console.log("allFiles",allFiles);
 		
 		let modelJson={},override=false;
 
@@ -39,17 +39,17 @@ const path = require('path');
 			let file=allFiles[i];
 			
 			if (file.indexOf('.json')==-1){
-				console.log("%s Not a json, continue",file);
+				//console.log("%s Not a json, continue",file);
 				continue;
 			}	
 			//console.log("%s is a json",file);
 			let jsonFile=path.join(__dirname,modelsPath,file);
 			
-			console.log("\n\nTrying to parse model json ",jsonFile);
+			console.log("\nTrying to parse model json ",jsonFile);
 			modelJson = JSON.parse(fs.readFileSync(path.join(__dirname,modelsPath,file)));
 
 			//console.log("modelJson for file %s",file,modelJson);
-			console.log("Model name?",modelJson.name);
+			//console.log("Model name?",modelJson.name);
 			let isPublic=modelJson.isPublic && modelJson.isPublic===true;
 			let dataSource=modelJson.dataSource ? modelJson.dataSource : "msql";
 			
@@ -94,7 +94,7 @@ const path = require('path');
 
 	const loadModuleMixins=(rPath,module,configObj)=>{
 
-		console.log("predefined mixins",configObj._meta.mixins);
+		console.log("loadModuleMixins, Predefined mixins",configObj._meta.mixins);
 		//"../src/modules/fileshandler/server/mixins"
 		let mixinsPath=path.join(module.path,rPath);
 		console.log("mixinsPath",mixinsPath);
@@ -105,7 +105,7 @@ const path = require('path');
 			console.log("Rewriting model-config.json ...");
 			console.log("In order to load module you should re-run the project again with node .");
 
-			fs.writeFileSync(path.join(__dirname,'/../','model-config.json'),JSON.stringify(configObj,null,2));
+			fs.writeFileSync(path.join(__dirname,'/../server/','model-config.json'),JSON.stringify(configObj,null,2));
 				
 		}else{
 			console.log("Module (%s) mixins should be already loaded with boot",module.name);
@@ -136,14 +136,14 @@ const path = require('path');
 
 
 	let configObj={};
-
+	
 	try 
 	{
         
-        const configJson = await fs.readFileSync(path.join(__dirname,'/../server','model-config.json'),'utf-8');
+        const configJson = fs.readFileSync(path.join(__dirname,'/../server','model-config.json'),'utf-8');
+        
         configObj = JSON.parse(configJson);
-        console.log("configObj",configObj);
-        //process.exit();
+        
 
         //let keys = Object.keys(list);
 

@@ -6,8 +6,8 @@
   "msql": {
     "host": "localhost",
     "port": 3306,
-    "database": "*********",
-    "password": "*********",
+    "database": "myproject",
+    "password": "z10mz10m",
     "name": "msql",
     "user": "root",
     "connector": "mysql"
