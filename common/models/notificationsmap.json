@@ -43,7 +43,6 @@
   "options": {
     "idInjection": false,
     "mysql": {
-      "schema": "myproject",
       "table": "NotificationsMap"
     },
     "relations": {

@@ -6,23 +6,19 @@
         "path": "../src/modules/fileshandler",
         "routes": "server/routes",
         "mixins": "server/mixins",
-        "models": "server/models",
-        "github":"https://github.com/carmel-6000/fileshandler"
+        "models": "server/models"
       },
       {
         "name": "auth",
         "path": "../src/modules/auth",
-        "models": "server/models",
-        "github":"https://github.com/carmel-6000/carmel-react-auth"
+        "models": "server/models"
       }
     ],
     "sources": [
       "loopback/server/models",
       "../src/modules/auth",
       "../common/models",
-      "./models",
-      "../src/modules/fileshandler/server/models",
-      "../src/modules/auth/server/models"
+      "./models"
     ],
     "mixins": [
       "loopback/common/mixins",
@@ -60,28 +56,5 @@
   "Files": {
     "dataSource": "msql",
     "public": true
-  },
-  "BaseFiles": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "BaseImages": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "RecordsPermissions": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "ACL": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "RoleMapping": {
-    "dataSource": "msql"
-  },
-  "Role": {
-    "public": false,
-    "dataSource": "msql"
   }
 }

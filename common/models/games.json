@@ -40,7 +40,6 @@
   "options": {
     "idInjection": false,
     "mysql": {
-      "schema": "myproject",
       "table": "games"
     }
   },

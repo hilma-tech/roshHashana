@@ -31,7 +31,6 @@ class App extends Component {
         const homePages={SimpleUserHome};
         
         return (
-
         <Suspense fallback={<div>Loading...</div>}>
             <Router>
                 <Switch>

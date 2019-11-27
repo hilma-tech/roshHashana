@@ -12,6 +12,11 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../build'));
 require('./routes')(app);
 
+//require('./../src/modules/fileshandler/server/routes')(app);
+
+require('../scripts/prebuild');
+
+
 app.start = function() {
   // start the web server
   return app.listen(function() {

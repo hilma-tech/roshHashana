@@ -1,8 +1,5 @@
 {
   "name": "CustomUser",
-  "mixins": {
-    "FilesHandler": true
-  },
   "pathLink": "CustomUsers",
   "base": "User",
   "idInjection": true,
@@ -34,16 +31,25 @@
       }
     }
   },
-  "properties": {},
+  "properties": {
+
+    "mainImageId":"number"
+
+  },
   "validations": [],
+  
   "relations": {
     "accessTokens": {
       "type": "hasMany",
       "model": "AccessToken",
       "foreignKey": "userId",
-      "options": {
-        "disableInclude": true
-      }
+      "options": {"disableInclude": true}
+    },
+
+    "mainImage":{
+        "type":"belongsTo",
+        "model":"Images",
+        "foreignKey":"mainImageId"
     }
   },
   "acls": [

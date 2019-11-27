@@ -27,7 +27,6 @@
   "options": {
     "idInjection": false,
     "mysql": {
-      "schema": "myproject",
       "table": "Notification"
     },
     "relations": {

@@ -1,6 +1,6 @@
 {
   "name": "pumba",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "main": "server/server.js",
   "proxy": "http://127.0.0.1:8080",
   "private": true,
