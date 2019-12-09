@@ -8,17 +8,17 @@ module.exports = async(app)=> {
 	
 	const loadModuleRoutes=(rPath,module)=>{
 		
-		console.log("loadModuleRoutes is launched with args rPath",rPath);
-		console.log("loadModuleRoutes is launched with args module",module);
+//		console.log("loadModuleRoutes is launched with args rPath",rPath);
+		//console.log("loadModuleRoutes is launched with args module",module);
 
 		let routesPath=path.join(__dirname,'../',module.path,rPath);
-		console.log("routesPath",routesPath);
+		//console.log("routesPath",routesPath);
 
 		if (!fs.existsSync(path.join(routesPath,'index.js'))){
 			console.log("Could not find index.js inside routes path (%s), aborting loadModuleRoutes",path.join(routesPath,'index.js'));
 			return;
 		}
-		console.log("Requiring module routes");
+		//console.log("Requiring module routes");
 		require(routesPath)(app);
 	}
 

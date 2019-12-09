@@ -15,6 +15,7 @@
         "models": "server/models",
         "github": "https://github.com/carmel-6000/carmel-react-auth"
       }
+
     ],
     "sources": [
       "loopback/server/models",

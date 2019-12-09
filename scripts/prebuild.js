@@ -1,6 +1,6 @@
 'use strict';
 
-console.log("prebuild is launched");
+//console.log("prebuild is launched");
 
 //modules loader
 const fs=require('fs');
@@ -12,21 +12,21 @@ const path = require('path');
 	const loadModuleModels=(rPath,module,configObj)=>{
 
 		try{
-		console.log("loadModuleModels, Predefined models paths",configObj._meta.sources);
+		//console.log("loadModuleModels, Predefined models paths",configObj._meta.sources);
 		//"../src/modules/fileshandler/server/mixins"
 		let modelsPath=path.join(module.path,rPath);
-		console.log("modelsPath",modelsPath);
+		//console.log("modelsPath",modelsPath);
 
 		if (configObj._meta.sources.indexOf(modelsPath)==-1){
 			configObj._meta.sources.push(modelsPath);
 			
-			console.log("Rewriting model-config.json ...");
-			console.log("In order to load module you should re-run the project again with node .");
+			//console.log("Rewriting model-config.json ...");
+			//console.log("In order to load module you should re-run the project again with node .");
 
 			fs.writeFileSync(path.join(__dirname,'/../server/','model-config.json'),JSON.stringify(configObj,null,2));
 				
 		}else{
-			console.log("Module (%s) models should be already loaded with boot",module.name);
+			//console.log("Module (%s) models should be already loaded with boot",module.name);
 		}
 
 
@@ -45,7 +45,7 @@ const path = require('path');
 			//console.log("%s is a json",file);
 			let jsonFile=path.join(__dirname,modelsPath,file);
 			
-			console.log("\nTrying to parse model json ",jsonFile);
+			//console.log("\nTrying to parse model json ",jsonFile);
 			modelJson = JSON.parse(fs.readFileSync(path.join(__dirname,modelsPath,file)));
 
 			//console.log("modelJson for file %s",file,modelJson);
@@ -62,7 +62,7 @@ const path = require('path');
 			if (configObj[modelJson.name] && configObj[modelJson.name].public===isPublic
 				&& configObj[modelJson.name].dataSource==dataSource){
 
-				console.log("model-config already has model (%s) set up with .public",modelJson.name);
+				//console.log("model-config already has model (%s) set up with .public",modelJson.name);
 			
 			}else{
 				console.log("Adding new entry to model-config models");
@@ -94,21 +94,21 @@ const path = require('path');
 
 	const loadModuleMixins=(rPath,module,configObj)=>{
 
-		console.log("loadModuleMixins, Predefined mixins",configObj._meta.mixins);
+		//console.log("loadModuleMixins, Predefined mixins",configObj._meta.mixins);
 		//"../src/modules/fileshandler/server/mixins"
 		let mixinsPath=path.join(module.path,rPath);
-		console.log("mixinsPath",mixinsPath);
+		//console.log("mixinsPath",mixinsPath);
 
 		if (configObj._meta.mixins.indexOf(mixinsPath)==-1){
 			configObj._meta.mixins.push(mixinsPath);
 			
-			console.log("Rewriting model-config.json ...");
-			console.log("In order to load module you should re-run the project again with node .");
+			//console.log("Rewriting model-config.json ...");
+			//console.log("In order to load module you should re-run the project again with node .");
 
 			fs.writeFileSync(path.join(__dirname,'/../server/','model-config.json'),JSON.stringify(configObj,null,2));
 				
 		}else{
-			console.log("Module (%s) mixins should be already loaded with boot",module.name);
+			//console.log("Module (%s) mixins should be already loaded with boot",module.name);
 		}
 		
 
@@ -120,17 +120,17 @@ const path = require('path');
 
 	const loadModuleRoutes=(rPath,module)=>{
 		
-		console.log("loadModuleRoutes is launched with args rPath",rPath);
-		console.log("loadModuleRoutes is launched with args module",module);
+		//console.log("loadModuleRoutes is launched with args rPath",rPath);
+		//console.log("loadModuleRoutes is launched with args module",module);
 
 		let routesPath=path.join(__dirname,'../',module.path,rPath);
-		console.log("routesPath",routesPath);
+		//console.log("routesPath",routesPath);
 
 		if (!fs.existsSync(path.join(routesPath,'index.js'))){
 			console.log("Could not find index.js inside routes path (%s), aborting loadModuleRoutes",path.join(routesPath,'index.js'));
 			return;
 		}
-		console.log("Requiring module routes");
+		//console.log("Requiring module routes");
 		require(routesPath)(app);
 	}
 
@@ -158,7 +158,7 @@ const path = require('path');
         	let module=modules[i];
         	let keys=Object.keys(module);
         	for (let ii=0;ii<keys.length;ii++){
-        		console.log("module (%s) KEYS["+ii+"]:%s",module.name, keys[ii],module[keys[ii]]);
+        		//console.log("module (%s) KEYS["+ii+"]:%s",module.name, keys[ii],module[keys[ii]]);
         		switch (keys[ii]){
         			case 'routes':
         				//loadModuleRoutes(module[keys[ii]],module);
