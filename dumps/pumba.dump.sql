@@ -96,7 +96,7 @@ CREATE TABLE `CustomUser` (
 
 LOCK TABLES `CustomUser` WRITE;
 /*!40000 ALTER TABLE `CustomUser` DISABLE KEYS */;
-INSERT INTO `CustomUser` VALUES (1,NULL,'admin','$2a$10$wSFoP.Hn.Ol2HE4MaTmne.fU3YlUYHRIDPDRFsDwaHZHvI9XAdcZO',NULL,'eran.gep@gmail.com',1,NULL,NULL),(3,NULL,'batz','$2a$10$sUh3o7.rJ4qTsom3TqLmC.BT3Y4Sn4S.CYlWB69k8bCc8fNB1pCqa',NULL,'batz@carmel6000.amitnet.org',1,NULL,8);
+INSERT INTO `CustomUser` VALUES (1,NULL,'admin','$2a$10$wSFoP.Hn.Ol2HE4MaTmne.fU3YlUYHRIDPDRFsDwaHZHvI9XAdcZO',NULL,'admin@carmel6000.amitnet.org',1,NULL,NULL),(3,NULL,'batz','$2a$10$sUh3o7.rJ4qTsom3TqLmC.BT3Y4Sn4S.CYlWB69k8bCc8fNB1pCqa',NULL,'batz@carmel6000.amitnet.org',1,NULL,8);
 /*!40000 ALTER TABLE `CustomUser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -425,4 +425,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-10 10:53:15
+-- Dump completed on 2019-12-10 10:57:31
