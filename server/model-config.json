@@ -14,8 +14,19 @@
         "path": "../src/modules/auth",
         "models": "server/models",
         "github": "https://github.com/carmel-6000/carmel-react-auth"
+      },
+      {
+        "name": "samples",
+        "path": "../src/modules/samples",
+        "github": "https://github.com/carmel-6000/pumbasamples",
+        "enabled": false
+      },
+      {
+        "name": "scripts",
+        "path": "../src/modules/scripts",
+        "github": "https://github.com/carmel-6000/scripts",
+        "enabled": false
       }
-
     ],
     "sources": [
       "loopback/server/models",
