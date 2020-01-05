@@ -20,6 +20,18 @@
         "path": "../src/modules/dashboard",
         "github": "https://github.com/carmel-6000/carmel-react-dashboard",
         "enabled": true
+      },
+      {	
+        "name": "samples",
+        "path": "../src/modules/samples",
+        "github": "https://github.com/carmel-6000/pumbasamples",
+        "enabled": false
+      },
+      {
+        "name": "scripts",
+        "path": "../src/modules/scripts",
+        "github": "https://github.com/carmel-6000/scripts",
+        "enabled": false
       }
     ],
     "sources": [
