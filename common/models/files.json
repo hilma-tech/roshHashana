@@ -42,5 +42,13 @@
         "foreignKey": "owner"
       }
     },
-    "properties": {}
+    "properties": {},
+    "acls": [
+      {
+        "principalType": "ROLE",
+        "principalId": "$authenticated",
+        "permission": "ALLOW",
+        "property": "create"
+      }
+    ]
   }

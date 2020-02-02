@@ -15,7 +15,6 @@
         "models": "server/models",
         "github": "https://github.com/carmel-6000/carmel-react-auth"
       }
-
     ],
     "sources": [
       "loopback/server/models",
@@ -71,7 +70,7 @@
     "dataSource": "msql"
   },
   "RecordsPermissions": {
-    "public": false,
+    "public": true,
     "dataSource": "msql"
   },
   "ACL": {
@@ -82,6 +81,14 @@
     "dataSource": "msql"
   },
   "Role": {
+    "public": false,
+    "dataSource": "msql"
+  },
+  "BaseVideos": {
+    "public": false,
+    "dataSource": "msql"
+  },
+  "BaseAudios": {
     "public": false,
     "dataSource": "msql"
   }
