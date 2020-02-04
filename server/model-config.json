@@ -21,12 +21,6 @@
         "models": "server/models",
         "github": "https://github.com/carmel-6000/carmel-react-auth"
       },
-      {
-        "name": "dashboard",
-        "path": "../src/modules/dashboard",
-        "github": "https://github.com/carmel-6000/carmel-react-dashboard",
-        "enabled": true
-      },
       {	
         "name": "samples",
         "path": "../src/modules/samples",
