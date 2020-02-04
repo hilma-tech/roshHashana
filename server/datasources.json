@@ -4,12 +4,12 @@
     "connector": "memory"
   },
   "msql": {
-    "host": "localhost",
+    "host": "mysql",
     "port": 3306,
-    "database": "myproject",
+    "database": "newproj",
     "password": "z10mz10m",
     "name": "msql",
-    "user": "root",
+    "user": "myuser",
     "connector": "mysql"
   },
   "myEmailDataSource": {
