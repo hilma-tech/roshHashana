@@ -39,7 +39,7 @@
         "path":"../src/modules/tools",
         "github": "https://github.com/carmel-6000/carmel-tools",
         "enabled":true
-      },
+      }
     ],
     "sources": [
       "loopback/server/models",
