@@ -1,3 +1,3 @@
 'use strict';
 
-module.export=function(Images){}
+module.exports=function(Images){}
