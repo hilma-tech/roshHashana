@@ -19,20 +19,27 @@
         "name": "auth",
         "path": "../src/modules/auth",
         "models": "server/models",
-        "github": "https://github.com/carmel-6000/carmel-react-auth"
+        "github": "https://github.com/carmel-6000/carmel-react-auth",
+        "enabled":true
       },
       {	
         "name": "samples",
         "path": "../src/modules/samples",
         "github": "https://github.com/carmel-6000/pumbasamples",
-        "enabled": false
+        "enabled": true
       },
       {
         "name": "scripts",
         "path": "../src/modules/scripts",
         "github": "https://github.com/carmel-6000/scripts",
-        "enabled": false
-      }
+        "enabled": true
+      },
+      {
+        "name":"tools",
+        "path":"../src/modules/tools",
+        "github": "https://github.com/carmel-6000/carmel-tools",
+        "enabled":true
+      },
     ],
     "sources": [
       "loopback/server/models",
