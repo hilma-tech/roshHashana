@@ -1,44 +1,44 @@
 {
   "name": "Games",
-  "mixins":{
-      "FilesHandler":true
+  "mixins": {
+    "FilesHandler": true
   },
   "crud": {
-  	"tableActions":{
-  		"addNewRow":true,
-  		"deleteRow":true,
-  		"editRow":true
-  	},
+    "tableActions": {
+      "addNewRow": true,
+      "deleteRow": true,
+      "editRow": true
+    },
     "fields": {
-	      "title":{
-	      	"title":"title",
-	      	"displayInForm":{
-	      		"type":"text",
-	      		"margin": "normal"
-	      	}
-	      },
-	      "played_num":{
-	      	"title":"played_num",
-	      	"displayInForm":{
-	      		"type":"number",
-	      		"margin": "normal"
-	      	}
-	      },
-	      "description":{
-	      	"title":"description",
-	      	"displayInForm":{
-	      		"margin": "normal",
-	      		"type":"text"
-	      	}
-	      },
-	      "school_name":{
-	      	"title":"school name",
-	      	"displayInForm":{
-	      		"margin": "normal",
-	      		"type":"text"
-	      	}
-	      }
+      "title": {
+        "title": "title",
+        "displayInForm": {
+          "type": "text",
+          "margin": "normal"
+        }
+      },
+      "played_num": {
+        "title": "played_num",
+        "displayInForm": {
+          "type": "number",
+          "margin": "normal"
+        }
+      },
+      "description": {
+        "title": "description",
+        "displayInForm": {
+          "margin": "normal",
+          "type": "text"
+        }
+      },
+      "school_name": {
+        "title": "school name",
+        "displayInForm": {
+          "margin": "normal",
+          "type": "text"
+        }
       }
+    }
   },
   "options": {
     "idInjection": false,
@@ -47,12 +47,24 @@
     }
   },
   "relations": {
-      "User": {
-        "model": "CustomUser",
-        "type": "belongsTo",
-        "foreignKey": "ownerId"
-      }
-   },
+    "User": {
+      "model": "CustomUser",
+      "type": "belongsTo",
+      "foreignKey": "ownerId"
+    },
+    "images": {
+      "model": "Images",
+      "type": "hasMany",
+      "foreignKey": "gameId",
+      "through": "GamesImages",
+      "keyThrough": "imageId"
+    },
+    "coverImage": {
+      "model": "Images",
+      "type": "belongsTo",
+      "foreignKey": "imgId"
+    }
+  },
   "properties": {
     "id": {
       "type": "Number",

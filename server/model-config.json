@@ -53,6 +53,10 @@
     "dataSource": "msql",
     "public": true
   },
+  "GamesImages": {
+    "dataSource": "msql",
+    "public": true
+  },
   "Images": {
     "dataSource": "msql",
     "public": true
