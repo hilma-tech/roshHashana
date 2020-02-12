@@ -1,8 +1,10 @@
 'use strict';
 
 //Modules auto loader, prebuild process (there's also a post build process on boot/modules-loader.js)
+
 require('../scripts/prebuild');
 
+const cors = require('cors');
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var path=require('path');
@@ -10,6 +12,8 @@ const express=require('express');
 
 var app = module.exports = loopback();
 app.use(express.json());
+app.use(cors());
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../build'));
 require('./routes')(app);
@@ -33,7 +37,7 @@ app.start = function() {
 boot(app, __dirname, function(err) {
   if (err) throw err;
 
-  app.use(express.static(__dirname + '../build'));	
+  app.use(express.static(__dirname + '../build'));  
     
   if (require.main === module){
 

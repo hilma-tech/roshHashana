@@ -7,13 +7,50 @@
         "routes": "server/routes",
         "mixins": "server/mixins",
         "models": "server/models",
-        "github": "https://github.com/carmel-6000/fileshandler"
+        "github": "https://github.com/carmel-6000/files-handler",
+        "fetch-version": "latest",
+        "current-version": "1.0.0"
+      },
+      {
+        "name": "dashboard",
+        "path": "../src/modules/dashboard",
+        "github": "https://github.com/carmel-6000/newdashboard",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": true
       },
       {
         "name": "auth",
         "path": "../src/modules/auth",
         "models": "server/models",
-        "github": "https://github.com/carmel-6000/carmel-react-auth"
+        "github": "https://github.com/carmel-6000/carmel-react-auth",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": true
+      },
+      {
+        "name": "scripts",
+        "path": "../src/modules/scripts",
+        "github": "https://github.com/carmel-6000/scripts",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": true
+      },
+      {
+        "name": "tools",
+        "path": "../src/modules/tools",
+        "github": "https://github.com/carmel-6000/carmel-tools",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": true
+      },
+      {
+        "name": "samples",
+        "path": "../src/modules/samples",
+        "github": "https://github.com/carmel-6000/pumbasamples",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": false
       }
     ],
     "sources": [
@@ -88,11 +125,11 @@
     "public": false,
     "dataSource": "msql"
   },
-  "BaseVideos": {
+  "BaseAudios": {
     "public": false,
     "dataSource": "msql"
   },
-  "BaseAudios": {
+  "BaseVideos": {
     "public": false,
     "dataSource": "msql"
   }
