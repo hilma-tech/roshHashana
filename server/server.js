@@ -16,7 +16,7 @@ app.use(cors());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../build'));
-require('./routes')(app);
+// require('./routes')(app);
 
 app.start = function() {
   // start the web server

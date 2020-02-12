@@ -4,12 +4,12 @@
     "connector": "memory"
   },
   "msql": {
-    "host": "mysql",
+    "host": "localhost",
     "port": 3306,
     "database": "pumba",
     "password": "z10mz10m",
     "name": "msql",
-    "user": "myuser",
+    "user": "root",
     "connector": "mysql"
   },
   "myEmailDataSource": {
