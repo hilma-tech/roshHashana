@@ -1,0 +1,10 @@
+{
+  "modulesList": [
+    "auth",
+    "scripts",
+    "tools",
+    "samples",
+    "supermodel"
+  ],
+  "auth": {}
+}

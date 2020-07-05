@@ -1,0 +1,15 @@
+[submodule "src/modules/scripts"]
+	path = src/modules/scripts
+	url = https://github.com/carmel-6000/scripts
+[submodule "src/modules/tools"]
+	path = src/modules/tools
+	url = https://github.com/carmel-6000/carmel-tools
+[submodule "src/modules/auth"]
+	path = src/modules/auth
+	url = https://github.com/carmel-6000/carmel-react-auth
+[submodule "src/modules/samples"]
+	path = src/modules/samples
+	url = https://github.com/carmel-6000/pumbasamples
+[submodule "src/modules/supermodel"]
+	path = src/modules/supermodel
+	url = https://github.com/carmel-6000/supermodel

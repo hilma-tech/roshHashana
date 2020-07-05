@@ -11,7 +11,7 @@ import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 
 
-const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
+// const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/SimpleUserHome'));
 
 class App extends Component {
@@ -38,7 +38,7 @@ class App extends Component {
                 <Switch>
                     <div className="App">
                       <HomeRoute exact path="/" component={Home} comps={homePages} />
-                      <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} />
+                      {/* <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} /> */}
                       <Route path="/reset-password" component={ResetPassword}/>
                       <Route path="/login" render={(props) => <Login {...props} />} />
                       <Route path="/samples" component={Samples} />         

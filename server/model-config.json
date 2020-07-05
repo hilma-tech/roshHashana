@@ -2,24 +2,6 @@
   "_meta": {
     "modules": [
       {
-        "name": "fileshandler",
-        "path": "../src/modules/fileshandler",
-        "routes": "server/routes",
-        "mixins": "server/mixins",
-        "models": "server/models",
-        "github": "https://github.com/carmel-6000/files-handler",
-        "fetch-version": "latest",
-        "current-version": "1.0.0"
-      },
-      {
-        "name": "dashboard",
-        "path": "../src/modules/dashboard",
-        "github": "https://github.com/carmel-6000/newdashboard",
-        "fetch-version": "latest",
-        "current-version": "1.0.0",
-        "enabled": true
-      },
-      {
         "name": "auth",
         "path": "../src/modules/auth",
         "models": "server/models",
@@ -40,6 +22,15 @@
         "name": "tools",
         "path": "../src/modules/tools",
         "github": "https://github.com/carmel-6000/carmel-tools",
+        "fetch-version": "latest",
+        "current-version": "1.0.0",
+        "enabled": true
+      },
+      {
+        "name": "supermodel",
+        "path": "../src/modules/supermodel",
+        "github": "https://github.com/carmel-6000/supermodel",
+        "mixins": "server/mixins",
         "fetch-version": "latest",
         "current-version": "1.0.0",
         "enabled": true
@@ -66,7 +57,8 @@
       "loopback/server/mixins",
       "../common/mixins",
       "./mixins",
-      "../src/modules/fileshandler/server/mixins"
+      "../src/modules/fileshandler/server/mixins",
+      "../src/modules/supermodel/server/mixins"
     ]
   },
   "User": {
@@ -90,30 +82,6 @@
     "dataSource": "msql",
     "public": true
   },
-  "GamesImages": {
-    "dataSource": "msql",
-    "public": true
-  },
-  "Images": {
-    "dataSource": "msql",
-    "public": true
-  },
-  "Files": {
-    "dataSource": "msql",
-    "public": true
-  },
-  "BaseFiles": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "BaseImages": {
-    "public": false,
-    "dataSource": "msql"
-  },
-  "RecordsPermissions": {
-    "public": true,
-    "dataSource": "msql"
-  },
   "ACL": {
     "public": false,
     "dataSource": "msql"
@@ -125,11 +93,11 @@
     "public": false,
     "dataSource": "msql"
   },
-  "BaseAudios": {
+  "AccessLogger": {
     "public": false,
     "dataSource": "msql"
   },
-  "BaseVideos": {
+  "Stop": {
     "public": false,
     "dataSource": "msql"
   }

@@ -1,8 +1,5 @@
 {
   "name": "Games",
-  "mixins": {
-    "FilesHandler": true
-  },
   "crud": {
     "tableActions": {
       "addNewRow": true,

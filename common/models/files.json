@@ -1,7 +1,6 @@
 {
     "name": "Files",
     "http":{"path": "Files"},
-    "base": "BaseFiles",
     "pathLink" : "Files",
     "listViewWidget":"FileDisplayer",
     "crud": {

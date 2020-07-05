@@ -1,8 +1,5 @@
 {
     "name": "GamesImages",
-    "mixins":{
-        "FilesHandler":true
-    },
     "options": {
       "idInjection": false,
       "mysql": {
