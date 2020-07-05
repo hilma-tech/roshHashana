@@ -9,7 +9,8 @@ import {PrivateRoute} from './modules/auth/PrivateRoute';
 import {HomeRoute} from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
-
+import RegisterIsolator from "./scenes/RegisterIsolator";
+import RegisterPoliceman from "./scenes/RegisterPoliceman";
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/SimpleUserHome'));
@@ -38,10 +39,8 @@ class App extends Component {
                 <Switch>
                     <div className="App">
                       <HomeRoute exact path="/" component={Home} comps={homePages} />
-                      {/* <PrivateRoute path="/admin" compName='DashboardMain' component={DashboardMain} /> */}
-                      <Route path="/reset-password" component={ResetPassword}/>
-                      <Route path="/login" render={(props) => <Login {...props} />} />
-                      <Route path="/samples" component={Samples} />         
+                      <Route path="/RegisterIsolator" component={RegisterIsolator}/>
+                      <Route path="/RegisterPoliceman" component={RegisterPoliceman}/>
                     </div>
                 </Switch>
             </Router>

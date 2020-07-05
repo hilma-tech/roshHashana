@@ -4,15 +4,11 @@ import { observer,inject } from 'mobx-react';
 function Home(props) {
   return (
       <header className="App-header">
-        <img src="favicon.ico" className="App-logo" alt="logo" />
         <p>
-          Welcome to Carmel 6000's Proffesional Updated Main Boilerplate App
+         מערכת להתאמת בעל תוקע לאנשים אשר מבודדים ואינם יכולים ללכת לשמוע תקיעת שופר
         </p>
-        <p>{props.ExampleStore.first} from ExampleStore</p>
-        <a className="App-link" href="/admin" rel="noopener noreferrer">Access Dashboard</a>
-        <a className="App-link" href="/samples" rel="noopener noreferrer">View Samples</a>
-        <a className="App-link" href="/login" rel="noopener noreferrer">Login</a>
-
+        <a className="App-link" href="/RegisterIsolator" rel="noopener noreferrer">הרשם כבעל תוקע</a>
+        <a className="App-link" href="/RegisterPoliceman" rel="noopener noreferrer">הרשם כמבודד</a>
       </header>
   );
 }
