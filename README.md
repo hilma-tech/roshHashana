@@ -1,3 +1,28 @@
+1. $ git clone  https://github.com/hilma-tech/roshHashana.git
+
+2.   $ git submodule update --init --recursive
+  (you need auth,samples,scripts,supermodel,tools)
+
+3. In MYPROJECT run
+      $ ./src/modules/scripts/help.sh
+      $ npm run generate-config 
+
+4. Open new file - 
+    Name - .env
+    Write inside - REACT_APP_DOMAIN = "REACT_APP_DOMAIN"
+
+5. Arrange the datasources
+
+6. Create database roshHashana
+
+7. in mysql create new user and update the user's permissions only to roshHashana database:
+    CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+    GRANT ALL Privileges ON roshHashana.* TO 'newuser'@'localhost' WITH GRANT OPTION;
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
