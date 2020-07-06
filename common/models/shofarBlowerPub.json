@@ -92,7 +92,7 @@
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "volunteeringStartTime",
+                "columnName": "startTime",
                 "dataType": "datetime",
                 "dataLength": null,
                 "dataPrecision": null,
