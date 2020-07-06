@@ -7,8 +7,8 @@ function Home(props) {
         <p>
          מערכת להתאמת בעל תוקע לאנשים אשר מבודדים ואינם יכולים ללכת לשמוע תקיעת שופר
         </p>
-        <a className="App-link" href="/RegisterIsolator" rel="noopener noreferrer">הרשם כבעל תוקע</a>
-        <a className="App-link" href="/RegisterPoliceman" rel="noopener noreferrer">הרשם כמבודד</a>
+        <a className="App-link" href="/RegisterIsolator" rel="noopener noreferrer">הרשמה של מבודד</a>
+        <a className="App-link" href="/RegisterShofar" rel="noopener noreferrer">הרשם כבעל תוקע</a>
       </header>
   );
 }
