@@ -97,8 +97,20 @@
     "public": false,
     "dataSource": "msql"
   },
+  "shofarBlower": {
+    "public": true,
+    "dataSource": "msql"
+  },
+  "isolated": {
+    "public": true,
+    "dataSource": "msql"
+  },
   "Stop": {
     "public": false,
+    "dataSource": "msql"
+  },
+  "shofarBlowerPub": {
+    "public": true,
     "dataSource": "msql"
   }
 }

@@ -474,6 +474,33 @@ LOCK TABLES `shofar_blower` WRITE;
 /*!40000 ALTER TABLE `shofar_blower` DISABLE KEYS */;
 /*!40000 ALTER TABLE `shofar_blower` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `shofar_blower_pub`
+--
+
+DROP TABLE IF EXISTS `shofar_blower_pub`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shofar_blower_pub` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `comments` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `startTime` date NOT NULL,
+  `shofarBlowerId` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `shofar_blower_pub`
+--
+
+LOCK TABLES `shofar_blower_pub` WRITE;
+/*!40000 ALTER TABLE `shofar_blower_pub` DISABLE KEYS */;
+/*!40000 ALTER TABLE `shofar_blower_pub` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -484,4 +511,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-05 16:16:29
+-- Dump completed on 2020-07-06 12:27:58

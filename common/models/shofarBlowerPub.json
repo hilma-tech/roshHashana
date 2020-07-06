@@ -1,5 +1,5 @@
 {
-    "name": "shofarBlower",
+    "name": "shofarBlowerPub",
     "crud": {
         "tableActions": {
             "addNewRow": true,
@@ -12,18 +12,13 @@
         "idInjection": false,
         "mysql": {
             "schema": "roshHashana",
-            "table": "shofar_blower"
+            "table": "shofar_blower_pub"
         }
     },
     "relations": {
-        "shofarIsolated": {
-            "model": "isolated",
-            "type": "hasMany",
-            "foreignKey": "shofarBlowerId"
-        },
         "shofarPublic": {
-            "model": "shofarBlowerPub",
-            "type": "hasMany",
+            "model": "shofarBlower",
+            "type": "belongsTo",
             "foreignKey": "shofarBlowerId"
         }
     },
@@ -42,21 +37,6 @@
                 "dataLength": null,
                 "dataPrecision": 10,
                 "dataScale": 0,
-                "nullable": "N"
-            }
-        },
-        "firstName": {
-            "type": "String",
-            "required": true,
-            "length": 255,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "firstName",
-                "dataType": "varchar",
-                "dataLength": 255,
-                "dataPrecision": null,
-                "dataScale": null,
                 "nullable": "N"
             }
         },
@@ -90,21 +70,6 @@
                 "nullable": "Y"
             }
         },
-        "appartment": {
-            "type": "String",
-            "required": false,
-            "length": 50,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "appartment",
-                "dataType": "varchar",
-                "dataLength": 50,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
         "comments": {
             "type": "String",
             "required": false,
@@ -120,7 +85,7 @@
                 "nullable": "Y"
             }
         },
-        "volunteeringStartTime": {
+        "startTime": {
             "type": "Date",
             "required": true,
             "length": null,
@@ -135,19 +100,19 @@
                 "nullable": "N"
             }
         },
-        "volunteeringEndTime": {
-            "type": "Date",
-            "required": true,
-            "length": null,
+        "shofarBlowerId": {
+            "type": "Number",
+            "required": false,
+            "length": 255,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "volunteeringEndTime",
-                "dataType": "datetime",
-                "dataLength": null,
+                "columnName": "shofarBlowerId",
+                "dataType": "int",
+                "dataLength": 255,
                 "dataPrecision": null,
                 "dataScale": null,
-                "nullable": "N"
+                "nullable": "Y"
             }
         }
     },
@@ -157,12 +122,6 @@
             "principalId": "$everyone",
             "permission": "DENY",
             "accessType": "*"
-        },
-        {
-            "principalType": "ROLE",
-            "principalId": "$everyone",
-            "permission": "ALLOW",
-            "property": "createNewShofarBlower"
         }
     ]
 }
