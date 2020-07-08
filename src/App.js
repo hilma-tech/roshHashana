@@ -11,7 +11,7 @@ import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 import RegisterIsolator from "./scenes/RegisterIsolator";
 import RegisterShofar from "./scenes/RegisterShofar";
-
+import Maps from "./scenes/maps/map.js"
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/SimpleUserHome'));
 
@@ -41,6 +41,7 @@ class App extends Component {
                       <HomeRoute exact path="/" component={Home} comps={homePages} />
                       <Route path="/RegisterIsolator" component={RegisterIsolator}/>
                       <Route path="/RegisterShofar" component={RegisterShofar}/>
+                      <Route path="/Map" component={Maps}/> 
                     </div>
                 </Switch>
             </Router>
