@@ -16,7 +16,7 @@ keys.createKey = async () => {
            }
        }
        let resKey= await keys.create({ key : key , dateKey: new Date()});
-       if(resKey) return resKey.id;
+       if(resKey) return {id : resKey.id, key : resKey.key };
        
     } catch (error) {
         if (error) { console.log("error creating new shofar...."); throw error }

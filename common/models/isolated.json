@@ -16,15 +16,15 @@
         }
     },
     "relations": {
-        "shofarIsolated": {
-            "model": "shofarBlower",
-            "type": "belongsTo",
-            "foreignKey": "shofarBlowerId"
-          },
         "UserToIsolated": {
             "model": "CustomUser",
             "type": "belongsTo",
-            "foreignKey": "customUserId"
+            "foreignKey": "userIsolatedId"
+        },
+        "BlowerToIsolated": {
+            "model": "shofarBlower",
+            "type": "belongsTo",
+            "foreignKey": "blowerId"
         }
     },
     "properties": {
@@ -45,29 +45,14 @@
                 "nullable": "N"
             }
         },
-        "firstName": {
-            "type": "String",
-            "required": true,
-            "length": 255,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "firstName",
-                "dataType": "varchar",
-                "dataLength": 255,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "N"
-            }
-        },
-        "phone": {
+        "userIsolatedId": {
             "type": "Number",
             "required": false,
             "length": 255,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "phone",
+                "columnName": "userIsolatedId",
                 "dataType": "int",
                 "dataLength": 255,
                 "dataPrecision": null,
@@ -75,119 +60,14 @@
                 "nullable": "Y"
             }
         },
-        "customUserId": {
-            "type": "Number",
-            "required": false,
-            "length": 255,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "customUserId",
-                "dataType": "int",
-                "dataLength": 255,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
-        "key": {
-            "type": "Number",
-            "required": true,
-            "length": 255,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "key",
-                "dataType": "int",
-                "dataLength": 255,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
-        "dateKey": {
-            "type": "Date",
-            "required": true,
-            "length": null,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "dateKey",
-                "dataType": "datetime",
-                "dataLength": null,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "N"
-            }
-        },
-        "city": {
-            "type": "String",
-            "required": true,
-            "length": 50,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "city",
-                "dataType": "varchar",
-                "dataLength": 50,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "N"
-            }
-        },
-        "street": {
-            "type": "String",
-            "required": true,
-            "length": 50,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "street",
-                "dataType": "varchar",
-                "dataLength": 50,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
-        "appartment": {
-            "type": "String",
-            "required": true,
-            "length": 50,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "appartment",
-                "dataType": "varchar",
-                "dataLength": 50,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
-        "comments": {
-            "type": "String",
-            "required": false,
-            "length": 255,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "comments",
-                "dataType": "varchar",
-                "dataLength": 255,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "Y"
-            }
-        },
-        "hasBalcony": {
+        "public_phone": {
             "type": "Number",
             "required": true,
             "length": null,
             "precision": 10,
             "scale": 0,
             "mysql": {
-                "columnName": "hasBalcony",
+                "columnName": "public_phone",
                 "dataType": "tinyint",
                 "dataLength": null,
                 "dataPrecision": 10,
@@ -195,14 +75,29 @@
                 "nullable": "Y"
             }
         },
-        "meetingTime": {
+        "public_meeting": {
+            "type": "Number",
+            "required": true,
+            "length": null,
+            "precision": 10,
+            "scale": 0,
+            "mysql": {
+                "columnName": "public_meeting",
+                "dataType": "tinyint",
+                "dataLength": null,
+                "dataPrecision": 10,
+                "dataScale": 0,
+                "nullable": "Y"
+            }
+        },   
+        "meeting_time": {
             "type": "Date",
             "required": false,
             "length": null,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "meetingTime",
+                "columnName": "meeting_time",
                 "dataType": "datetime",
                 "dataLength": null,
                 "dataPrecision": null,
@@ -210,14 +105,14 @@
                 "nullable": "Y"
             }
         },
-        "shofarBlowerId": {
+        "blowerId": {
             "type": "Number",
             "required": false,
             "length": 255,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "shofarBlowerId",
+                "columnName": "blowerId",
                 "dataType": "int",
                 "dataLength": 255,
                 "dataPrecision": null,

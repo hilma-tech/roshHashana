@@ -16,10 +16,10 @@
         }
     },
     "relations": {
-        "shofarPublic": {
+        "blowerPublic": {
             "model": "shofarBlower",
             "type": "belongsTo",
-            "foreignKey": "shofarBlowerId"
+            "foreignKey": "blowerId"
         }
     },
     "properties": {
@@ -85,7 +85,7 @@
                 "nullable": "Y"
             }
         },
-        "startTime": {
+        "start_time": {
             "type": "Date",
             "required": true,
             "length": null,
@@ -100,14 +100,14 @@
                 "nullable": "N"
             }
         },
-        "shofarBlowerId": {
+        "blowerId": {
             "type": "Number",
             "required": false,
             "length": 255,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "shofarBlowerId",
+                "columnName": "blowerId",
                 "dataType": "int",
                 "dataLength": 255,
                 "dataPrecision": null,
