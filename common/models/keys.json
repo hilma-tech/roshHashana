@@ -55,14 +55,14 @@
                 "nullable": "Y"
             }
         },
-        "date_Key": {
+        "date_key": {
             "type": "Date",
             "required": true,
             "length": null,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "date_Key",
+                "columnName": "date_key",
                 "dataType": "datetime",
                 "dataLength": null,
                 "dataPrecision": null,
