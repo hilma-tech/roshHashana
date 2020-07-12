@@ -1,0 +1,83 @@
+{
+    "name": "keys",
+    "crud": {
+        "tableActions": {
+            "addNewRow": true,
+            "deleteRow": true,
+            "editRow": true
+        },
+        "fields": {}
+    },
+    "options": {
+        "idInjection": false,
+        "mysql": {
+            "schema": "roshHashana",
+            "table": "keys"
+        }
+    },
+    "relations": {
+        "userKey": {
+            "model": "CustomUser",
+            "type": "hasMany",
+            "foreignKey": "keyId"
+        }
+    },
+    "properties": {
+        "id": {
+            "type": "Number",
+            "required": false,
+            "length": null,
+            "precision": 10,
+            "scale": 0,
+            "generated": true,
+            "id": 1,
+            "mysql": {
+                "columnName": "id",
+                "dataType": "int",
+                "dataLength": null,
+                "dataPrecision": 10,
+                "dataScale": 0,
+                "nullable": "N"
+            }
+        },
+        "key": {
+            "type": "Number",
+            "required": false,
+            "length": 255,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "key",
+                "dataType": "int",
+                "dataLength": 255,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "Y"
+            }
+        },
+        "dateKey": {
+            "type": "Date",
+            "required": true,
+            "length": null,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "dateKey",
+                "dataType": "datetime",
+                "dataLength": null,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "N"
+            }
+        }
+
+    },
+    "acls": [
+        {
+            "principalType": "ROLE",
+            "principalId": "$everyone",
+            "permission": "DENY",
+            "accessType": "*"
+        }
+    ]
+}

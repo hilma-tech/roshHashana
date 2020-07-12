@@ -20,7 +20,12 @@
             "model": "shofarBlower",
             "type": "belongsTo",
             "foreignKey": "shofarBlowerId"
-          }
+          },
+        "UserToIsolated": {
+            "model": "CustomUser",
+            "type": "belongsTo",
+            "foreignKey": "customUserId"
+        }
     },
     "properties": {
         "id": {
@@ -50,6 +55,66 @@
                 "columnName": "firstName",
                 "dataType": "varchar",
                 "dataLength": 255,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "N"
+            }
+        },
+        "phone": {
+            "type": "Number",
+            "required": false,
+            "length": 255,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "phone",
+                "dataType": "int",
+                "dataLength": 255,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "Y"
+            }
+        },
+        "customUserId": {
+            "type": "Number",
+            "required": false,
+            "length": 255,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "customUserId",
+                "dataType": "int",
+                "dataLength": 255,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "Y"
+            }
+        },
+        "key": {
+            "type": "Number",
+            "required": true,
+            "length": 255,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "key",
+                "dataType": "int",
+                "dataLength": 255,
+                "dataPrecision": null,
+                "dataScale": null,
+                "nullable": "Y"
+            }
+        },
+        "dateKey": {
+            "type": "Date",
+            "required": true,
+            "length": null,
+            "precision": null,
+            "scale": null,
+            "mysql": {
+                "columnName": "dateKey",
+                "dataType": "datetime",
+                "dataLength": null,
                 "dataPrecision": null,
                 "dataScale": null,
                 "nullable": "N"

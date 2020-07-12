@@ -2,6 +2,15 @@
 
 2.   $ git submodule update --init --recursive
   (you need auth,samples,scripts,supermodel,tools)
+  set in src/mobule/auth/server/models/user.json 
+      "password": {
+      "type": "string",
+      "required": false
+    },
+    "email": {
+      "type": "string",
+      "required": false
+    },
 
 3. In MYPROJECT run
       $ ./src/modules/scripts/help.sh

@@ -32,7 +32,97 @@
     }
   },
   "properties": {
-
+  
+  "firstName": {
+    "type": "String",
+    "required": true,
+    "length": 255,
+    "precision": null,
+    "scale": null,
+    "mysql": {
+        "columnName": "firstName",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+    }
+},
+  "keyId": {
+      "type": "Number",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+          "columnName": "keyId",
+          "dataType": "int",
+          "dataLength": 255,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "Y"
+      }
+  },
+  "city": {
+      "type": "String",
+      "required": false,
+      "length": 50,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+          "columnName": "city",
+          "dataType": "varchar",
+          "dataLength": 50,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "N"
+      }
+  },
+  "street": {
+      "type": "String",
+      "required": false,
+      "length": 50,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+          "columnName": "street",
+          "dataType": "varchar",
+          "dataLength": 50,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "Y"
+      }
+  },
+  "appartment": {
+      "type": "String",
+      "required": false,
+      "length": 50,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+          "columnName": "appartment",
+          "dataType": "varchar",
+          "dataLength": 50,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "Y"
+      }
+  },
+  "comments": {
+      "type": "String",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+          "columnName": "comments",
+          "dataType": "varchar",
+          "dataLength": 255,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "Y"
+      }
+  },
     "mainImageId":"number"
 
   },
@@ -50,8 +140,17 @@
         "type":"belongsTo",
         "model":"Images",
         "foreignKey":"mainImageId"
-    }
+    },
+
+    "userKey": {
+      "model": "CustomUser",
+      "type": "belongsTo",
+      "foreignKey": "keyId"
+  }
   },
+
+
+
   "acls": [
     {
       "principalType": "ROLE",
@@ -64,7 +163,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "authenticate"
-    }
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "createNewShofarBlower"
+  }
   ],
   "methods": {}
 }

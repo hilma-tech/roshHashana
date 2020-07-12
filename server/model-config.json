@@ -112,5 +112,9 @@
   "shofarBlowerPub": {
     "public": true,
     "dataSource": "msql"
+  },
+  "keys": {
+    "public": false,
+    "dataSource": "msql"
   }
 }

@@ -80,9 +80,15 @@ CREATE TABLE `CustomUser` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `realm` varchar(512) DEFAULT NULL,
   `username` varchar(512) DEFAULT NULL,
+  `firstName` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `keyId` int(11) DEFAULT NULL,
+  `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `appartment` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `comments` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `password` varchar(512) DEFAULT NULL,
   `credentials` text,
-  `email` varchar(512) NOT NULL,
+  `email` varchar(512) DEFAULT NULL,
   `emailVerified` tinyint(1) DEFAULT NULL,
   `verificationToken` varchar(512) DEFAULT NULL,
   `mainImageId` int(11) DEFAULT NULL,
@@ -96,7 +102,6 @@ CREATE TABLE `CustomUser` (
 
 LOCK TABLES `CustomUser` WRITE;
 /*!40000 ALTER TABLE `CustomUser` DISABLE KEYS */;
-INSERT INTO `CustomUser` VALUES (1,NULL,'admin','$2a$10$wSFoP.Hn.Ol2HE4MaTmne.fU3YlUYHRIDPDRFsDwaHZHvI9XAdcZO',NULL,'admin@carmel6000.amitnet.org',1,NULL,NULL),(3,NULL,'batz','$2a$10$sUh3o7.rJ4qTsom3TqLmC.BT3Y4Sn4S.CYlWB69k8bCc8fNB1pCqa',NULL,'batz@carmel6000.amitnet.org',1,NULL,8);
 /*!40000 ALTER TABLE `CustomUser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -399,6 +404,10 @@ DROP TABLE IF EXISTS `isolated`;
 CREATE TABLE `isolated` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `phone` int(11) unsigned NOT NULL,
+  `customUserId` int(11) unsigned NOT NULL,
+  `key` int(11) DEFAULT NULL,
+  `dateKey` date NOT NULL,
   `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `appartment` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -417,6 +426,30 @@ CREATE TABLE `isolated` (
 LOCK TABLES `isolated` WRITE;
 /*!40000 ALTER TABLE `isolated` DISABLE KEYS */;
 /*!40000 ALTER TABLE `isolated` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `keys`
+--
+
+DROP TABLE IF EXISTS `keys`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `keys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` int(11) NOT NULL,
+  `dateKey` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `keys`
+--
+
+LOCK TABLES `keys` WRITE;
+/*!40000 ALTER TABLE `keys` DISABLE KEYS */;
+/*!40000 ALTER TABLE `keys` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -456,6 +489,10 @@ DROP TABLE IF EXISTS `shofar_blower`;
 CREATE TABLE `shofar_blower` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `phone` int(11) unsigned NOT NULL,
+  `customUserId` int(11) unsigned NOT NULL,
+  `key` int(11) DEFAULT NULL,
+  `dateKey` date NOT NULL,
   `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `appartment` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -511,4 +548,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-06 12:27:58
+-- Dump completed on 2020-07-09 13:27:05
