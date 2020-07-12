@@ -11,7 +11,7 @@
     "fields": {
       "id": {},
       "username": {
-          "title": "user name"
+        "title": "user name"
       },
       "email": {
         "title": "email"
@@ -32,116 +32,113 @@
     }
   },
   "properties": {
-  
-  "name": {
-    "type": "String",
-    "required": true,
-    "length": 255,
-    "precision": null,
-    "scale": null,
-    "mysql": {
+    "name": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
         "columnName": "name",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "N"
-    }
-},
-  "keyId": {
+      }
+    },
+    "keyId": {
       "type": "Number",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "keyId",
-          "dataType": "int",
-          "dataLength": 255,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "Y"
+        "columnName": "keyId",
+        "dataType": "int",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
       }
-  },
-  "city": {
+    },
+    "city": {
       "type": "String",
       "required": false,
       "length": 50,
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "city",
-          "dataType": "varchar",
-          "dataLength": 50,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "N"
+        "columnName": "city",
+        "dataType": "varchar",
+        "dataLength": 50,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
       }
-  },
-  "street": {
+    },
+    "street": {
       "type": "String",
       "required": false,
       "length": 50,
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "street",
-          "dataType": "varchar",
-          "dataLength": 50,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "Y"
+        "columnName": "street",
+        "dataType": "varchar",
+        "dataLength": 50,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
       }
-  },
-  "appartment": {
+    },
+    "appartment": {
       "type": "String",
       "required": false,
       "length": 50,
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "appartment",
-          "dataType": "varchar",
-          "dataLength": 50,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "Y"
+        "columnName": "appartment",
+        "dataType": "varchar",
+        "dataLength": 50,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
       }
-  },
-  "comments": {
+    },
+    "comments": {
       "type": "String",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "comments",
-          "dataType": "varchar",
-          "dataLength": 255,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "Y"
+        "columnName": "comments",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
       }
-  },
-    "mainImageId":"number"
-
+    },
+    "mainImageId": "number"
   },
   "validations": [],
-  
   "relations": {
     "accessTokens": {
       "type": "hasMany",
       "model": "AccessToken",
       "foreignKey": "userId",
-      "options": {"disableInclude": true}
+      "options": {
+        "disableInclude": true
+      }
     },
-
-    "mainImage":{
-        "type":"belongsTo",
-        "model":"Images",
-        "foreignKey":"mainImageId"
+    "mainImage": {
+      "type": "belongsTo",
+      "model": "Images",
+      "foreignKey": "mainImageId"
     },
-
     "userKey": {
       "model": "CustomUser",
       "type": "belongsTo",
@@ -156,11 +153,8 @@
       "model": "isolated",
       "type": "hasMany",
       "foreignKey": "userIsolatedId"
-  }
+    }
   },
-
-
-
   "acls": [
     {
       "principalType": "ROLE",
@@ -179,7 +173,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "createNewShofarBlower"
-  }
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "authenticationKey"
+    }
   ],
   "methods": {}
 }

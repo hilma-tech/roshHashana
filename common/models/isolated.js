@@ -1,24 +1,51 @@
 'use strict';
 
 module.exports=function(Isolated){
-
-
-Isolated.createNewIsolated = async (newIsolated) => {
+      //role = 1
+// {
+// "userIsolatedId" :  4,
+//         "public_phone": 0 ,
+//         "public_meeting" : 1,   
+//         "city" : "חיפה",
+//         "street": "פרויד",
+//         "appartment": "23",
+//         "comments": null
+//     }
+Isolated.InsertDataIsolated = async (data, options) => {
+    let objToIsolated={
+        "userIsolatedId" : options.accessToken.userId ,
+        "public_phone": data.public_phone,
+        "public_meeting" : data.public_meeting
+    },
+     objToCU={
+        "city" : data.city,
+        "street": data.street,
+        "appartment": data.appartment,
+        "comments": data.comments
+    };
     try {
-       let res = await Isolated.create(newIsolated);
-        return res;
+        let resRole = await ShofarBlower.app.models.CustomUser.findOne({where:{id : options.accessToken.userId }});
+           if (resRole.role === 1){
+        let resIsolated = await Isolated.create(objToIsolated);
+        let resCU = await Isolated.app.models.CustomUser.updateAll({id : options.accessToken.userId }, objToCU);
+        return {ok : true};
+        }else{
+            return {ok : false, err:"No permissions"};
+        }
+           
     } catch (error) {
-        console.log("Can`t do create new isolated"); 
+        console.log("Can`t do create new isolated",error); 
        throw error;
     
     }
 }
 
 
-Isolated.remoteMethod('createNewIsolated', {
+Isolated.remoteMethod('InsertDataIsolated', {
     http: { verb: 'post' },
     accepts: [
-        { arg: 'newIsolated', type: 'object' }
+        { arg: 'data', type: 'object' },
+        { arg: 'options', type: 'object', http: 'optionsFromRequest' },
     ],
     returns: { arg: 'res', type: 'object', root: true }
 });
