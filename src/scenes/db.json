@@ -1,0 +1,38 @@
+{
+    "isolateds": [
+        {
+            "id": 3,
+            "name": "שיר",
+            "address": "צור הדסה רכסים 10",
+            "shofarBlowerId": 1
+        },
+        {
+            "id": 4,
+            "name": "ראם",
+            "address": "צור הדסה רכסים 7",
+            "shofarBlowerId": 2
+        }
+    ],
+    "shofarlowers": [
+        {
+            "id": 1,
+            "name": "מוטי"
+        },
+        {
+            "id": 2,
+            "name": "רותם"
+        }
+    ],
+    "pubSHofarBlowing": [
+        {
+            "startTime": "11:00",
+            "address": "צור הדסה רכסים 22",
+            "shofarBlowerId": 1
+        },
+        {
+            "startTime": "10:00",
+            "address": "צור הדסה רכסים 2",
+            "shofarBlowerId": 2
+        }
+    ]
+}

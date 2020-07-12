@@ -1,0 +1,82 @@
+@import "../../consts/generalStyles";
+#map-contaoner {
+    #info-window-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        div {
+            font-size: 0.8rem;
+        }
+        .info-window-header {
+            color: $turquoise;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 4%;
+            text-align: right;
+        }
+        #pub-shofar-blower-name-container,
+        #pub-address-container,
+        #pub-start-time-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            align-content: center;
+            justify-content: flex-start;
+            margin-bottom: 4%;
+            width: 100%;
+            img {
+                width: 1.2em;
+                height: 1.2em;
+                margin-left: 4%;
+            }
+            div {
+                font-size: 1rem;
+            }
+        }
+        .notes {
+            margin-bottom: 4%;
+        }
+        #join-button {
+            background-color: $orange;
+            color: white;
+            height: fit-content;
+            width: fit-content;
+            padding: 2% 2%;
+            margin: 0 auto;
+            font-size: 1rem;
+            border-radius: 3px;
+        }
+    }
+
+    #search-input-container {
+        position: relative !important;
+        width: fit-content;
+        height: fit-content;
+        margin: auto;
+        margin-top: 5%;
+        #search-input {
+            margin-top: 0 !important;
+        }
+        #search-icon {
+            position: absolute;
+            left: 7%;
+            top: 50%;
+            width: 1rem;
+            transform: translate(-50%, -50%);
+        }
+    }
+    .gm-style-iw.gm-style-iw-c {
+        border-radius: 2px;
+    }
+
+    button {
+        top: 0 !important;
+        left: 0 !important;
+        width: fit-content !important;
+        height: fit-content !important;
+        img {
+            width: 1.2rem !important;
+            height: 1.2rem !important;
+        }
+    }
+}
