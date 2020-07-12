@@ -24,7 +24,12 @@
         "BlowerToIsolated": {
             "model": "shofarBlower",
             "type": "belongsTo",
-            "foreignKey": "blowerId"
+            "foreignKey": "blowerMeetingId"
+        },
+        "BlowerPubToIsolated": {
+            "model": "shofarBlowerPub",
+            "type": "belongsTo",
+            "foreignKey": "blowerMeetingId"
         }
     },
     "properties": {
@@ -105,14 +110,14 @@
                 "nullable": "Y"
             }
         },
-        "blowerId": {
+        "blowerMeetingId": {
             "type": "Number",
             "required": false,
             "length": 255,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "blowerId",
+                "columnName": "blowerMeetingId",
                 "dataType": "int",
                 "dataLength": 255,
                 "dataPrecision": null,

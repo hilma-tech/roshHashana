@@ -29,7 +29,7 @@
         "BlowerToIsolated": {
             "model": "isolated",
             "type": "hasMany",
-            "foreignKey": "blowerId"
+            "foreignKey": "blowerMeetingId"
         }
     },
     "properties": {

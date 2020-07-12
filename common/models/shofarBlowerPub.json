@@ -20,6 +20,11 @@
             "model": "shofarBlower",
             "type": "belongsTo",
             "foreignKey": "blowerId"
+        },
+        "BlowerPubToIsolated": {
+            "model": "isolated",
+            "type": "hasMany",
+            "foreignKey": "blowerMeetingId"
         }
     },
     "properties": {

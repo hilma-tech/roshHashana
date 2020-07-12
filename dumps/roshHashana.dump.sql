@@ -407,7 +407,7 @@ CREATE TABLE `isolated` (
   `public_phone` tinyint(1) unsigned DEFAULT '0',
   `public_meeting` tinyint(1) unsigned DEFAULT '0',
   `meeting_time` date NOT NULL,
-  `blowerId` int(11) DEFAULT NULL,
+  `blowerMeetingId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
