@@ -94,7 +94,7 @@
                 "dataScale": 0,
                 "nullable": "Y"
             }
-        },   
+        },
         "meeting_time": {
             "type": "Date",
             "required": false,
@@ -137,7 +137,7 @@
             "principalType": "ROLE",
             "principalId": "$everyone",
             "permission": "ALLOW",
-            "property": "createNewIsolated"
+            "property": "InsertDataIsolated"
         }
     ]
 }

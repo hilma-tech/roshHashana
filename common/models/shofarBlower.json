@@ -67,7 +67,7 @@
         },
         "confirm": {
             "type": "Number",
-            "required": true,
+            "required": false,
             "length": null,
             "precision": 10,
             "scale": 0,
@@ -137,7 +137,7 @@
             "principalType": "ROLE",
             "principalId": "$everyone",
             "permission": "ALLOW",
-            "property": "createNewShofarBlower"
+            "property": "InsertDataShofarBlower"
         }
     ]
 }

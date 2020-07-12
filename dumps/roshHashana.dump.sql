@@ -406,7 +406,7 @@ CREATE TABLE `isolated` (
   `userIsolatedId` int(11) unsigned NOT NULL,
   `public_phone` tinyint(1) unsigned DEFAULT '0',
   `public_meeting` tinyint(1) unsigned DEFAULT '0',
-  `meeting_time` date NOT NULL,
+  `meeting_time` date DEFAULT NULL,
   `blowerMeetingId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
