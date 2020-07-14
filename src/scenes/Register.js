@@ -16,8 +16,9 @@ class Register extends React.Component {
       name: "",
       key: "",
       alart: null,
+      sendKey: false,
     };
-    console.log("!!!",this.props.location.state.type,this.state.role)
+    console.log("!!!", this.props.location.state.type, this.state.role)
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -61,12 +62,12 @@ class Register extends React.Component {
             this.setState({ alart: "קוד שגוי" })
             break;
           case "time out":
-            this.setState({ alart: "זמן הקוד פג"});
+            this.setState({ alart: "זמן הקוד פג" });
 
             break;
           case "blower new":
             console.log("קרוא לדף של רעות להרשמת תוקע בשופר ");
-           //TODO לקרוא לדף של רעות להרשמת תוקע בשופר 
+            //TODO לקרוא לדף של רעות להרשמת תוקע בשופר 
 
             break;
           case "blower with data":
@@ -74,24 +75,24 @@ class Register extends React.Component {
             //TODO ללכת למפה של תוקע בשופר 
 
             break;
-            case "isolator new":
-              console.log("לקרוא לדף של רעות להרשמת  של מבודד");
-              //TODO לקרוא לדף של רעות להרשמת  של מבודד
-          
+          case "isolator new":
+            console.log("לקרוא לדף של רעות להרשמת  של מבודד");
+            //TODO לקרוא לדף של רעות להרשמת  של מבודד
+
 
             break;
-            case "isolator with data":
-              console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
-              //TODO להציג למבודד שנירשם כבר את הסטטוס שלו
+          case "isolator with data":
+            console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
+            //TODO להציג למבודד שנירשם כבר את הסטטוס שלו
 
             break;
-            case "isolated with public meeting":
-              console.log("להודיע לו שהוא נרשם");
-              //TODO להודיע לו שהוא נרשם 
+          case "isolated with public meeting":
+            console.log("להודיע לו שהוא נרשם");
+            //TODO להודיע לו שהוא נרשם 
 
             break;
           default:
-            this.setState({status: "start",})
+            this.setState({ status: "start", })
         }
 
       }
@@ -99,6 +100,22 @@ class Register extends React.Component {
     }
 
 
+  }
+  sendKey = async () => {
+    if (!this.state.sendKey) {
+      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createNewShofarBlower`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ "name": this.state.name, "phone": this.state.phone })
+      });
+      if (err) {
+        console.log("ERR", err);
+      }
+      if (res) {
+        this.setState({ sendKey: true })
+        setTimeout( () =>{ this.setState({ sendKey: false, }) }, 300000);
+      }
+    }
   }
 
   render() {
@@ -120,7 +137,7 @@ class Register extends React.Component {
           : <>
             <input id="key" type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} />
             <button onClick={this.handleSubmit}> התחבר </button>
-            <button >
+            <button onClick={this.sendKey} >
               שלח לי קוד מחדש
                 </button>
             <div>{this.state.alart != null && this.state.alart}</div>

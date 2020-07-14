@@ -3,7 +3,6 @@
 const moment = require('moment');
 module.exports = function (keys) {
 
-
 //create new key that does not exist
 keys.createKey = async () => {
     let key = Math.floor(Math.random() * 9000) + 1000;

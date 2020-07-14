@@ -3,7 +3,7 @@ var logUser = require('debug')('model:user');
 let sendMsg = require('../../server/sendSms/SendSms.js')
 const moment = require('moment');
 const randomstring = require("randomstring");
-let msgText = ` שלום `
+let msgText = `שלום`
 let msgText2 = `הקוד שלך הוא:`
 module.exports = function (CustomUser) {
 
@@ -30,17 +30,23 @@ module.exports = function (CustomUser) {
                     "principalId": ResCustom.id,
                     "roleId": role
                 }
-
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
+                // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 return ResCustom;
 
-                //  sendMsg(phone,`${msgText} ${name} /n ${msgText2} ${pincode}`)
+                 
 
             } else {
-
+                console.log("ResFindUser.KeyId",ResFindUser.keyId);
+                if(ResFindUser && ResFindUser.keyId){
+                    let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId );
+                    console.log("ResDeleteKey",ResDeleteKey);
+                }
+                
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
+                // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 return ResUpdateUser;
-                // sendMsg(phone,`${msgText} ${name} /n ${msgText2} ${pincode}`)
+               
 
             }
         } catch (error) {
@@ -55,6 +61,7 @@ module.exports = function (CustomUser) {
                 cb(err1, null);
             }
             if (!resKey) {
+                console.log(resKey)
                 console.log("err key")
                 cb(null, { ok: "err key" })
             } else {
@@ -62,7 +69,7 @@ module.exports = function (CustomUser) {
                 const endTime = moment(resKey.date_key).add(10, 'm');
                 //TODO לבדוק אם צריך לזהות שהקוד הגיע מאותו מקום שרשם את הטלפון הזה 
                 if (newTime.isBefore(endTime)) {
-                    CustomUser.app.models.keys.destroyAll({ where: { key } }, (err2, resdelet) => {
+                    CustomUser.app.models.keys.destroyById(resKey.id , (err2, resdelet) => {
                         if (err2) {
                             console.log("err", err2)
                             cb(err2, null)
@@ -109,7 +116,6 @@ module.exports = function (CustomUser) {
                         console.log("Err", err);
                     }
                     if (res) {
-                        console.log("res",res,resRole)
                         if (res.city == null && status === 2) {
                             cb(null, { ok: "blower new" })
                         } else
