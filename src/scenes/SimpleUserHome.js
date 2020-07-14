@@ -1,14 +1,23 @@
 import React from 'react';
 import { observer,inject } from 'mobx-react';
 
-function SimpleUserHome(props) {
-  return (
-      <header className="App-header">
-        <img src="favicon.ico" className="App-logo" alt="logo" />
-        <p>Welcome to Carmel 6000's Proffesional Updated Main Boilerplate App</p>
-        <p>Home page example for users with role SimpleUser</p>
-      </header>
-  );
+class Register extends React.Component { 
+    constructor(props) {
+        super(props);
+        this.state = { isAuth: false };
+
+    }
+
+    render() {
+
+        return (
+           <div>
+              <div className="isolator">אני רוצה לשמוע תקיעת שופר</div>
+              <div className="blower">אני רוצה לתקוע בשפור</div>
+           </div>
+        );
+    }
 }
 
-export default inject('ExampleStore')(observer(SimpleUserHome));
+
+export default Register;

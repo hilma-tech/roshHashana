@@ -114,7 +114,7 @@
     "dataSource": "msql"
   },
   "keys": {
-    "public": false,
+    "public": true,
     "dataSource": "msql"
   }
 }

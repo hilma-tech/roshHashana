@@ -9,14 +9,15 @@ import { PrivateRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
-import RegisterIsolator from "./scenes/RegisterIsolator";
-import RegisterShofar from "./scenes/RegisterShofar";
+// import SimpleUserHome from "./scenes/Home";
 
 const Map = loadable(() => import('./scenes/maps/map'));
 
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
-const SimpleUserHome = loadable(() => import('./scenes/SimpleUserHome'));
+const SimpleUserHome = loadable(() => import('./scenes/Home'));
+const Register = loadable(() => import('./scenes/Register'));
+
 
 class App extends Component {
 
@@ -34,19 +35,18 @@ class App extends Component {
 
     render() {
 
-        const homePages = { SimpleUserHome };
+        const homePages = { SimpleUserHome : (props)=> <SimpleUserHome {...props} /> };
 
         return (
             <Suspense fallback={<div>Loading...</div>}>
                 <Router>
-                    <Switch>
                         <div className="App">
-                            <HomeRoute exact path="/" component={Home} comps={homePages} />
-                            <Route path="/RegisterIsolator" component={RegisterIsolator} />
-                            <Route path="/RegisterShofar" component={RegisterShofar} />
+                    <Switch>
+                            <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
+                            <Route path="/Register" component={(props) => <Register {...props} />} />
                             <Route path="/public-shofar-blowing-map" component={(props) => <Map {...props} publicMap/>} />
-                        </div>
                     </Switch>
+                        </div>
                 </Router>
             </Suspense>
         );

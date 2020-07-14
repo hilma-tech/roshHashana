@@ -1,6 +1,6 @@
 'use strict';
 
-
+const moment = require('moment');
 module.exports = function (keys) {
 
 
@@ -15,9 +15,11 @@ keys.createKey = async () => {
                 i=0;
            }
        }
+
        let resKey= await keys.create({ key : key , date_key: new Date()});
-       if(resKey) return {id : resKey.id, key : resKey.key };
-       
+       if(resKey) {
+           return {id : resKey.id, key : resKey.key };
+       }
     } catch (error) {
         if (error) { console.log("error creating new shofar...."); throw error }
     }
