@@ -18,7 +18,6 @@ CustomUser.createNewShofarBlower = async(name,phone,role) => {
                     name:name,
                     username:phone,
                     keyId:resKey.id,
-                    roleId: role
                 };
 
             let ResCustom = await CustomUser.create(user);

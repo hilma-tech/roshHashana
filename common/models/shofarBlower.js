@@ -30,8 +30,8 @@ module.exports = function(ShofarBlower) {
        
        
        try {
-           let resRole = await ShofarBlower.app.models.CustomUser.findOne({where:{id : options.accessToken.userId }});
-           if (resRole.role === 2){
+           let resRole = await ShofarBlower.app.models.RoleMapping.findOne({where:{principalId : options.accessToken.userId }});
+           if (resRole.roleId === 2){
                 let resBlower = await ShofarBlower.create(objToBlower)
                 let resCU = await ShofarBlower.app.models.CustomUser.updateAll({id : options.accessToken.userId }, objToCU);
                 return {ok : true};
