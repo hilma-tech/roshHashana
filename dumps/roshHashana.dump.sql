@@ -406,7 +406,7 @@ CREATE TABLE `isolated` (
   `userIsolatedId` int(11) unsigned NOT NULL,
   `public_phone` tinyint(1) unsigned DEFAULT '0',
   `public_meeting` tinyint(1) unsigned DEFAULT '0',
-  `meeting_time` date DEFAULT NULL,
+  `meeting_time` datetime DEFAULT NULL,
   `blowerMeetingId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -431,7 +431,7 @@ DROP TABLE IF EXISTS `keys`;
 CREATE TABLE `keys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `key` int(11) NOT NULL,
-  `date_key` date NOT NULL,
+  `date_key` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -484,8 +484,8 @@ CREATE TABLE `shofar_blower` (
   `userBlowerId` int(11) unsigned NOT NULL,
   `confirm` tinyint(1) unsigned DEFAULT '0',
   `can_blow_x_times` int(11) unsigned NOT NULL,
-  `volunteering_start_time` date NOT NULL,
-  `volunteering_end_time` date NOT NULL,
+  `volunteering_start_time` datetime NOT NULL,
+  `volunteering_end_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -511,7 +511,7 @@ CREATE TABLE `shofar_blower_pub` (
   `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `comments` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `start_time` date NOT NULL,
+  `start_time` datetime NOT NULL,
   `blowerId` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
