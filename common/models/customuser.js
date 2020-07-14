@@ -14,13 +14,12 @@ module.exports = function (CustomUser) {
         try {
             let ResFindUser = await CustomUser.findOne({ where: { username: phone } })
 
-            if (!ResFindUser) {
-
-                let user = {
-                    name: name,
-                    username: phone,
-                    keyId: resKey.id,
-                    roleId: role
+        if(!ResFindUser) {
+ 
+                let user= {
+                    name:name,
+                    username:phone,
+                    keyId:resKey.id,
                 };
 
                 let ResCustom = await CustomUser.create(user);
