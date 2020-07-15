@@ -12,7 +12,7 @@ import ResetPassword from './modules/auth/client/components/ResetPassword';
 // import SimpleUserHome from "./scenes/Home";
 
 const Map = loadable(() => import('./scenes/maps/map'));
-const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
+// const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/Home'));
@@ -44,7 +44,7 @@ class App extends Component {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/Register" component={(props) => <Register {...props} />} />
-                            <Route path="/addDetails/isolated" component={(props => <IsolatedForm {...props} />)} />
+                            {/* <Route path="/addDetails/isolated" component={(props => <IsolatedForm {...props} />)} /> */}
                             <Route path="/public-shofar-blowing-map" component={(props) => <Map {...props} publicMap />} />
                         </Switch>
                     </div>

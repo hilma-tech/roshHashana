@@ -2,7 +2,7 @@ import React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Link } from "react-router-dom";
 import Register from "./Register";
-
+import './Home.scss'
 
 
 class Home extends React.Component {
@@ -23,10 +23,11 @@ class Home extends React.Component {
     render() {
 
         return (
-            <div>
-                <div> <img src="/images/shoparForStart.png" />
-                    <div>תוקעים בבית?</div>
-                    <div>אנחנו נדאג לכם לתקיעת שופר</div>
+            <div className="textTitle">
+                <div> <img className="coverImg" src="/images/shoparForStart.png" />
+                <div className="allText">
+                <div> <img src="/images/header.svg"/></div>
+                <div>תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
 
                     <button className="RegisterIsolator" value="isolator" onClick={(e) => this.onClickRegister(e.target.value)}>
                         אני רוצה לשמוע תקיעת שופר
@@ -34,6 +35,9 @@ class Home extends React.Component {
                     <button className="RegisterBlower" value="blower" onClick={(e) => this.onClickRegister(e.target.value)}>
                         אני רוצה לתקוע שופר
               </button>
+
+              <div>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
+              </div>
                 </div>
 
             </div>

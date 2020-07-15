@@ -39,7 +39,6 @@ module.exports = function (CustomUser) {
                 console.log("ResFindUser.KeyId",ResFindUser.keyId);
                 if(ResFindUser && ResFindUser.keyId){
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId );
-                    console.log("ResDeleteKey",ResDeleteKey);
                 }
                 
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
@@ -129,7 +128,6 @@ module.exports = function (CustomUser) {
                                     } else
                                         if (status == 3) {
                                             cb(null, { ok: "isolated with public meeting" })
-
                                             //TODO להוסיף הרשמה של מבודד לפגישה ציבורית
                                         } else cb(null, { ok: "problem" })
                     }

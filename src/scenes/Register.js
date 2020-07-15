@@ -2,9 +2,13 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
 import Auth from "../modules/auth/Auth";
+import './Register.scss';
 
 let isolator = "אני רוצה לשמוע תקיעת שופר"
 let blower = "אני רוצה לתקוע בשפור"
+let errKey = "קוד שגוי"
+let timeOut = "זמן הקוד פג"
+let SomethingMissing = "חסר שם או מספר טלפון לא תקין"
 class Register extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +28,7 @@ class Register extends React.Component {
   }
 
   handleChange(event) {
+    this.setState({ alart: null })
     if (event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." ||
       event.target.id === "name" && event.target.value.length < 20 ||
       event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
@@ -35,7 +40,7 @@ class Register extends React.Component {
   }
 
   async handleSubmit() {
-    if (this.state.status == "start") {
+    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createNewShofarBlower`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -48,7 +53,10 @@ class Register extends React.Component {
         this.setState({ status: "stepTwo" })
 
       }
-    } else {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 1 || this.state.phone && this.state.phone[0] != 0) {
+      this.setState({ alart: SomethingMissing})
+    }
+    if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
@@ -59,10 +67,10 @@ class Register extends React.Component {
       if (res && res.ok) {
         switch (res.ok) {
           case "err key":
-            this.setState({ alart: "קוד שגוי" })
+            this.setState({ alart: errKey })
             break;
           case "time out":
-            this.setState({ alart: "זמן הקוד פג" });
+            this.setState({ alart: timeOut });
 
             break;
           case "blower new":
@@ -113,7 +121,7 @@ class Register extends React.Component {
       }
       if (res) {
         this.setState({ sendKey: true })
-        setTimeout( () =>{ this.setState({ sendKey: false, }) }, 300000);
+        setTimeout(() => { this.setState({ sendKey: false, }) }, 300000);
       }
     }
   }
@@ -140,10 +148,11 @@ class Register extends React.Component {
             <button onClick={this.sendKey} >
               שלח לי קוד מחדש
                 </button>
-            <div>{this.state.alart != null && this.state.alart}</div>
+
             <div>
             </div></>
         }
+        <div>{this.state.alart != null && this.state.alart}</div>
 
       </div>
     );
