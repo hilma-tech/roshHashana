@@ -26,8 +26,8 @@ class Home extends React.Component {
             <div className="textTitle">
                 <div> <img className="coverImg" src="/images/shoparForStart.png" />
                 <div className="allText">
-                <div> <img src="/images/header.svg"/></div>
-                <div>תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
+                <div> <img className="imgText" src="/images/header.svg"/></div>
+                <div className="text1">תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
 
                     <button className="RegisterIsolator" value="isolator" onClick={(e) => this.onClickRegister(e.target.value)}>
                         אני רוצה לשמוע תקיעת שופר
@@ -36,7 +36,7 @@ class Home extends React.Component {
                         אני רוצה לתקוע שופר
               </button>
 
-              <div>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
+              <div className="text2">לכל מפגשי <br></br>תקיעות שופר בארץ</div>
               </div>
                 </div>
 
