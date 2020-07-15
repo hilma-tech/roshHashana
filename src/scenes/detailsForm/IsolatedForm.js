@@ -110,7 +110,7 @@ export default class IsolatedForm extends Component {
 
                             <div className="checkbox-container">
                                 <div>בפתח הבית</div>
-                                <input id="home" type="radio" name="preferance" />
+                                <input id="home" type="radio" name="preferance" checked />
                             </div>
 
                             <div className="checkbox-container">
@@ -134,9 +134,9 @@ export default class IsolatedForm extends Component {
                         <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
                         <div id="button">הבנתי תודה</div>
                     </div>}
-                <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
+                {!this.state.openModal && <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />
-                </BrowserView>
+                </BrowserView>}
             </div>
         );
     }

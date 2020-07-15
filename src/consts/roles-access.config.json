@@ -1,5 +1,22 @@
 {
-"ADMIN":{"comps":["DashboardMain","AnotherComponent"]},
-"SUPERADMIN":{"comps":["DashboardMain","AnotherComponent"]},
-"SIMPLEUSER":{"comps":["AnotherComponent"],"defaultHomePage":"SimpleUserHome"}
+    "ADMIN": {
+        "comps": [
+            "DashboardMain",
+            "AnotherComponent",
+            "BlowerDetailsForm"
+        ]
+    },
+    "SUPERADMIN": {
+        "comps": [
+            "DashboardMain",
+            "AnotherComponent"
+        ]
+    },
+    "SIMPLEUSER": {
+        "comps": [
+            "AnotherComponent",
+            "IsolatedDetailsForm"
+        ],
+        "defaultHomePage": "SimpleUserHome"
+    }
 }
