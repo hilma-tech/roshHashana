@@ -81,13 +81,16 @@ export default class IsolatedForm extends Component {
     }
 
     render() {
+        const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
+
         return (
             <div id="isolated-form-container" className={`${this.state.openModal ? 'change-color' : ''}`}>
 
                 {!this.state.openModal ?
                     <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                         <img id="go-back" src="/icons/go-back.svg" />
-                        <div className="msg-txt header">שלום רון, <br></br> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
+                        <div className="msg-txt header">{`שלום ${name},`}</div>
+                        <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
                         <div className="msg-txt">הפרטים שלך הם:</div>
                         <form onSubmit={this.saveIsolatedDetails}>
@@ -110,7 +113,7 @@ export default class IsolatedForm extends Component {
 
                             <div className="checkbox-container">
                                 <div>בפתח הבית</div>
-                                <input id="home" type="radio" name="preferance" checked />
+                                <input id="home" type="radio" name="preferance" defaultChecked />
                             </div>
 
                             <div className="checkbox-container">
