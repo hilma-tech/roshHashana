@@ -54,7 +54,7 @@ class Register extends React.Component {
 
       }
     } else if (this.state.phone.length < 10 || this.state.name.length < 1 || this.state.phone && this.state.phone[0] != 0) {
-      this.setState({ alart: SomethingMissing})
+      this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}`, {
@@ -74,8 +74,8 @@ class Register extends React.Component {
 
             break;
           case "blower new":
-            console.log("קרוא לדף של רעות להרשמת תוקע בשופר " ,res.data.name);
-            //TODO לקרוא לדף של רעות להרשמת תוקע בשופר 
+            console.log("קרוא לדף של רעות להרשמת תוקע בשופר ", res.data.name);
+            this.props.history.push('/addDetails/shofar-blower', { name: res.data.name });
 
             break;
           case "blower with data":
@@ -84,9 +84,7 @@ class Register extends React.Component {
 
             break;
           case "isolator new":
-            console.log("לקרוא לדף של רעות להרשמת  של מבודד",res.data.name);
-            //TODO לקרוא לדף של רעות להרשמת  של מבודד
-
+            this.props.history.push('/addDetails/isolated', { name: res.data.name });
 
             break;
           case "isolator with data":
@@ -111,7 +109,7 @@ class Register extends React.Component {
   }
   sendKey = async () => {
     if (!this.state.sendKey) {
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createNewShofarBlower`, {
+      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify({ "name": this.state.name, "phone": this.state.phone })

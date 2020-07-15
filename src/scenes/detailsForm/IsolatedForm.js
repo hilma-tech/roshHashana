@@ -81,13 +81,16 @@ export default class IsolatedForm extends Component {
     }
 
     render() {
+        const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
+
         return (
             <div id="isolated-form-container" className={`${this.state.openModal ? 'change-color' : ''}`}>
 
                 {!this.state.openModal ?
                     <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                         <img id="go-back" src="/icons/go-back.svg" />
-                        <div className="msg-txt header">שלום רון, <br></br> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
+                        <div className="msg-txt header">{`שלום ${name},`}</div>
+                        <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
                         <div className="msg-txt">הפרטים שלך הם:</div>
                         <form onSubmit={this.saveIsolatedDetails}>
@@ -110,7 +113,7 @@ export default class IsolatedForm extends Component {
 
                             <div className="checkbox-container">
                                 <div>בפתח הבית</div>
-                                <input id="home" type="radio" name="preferance" />
+                                <input id="home" type="radio" name="preferance" defaultChecked />
                             </div>
 
                             <div className="checkbox-container">
@@ -134,9 +137,9 @@ export default class IsolatedForm extends Component {
                         <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
                         <div id="button">הבנתי תודה</div>
                     </div>}
-                <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
+                {!this.state.openModal && <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />
-                </BrowserView>
+                </BrowserView>}
             </div>
         );
     }
