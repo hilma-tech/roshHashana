@@ -74,7 +74,7 @@ class Register extends React.Component {
 
             break;
           case "blower new":
-            console.log("קרוא לדף של רעות להרשמת תוקע בשופר ");
+            console.log("קרוא לדף של רעות להרשמת תוקע בשופר " ,res.data.name);
             //TODO לקרוא לדף של רעות להרשמת תוקע בשופר 
 
             break;
@@ -84,7 +84,7 @@ class Register extends React.Component {
 
             break;
           case "isolator new":
-            console.log("לקרוא לדף של רעות להרשמת  של מבודד");
+            console.log("לקרוא לדף של רעות להרשמת  של מבודד",res.data.name);
             //TODO לקרוא לדף של רעות להרשמת  של מבודד
 
 

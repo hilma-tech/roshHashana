@@ -114,13 +114,13 @@ module.exports = function (CustomUser) {
                     }
                     if (res) {
                         if (res.city == null && status === 2) {
-                            cb(null, { ok: "blower new" })
+                            cb(null, { ok: "blower new", data: {name : res.name}})
                         } else
                             if ((res.city != null && status === 2)) {
                                 cb(null, { ok: "blower with data" })
                             } else
                                 if (res.city == null && status === 1) {
-                                    cb(null, { ok: "isolator new" })
+                                    cb(null, { ok: "isolator new" , data: {name : res.name}})
                                 } else
                                     if (res.city != null && status === 1) {
                                         cb(null, { ok: "isolator with data" })
