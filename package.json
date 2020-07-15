@@ -87,6 +87,7 @@
     "react": "^16.9.0",
     "react-app-polyfill": "^1.0.2",
     "react-dev-utils": "^9.0.3",
+    "react-device-detect": "^1.13.1",
     "react-dom": "^16.9.0",
     "react-dropzone": "^10.2.1",
     "react-geocode": "^0.2.1",

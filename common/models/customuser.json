@@ -172,7 +172,7 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "createNewShofarBlower"
+      "property": "createUser"
     },
     {
       "principalType": "ROLE",

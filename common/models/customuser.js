@@ -8,7 +8,7 @@ let msgText2 = `הקוד שלך הוא:`
 module.exports = function (CustomUser) {
 
 
-    CustomUser.createNewShofarBlower = async (name, phone, role) => {
+    CustomUser.createUser = async (name, phone, role) => {
         let resKey = await CustomUser.app.models.keys.createKey();
         console.log(resKey);
         try {
@@ -137,7 +137,7 @@ module.exports = function (CustomUser) {
 
     }
 
-    CustomUser.remoteMethod('createNewShofarBlower', {
+    CustomUser.remoteMethod('createUser', {
         http: { verb: 'post' },
         accepts: [
             { arg: 'name', type: 'string' },
