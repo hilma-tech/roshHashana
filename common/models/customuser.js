@@ -36,7 +36,6 @@ module.exports = function (CustomUser) {
                  
 
             } else {
-                console.log("ResFindUser.KeyId",ResFindUser.keyId);
                 if(ResFindUser && ResFindUser.keyId){
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId );
                 }

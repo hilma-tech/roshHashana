@@ -41,7 +41,7 @@ class Register extends React.Component {
 
   async handleSubmit() {
     if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0) {
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createNewShofarBlower`, {
+      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify({ "name": this.state.name, "phone": this.state.phone, "role": this.state.role })
