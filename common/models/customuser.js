@@ -36,10 +36,8 @@ module.exports = function (CustomUser) {
                  
 
             } else {
-                console.log("ResFindUser.KeyId",ResFindUser.keyId);
                 if(ResFindUser && ResFindUser.keyId){
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId );
-                    console.log("ResDeleteKey",ResDeleteKey);
                 }
                 
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
@@ -116,20 +114,19 @@ module.exports = function (CustomUser) {
                     }
                     if (res) {
                         if (res.city == null && status === 2) {
-                            cb(null, { ok: "blower new" })
+                            cb(null, { ok: "blower new", data: {name : res.name}})
                         } else
                             if ((res.city != null && status === 2)) {
                                 cb(null, { ok: "blower with data" })
                             } else
                                 if (res.city == null && status === 1) {
-                                    cb(null, { ok: "isolator new" })
+                                    cb(null, { ok: "isolator new" , data: {name : res.name}})
                                 } else
                                     if (res.city != null && status === 1) {
                                         cb(null, { ok: "isolator with data" })
                                     } else
                                         if (status == 3) {
                                             cb(null, { ok: "isolated with public meeting" })
-
                                             //TODO להוסיף הרשמה של מבודד לפגישה ציבורית
                                         } else cb(null, { ok: "problem" })
                     }
