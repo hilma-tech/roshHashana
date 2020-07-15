@@ -116,5 +116,9 @@
   "keys": {
     "public": true,
     "dataSource": "msql"
+  },
+  "city": {
+    "public": true,
+    "dataSource": "msql"
   }
 }

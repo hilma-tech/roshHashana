@@ -12,6 +12,24 @@ module.exports = function (Isolated) {
     //                             "comments": null
     // }
     Isolated.InsertDataIsolated = async (data, options) => {
+
+        try {
+            //check if the city is exist in city table
+            let res = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
+            //the city doesnt exist-> create the city
+            if (!res) {
+                try {
+                    let res = await Isolated.app.models.City.addNewCity(data.city);
+                }
+                catch (err) {
+                    return (err, null);
+                }
+            }
+        } catch (error) {
+            return (err, null);
+        }
+
+
         let objToIsolated = {
             "userIsolatedId": options.accessToken.userId,
             "public_phone": data.public_phone,
