@@ -107,8 +107,8 @@ class Register extends React.Component {
 
       }
 
-    }else if (this.state.status == "stepTwo" && this.state.key.length < 4) {
-      this.setState({ alart: errKey})
+    } else if (this.state.status == "stepTwo" && this.state.key.length < 4) {
+      this.setState({ alart: errKey })
     }
 
 
@@ -131,30 +131,35 @@ class Register extends React.Component {
   }
 
   render() {
-console.log(this.state.alart)
+    console.log(this.state.alart)
 
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`}  >
+        {this.state.status === "start" ?
+          <a href="/" ><img id="go-back" src="/icons/go-back.svg" /></a>
+          :
+         <img id="go-back" src="/icons/go-back.svg" onClick={()=>{this.setState({status : "start"})}} />
+        }
         <div className=""><img style={{ width: isBrowser ? '28vw' : '68vw', marginTop: isBrowser ? "3%" : "27%" }} src="/images/header.svg" /></div>
-        {this.props.location.state.type === 'blower' ? 
-        <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
-        :
-        this.props.location.state.type === 'isolator'&&
-        <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
+        {this.props.location.state.type === 'blower' ?
+          <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
+          :
+          this.props.location.state.type === 'isolator' &&
+          <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
         }
 
         {this.state.status === "start" ?
-            <div className="allInputInRegisterPage" >
-              <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} />
-              <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
-              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
-                שלח לי קוד
+          <div className="allInputInRegisterPage" >
+            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} />
+            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+            <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
+            <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
+              שלח לי קוד
                  </button>
 
-            </div>
+          </div>
           : <>
-           <div className="allInputInRegisterPage" >
+            <div className="allInputInRegisterPage" >
               <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} />
               <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
               <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
@@ -167,7 +172,7 @@ console.log(this.state.alart)
             </div></>
 
         }
-        
+
 
       </div>
     );

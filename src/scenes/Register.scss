@@ -5,6 +5,15 @@
     background-size: cover;
     height: 100vh;
 
+
+    #go-back {
+        height: 3rem;
+        width: 3rem;
+        position: absolute;
+        top: 2.5%;
+        right: 4%;
+    } 
+
     .allInputInRegisterPage{
         display: flex;
         flex-direction: column;
@@ -85,7 +94,14 @@
     background-repeat: no-repeat;
     background-size: cover;
     height: 100vh;
-
+   
+    #go-back {
+      height: 1.5rem;
+      width: 1.5rem;
+      position: absolute;
+      top: 2.5%;
+      right: 4%;
+  }
 
     .allInputInRegisterPage{
         display: flex;
