@@ -1,51 +1,78 @@
-.textTitle{
-    color: #ffffff;
-  
- .coverImg {
-    height: 100vh;
-    width: 100vw;
-    object-fit: cover;
- }
+.HomePage {
+   background-image: url("/images/shoparForStart.png");
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: cover;
+   height: 100vh;
 
- .imgText{
-    width: 65%;
- }
+   #text1 {
+      font-size: 190%;
+      margin-top: 18%;
+      font-weight: bold;
+   }
+   .textTitle {
+      color: #ffffff;
+   }
+   .coverImg {
+      height: 100vh;
+      width: 100vw;
+      object-fit: cover;
+   }
 
- .allText{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
- }
- .text1 {
-    font-weight: bold;
-    font-size: 132%;
-    margin-top: 6%;
- }
+   .imgText {
+      width: 102%;
+   }
 
- .RegisterIsolator{
-    background-color: #FFA62B;
-    color: white;
-    border: none;
-    padding: 3% 7%;
-    font-size: 130%;
-    font-weight: bold;
-    margin-top: 9%;
- }
- .RegisterBlower{
-    background-color: #489FB5;
-    color: white;
-    border: none;
-    padding: 3% 15%;
-    font-size: 130%;
-    font-weight: bold;
-    margin-top: 6%;
- }
- .text2{
-    font-size: 131%;
-    margin-top: 20%;
+   .browserButtonForRegister {
+      margin-top: 3%;
+      .browserRegisterIsolator {
+         padding: 1% 2%;
+         font-size: 3vh;
+         font-weight: bold;
+         background-color: #ffa62b;
+         // margin: 0 2vw;
+         color: white;
+         border: none;
+      }
+      .browserRegisterBlower {
+         margin: 0 2vw;
+         padding: 1% 6%;
+         color: white;
+         border: none;
+         font-size: 3vh;
+         font-weight: bold;
+         background-color: #489fb5;
+      }
+   }
+   .mobileButtonForRegister {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 
- }
+      .mobileRegisterIsolator {
+         background-color: #ffa62b;
+         color: white;
+         border: none;
+         padding: 2.5%;
+         width: 103%;
+         font-size: 3vh;
+         font-weight: bold;
+         margin-top: 12%;
+      }
+      .mobileRegisterBlower {
+         background-color: #489fb5;
+         color: white;
+         border: none;
+         padding: 2.5%;
+         width: 103%;
+         font-size: 3vh;
+         font-weight: bold;
+         margin-top: 4%;
+      }
+   }
 
+   #text2 {
+      font-size: 131%;
+      margin-top: 30%;
+   }
 }
