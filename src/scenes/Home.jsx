@@ -26,7 +26,7 @@ class Home extends React.Component {
             <div className="HomePage d-flex justify-content-center align-items-center ">
                 <div className="">
 
-                    <img style={{ width: isBrowser ? '28vw' : '70vw' }} src="/images/header.svg" />
+                    <img style={{ width: isBrowser ? '26vw' : '70vw' }} src="/images/header.svg" />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "160%", fontWeight: "bold" }} >
                         <div >תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
                     </div>

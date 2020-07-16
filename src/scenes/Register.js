@@ -4,8 +4,6 @@ import { observer, inject } from 'mobx-react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { BrowserView, isBrowser } from "react-device-detect";
-let isolator = "אני רוצה לשמוע תקיעת שופר"
-let blower = "אני רוצה לתקוע בשפור"
 let errKey = "קוד שגוי"
 let timeOut = "זמן הקוד פג"
 let SomethingMissing = "חסר שם או מספר טלפון לא תקין"
@@ -13,7 +11,7 @@ class Register extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      type: this.props.location.state.type === 'blower' ? blower : isolator,
+      // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
       role: this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3,
       phone: "",
@@ -24,7 +22,7 @@ class Register extends React.Component {
     };
     this.isolator1 = "אני רוצה לשמוע";
     this.isolator2 = "תקיעת שופר";
-    this.blower = "אני רוצה לתקוע בשפור";
+    this.blower = "אני רוצה לתקוע בשופר";
     console.log("!!!", this.props.location.state.type, this.state.role)
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -140,7 +138,7 @@ class Register extends React.Component {
           :
          <img id="go-back" src="/icons/go-back.svg" onClick={()=>{this.setState({status : "start"})}} />
         }
-        <div className=""><img style={{ width: isBrowser ? '28vw' : '68vw', marginTop: isBrowser ? "3%" : "27%" }} src="/images/header.svg" /></div>
+        <div className=""><img style={{ width: isBrowser ? '26vw' : '68vw', marginTop: isBrowser ? "2%" : "27%" }} src="/images/header.svg" /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
