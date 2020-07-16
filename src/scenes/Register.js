@@ -3,7 +3,7 @@ import React from 'react';
 import { observer, inject } from 'mobx-react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
-
+import { BrowserView, isBrowser } from "react-device-detect";
 let isolator = "אני רוצה לשמוע תקיעת שופר"
 let blower = "אני רוצה לתקוע בשפור"
 let errKey = "קוד שגוי"
@@ -22,6 +22,9 @@ class Register extends React.Component {
       alart: null,
       sendKey: false,
     };
+    this.isolator1 = "אני רוצה לשמוע";
+    this.isolator2 = "תקיעת שופר";
+    this.blower = "אני רוצה לתקוע בשפור";
     console.log("!!!", this.props.location.state.type, this.state.role)
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -51,6 +54,7 @@ class Register extends React.Component {
       }
       if (res) {
         this.setState({ status: "stepTwo" })
+        return
 
       }
     } else if (this.state.phone.length < 10 || this.state.name.length < 1 || this.state.phone && this.state.phone[0] != 0) {
@@ -103,6 +107,8 @@ class Register extends React.Component {
 
       }
 
+    }else if (this.state.status == "stepTwo" && this.state.key.length < 4) {
+      this.setState({ alart: errKey})
     }
 
 
@@ -125,32 +131,43 @@ class Register extends React.Component {
   }
 
   render() {
-
+console.log(this.state.alart)
 
     return (
-      <div>
-        {this.state.status === "start" ?
-          <div>
-            <div>{this.state.type}</div>
-            <input id="name" type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} />
-            <input id="phone" type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`}  >
+        <div className=""><img style={{ width: isBrowser ? '28vw' : '68vw', marginTop: isBrowser ? "3%" : "27%" }} src="/images/header.svg" /></div>
+        {this.props.location.state.type === 'blower' ? 
+        <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
+        :
+        this.props.location.state.type === 'isolator'&&
+        <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
+        }
 
-            <button onClick={this.handleSubmit}>
-              שלח לי קוד
+        {this.state.status === "start" ?
+            <div className="allInputInRegisterPage" >
+              <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} />
+              <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
+              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
+                שלח לי קוד
                  </button>
 
-          </div>
+            </div>
           : <>
-            <input id="key" type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} />
-            <button onClick={this.handleSubmit}> התחבר </button>
-            <button onClick={this.sendKey} >
-              שלח לי קוד מחדש
+           <div className="allInputInRegisterPage" >
+              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} />
+              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
+              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
+              <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
+                שלח לי קוד מחדש
                 </button>
 
-            <div>
+              <div>
+              </div>
             </div></>
+
         }
-        <div>{this.state.alart != null && this.state.alart}</div>
+        
 
       </div>
     );

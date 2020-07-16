@@ -26,16 +26,16 @@ class Home extends React.Component {
             <div className="HomePage d-flex justify-content-center align-items-center ">
                 <div className="">
 
-                    <img style={{ width: isBrowser ? '35vw' : '70vw' }} src="/images/header.svg" />
+                    <img style={{ width: isBrowser ? '28vw' : '70vw' }} src="/images/header.svg" />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "160%", fontWeight: "bold" }} >
                         <div >תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
                     </div>
                     <div className="buttonAll justify-content-center align-items-center">
                         <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} ` + ' row justify-content-center '} style={{ width: isBrowser && '56vw', marginTop: isBrowser && "3%", margin: !isBrowser && "10% 0% 0 0", }}>
-                            <div style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => this.onClickRegister(e.target.value)}>
-                                אני רוצה לשמוע תקיעת שופר  </div>
-                            <div className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value="blower" onClick={(e) => this.onClickRegister(e.target.value)}>
-                                אני רוצה לתקוע בשופר </div>
+                            <button style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => this.onClickRegister(e.target.value)}>
+                                אני רוצה לשמוע תקיעת שופר  </button>
+                            <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value="blower" onClick={(e) => this.onClickRegister(e.target.value)}>
+                                אני רוצה לתקוע בשופר </button>
                         </div>
                     </div>
                     {isBrowser ? <div className="text-light" id="text1">מפת תקיעות ארצית</div> :
