@@ -1,3 +1,4 @@
+@import "../../consts/generalStyles";
 #isolated-form-container {
     background-color: #f6f6f6;
     height: 100%;
@@ -27,7 +28,7 @@
         }
     }
     .msg-txt {
-        color: #16697a;
+        color: $turquoise;
         font-size: 1.5rem;
         width: fit-content;
         margin: auto;
@@ -37,6 +38,7 @@
     .header {
         margin-right: 10%;
         margin-left: 10%;
+        margin-bottom: 0;
     }
     form {
         input {
@@ -65,12 +67,18 @@
             }
         }
         input[type="text"],
-        .autocompleteInput {
+        .autocompleteInput,
+        input[type="number"] {
             border: black solid 1px;
+            margin: auto;
             margin-bottom: 5%;
             width: 80%;
             height: 3rem;
             padding-right: 5%;
+            font-size: 1rem;
+            &::-webkit-input-placeholder {
+                font-size: 1rem;
+            }
         }
 
         input[type="submit"] {
@@ -81,10 +89,20 @@
             border-style: none;
             border-color: transparent;
             border-image: none;
+            border-radius: 3px;
             border-width: 0;
             float: left;
             margin-left: 10%;
             margin-bottom: 5%;
+        }
+        input.increase-padding {
+            padding: 3% 10%;
+        }
+        input:focus {
+            outline-width: 0;
+        }
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
         }
         .preferance {
             font-size: 1.3rem;
@@ -149,7 +167,7 @@
             &.approval {
                 padding-left: 5%;
                 #approval {
-                    color: #16697a;
+                    color: $turquoise;
                     text-align: right;
                 }
                 input[type="checkbox"] {
@@ -179,6 +197,92 @@
             font-size: 1.2rem;
             color: darkred;
         }
+        .MuiFormControl-root {
+            width: 100%;
+            .MuiInputBase-input {
+                width: 75%;
+                height: 2rem;
+                color: black;
+                &::-webkit-input-placeholder {
+                    color: black;
+                    opacity: 1;
+                    font-size: 1rem;
+                }
+            }
+            .MuiInput-underline:before {
+                border: none;
+            }
+        }
+        .title {
+            font-size: 1.2rem;
+            padding: 1% 10%;
+            text-align: right;
+        }
+        #comment {
+            padding: 1% 10%;
+            text-align: right;
+        }
+        .public-meeting-options {
+            #public-place-container {
+                border-bottom: 1px solid #00000040;
+                margin-bottom: 2%;
+                padding-top: 2%;
+            }
+            #add-public-place {
+                display: flex;
+                flex-direction: row;
+                width: 50%;
+                justify-content: flex-start;
+                margin: auto;
+                align-items: center;
+                margin-bottom: 2%;
+                font-size: 1rem;
+                #plus {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: row;
+                    align-content: center;
+                    margin-left: 5%;
+                    border-radius: 50%;
+                    width: 1em;
+                    height: 1em;
+                    background-color: black;
+                    color: white;
+                }
+            }
+        }
+        .slider {
+            -webkit-appearance: none; /* Override default CSS styles */
+            appearance: none;
+            width: 80%; /* Full-width */
+            height: 0.2rem; /* Specified height */
+            background: #3e3e3e; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+            -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+            transition: opacity 0.2s;
+            border-radius: 20%;
+            &:hover {
+                opacity: 1; /* Fully shown on mouse-over */
+            }
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none; /* Override default look */
+                appearance: none;
+                width: 1rem; /* Set a specific slider handle width */
+                height: 1rem; /* Slider handle height */
+                background: #3e3e3e; /* Green background */
+                cursor: pointer; /* Cursor on hover */
+                border-radius: 50%;
+            }
+            &::-moz-range-thumb {
+                width: 1rem; /* Set a specific slider handle width */
+                height: 1rem; /* Slider handle height */
+                background: #3e3e3e; /* Green background */
+                cursor: pointer; /* Cursor on hover */
+                border-radius: 50%;
+            }
+        }
     }
 
     #modal-container {
@@ -189,6 +293,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
+        z-index: 1;
         #modal-contnet {
             font-size: 1.3rem;
             color: #1e2e31;
@@ -203,6 +308,10 @@
             margin: 7% auto;
         }
     }
+    .modal-resize {
+        width: 60% !important;
+    }
+
     #shofar-img {
         width: 100%;
         height: 100%;

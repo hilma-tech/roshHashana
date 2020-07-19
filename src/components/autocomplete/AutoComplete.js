@@ -93,7 +93,8 @@ export default class AutocompleteComponent extends Component {
     } else {
       let filteredOptions = [];
       this.props.optionsArr.forEach((option, index) => {
-        if (option[this.props.displyField].includes(inputValue)) {
+
+        if (option[this.props.displyField] && option[this.props.displyField].includes(inputValue)) {
           filteredOptions.push(option);
         }
       });
@@ -111,7 +112,7 @@ export default class AutocompleteComponent extends Component {
   render() {
     return (
       <label className="autocompleteContainer">
-       
+
         <input
           ref={this.props.inputRef || null}
           style={this.props.inputStyle}
