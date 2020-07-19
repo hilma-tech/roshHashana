@@ -136,7 +136,7 @@ class Register extends React.Component {
         {this.state.status === "start" ?
           <a href="/" ><img id="go-back" src="/icons/go-back.svg" /></a>
           :
-         <img id="go-back" src="/icons/go-back.svg" onClick={()=>{this.setState({status : "start"})}} />
+          <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
         <div className=""><img style={{ width: isBrowser ? '26vw' : '68vw', marginTop: isBrowser ? "2%" : "27%" }} src="/images/header.svg" /></div>
         {this.props.location.state.type === 'blower' ?
@@ -148,7 +148,7 @@ class Register extends React.Component {
 
         {this.state.status === "start" ?
           <div className="allInputInRegisterPage" >
-            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} />
+            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
             <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
             <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
             <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
@@ -158,7 +158,7 @@ class Register extends React.Component {
           </div>
           : <>
             <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} />
+              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} />
               <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
               <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
               <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
@@ -167,11 +167,7 @@ class Register extends React.Component {
 
               <div>
               </div>
-            </div></>
-
-        }
-
-
+            </div></>}
       </div>
     );
   }

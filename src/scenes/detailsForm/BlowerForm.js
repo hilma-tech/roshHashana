@@ -59,6 +59,10 @@ export default class IsolatedForm extends Component {
         })();
     }
 
+    goBack = () => {
+        this.props.history.goBack();
+    }
+
     //update the city of the shofar blower
     updateCity = (city) => {
         let chosenCity;
@@ -133,35 +137,35 @@ export default class IsolatedForm extends Component {
 
         await this.checkForMissingDataInPublicPlaces();
 
-        // await Geocode.fromAddress(address).then(
-        //     async response => {
-        //         let blowerDetails = {
-        //             "can_blow_x_times": formChilds[1].value,
-        //             "volunteering_start_time": new Date(this.state.chosenTime),
-        //             "volunteering_end_time": endTime,
-        //             "city": this.state.chosenCity,
-        //             "street": formChilds[7].value,
-        //             "appartment": formChilds[8].value,
-        //             "publicPlaces": this.state.publicPlaces
-        //         }
-        //         this.setState({ errorMsg: '' });
+        await Geocode.fromAddress(address).then(
+            async response => {
+                let blowerDetails = {
+                    "can_blow_x_times": formChilds[1].value,
+                    "volunteering_start_time": new Date(this.state.chosenTime),
+                    "volunteering_end_time": endTime,
+                    "city": this.state.chosenCity,
+                    "street": formChilds[7].value,
+                    "appartment": formChilds[8].value,
+                    "publicPlaces": this.state.publicPlaces
+                }
+                this.setState({ errorMsg: '' });
 
-        //         //update shofar blower details
-        //         let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
-        //             headers: { Accept: "application/json", "Content-Type": "application/json" },
-        //             method: "POST",
-        //             body: JSON.stringify({ data: blowerDetails })
-        //         }, true);
-        //         if (res) {
-        //open modal with message
-        this.setState({ openModal: true });
-        //         }
-        //     },
-        //     error => {
-        //         this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
-        //         return;
-        //     }
-        // );
+                //update shofar blower details
+                let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    method: "POST",
+                    body: JSON.stringify({ data: blowerDetails })
+                }, true);
+                if (res) {
+                    //open modal with message
+                    this.setState({ openModal: true });
+                }
+            },
+            error => {
+                this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
+                return;
+            }
+        );
     }
 
     render() {
@@ -170,7 +174,7 @@ export default class IsolatedForm extends Component {
             <div id="isolated-form-container" className={`${this.state.openModal ? 'change-color' : ''}`}>
 
                 <div className="form-container" style={{ width: isBrowser ? '40%' : '100%', opacity: this.state.openModal ? '0.2' : '1' }}>
-                    <img id="go-back" src="/icons/go-back.svg" />
+                    <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                     <div className="msg-txt header"> {`שלום ${name}, `}</div>
                     <div className="msg-txt header">ותודה על הנכונות לעזור!</div>
                     <div className="msg-txt header">כמה שאלות, ונמשיך לקביעת המפגש</div>

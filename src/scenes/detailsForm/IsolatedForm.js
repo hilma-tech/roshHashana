@@ -28,6 +28,12 @@ export default class IsolatedForm extends Component {
         })();
     }
 
+    goBack = () => {
+        this.props.history.goBack();
+    }
+
+
+    //update the chosen city
     updateCity = (city) => {
         let chosenCity;
         if (city.name) chosenCity = city.name;
@@ -35,6 +41,7 @@ export default class IsolatedForm extends Component {
         this.setState({ chosenCity });
     }
 
+    //save the isolated details
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
@@ -88,7 +95,7 @@ export default class IsolatedForm extends Component {
 
                 {!this.state.openModal ?
                     <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
-                        <img id="go-back" src="/icons/go-back.svg" />
+                        <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                         <div className="msg-txt header">{`שלום ${name},`}</div>
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>

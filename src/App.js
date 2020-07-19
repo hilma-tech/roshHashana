@@ -44,7 +44,7 @@ class App extends Component {
                     <div className="App">
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
-                            <Route path="/Register" component={(props) => <Register {...props} />} />
+                            <Route path="/register" component={(props) => <Register {...props} />} />
                             <Route path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <Route path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <Route path="/public-shofar-blowing-map" component={(props) => <Map {...props} publicMap />} />

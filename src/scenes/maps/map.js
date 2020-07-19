@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow } from "react-google-maps";
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 import Geocode from "react-geocode";
+import _ from "lodash";
 import './map.scss';
 import db from '../db.json';
 
@@ -10,6 +11,7 @@ const mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
+    componentRestrictions: { country: "il" }
 };
 
 const SHOFAR_BLOWER = 'shofar blower';
@@ -29,13 +31,14 @@ export default class MyTestComponent extends Component {
 
     componentDidMount() {
         (async () => {
+
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
 
             if (this.props.publicMap) await this.setPublicMapContent();
-            console.log(this.state.allLocations, 'ksksl')
-            Geocode.fromAddress("צור הדסה רכסים 7").then(
+            Geocode.fromAddress("ירושלים").then(
                 response => {
+                    console.log(response, 'res')
                     const { lat, lng } = response.results[0].geometry.location;
                     this.setState({ center: { lat, lng } });
                 },
@@ -95,10 +98,12 @@ export default class MyTestComponent extends Component {
     }
 
     changeCenter = (newCenter) => {
-        console.log(newCenter, 'new');
         this.setState({ center: newCenter });
     }
 
+    getCenter = () => {
+        return this.state.center;
+    }
     // setRoute = (startPoint, points) => {
     //     let google = window.google;
     //     this.directionsRenderer = new google.maps.DirectionsRenderer();//used to be called directionsDisplay
@@ -136,10 +141,11 @@ export default class MyTestComponent extends Component {
         return (
             <div id="map-contaoner">
                 <MyMapComponent
+                    getCenter={this.getCenter}
                     changeCenter={this.changeCenter}
                     allLocations={this.state.allLocations}
                     center={Object.keys(this.state.center).length ? this.state.center : { lat: 31.7767257, lng: 35.2346218 }}
-                    isMarkerShown
+                    isMarkerShown={this.state.isMarkerShown}
                     googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                     loadingElement={<img src='/icons/loader.svg' />}
                     containerElement={<div style={{ height: `100vh` }} />}
@@ -153,11 +159,11 @@ export default class MyTestComponent extends Component {
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) =>
     <GoogleMap
-        defaultZoom={18}
+        defaultZoom={20}
         defaultOptions={mapOptions}
-        center={props.center}
-    >
-        <SearchBoxCreator changeCenter={props.changeCenter} />
+        // bounds={31.4117257, 35.0818155}
+        center={props.center}>
+        <SearchBoxCreator changeCenter={props.changeCenter} getCenter={props.getCenter} />
         {props.isMarkerShown && <Marker position={props.center} />}
         {props.allLocations && props.allLocations.map((locationInfo, index) => {
             return <MarkerCreator key={index} locationInfo={locationInfo} />
@@ -199,7 +205,6 @@ class SearchBoxCreator extends Component {
 
     componentDidMount() {
         var bounds = new window.google.maps.LatLngBounds();
-        console.log(bounds, 'bounds')
         Geocode.fromAddress('ישראל').then(
             response => {
                 const { lat, lng } = response.results[0].geometry.location;
@@ -215,7 +220,7 @@ class SearchBoxCreator extends Component {
     onPlacesChanged = () => {
         let places = this.SearchBoxRef.current.getPlaces();
         const bounds = new window.google.maps.LatLngBounds();
-        console.log('hetyyy', places);
+        console.log(bounds, '1');
         places.forEach(place => {
             if (place.geometry.viewport) {
                 bounds.union(place.geometry.viewport)
@@ -223,29 +228,22 @@ class SearchBoxCreator extends Component {
                 bounds.extend(place.geometry.location)
             }
         });
-        //const nextMarkers =
-        places.forEach(place => {
-            console.log(place, 'place');
-            //({
-            //     position: place.geometry.location,
-            // })
-        });
-        // console.log(nextCenter, 'nextMarkers');
-        // const nextCenter = _.get(nextMarkers, '0.position', this.state.center);
-        // const nextCenter = nextMarkers;
+        console.log(bounds, '2');
 
-        // this.props.changeCenter(nextCenter);
-        // this.setState({
-        //     center: nextCenter,
-        //     markers: nextMarkers,
-        // });
+
+        const nextMarkers = places.map(place => ({
+            position: place.geometry.location,
+        }));
+        const nextCenter = _.get(nextMarkers, '0.position', this.props.getCenter());
+        this.props.changeCenter(nextCenter);
+        // this.SearchBoxRef.current.map.fitBounds(bounds);
     }
 
     render() {
 
         return (<SearchBox
+            strictBounds={true}
             ref={this.SearchBoxRef}
-            // bounds={this.state.bounds}
             controlPosition={window.google.maps.ControlPosition.TOP_CENTER}
             onPlacesChanged={this.onPlacesChanged}
         >
@@ -254,19 +252,6 @@ class SearchBoxCreator extends Component {
                     id="search-input"
                     type="text"
                     placeholder="חיפוש"
-                    style={{
-                        boxSizing: `border-box`,
-                        border: `1px solid transparent`,
-                        width: `240px`,
-                        height: `32px`,
-                        marginTop: `27px`,
-                        padding: `0 12px`,
-                        borderRadius: `3px`,
-                        boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                        fontSize: `14px`,
-                        outline: `none`,
-                        textOverflow: `ellipses`,
-                    }}
                 />
                 <img id="search-icon" src="/icons/search.svg" />
             </div>

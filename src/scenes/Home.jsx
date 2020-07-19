@@ -19,6 +19,9 @@ class Home extends React.Component {
 
     }
 
+    openMap = () => {
+        this.props.history.push('/public-shofar-blowing-map');
+    }
 
     render() {
 
@@ -38,13 +41,13 @@ class Home extends React.Component {
                                 אני רוצה לתקוע בשופר </button>
                         </div>
                     </div>
-                    {isBrowser ?<>
-                        <div className=""><img style={{ width:  '5vw' , marginTop:"6%"  }} src="/images/map.svg" /></div>
-                        <div className="text-light" id="text1">מפת תקיעות ארצית</div>
-                       </>
-                     :<>
-                        <div className="text-light" style={{ fontSize: "3vh", fontWeight: 'bold', marginTop: "17%" }}>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
-                        <div className=""><img style={{ width: '12vw', marginTop: "7%" }} src="/images/map.svg" /></div></>
+                    {isBrowser ? <>
+                        <div className="clickAble" onClick={this.openMap}><img style={{ width: '5vw', marginTop: "6%" }} src="/images/map.svg" /></div>
+                        <div className="text-light clickAble" id="text1" onClick={this.openMap}>מפת תקיעות ארצית</div>
+                    </>
+                        : <>
+                            <div className="text-light" style={{ fontSize: "3vh", fontWeight: 'bold', marginTop: "17%" }}>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
+                            <div className=""><img style={{ width: '12vw', marginTop: "7%" }} src="/images/map.svg" /></div></>
                     }
                 </div>
             </div>
