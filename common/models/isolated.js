@@ -12,21 +12,22 @@ module.exports = function (Isolated) {
     //                             "comments": null
     // }
     Isolated.InsertDataIsolated = async (data, options) => {
-
+        let city;
         try {
             //check if the city is exist in city table
-            let res = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
+            city = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
             //the city doesnt exist-> create the city
-            if (!res) {
+            if (!city.id) {
                 try {
-                    let res = await Isolated.app.models.City.addNewCity(data.city);
+                    city = await Isolated.app.models.City.addNewCity(data.city, options);
                 }
                 catch (err) {
-                    return (err, null);
+                    throw err;
                 }
             }
         } catch (error) {
-            return (err, null);
+
+            throw error;
         }
 
 
@@ -36,11 +37,12 @@ module.exports = function (Isolated) {
             "public_meeting": data.public_meeting
         },
             objToCU = {
-                "city": data.city,
+                "cityId": city.id,
                 "street": data.street,
                 "appartment": data.appartment,
                 "comments": data.comments
             };
+
         try {
 
             let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });

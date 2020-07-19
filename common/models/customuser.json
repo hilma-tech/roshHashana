@@ -62,16 +62,16 @@
         "nullable": "Y"
       }
     },
-    "city": {
-      "type": "String",
+    "cityId": {
+      "type": "Number",
       "required": false,
-      "length": 50,
+      "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "city",
-        "dataType": "varchar",
-        "dataLength": 50,
+        "columnName": "cityId",
+        "dataType": "int",
+        "dataLength": 255,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "N"
@@ -153,6 +153,11 @@
       "model": "isolated",
       "type": "hasMany",
       "foreignKey": "userIsolatedId"
+    },
+    "userCity": {
+      "model": "city",
+      "type": "belongsTo",
+      "foreignKey": "cityId"
     }
   },
   "acls": [

@@ -82,7 +82,7 @@ CREATE TABLE `CustomUser` (
   `username` varchar(512) DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `keyId` int(11) DEFAULT NULL,
-  `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cityId` int(11) DEFAULT NULL,
   `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `appartment` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `comments` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -533,11 +533,11 @@ DROP TABLE IF EXISTS `shofar_blower_pub`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `shofar_blower_pub` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `city` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `cityId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `street` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `comments` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `start_time` datetime NOT NULL,
-  `blowerId` int(11) unsigned NOT NULL,
+  `blowerId` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
