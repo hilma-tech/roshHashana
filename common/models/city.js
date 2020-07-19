@@ -12,9 +12,10 @@ module.exports = function (City) {
     }
 
     City.addNewCity = async (newCity, options) => {
-        if (options.accessToken && options.accessToken.id) {
+        if (options.accessToken && options.accessToken.userId) {
             try {
                 let res = await City.create({ name: newCity });
+                return res.id
             } catch (error) {
                 throw error;
             }
@@ -29,7 +30,7 @@ module.exports = function (City) {
     City.remoteMethod('addNewCity', {
         http: { verb: 'post' },
         accepts: [
-            { arg: 'newCity', type: 'object' },
+            { arg: 'newCity', type: 'string' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         ],
     });
