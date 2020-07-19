@@ -1,0 +1,170 @@
+.browserRegisterPage {
+    background-image: url("/images/shoparForStart.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+
+
+    #go-back {
+        height: 2rem;
+        width: 2rem;
+        position: absolute;
+        top: 2.5%;
+        right: 4%;
+    } 
+
+    .allInputInRegisterPage{
+        display: flex;
+        flex-direction: column;
+    }
+    .browserinputTextAndPhone{
+        font-size: 180%;
+        margin-top: 0%;
+        color: #ffffff;
+
+
+    }
+    .browsername{
+        border: 1.2px solid #ffffff;
+        margin: 1% 36% 0% 36%;
+        background-color: #F2F2F2BA;
+        padding: 1%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        // color: #16697A;
+        &::placeholder {color: #16697A;}
+
+    }
+    .browserphone{
+        background-color: #F2F2F2BA;
+        border :none;
+        border: 1.2px solid #ffffff;  
+        margin: 1% 36% 0% 36%;
+        padding: 1%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        &::placeholder {color: #16697A;}
+    }
+    .browserkey{
+        border: 1.2px solid #ffffff;
+        margin: 2% 36% 0% 36%;
+        background-color: #F2F2F2BA;
+        padding: 1%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        // color: #16697A;
+        &::placeholder {color: #16697A;}
+    }
+
+    #browserbuttonAgn{
+        font-size: 130%;
+        background: none;
+        border: none;
+        border-bottom-style: solid;
+        border-bottom-width: thin;
+        width: fit-content;
+        margin: auto;
+        margin-top: 1%;
+
+    }
+
+    .browserbutton1{
+        border: none;
+        padding: 1% 0%;
+        margin: 1% 44% 0% 44%;
+        color: #ffffff;
+        background-color: #489FB5;
+        font-size: 2.5vh;
+        font-weight: bold;
+    }
+    .browseralartRegisterPage{
+        font-size: 110%;
+        font-weight: bold;
+
+    }
+
+
+} 
+
+
+.mobileRegisterPage{
+    background-image: url("/images/imgShopar.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+   
+    #go-back {
+      height: 1.5rem;
+      width: 1.5rem;
+      position: absolute;
+      top: 2.5%;
+      right: 4%;
+  }
+
+    .allInputInRegisterPage{
+        display: flex;
+        flex-direction: column;
+    }
+    .mobileinputTextAndPhone{
+        font-size: 170%;
+        margin: 8% 0% 2% 0%;
+        color: #ffffff;
+
+
+    }
+    .mobilename{
+        border: 1.2px solid #ffffff;
+        margin: 5% 10% 3% 10%;
+        background-color: #f2f2f252;
+        padding: 3%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        &::placeholder {color: #16697A;}
+
+    }
+    .mobilephone{
+        background-color: #f2f2f252;
+        border: 1.2px solid #ffffff;
+        margin: 1% 10% 1% 10%;
+        padding: 3%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        &::placeholder {color: #16697A;}
+    }
+    .mobilekey{
+        border: 1.2px solid #ffffff;
+        margin: 22% 10% 3% 10%;
+        background-color: #f2f2f252;
+        padding: 3%;
+        font-size: 2.2vh;
+        font-weight: bold;
+        &::placeholder {color: #16697A;}
+    }
+ 
+    #mobilebuttonAgn{
+        background: none;
+        border: none;
+        border-bottom-style: solid;
+        border-bottom-width: thin;
+        width: fit-content;
+        margin: auto;
+        margin-top: 5%;
+
+    }
+    .mobilebutton1{
+        border: none;
+        padding: 2% 0%;
+        margin: 5% 22% 0% 22%;
+        color: #ffffff;
+        background-color: #489FB5;
+        font-size: 157%;
+        font-weight: bold;
+    }
+    .mobilealartRegisterPage{
+        font-size: 100%;
+        font-weight: bold;
+
+    }
+}

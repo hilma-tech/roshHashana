@@ -1,32 +1,78 @@
-.textTitle{
-    color: #ffffff;
-  
- .coverImg {
-    height: 100vh;
-    width: 100vw;
-    object-fit: cover;
-    
- }
+.HomePage {
+   background-image: url("/images/shoparForStart.png");
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: cover;
+   height: 100vh;
 
- .allText{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
- }
- .RegisterIsolator{
-    background-color: #FFA62B;
-    color: white;
-    border: none;
-    padding: 5% 7%;
- }
- .RegisterBlower{
-    background-color: #489FB5;
-    color: white;
-    border: none;
-    padding: 5% 18%;
+   #text1 {
+      font-size: 205%;
+      margin-top: 1%;
+      font-weight: bold;
+   }
+   .textTitle {
+      color: #ffffff;
+   }
+   .coverImg {
+      height: 100vh;
+      width: 100vw;
+      object-fit: cover;
+   }
 
- }
+   .imgText {
+      width: 102%;
+   }
 
+   .browserButtonForRegister {
+      margin-top: 3%;
+      .browserRegisterIsolator {
+         padding: 2% 3%;
+         font-size: 3vh;
+         font-weight: bold;
+         background-color: #ffa62b;
+         // margin: 0 2vw;
+         color: white;
+         border: none;
+      }
+      .browserRegisterBlower {
+         margin: 0 2vw;
+         padding: 2% 6%;
+         color: white;
+         border: none;
+         font-size: 3vh;
+         font-weight: bold;
+         background-color: #489fb5;
+      }
+   }
+   .mobileButtonForRegister {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .mobileRegisterIsolator {
+         background-color: #ffa62b;
+         color: white;
+         border: none;
+         padding: 2.5%;
+         width: 103%;
+         font-size: 3vh;
+         font-weight: bold;
+         margin-top: 12%;
+      }
+      .mobileRegisterBlower {
+         background-color: #489fb5;
+         color: white;
+         border: none;
+         padding: 2.5%;
+         width: 103%;
+         font-size: 3vh;
+         font-weight: bold;
+         margin-top: 4%;
+      }
+   }
+
+   #text2 {
+      font-size: 131%;
+      margin-top: 30%;
+   }
 }
