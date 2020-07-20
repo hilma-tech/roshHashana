@@ -1,15 +1,17 @@
 
 import React from 'react';
-import { observer, inject } from 'mobx-react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { BrowserView, isBrowser } from "react-device-detect";
 let errKey = "קוד שגוי"
 let timeOut = "זמן הקוד פג"
 let SomethingMissing = "חסר שם או מספר טלפון לא תקין"
+const generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
 class Register extends React.Component {
   constructor(props) {
     super(props);
+    console.log(this.props.location);
+    
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
@@ -138,12 +140,16 @@ class Register extends React.Component {
           :
           <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
+        
         <div className=""><img style={{ width: isBrowser ? '26vw' : '68vw', marginTop: isBrowser ? "2%" : "27%" }} src="/images/header.svg" /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
-          this.props.location.state.type === 'isolator' &&
-          <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
+          this.props.location.state.type === 'isolator' ?
+            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
+            :
+            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{generalUser}</div>
+
         }
 
         {this.state.status === "start" ?

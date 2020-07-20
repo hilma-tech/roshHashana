@@ -1,19 +1,30 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow } from "react-google-maps";
-import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 import Geocode from "react-geocode";
 import _ from "lodash";
 import Auth from '../../modules/auth/Auth';
 import './map.scss';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
+const israelCoords = [
+    { lat: 32.863532, lng: 35.889902 },
+    { lat: 33.458826, lng: 35.881345 },
+    { lat: 33.107715, lng: 35.144508 },
+    { lat: 31.296718, lng: 34.180102 },
+    { lat: 29.486869, lng: 34.881321 },
+    { lat: 29.551662, lng: 34.984779 },
+];
 
-const mapOptions = {
+var mapOptions = {
     fullscreenControl: false,
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    componentRestrictions: { country: "il" }
+    // componentRestrictions: { country: "il" },
+    // restriction: {
+    //     latLngBounds: polygonBounds(israelPolygon),
+    //     strictBounds: false
+    // }
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -59,7 +70,7 @@ const MapComp = (props) => {
 
         //private meetings
         mapInfo && mapInfo.privateMeetings && mapInfo.privateMeetings.forEach(async privateMeet => { // isolated location (private meetings)
-            const address = privateMeet.cityMeeting + privateMeet.streetMeeting + privateMeet.appartment;
+            const address = privateMeet.cityMeeting + ' ' + privateMeet.streetMeeting + ' ' + privateMeet.appartment;
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
             try {
@@ -77,10 +88,11 @@ const MapComp = (props) => {
         });
 
         mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
-            const address = pub.city + pub.street;
+            const address = pub.city + ' ' + pub.street;
             const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
+                const time = `${new Date(pub.start_time).getHours() + ':' + new Date(pub.start_time).getMinutes()}`
                 const { lat, lng } = response.results[0].geometry.location;
                 let newLocObj = {
                     type: SHOFAR_BLOWING_PUBLIC,
@@ -89,10 +101,10 @@ const MapComp = (props) => {
                         <div className="info-window-header">תקיעה ציבורית</div>
                         <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
                         <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{pub.start_time}</div></div>
+                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{time}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                        <div id="join-button">הצטרף לתקיעה</div>
+                        <div id="join-button" className="clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                     </div>
                 };
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
@@ -100,8 +112,13 @@ const MapComp = (props) => {
         });
     }
 
+    const joinPublicMeeting = async (meetingInfo) => {
+        console.log(props)
+        props.history.push('/register', { type: 'generalUser', meetingInfo })
+    }
+
     return (
-        <div id="map-contaoner">
+        <div id="map-container" className={'slide-in-bottom'}>
             <MyMapComponent
                 changeCenter={setCenter}
                 allLocations={allLocations}
@@ -109,9 +126,10 @@ const MapComp = (props) => {
                 isMarkerShown={isMarkerShown}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img src='/icons/loader.svg' />}
-                containerElement={<div style={{ height: `100vh` }} />}
+                containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
+            <div className="close-map clickAble" onClick={props.closeMap}>^</div>
         </div>
     );
 }
@@ -122,10 +140,30 @@ export default MapComp;
 
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
+    let options = mapOptions;
+    var israelPolygon = new window.google.maps.Polygon({
+        paths: israelCoords,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    var bounds = new window.google.maps.LatLngBounds();
+    for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
+        for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
+            bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
+        }
+    }
+    options.restriction = {
+        latLngBounds: bounds,
+        strictBounds: false
+    }
 
     return <GoogleMap
         defaultZoom={20}
-        defaultOptions={mapOptions}
+        defaultOptions={options}
         // bounds={31.4117257, 35.0818155}
         center={props.center}
     >
@@ -139,49 +177,26 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 ));
 
 const SearchBoxGenerator = (props) => {
-    const searchBoxRef = useRef()
 
-    const handlePlacesChange = () => {
-        let places = searchBoxRef.current.getPlaces();
-        console.log('places: ', places);
-        const bounds = new window.google.maps.LatLngBounds();
-        // console.log(bounds, '1');
-        places.forEach(place => {
-            if (place.geometry.viewport) {
-                bounds.union(place.geometry.viewport)
-            } else {
-                bounds.extend(place.geometry.location)
-            }
-        });
-        console.log(bounds, '2');
-
-
-        const nextMarkers = places.map(place => ({
-            position: place.geometry.location,
-        }));
-        const nextCenter = _.get(nextMarkers, '0.position', props.center);
-        props.changeCenter(nextCenter);
-        // this.SearchBoxRef.current.map.fitBounds(bounds);
-    }
-
-
+    useEffect(() => {
+        const input = document.getElementById('search-input');
+        let autocomplete = new window.google.maps.places.Autocomplete(input);
+        autocomplete.setComponentRestrictions({ "country": "il" });
+        autocomplete.addListener("place_changed", () => {
+            let place = autocomplete.getPlace();
+            props.changeCenter(place.geometry.location);
+        })
+    }, []);
 
     return (
-        <SearchBox
-            strictBounds={true}
-            ref={searchBoxRef}
-            controlPosition={window.google.maps.ControlPosition.TOP_CENTER}
-            onPlacesChanged={handlePlacesChange}
-        >
-            <div id="search-input-container">
-                <input
-                    id="search-input"
-                    type="text"
-                    placeholder="חיפוש"
-                />
-                <img id="search-icon" src="/icons/search.svg" />
-            </div>
-        </SearchBox>
+        <div id="search-input-container">
+            <input
+                id="search-input"
+                type="text"
+                placeholder="חיפוש"
+            />
+            <img id="search-icon" src="/icons/search.svg" />
+        </div>
     );
 }
 
