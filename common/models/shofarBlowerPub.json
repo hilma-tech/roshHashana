@@ -138,6 +138,13 @@
             "principalId": "$authenticated",
             "permission": "ALLOW",
             "property": "createNewPubMeeting"
+        },
+        {
+
+            "principalType": "ROLE",
+            "principalId": "$authenticated",
+            "permission": "ALLOW",
+            "property": "createNewPubMeeting"
         }
     ]
 }

@@ -20,7 +20,7 @@ class Home extends React.Component {
     }
 
     openMap = () => {
-        this.props.history.push('/public-shofar-blowing-map');
+        this.props.history.push('/public-map');
     }
 
     render() {

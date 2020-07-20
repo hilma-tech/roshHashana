@@ -19,6 +19,7 @@
 4. Open new file - 
     Name - .env
     Write inside - REACT_APP_DOMAIN = "REACT_APP_DOMAIN"
+                   REACT_APP_GOOGLE_KEY= "REACT_APP_GOOGLE_KEY"
 
 5. Arrange the datasources
 

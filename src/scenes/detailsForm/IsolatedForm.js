@@ -118,21 +118,21 @@ export default class IsolatedForm extends Component {
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
-                            <div className="checkbox-container">
+                            <div className="checkbox-container ">
                                 <div>בפתח הבית</div>
-                                <input id="home" type="radio" name="preferance" defaultChecked />
+                                <input className="clickAble" type="radio" name="preferance" defaultChecked />
                             </div>
 
-                            <div className="checkbox-container">
+                            <div className="checkbox-container ">
                                 <div>בחלון או במרפסת הפונה לרחוב</div>
-                                <input id="street" type="radio" name="preferance" />
+                                <input className="clickAble" type="radio" name="preferance" />
                             </div>
 
                             <input autoComplete={'off'} id="comments" type="text" placeholder="הערות" />
 
-                            <div className="checkbox-container approval">
+                            <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                                <input type="checkbox" ></input>
+                                <input className="clickAble" type="checkbox" ></input>
                             </div>
 
                             <div className="err-msg">{this.state.errorMsg}</div>
@@ -140,7 +140,7 @@ export default class IsolatedForm extends Component {
                             <input type="submit" value="מצאו לי בעל תוקע" />
                         </form>
                     </div>
-                    : <div id="modal-container">
+                    : <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
                         <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
                         <div id="button">הבנתי תודה</div>
                     </div>}
