@@ -3,9 +3,8 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 import Geocode from "react-geocode";
 import _ from "lodash";
+import Auth from '../../modules/auth/Auth';
 import './map.scss';
-import db from '../db.json';
-
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -19,13 +18,26 @@ const mapOptions = {
 
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
-const ISOLATED = 'isolated';
+const PRIVATE_MEETING = 'private meeting';
 
 const MapComp = (props) => {
 
-    const [allLocations, setAllLocations] = useState([])
-    const [center, setCenter] = useState({})
-    const [isMarkerShown, setIsMarkerShown] = useState(false)
+    const [allLocations, setAllLocations] = useState([]);
+    const [center, setCenter] = useState({});
+    const [isMarkerShown, setIsMarkerShown] = useState(false);
+    const [mapInfo, setMapInfo] = useState({});
+
+    useEffect(() => {
+        (async () => {
+
+            let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap}`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" }
+            }, true);
+            if (mapContent) {
+                setMapInfo(mapContent);
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         (async () => {
@@ -36,53 +48,55 @@ const MapComp = (props) => {
             if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
             try {
                 const newCenter = res.results[0].geometry.location;
-                setCenter(newCenter)
+                if (newCenter !== center) setCenter(newCenter)
             } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
-        })()
-    }, [])
+        })();
+    }, [mapInfo])
+
 
 
     const setPublicMapContent = async () => {
-        //isolated meetings
-        //public meetings
-        db.isolateds.forEach(async isolated => { // isolated location (private meetings)
-            let [error, response] = await to(Geocode.fromAddress(isolated.address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
+
+        //private meetings
+        mapInfo && mapInfo.privateMeetings && mapInfo.privateMeetings.forEach(async privateMeet => { // isolated location (private meetings)
+            const address = privateMeet.cityMeeting + privateMeet.streetMeeting + privateMeet.appartment;
+            let [error, response] = await to(Geocode.fromAddress(address))
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
-                const shofarBlowerName = db.shofarlowers.find((shofarBlower) => shofarBlower.id === isolated.shofarBlowerId).name;
                 const newLocObj = {
-                    type: ISOLATED,
+                    type: PRIVATE_MEETING,
                     location: { lat, lng },
                     info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{shofarBlowerName}</div></div>
+                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
                         <div>לא ניתן להצטרף לתקיעה זו</div></div>
                 }
-                setAllLocations(allLocations => Array.isArray(allLocations) ? allLocations.push(newLocObj) : [newLocObj])
+
+                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
             } catch (e) { console.log("err setPublicMapContent, ", e); }
         });
 
-        db.pubSHofarBlowing.forEach(async pub => { //public meetings location
-            const [error, response] = await to(Geocode.fromAddress(pub.address))
+        mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
+            const address = pub.city + pub.street;
+            const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
-                const shofarBlowerInfo = db.shofarlowers.find((shofarBlower) => shofarBlower.id === pub.shofarBlowerId);
                 let newLocObj = {
                     type: SHOFAR_BLOWING_PUBLIC,
                     location: { lat, lng },
                     info: <div id="info-window-container">
                         <div className="info-window-header">תקיעה ציבורית</div>
-                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{shofarBlowerInfo.name}</div></div>
-                        <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{pub.address}</div></div>
-                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{pub.startTime}</div></div>
+                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                        <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
+                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{pub.start_time}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                         <div id="join-button">הצטרף לתקיעה</div>
                     </div>
                 };
-                setAllLocations(allLocations => Array.isArray(allLocations) ? allLocations.push(newLocObj) : [newLocObj]);
-            } catch (e) { console.log("cought Geocode.fromAddress(pub.address)==", pub.address, " : ", e); return; }
+                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+            } catch (e) { console.log("cought Geocode.fromAddress(pub.address)==", address, " : ", e); return; }
         });
     }
 
@@ -181,11 +195,16 @@ const MarkerGenerator = (props) => {
     }
 
     const { info, location, type } = props.locationInfo;
-
+    const icon = {
+        url: type === PRIVATE_MEETING ? '/icons/single-blue.svg' : '/icons/group-orange.svg',
+        scaledSize: type === PRIVATE_MEETING ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
+        origin: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(0, 0)
+    }
 
     return (
         <Marker
-            icon={type === ISOLATED ? '/icons/single-blue.svg' : '/icons/group-orange.svg'}
+            icon={icon}
             onClick={closeOrOpenInfoWindow}
             position={{ lat: location.lat, lng: location.lng }}>
             {isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
