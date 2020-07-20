@@ -141,16 +141,16 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.getMapData = async (isPubMap = false, options) => {
-        
+
         //get all private meetings
-        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser, `select isolatedUser.name AS "isolatedName", city.name AS "city meeting", isolatedUser.street "street meeting", isolatedUser.appartment, isolatedUser.comments, blowerUser.name AS "sbName" FROM isolated left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId left join city on isolatedUser.cityId = city.id left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId where isolated.blowerMeetingId is not null;`);
+        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser, `select isolatedUser.name AS "isolatedName", city.name AS "cityMeeting", isolatedUser.street "streetMeeting", isolatedUser.appartment, isolatedUser.comments, blowerUser.name AS "blowerName" FROM isolated left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId left join city on isolatedUser.cityId = city.id left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId where isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser, `select blowerUser.name AS "blowerName", city.name AS "city", shofar_blower_pub.street, shofar_blower_pub.comments , shofar_blower_pub.start_time from shofar_blower_pub LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId LEFT JOIN city on city.id = shofar_blower_pub.cityId where blowerId is not null;`);
             if (errPublic) throw errPublic;
-            
-            if (resPublic){
+
+            if (resPublic) {
                 let userAddress;
                 //get user address if it is not public map
                 if (!isPubMap) {

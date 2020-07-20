@@ -9,9 +9,10 @@ import { PrivateRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
+import MapComp from './scenes/maps/mapp';
 // import SimpleUserHome from "./scenes/Home";
 
-const Map = loadable(() => import('./scenes/maps/map'));
+const Map = loadable(() => import('./scenes/maps/mapp'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 
