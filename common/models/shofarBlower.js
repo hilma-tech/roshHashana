@@ -30,7 +30,6 @@ module.exports = function (ShofarBlower) {
             throw error;
         }
 
-
         let objToBlower = {
             "userBlowerId": options.accessToken.userId,
             "can_blow_x_times": data.can_blow_x_times,
@@ -50,7 +49,7 @@ module.exports = function (ShofarBlower) {
             if (resRole.roleId === 2) {
                 let resBlower = await ShofarBlower.create(objToBlower)
                 let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
-                //if the shofar blower added publicPlaces, create them
+                //if the shofar blower added publicPlaces,
                 if (data.publicPlaces) {
                     let resPublicMeetings = await ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options);
                 }

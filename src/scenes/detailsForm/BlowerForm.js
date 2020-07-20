@@ -130,8 +130,12 @@ export default class IsolatedForm extends Component {
         }
 
         let address = this.state.chosenCity + formChilds[7].value + formChilds[2].value;
+        let startTime = new Date(this.state.chosenTime);
         let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
-        // //check if the address is correct
+        endTime.setFullYear(2020, 8, 20);
+        startTime.setFullYear(2020, 8, 20);
+
+        //check if the address is correct
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
 
@@ -141,7 +145,7 @@ export default class IsolatedForm extends Component {
             async response => {
                 let blowerDetails = {
                     "can_blow_x_times": formChilds[1].value,
-                    "volunteering_start_time": new Date(this.state.chosenTime),
+                    "volunteering_start_time": startTime,
                     "volunteering_end_time": endTime,
                     "city": this.state.chosenCity,
                     "street": formChilds[7].value,
@@ -259,7 +263,7 @@ export default class IsolatedForm extends Component {
 
                 {this.state.openModal && <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
                     <div id="modal-contnet">תודה!<br></br> לא מצאנו כרגע מחפשי תקיעת שופר בשעה ובמיקום שהגדרת.</div>
-                    <div id="button">הבנתי תודה</div>
+                    <div id="button" className="clickAble">הבנתי תודה</div>
                 </div>}
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>

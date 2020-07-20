@@ -184,6 +184,12 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "authenticationKey"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "getMapData"
     }
   ],
   "methods": {}

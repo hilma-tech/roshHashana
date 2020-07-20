@@ -11,7 +11,14 @@ const mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    componentRestrictions: { country: "il" }
+    minZoom: 7
+    // componentRestrictions: { LatLngBounds: {
+    //     north: 35.773500,
+    //     south: 34.902743,
+    //     west: 31.323394,
+    //     east: 32.946525
+    // }, strictBounds: true
+    //  }
 };
 
 const SHOFAR_BLOWER = 'shofar blower';
@@ -27,11 +34,18 @@ export default class MyTestComponent extends Component {
             center: {},
             allLocations: []
         }
+        this.mapRef = React.createRef();
     }
 
     componentDidMount() {
         (async () => {
+            this.mapRef.current && this.mapRef.current.panToBounds()
 
+            //     NW: { lat: 33.348105, lan: 34.066793 },
+            //     SW: { lat: 29.513980, lan: 33.696013 },
+            //     SE: { lat: 29.517320, lan: 35.619917 },
+            //     NE: { lat: 33.350947, lan: 35.872503 }
+            // })
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
 
@@ -138,9 +152,11 @@ export default class MyTestComponent extends Component {
     // }
 
     render() {
+        console.log(this.mapRef.current && this.mapRef.current.state)
         return (
             <div id="map-contaoner">
                 <MyMapComponent
+                    mapRef={this.mapRef}
                     getCenter={this.getCenter}
                     changeCenter={this.changeCenter}
                     allLocations={this.state.allLocations}
@@ -159,9 +175,17 @@ export default class MyTestComponent extends Component {
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) =>
     <GoogleMap
+        ref={props.mapRef}
         defaultZoom={20}
         defaultOptions={mapOptions}
-        // bounds={31.4117257, 35.0818155}
+        bounds={{
+
+            NW: { lat: 33.348105, lan: 34.066793 },
+            SW: { lat: 29.513980, lan: 33.696013 },
+            SE: { lat: 29.517320, lan: 35.619917 },
+            NE: { lat: 33.350947, lan: 35.872503 }
+        }}
+
         center={props.center}>
         <SearchBoxCreator changeCenter={props.changeCenter} getCenter={props.getCenter} />
         {props.isMarkerShown && <Marker position={props.center} />}
@@ -185,10 +209,18 @@ class MarkerCreator extends Component {
 
     render() {
         const { info, location, type } = this.props.locationInfo;
+        const icon = {
+            url: type === ISOLATED ? '/icons/single-blue.svg' : '/icons/group-orange.svg',
+            scaledSize: type === ISOLATED ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85), // scaled size
+            origin: new window.google.maps.Point(0, 0), // origin
+            anchor: new window.google.maps.Point(0, 0)
+        }
         return (<Marker
-            icon={type === ISOLATED ? '/icons/single-blue.svg' : '/icons/group-orange.svg'}
+            icon={icon}
             onClick={this.closeOrOpenInfoWindow}
-            position={{ lat: location.lat, lng: location.lng }}>
+            position={{ lat: location.lat, lng: location.lng }}
+
+        >
             {this.state.isInfoWindowOpen && <InfoWindow onCloseClick={this.closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>);
     }
