@@ -10,9 +10,10 @@ import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 import MapComp from './scenes/maps/mapp';
+import SBHomePage from './scenes/shofar_blower_home_page';
 // import SimpleUserHome from "./scenes/Home";
 
-const Map = loadable(() => import('./scenes/maps/map'));
+const Map = loadable(() => import('./scenes/maps/mapp'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 
@@ -49,7 +50,7 @@ class App extends Component {
                             <Route path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <Route path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <Route path="/public-shofar-blowing-map" component={(props) => <Map {...props} publicMap />} />
-                            {/* <Route path="/public-shofar-blowing-map" component={(props) => <MapComp {...props} publicMap />} /> */}
+                            <Route path="/sb-map" compName="SBHomePage" component={props => <SBHomePage {...props} />} />
                         </Switch>
                     </div>
                 </Router>

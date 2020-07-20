@@ -38,7 +38,7 @@ module.exports = function (ShofarBlower) {
             "volunteering_end_time": data.volunteering_end_time
         },
             objToCU = {
-                "city": city.id,
+                "cityId": city.id,
                 "street": data.street,
                 "appartment": data.appartment,
                 "comments": null

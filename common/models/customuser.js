@@ -33,17 +33,17 @@ module.exports = function (CustomUser) {
                 // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 return ResCustom;
 
-                 
-
-            } else {
-                if(ResFindUser && ResFindUser.keyId){
-                    let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId );
-                }
+        
                 
+            } else {
+                if (ResFindUser && ResFindUser.keyId) {
+                    let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId);
+                }
+
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
                 // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 return ResUpdateUser;
-               
+
 
             }
         } catch (error) {
@@ -113,16 +113,16 @@ module.exports = function (CustomUser) {
                         console.log("Err", err);
                     }
                     if (res) {
-                        if (res.city == null && status === 2) {
-                            cb(null, { ok: "blower new", data: {name : res.name}})
+                        if (res.cityId == null && status === 2) {
+                            cb(null, { ok: "blower new", data: { name: res.name } })
                         } else
-                            if ((res.city != null && status === 2)) {
+                            if ((res.cityId != null && status === 2)) {
                                 cb(null, { ok: "blower with data" })
                             } else
-                                if (res.city == null && status === 1) {
-                                    cb(null, { ok: "isolator new" , data: {name : res.name}})
+                                if (res.cityId == null && status === 1) {
+                                    cb(null, { ok: "isolator new", data: { name: res.name } })
                                 } else
-                                    if (res.city != null && status === 1) {
+                                    if (res.cityId != null && status === 1) {
                                         cb(null, { ok: "isolator with data" })
                                     } else
                                         if (status == 3) {
@@ -157,5 +157,19 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'string', root: true }
     });
 
+    CustomUser.openSBRequests = function (options, cb) {
+        const openReqs = `select CustomUser.name AS "isolatedName", isolated.public_phone, isolated.public_meeting, shofar_blower_pub.cityId AS "public city id" from isolated left join shofar_blower_pub on shofar_blower_pub.id = isolated.blowerMeetingId left join CustomUser on CustomUser.id = isolated.userIsolatedId where blowerMeetingId is null or ( isolated.public_meeting = 1 and (select blowerId from shofar_blower_pub where shofar_blower_pub.id = isolated.blowerMeetingId) is null )`
+        let [err, res] = await executeMySqlQuery(CustomUser, openReqs);
+        if (err || !res) return cb(true)
+        return cb(res)
+
+    }
+    CustomUser.remoteMethod('openSBRequests', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'res', type: 'string', root: true }
+    });
 
 };

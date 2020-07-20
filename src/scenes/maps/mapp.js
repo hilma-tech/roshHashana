@@ -32,6 +32,7 @@ const MapComp = (props) => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
             if (props.publicMap) await setPublicMapContent();
+            else if (props.sbMap) await setSBMapContent()
             let [error, res] = await to(Geocode.fromAddress("ירושלים"))
             if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
             try {
@@ -41,10 +42,51 @@ const MapComp = (props) => {
         })()
     }, [])
 
-
     const setPublicMapContent = async () => {
-        //isolated meetings
-        //public meetings
+        // open meetings (suggestion)
+        db.isolateds.forEach(async isolated => { // isolated location (private meetings)
+            let [error, response] = await to(Geocode.fromAddress(isolated.address))
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
+            try {
+                const { lat, lng } = response.results[0].geometry.location;
+                const shofarBlowerName = db.shofarlowers.find((shofarBlower) => shofarBlower.id === isolated.shofarBlowerId).name;
+                const newLocObj = {
+                    type: ISOLATED,
+                    location: { lat, lng },
+                    info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{shofarBlowerName}</div></div>
+                        <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                }
+                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+            } catch (e) { console.log("err setPublicMapContent, ", e); }
+        });
+
+        db.pubSHofarBlowing.forEach(async pub => { //public meetings location
+            const [error, response] = await to(Geocode.fromAddress(pub.address))
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
+            try {
+                const { lat, lng } = response.results[0].geometry.location;
+                const shofarBlowerInfo = db.shofarlowers.find((shofarBlower) => shofarBlower.id === pub.shofarBlowerId);
+                let newLocObj = {
+                    type: SHOFAR_BLOWING_PUBLIC,
+                    location: { lat, lng },
+                    info: <div id="info-window-container">
+                        <div className="info-window-header">תקיעה ציבורית</div>
+                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{shofarBlowerInfo.name}</div></div>
+                        <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{pub.address}</div></div>
+                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{pub.startTime}</div></div>
+                        <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                        <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                        <div id="join-button">הצטרף לתקיעה</div>
+                    </div>
+                };
+                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+            } catch (e) { console.log("cought Geocode.fromAddress(pub.address)==", pub.address, " : ", e); return; }
+        });
+    }
+
+    const setSBMapContent = async () => {
+        //open requests
         db.isolateds.forEach(async isolated => { // isolated location (private meetings)
             let [error, response] = await to(Geocode.fromAddress(isolated.address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
