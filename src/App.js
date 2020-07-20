@@ -9,6 +9,7 @@ import { PrivateRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
+import MapComp from './scenes/maps/mapp';
 // import SimpleUserHome from "./scenes/Home";
 
 const Map = loadable(() => import('./scenes/maps/map'));
@@ -48,6 +49,7 @@ class App extends Component {
                             <Route path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <Route path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <Route path="/public-shofar-blowing-map" component={(props) => <Map {...props} publicMap />} />
+                            {/* <Route path="/public-shofar-blowing-map" component={(props) => <MapComp {...props} publicMap />} /> */}
                         </Switch>
                     </div>
                 </Router>
