@@ -83,13 +83,10 @@ class Register extends React.Component {
 
             break;
           case "blower with data":
-            console.log("ללכת למפה של תוקע בשופר ");
-            //TODO ללכת למפה של תוקע בשופר 
-
+            this.props.history.push('/sb-map');
             break;
           case "isolator new":
             this.props.history.push('/addDetails/isolated', { name: res.data.name });
-
             break;
           case "isolator with data":
             console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");

@@ -41,7 +41,7 @@ const MapComp = (props) => {
     useEffect(() => {
         (async () => {
 
-            let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap}`, {
+            let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
             if (mapContent) {
@@ -63,7 +63,6 @@ const MapComp = (props) => {
             } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
         })();
     }, [mapInfo])
-
 
 
     const setPublicMapContent = async () => {
