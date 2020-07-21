@@ -1,5 +1,5 @@
 import React from 'react'
-import MapComp from './mapp'
+import MapComp from './map'
 
 
 const ShofarBlowerMap = (props) => {

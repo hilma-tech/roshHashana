@@ -11,7 +11,7 @@ class Register extends React.Component {
   constructor(props) {
     super(props);
     console.log(this.props.location);
-    
+
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
@@ -90,7 +90,7 @@ class Register extends React.Component {
             break;
           case "isolator with data":
             console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
-            //TODO להציג למבודד שנירשם כבר את הסטטוס שלו
+            this.props.history.push('isolated-main-page', { name: res.data.name, address: res.data.address });
 
             break;
           case "isolated with public meeting":
@@ -137,7 +137,7 @@ class Register extends React.Component {
           :
           <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
-        
+
         <div className=""><img style={{ width: isBrowser ? '26vw' : '68vw', marginTop: isBrowser ? "2%" : "27%" }} src="/images/header.svg" /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>

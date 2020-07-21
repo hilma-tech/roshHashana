@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Register from "./Register";
 import './Home.scss'
 import { BrowserView, isBrowser } from "react-device-detect";
-import Map from './maps/mapp';
+import Map from '../components/maps/map';
 
 class Home extends React.Component {
     constructor(props) {

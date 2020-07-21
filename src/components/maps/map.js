@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import Geocode from "react-geocode";
 import _ from "lodash";
 import Auth from '../../modules/auth/Auth';
@@ -20,11 +20,6 @@ var mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    // componentRestrictions: { country: "il" },
-    // restriction: {
-    //     latLngBounds: polygonBounds(israelPolygon),
-    //     strictBounds: false
-    // }
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -35,7 +30,7 @@ const MapComp = (props) => {
 
     const [allLocations, setAllLocations] = useState([]);
     const [center, setCenter] = useState({});
-    const [isMarkerShown, setIsMarkerShown] = useState(false);
+    const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
 
     useEffect(() => {
@@ -54,16 +49,35 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-            if (props.publicMap) await setPublicMapContent();
-            let [error, res] = await to(Geocode.fromAddress("ירושלים"))
-            if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
-            try {
-                const newCenter = res.results[0].geometry.location;
-                if (newCenter !== center) setCenter(newCenter)
-            } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
+
+            if (props.publicMap || props.isolated) await setPublicMapContent();
+
+            if (props.publicMap && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    let newCenter = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    if (newCenter !== center) setCenter(newCenter);
+                }, await findLocationCoords('ירושלים'));
+            }
+            else {
+                let address = 'ירושלים';
+                if (mapInfo.userAddress) {
+                    address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment;
+                }
+                await findLocationCoords(address);
+            }
+            setIsMarkerShown(true);
+
         })();
     }, [mapInfo])
 
+    const findLocationCoords = async (address = 'ירושלים') => {
+        let [error, res] = await to(Geocode.fromAddress(address));
+        if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
+        try {
+            const newCenter = res.results[0].geometry.location;
+            if (newCenter !== center) setCenter(newCenter);
+        } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
+    }
 
     const setPublicMapContent = async () => {
 
@@ -81,7 +95,6 @@ const MapComp = (props) => {
                         <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
                         <div>לא ניתן להצטרף לתקיעה זו</div></div>
                 }
-
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
             } catch (e) { console.log("err setPublicMapContent, ", e); }
         });
@@ -112,23 +125,39 @@ const MapComp = (props) => {
     }
 
     const joinPublicMeeting = async (meetingInfo) => {
-        console.log(props)
-        props.history.push('/register', { type: 'generalUser', meetingInfo })
-    }
+        if (props.publicMap)
+            props.history.push('/register', { type: 'generalUser', meetingInfo });
+        else {
+            //join the isolator to the meeting
+            let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                method: 'post',
+                body: JSON.stringify({ meetingInfo })
+            }, true);
+            if (res) {
+                // if(res.status==='OK')
+                //TODO: add msg of success 
+                // else 
+                //TODO: add msg of fail
+                console.log(res, 'res')
+            }
+        }
 
+    }
     return (
         <div id="map-container" className={'slide-in-bottom'}>
             <MyMapComponent
+                isolated={props.isolated}
                 changeCenter={setCenter}
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
-                isMarkerShown={isMarkerShown}
+                userLocation={userLocation}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img src='/icons/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            <div className="close-map clickAble" onClick={props.closeMap}>^</div>
+            <div className="close-map clickAble" onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
         </div>
     );
 }
@@ -139,6 +168,7 @@ export default MapComp;
 
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
+
     let options = mapOptions;
     var israelPolygon = new window.google.maps.Polygon({
         paths: israelCoords,
@@ -160,16 +190,23 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         strictBounds: false
     }
 
+    const userLocationIcon = {
+        url: '/icons/selfLocation.svg',
+        scaledSize: new window.google.maps.Size(50, 50),
+        origin: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(0, 0),
+        labelOrigin: new window.google.maps.Point(0, 60)
+    }
+
     return <GoogleMap
         defaultZoom={20}
         defaultOptions={options}
-        // bounds={31.4117257, 35.0818155}
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-        {props.isMarkerShown && <Marker position={props.center} />} {/* my location */}
+        {props.userLocation && <MarkerGenerator position={props.center} label={{ text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }} icon={userLocationIcon} />} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }
@@ -207,21 +244,24 @@ const MarkerGenerator = (props) => {
     const closeOrOpenInfoWindow = () => {
         setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen);
     }
+    if (props.locationInfo)
+        var { info, location, type } = props.locationInfo;
 
-    const { info, location, type } = props.locationInfo;
+    const url = (type === PRIVATE_MEETING) ? props.isolated ? 'icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
     const icon = {
-        url: type === PRIVATE_MEETING ? '/icons/single-blue.svg' : '/icons/group-orange.svg',
-        scaledSize: type === PRIVATE_MEETING ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
+        url: url,
+        scaledSize: (type === PRIVATE_MEETING) ? props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(0, 0)
     }
 
     return (
         <Marker
-            icon={icon}
+            icon={props.icon ? props.icon : icon}
+            label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
-            position={{ lat: location.lat, lng: location.lng }}>
-            {isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
+            position={props.position ? props.position : { lat: location.lat, lng: location.lng }}>
+            {info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>
     );
 }

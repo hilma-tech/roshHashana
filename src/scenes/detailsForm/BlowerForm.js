@@ -128,10 +128,10 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
-
-        let address = this.state.chosenCity + formChilds[7].value + formChilds[2].value;
+        let address = this.state.chosenCity + ' '+formChilds[7].value + ' '+formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
         let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
+        // console.log(startTime,endTime )
         endTime.setFullYear(2020, 8, 20);
         startTime.setFullYear(2020, 8, 20);
 

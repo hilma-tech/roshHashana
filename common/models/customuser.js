@@ -117,17 +117,25 @@ module.exports = function (CustomUser) {
                         console.log("Err", err);
                     }
                     if (res) {
+                        console.log(res, 'res');
+
                         if (res.cityId == null && status === 2) {
                             cb(null, { ok: "blower new", data: { name: res.name } })
                         } else
                             if ((res.cityId != null && status === 2)) {
-                                cb(null, { ok: "blower with data" })
+                                cb(null, { ok: "blower with data", data: { name: res.name } })
                             } else
                                 if (res.cityId == null && status === 1) {
                                     cb(null, { ok: "isolator new", data: { name: res.name } })
                                 } else
                                     if (res.cityId != null && status === 1) {
-                                        cb(null, { ok: "isolator with data" })
+                                        CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
+                                            if (errCity) console.log('errCity', errCity);
+                                            if (city) {
+                                                let address = res.street + ' ' + res.appartment + ' ' + res.comments + ', ' + city.name;
+                                                cb(null, { ok: "isolator with data", data: { name: res.name, address } })
+                                            }
+                                        });
                                     } else
                                         if (status == 3) {
                                             cb(null, { ok: "isolated with public meeting" })
@@ -147,7 +155,7 @@ module.exports = function (CustomUser) {
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
-            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser, `select blowerUser.name AS "blowerName", city.name AS "city", shofar_blower_pub.street, shofar_blower_pub.comments , shofar_blower_pub.start_time from shofar_blower_pub LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId LEFT JOIN city on city.id = shofar_blower_pub.cityId where blowerId is not null;`);
+            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser, `select blowerUser.name AS "blowerName", city.name AS "city", shofar_blower_pub.id, shofar_blower_pub.street, shofar_blower_pub.comments , shofar_blower_pub.start_time from shofar_blower_pub LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId LEFT JOIN city on city.id = shofar_blower_pub.cityId where blowerId is not null;`);
             if (errPublic) throw errPublic;
 
             if (resPublic) {

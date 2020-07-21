@@ -135,9 +135,15 @@
         },
         {
             "principalType": "ROLE",
-            "principalId": "$everyone",
+            "principalId": "$authenticated",
             "permission": "ALLOW",
             "property": "InsertDataIsolated"
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "$authenticated",
+            "permission": "ALLOW",
+            "property": "joinPublicMeeting"
         }
     ]
 }
