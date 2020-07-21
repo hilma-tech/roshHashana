@@ -140,7 +140,7 @@ const ShofarBlowerMap = (props) => {
 
     if (!reqsLocs && !sbLocs) return <div>LOADING...</div>;
     return (
-        <div id="map-contaoner">
+        <div id="map-container">
             <MyMapComponent
                 changeCenter={setCenter}
                 reqsLocs={reqsLocs}
