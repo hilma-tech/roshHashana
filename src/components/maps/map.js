@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
+import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import _ from "lodash";
 import Auth from '../../modules/auth/Auth';
 import './map.scss';
+import loadable from '@loadable/component';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
@@ -198,13 +200,14 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         labelOrigin: new window.google.maps.Point(0, 60)
     }
 
+
     return <GoogleMap
         defaultZoom={20}
         defaultOptions={options}
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-        {props.userLocation && <MarkerGenerator position={props.center} label={{ text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }} icon={userLocationIcon} />} {/* my location */}
+        {props.userLocation ? <MarkerGenerator position={props.center} label={{ text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }} icon={userLocationIcon} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
@@ -233,35 +236,5 @@ const SearchBoxGenerator = (props) => {
             />
             <img id="search-icon" src="/icons/search.svg" />
         </div>
-    );
-}
-
-
-const MarkerGenerator = (props) => {
-
-    const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
-
-    const closeOrOpenInfoWindow = () => {
-        setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen);
-    }
-    if (props.locationInfo)
-        var { info, location, type } = props.locationInfo;
-
-    const url = (type === PRIVATE_MEETING) ? props.isolated ? 'icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
-    const icon = {
-        url: url,
-        scaledSize: (type === PRIVATE_MEETING) ? props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
-        origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(0, 0)
-    }
-
-    return (
-        <Marker
-            icon={props.icon ? props.icon : icon}
-            label={props.label ? props.label : ''}
-            onClick={closeOrOpenInfoWindow}
-            position={props.position ? props.position : { lat: location.lat, lng: location.lng }}>
-            {info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
-        </Marker>
     );
 }

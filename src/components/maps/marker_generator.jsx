@@ -8,28 +8,32 @@ const PRIVATE_MEETING = 'private meeting';
 
 const MarkerGenerator = (props) => {
     // locationInfo, icon, label, position,
-
     const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
 
     const closeOrOpenInfoWindow = () => {
         setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen);
     }
 
-    if (!props.locationInfo || typeof props.locationInfo !== "object" || Array.isArray(props.locationInfo)) return null;
-    const { info, location, type } = props.locationInfo;
-    if (!location || !location.lng || !location.lat) return null;
+    if (!props.position && (!props.locationInfo || typeof props.locationInfo !== "object" || Array.isArray(props.locationInfo))) return null;
 
-    const icon = {
-        url: type === PRIVATE_MEETING ? '/icons/single-blue.svg' : type === SHOFAR_BLOWER ? 'icons/my_location.svg' : '/icons/group-orange.svg',
-        scaledSize: type === PRIVATE_MEETING ? new window.google.maps.Size(50, 50) : type === SHOFAR_BLOWER ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
+    if (props.locationInfo) {
+        var { info, location, type } = props.locationInfo;
+        if (!location || !location.lng || !location.lat) return null;
+    }
+
+    const url = (type === PRIVATE_MEETING) ? props.isolated ? 'icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
+
+    const icon = props.icon ? props.icon : {
+        url: url,
+        scaledSize: (type === PRIVATE_MEETING) ? props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
         origin: new window.google.maps.Point(0, 0),
-        anchor: type === SHOFAR_BLOWER ? new window.google.maps.Point(35, -5):new window.google.maps.Point(13, 5), // changes position of icon
+        anchor: type === SHOFAR_BLOWER ? new window.google.maps.Point(35, -5) : new window.google.maps.Point(13, 5), // changes position of icon
     }
 
     return (
         <Marker
-            icon={props.icon ? props.icon : icon}
-            lable={props.label ? props.label : ''}
+            icon={icon}
+            label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
             position={props.position ? props.position : { lat: location.lat, lng: location.lng }}>
             {info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
