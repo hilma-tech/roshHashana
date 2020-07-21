@@ -11,6 +11,7 @@ import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 import MapComp from './scenes/maps/mapp';
 import SBHomePage from './scenes/shofar_blower_home_page';
+import { AppMapEG, places } from './app_map_eg'
 // import SimpleUserHome from "./scenes/Home";
 
 const Map = loadable(() => import('./scenes/maps/mapp'));
@@ -51,6 +52,7 @@ class App extends Component {
                             <Route path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <Route path="/public-map" component={(props) => <Map {...props} publicMap />} />
                             <Route path="/sb-map" compName="SBHomePage" component={props => <SBHomePage {...props} />} />
+                            {/* <Route path="/sb-map" compName="SBHomePage" component={props => <AppMapEG defaultZoomfdsfds={7} places={places} {...props} />} /> */}
                         </Switch>
                     </div>
                 </Router>

@@ -190,6 +190,12 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "getMapData"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "openSBRequests"
     }
   ],
   "methods": {}

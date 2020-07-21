@@ -7,9 +7,9 @@
     "host": "localhost",
     "port": 3306,
     "database": "roshHashana",
-    "password": "8Nf2B%v@hu^Rn2G",
+    "password": "z10mz10m",
     "name": "msql",
-    "user": "shofar",
+    "user": "root",
     "connector": "mysql"
   },
   "myEmailDataSource": {
