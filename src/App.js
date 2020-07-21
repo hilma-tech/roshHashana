@@ -45,7 +45,7 @@ class App extends Component {
                 <Router>
                     <div className="App">
                         <Switch>
-                            <HomeRoute force exact path="/" component={(props) => <Register {...props} />} comps={homePages} />
+                            <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
