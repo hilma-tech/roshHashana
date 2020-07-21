@@ -37,6 +37,7 @@
     ],
     "mySBRoute": [
         {
+            "id": 0,
             "startTime": "2020-07-20 10:00:00",
             "address": "רעננה הר סיני 9א",
             "shofarBlowerId": 9,
@@ -44,12 +45,14 @@
             "isolatedName": "סוזי"
         },
         {
+            "id": 1,
             "startTime": "2020-07-20 10:05:00",
             "address": "רעננה השרון 10",
             "shofarBlowerId": 9,
             "isPrivateMeeting": 0
         },
         {
+            "id": 2,
             "startTime": "2020-07-20 10:07:00",
             "address": "רעננה הרצל 10",
             "shofarBlowerId": 9,

@@ -56,7 +56,7 @@ const ShofarBlowerMap = (props) => {
             }, true);
             if (mapContent && mapContent.openReqs && !meetingsReqs) {
                 setMeetingsReqs(mapContent.openReqs);
-                setSBMapContent(mapContent.openReqs)
+                setOpenReqsContent(mapContent.openReqs)
             }
         })();
     }, []);
@@ -76,7 +76,7 @@ const ShofarBlowerMap = (props) => {
     }, [meetingsReqs])
 
 
-    const setSBMapContent = async (reqsArr) => {
+    const setOpenReqsContent = async (reqsArr) => {
         if (!reqsArr || !Array.isArray(reqsArr) || !reqsArr.length) { setReqsLocs([]); return; } //!
         //open requests meetings
         // isolated location (private meetings)
@@ -102,8 +102,9 @@ const ShofarBlowerMap = (props) => {
                 }
             } catch (e) { console.log("err setSBMapContent, ", e); }
         }
+    }
 
-
+    const setMyMeetingsContent = (meetings)=>{
         // setSBLocs(db.mySBRoute)
         let newSBLocs = []
         db.mySBRoute.sort((a, b) => new Date(a.startTime).getTime() > new Date(b.startTime).getTime()).forEach(async (myMeeting, i, arr) => {
@@ -132,7 +133,7 @@ const ShofarBlowerMap = (props) => {
 
 
     const addNewSBMeeting = (meetingInfo) => {
-
+        
     }
 
 
@@ -160,7 +161,6 @@ export default ShofarBlowerMap;
 
 //!MAP START
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
-
     const userLocationIcon = {
         url: '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(50, 50),
