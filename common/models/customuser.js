@@ -204,10 +204,54 @@ module.exports = function (CustomUser) {
 
     CustomUser.openSBRequests = function (options, cb) {
         (async () => {
-            const openReqs = `select CustomUser.name AS "isolatedName", isolated.public_phone, isolated.public_meeting, shofar_blower_pub.cityId AS "public city id" from isolated left join shofar_blower_pub on shofar_blower_pub.id = isolated.blowerMeetingId left join CustomUser on CustomUser.id = isolated.userIsolatedId where blowerMeetingId is null or ( isolated.public_meeting = 1 and (select blowerId from shofar_blower_pub where shofar_blower_pub.id = isolated.blowerMeetingId) is null )`
-            let [err, res] = await executeMySqlQuery(CustomUser, openReqs);
-            if (err || !res) return cb(true)
-            return cb(res)
+            const allRes = {}
+            options.accessToken = { userId: 7 }; //!
+            if (!options || !options.accessToken || !options.accessToken.userId) {
+                allRes.userData = true
+            } else {
+                const userDataQ = `SELECT city.name, CustomUser.street, CustomUser.appartment FROM CustomUser LEFT JOIN city ON CustomUser.cityId = city.id WHERE CustomUser.id = ${options.accessToken.userId}`
+                let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
+                if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
+                allRes.userData = userDataErr || !userData ? true : userData
+            }
+
+            const openReqsQ = `SELECT iUser.name AS "isolatedName", cuCity.name AS "isolatedCity", iUser.street AS "isolatedStreet", iUser.appartment AS "isolatedAppartment", IF(isolated.public_phone = 1, iUser.username, NULL) AS "isolatedPhone", 
+            publicMeetingCity.name AS "publicMeetingCity", shofar_blower_pub.street AS "publicMeetingStreet", shofar_blower_pub.start_time AS "publicMeetingStartTime", sbUser.name AS "sbName", 
+            isolated.public_meeting = 1 AS "isPublicMeeting"
+            FROM isolated 
+            LEFT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
+            LEFT JOIN CustomUser sbUser ON sbUser.id = shofar_blower_pub.blowerId 
+            LEFT JOIN city publicMeetingCity ON publicMeetingCity.id = shofar_blower_pub.cityId 
+            LEFT JOIN CustomUser iUser ON iUser.id = isolated.userIsolatedId 
+            LEFT JOIN city cuCity ON cuCity.id = iUser.cityId 
+            WHERE blowerMeetingId IS NULL 
+            OR ( isolated.public_meeting = 1 
+            AND (SELECT blowerId FROM shofar_blower_pub WHERE shofar_blower_pub.id = isolated.blowerMeetingId) IS NULL );`
+            let [openReqsErr, openReqs] = await executeMySqlQuery(CustomUser, openReqsQ);
+            if (openReqsErr || !openReqs) console.log('openReqsErr: ', openReqsErr);
+            allRes.openReqs = openReqsErr || !openReqs ? true : openReqs
+
+            const userPriRouteQ = `select * from isolated where blowerMeetingId = 9;`
+            const userPubRouteQ = `select * from shofar_blower_pub where blowerId = 9;`
+
+            const promises = [userPriRouteQ, userPubRouteQ] //for returned object
+            const promisNames = ["userPriRoute", "userPubRoute"] //! order is very important!!!!! bcos when looping over the results of these promised queries, their INDEX is how we tell them apart (e.g. only for offersByStatusAndSchool we need to translate the status to client-english names)
+
+            const [err, results] = await to(Promise.all(promises))
+            if (err) { console.log("error promise.all on get sb map info ", err); return }
+            let currQRes = [];
+            results.forEach((result, i) => {
+                if (Array.isArray(result) && (result[0] || result[0] !== null)) {
+                    allRes[promisNames[i]] = null;
+                    console.log(`error for result #${i}(starts from 0) from Promise.ALL (for sb map info):`, result);
+                    return;
+                }
+                //got query res successfully
+                currQRes = Array.isArray(result) ? result[1] : [] //IS ARRAY.
+                allRes[promisNames[i]] = currQRes
+            });
+
+            return cb(null, allRes)
         })();
     }
     CustomUser.remoteMethod('openSBRequests', {
