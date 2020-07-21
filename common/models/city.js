@@ -20,6 +20,7 @@ module.exports = function (City) {
                 throw error;
             }
         }
+        else return;
     }
 
     City.remoteMethod('getAllCities', {

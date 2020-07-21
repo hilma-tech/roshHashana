@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
 
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";

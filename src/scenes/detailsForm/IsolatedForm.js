@@ -45,14 +45,13 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
-        console.log(formChilds, 'formChilds');
 
         //cheked if the user inserted a city
         if (this.state.chosenCity === '') {
             this.setState({ errorMsg: 'אנא הכנס את שם העיר או היישוב' });
             return;
         }
-        let address = this.state.chosenCity + formChilds[1].value + formChilds[2].value;
+        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value;
         //check if the address is correct
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
@@ -85,6 +84,15 @@ export default class IsolatedForm extends Component {
                 return;
             }
         );
+    }
+
+    goToMainPage = () => {
+        const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
+        const street = document.getElementById('street');
+        const appartment = document.getElementById('appartment');
+        const comments = document.getElementById('comments');
+        const address = street.value + ' ' + appartment.value + ' ' + comments.value + ', ' + this.state.chosenCity;
+        this.props.history.push('/isolated-main-page', { name, address });
     }
 
     render() {
@@ -142,7 +150,7 @@ export default class IsolatedForm extends Component {
                     </div>
                     : <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
                         <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
-                        <div id="button">הבנתי תודה</div>
+                        <div id="button" onClick={this.goToMainPage}>הבנתי תודה</div>
                     </div>}
                 {!this.state.openModal && <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />

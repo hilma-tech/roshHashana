@@ -30,6 +30,7 @@ module.exports = function (ShofarBlower) {
             throw error;
         }
 
+        console.log('data', new Date(data.volunteering_start_time), new Date(data.volunteering_end_time))
         let objToBlower = {
             "userBlowerId": options.accessToken.userId,
             "can_blow_x_times": data.can_blow_x_times,

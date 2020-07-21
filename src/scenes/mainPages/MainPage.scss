@@ -1,0 +1,46 @@
+@import "../../consts/generalStyles";
+#isolated-page-container {
+    width: 100%;
+    height: 100vh;
+    background-color: #f6f6f6;
+    color: $turquoise;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 15% 0% 5% 0%;
+    font-size: 1.6rem;
+    text-align: right;
+    position: relative;
+    overflow: hidden;
+    .settings {
+        width: fit-content;
+        position: absolute;
+        top: 2%;
+        left: 2%;
+    }
+    .content-container {
+        position: absolute;
+        width: 100%;
+        padding: 0 10%;
+        #thank-you-msg {
+            margin-bottom: 7%;
+        }
+        #address {
+            font-weight: bold;
+            margin-bottom: 50%;
+        }
+        #cancel-request {
+            text-decoration: underline;
+            margin-bottom: 40%;
+            font-size: 1.3rem;
+        }
+        #see-map {
+            font-weight: bold;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

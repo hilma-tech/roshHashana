@@ -3,7 +3,8 @@
         "comps": [
             "DashboardMain",
             "AnotherComponent",
-            "BlowerDetailsForm"
+            "BlowerDetailsForm",
+            "SBHomePage"
         ]
     },
     "SUPERADMIN": {
@@ -15,7 +16,8 @@
     "SIMPLEUSER": {
         "comps": [
             "AnotherComponent",
-            "IsolatedDetailsForm"
+            "IsolatedDetailsForm",
+            "IsolatedMainPage"
         ],
         "defaultHomePage": "SimpleUserHome"
     }
