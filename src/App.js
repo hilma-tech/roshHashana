@@ -5,7 +5,7 @@ import Auth from "./modules/auth/Auth";
 import Login from "./modules/auth/Login";
 import Home from './scenes/Home';
 import Samples from './modules/samples/Samples';
-import { PrivateRoute } from './modules/auth/PrivateRoute';
+import { PrivateRoute, MultipleRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
@@ -16,6 +16,9 @@ const Map = loadable(() => import('./components/maps/map'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
+const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedSettigns'));
+const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));
+const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSettings'));
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/Home'));
@@ -46,10 +49,12 @@ class App extends Component {
                     <div className="App">
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
-                            <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
-                            <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
+                            {/* <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
+                            <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} /> */}
                             <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
                             <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBHomePage {...props} />} />
+                            <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
+                            <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                             <Route path="/register" component={(props) => <Register {...props} />} />
                         </Switch>
                     </div>

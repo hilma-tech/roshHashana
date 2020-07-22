@@ -4,20 +4,23 @@
             "DashboardMain",
             "AnotherComponent",
             "BlowerDetailsForm",
-            "SBHomePage"
+            "SBHomePage",
+            "BlowerSettings"
         ]
     },
     "SUPERADMIN": {
         "comps": [
             "DashboardMain",
-            "AnotherComponent"
+            "AnotherComponent",
+            "GeneralUserSettings"
         ]
     },
     "SIMPLEUSER": {
         "comps": [
             "AnotherComponent",
             "IsolatedDetailsForm",
-            "IsolatedMainPage"
+            "IsolatedMainPage",
+            "IsolatedSettings"
         ],
         "defaultHomePage": "SimpleUserHome"
     }

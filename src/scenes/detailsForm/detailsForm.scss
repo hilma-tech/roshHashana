@@ -1,6 +1,6 @@
 @import "../../consts/generalStyles";
 #isolated-form-container {
-    background-color: #f6f6f6;
+    background-color: $grey-bg;
     height: 100%;
     width: 100%;
     display: flex;
@@ -42,7 +42,7 @@
     }
     form {
         input {
-            background-color: #f6f6f6;
+            background-color: $grey-bg;
             font-size: 1.2rem;
             &::-webkit-input-placeholder {
                 font-size: 1.2rem;
@@ -69,16 +69,7 @@
         input[type="text"],
         .autocompleteInput,
         input[type="number"] {
-            border: black solid 1px;
-            margin: auto;
-            margin-bottom: 5%;
-            width: 80%;
-            height: 3rem;
-            padding-right: 5%;
-            font-size: 1rem;
-            &::-webkit-input-placeholder {
-                font-size: 1rem;
-            }
+            @include input();
         }
 
         input[type="submit"] {
@@ -285,8 +276,20 @@
         }
     }
 
+    #shofar-img {
+        width: 100%;
+        height: 100%;
+    }
+}
+#background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #9b9b9b8f;
     #modal-container {
-        background-color: #f6f6f6;
+        background-color: $grey-bg;
         width: 90%;
         position: absolute;
         top: 50%;
@@ -308,14 +311,9 @@
             margin: 7% auto;
         }
     }
-    .modal-resize {
-        width: 60% !important;
-    }
-
-    #shofar-img {
-        width: 100%;
-        height: 100%;
-    }
+}
+.modal-resize {
+    width: 60% !important;
 }
 div#isolated-form-container.change-color {
     background-color: #9b9b9b8f;

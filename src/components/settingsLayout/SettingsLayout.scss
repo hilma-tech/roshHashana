@@ -1,0 +1,39 @@
+@import "../../consts/generalStyles";
+#settings-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: $grey-bg;
+    color: $turquoise;
+    overflow-y: scroll;
+    &::-webkit-scrollbar{
+        display: none;
+    }
+    #close {
+        width: 1.5rem;
+        position: absolute;
+        top: 4%;
+        right: 7%;
+    }
+    #content-container {
+        position: absolute;
+        top: 10%;
+        right: 5%;
+        text-align: right;
+        width: 90%;
+    }
+    #title {
+        font-size: 2.3rem;
+        font-weight: bold;
+        margin-right: 2%;
+    }
+    #log-out {
+        font-size: 1.5rem;
+        text-decoration: underline;
+        margin-top: 10%;
+        margin-right: 2%;
+        margin-bottom: 3%;
+    }
+}

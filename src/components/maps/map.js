@@ -194,10 +194,9 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const userLocationIcon = {
         url: '/icons/selfLocation.svg',
-        scaledSize: new window.google.maps.Size(50, 50),
+        scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(0, 0),
-        labelOrigin: new window.google.maps.Point(0, 60)
     }
 
 
@@ -207,7 +206,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-        {props.userLocation ? <MarkerGenerator position={props.center} label={{ text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }} icon={userLocationIcon} /> : null} {/* my location */}
+        {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
