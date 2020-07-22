@@ -205,16 +205,17 @@ module.exports = function (CustomUser) {
     CustomUser.openSBRequests = function (options, cb) {
         (async () => {
             const allRes = {}
-            options.accessToken = { userId: 7 }; //!
             if (!options || !options.accessToken || !options.accessToken.userId) {
-                allRes.userData = true
-            } else {
-                const userDataQ = `SELECT city.name, CustomUser.street, CustomUser.appartment FROM CustomUser LEFT JOIN city ON CustomUser.cityId = city.id WHERE CustomUser.id = ${options.accessToken.userId}`
-                let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
-                if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-                allRes.userData = userDataErr || !userData ? true : userData
+                return cb(true);
             }
+            const { userId } = options.accessToken
 
+            const userDataQ = `SELECT CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment FROM CustomUser LEFT JOIN city ON CustomUser.cityId = city.id WHERE CustomUser.id = ${userId}`
+            let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
+            if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
+            allRes.userData = userDataErr || !userData ? true : userData
+
+            //open meeting requests
             const openReqsQ = `SELECT iUser.name AS "isolatedName", cuCity.name AS "isolatedCity", iUser.street AS "isolatedStreet", iUser.appartment AS "isolatedAppartment", IF(isolated.public_phone = 1, iUser.username, NULL) AS "isolatedPhone", 
             publicMeetingCity.name AS "publicMeetingCity", shofar_blower_pub.street AS "publicMeetingStreet", shofar_blower_pub.start_time AS "publicMeetingStartTime", sbUser.name AS "sbName", 
             isolated.public_meeting = 1 AS "isPublicMeeting"
@@ -226,32 +227,52 @@ module.exports = function (CustomUser) {
             LEFT JOIN city cuCity ON cuCity.id = iUser.cityId 
             WHERE blowerMeetingId IS NULL 
             OR ( isolated.public_meeting = 1 
-            AND (SELECT blowerId FROM shofar_blower_pub WHERE shofar_blower_pub.id = isolated.blowerMeetingId) IS NULL );`
+            AND (SELECT blowerId FROM shofar_blower_pub WHERE shofar_blower_pub.id = isolated.blowerMeetingId) IS NULL )`
             let [openReqsErr, openReqs] = await executeMySqlQuery(CustomUser, openReqsQ);
             if (openReqsErr || !openReqs) console.log('openReqsErr: ', openReqsErr);
             allRes.openReqs = openReqsErr || !openReqs ? true : openReqs
 
-            const userPriRouteQ = `select * from isolated where blowerMeetingId = 9;`
-            const userPubRouteQ = `select * from shofar_blower_pub where blowerId = 9;`
+            //my meetings
+            const userPriMeetingsQ = `SELECT isolated.meeting_time AS "startTime", 
+            city.name AS "city", CustomUser.appartment, CustomUser.street,
+            IF(isolated.public_meeting = 1, false, true) AS "isPrivateMeeting", CustomUser.name AS "isolatedName" 
+            FROM isolated LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId LEFT JOIN city ON city.id = CustomUser.cityId WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
+            const userPubMeetingsQ = `SELECT shofar_blower_pub.start_time AS "startTime", 
+            city.name AS "city", shofar_blower_pub.street, 
+            false AS "isPrivateMeeting" 
+            FROM shofar_blower_pub LEFT JOIN city ON city.id = shofar_blower_pub.cityId WHERE blowerId = ${userId}`
+            
+            const userPriMeetingsP = await executeMySqlQuery(CustomUser, userPriMeetingsQ) //private and i am the shofar blower
+            const userPubMeetingsP = await executeMySqlQuery(CustomUser, userPubMeetingsQ) //public shofar blowing meeting
 
-            const promises = [userPriRouteQ, userPubRouteQ] //for returned object
-            const promisNames = ["userPriRoute", "userPubRoute"] //! order is very important!!!!! bcos when looping over the results of these promised queries, their INDEX is how we tell them apart (e.g. only for offersByStatusAndSchool we need to translate the status to client-english names)
+            const promises = [userPriMeetingsP, userPubMeetingsP] //for returned object
+            const promiseNames = ["userPriMeetings", "userPubMeetings"] // order is very important!!!!! bcos when looping over the results of these promised queries, their INDEX is how we tell them apart (e.g. only for offersByStatusAndSchool we need to translate the status to client-english names)
 
             const [err, results] = await to(Promise.all(promises))
             if (err) { console.log("error promise.all on get sb map info ", err); return }
             let currQRes = [];
-            results.forEach((result, i) => {
+            let result;
+            for (let i in results) {
+                result = results[i]
                 if (Array.isArray(result) && (result[0] || result[0] !== null)) {
-                    allRes[promisNames[i]] = null;
+                    //error 
+                    allRes[promiseNames[i]] = null;
                     console.log(`error for result #${i}(starts from 0) from Promise.ALL (for sb map info):`, result);
                     return;
                 }
                 //got query res successfully
-                currQRes = Array.isArray(result) ? result[1] : [] //IS ARRAY.
-                allRes[promisNames[i]] = currQRes
-            });
+                currQRes = Array.isArray(result) ? result[1] : [] //currQRes IS ARRAY.
+                if (i == 1) { //userPubRoutes and in allRes[promisNames[0]] we got userPRIVRoutes
+                    allRes["myMeetings"] = [...currQRes, ...allRes[promiseNames[0]]]
+                    delete allRes[promiseNames[0]]
+                } else
+                    allRes[promiseNames[i]] = currQRes
 
-            return cb(null, allRes)
+                if (i == results.length - 1) {//end of for()
+                    return cb(null, allRes)
+                }
+            }
+
         })();
     }
     CustomUser.remoteMethod('openSBRequests', {

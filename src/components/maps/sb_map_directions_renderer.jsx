@@ -16,7 +16,7 @@ const MyMapDirectionsRenderer = (props) => {
         lineCoordinates: null,
     });
     const { places } = props; // [{ location: {}, isPublic: t/f,  }, { location: {} }]
-    
+
     useEffect(() => {
         console.log('places: ', places);
         const travelMode = window.google.maps.TravelMode.WALKING
@@ -64,14 +64,12 @@ const MyMapDirectionsRenderer = (props) => {
                     strokeWeight: 7,
                 }}
             />
-            {/* <MarkerGenerator locationInfo={{ location: state.origin, type: SHOFAR_BLOWER }} /> */}
-            {/* <MarkerGenerator locationInfo={{ location: state.destination }} /> */}
             {
                 places.map((place, i, arr) => {
                     isOrigin = i == arr.length - 1;
                     locationInfo = { location: place.location, ...place.markerOptions }
-                    isOrigin && (locationInfo.type = SHOFAR_BLOWER)
-                    return <MarkerGenerator key={i} locationInfo={locationInfo} />
+                    // if(isOrigin) return null
+                    return <MarkerGenerator key={i} locationInfo={locationInfo} icon={place.icon || null} label={place.label || null} />
                 })
             }
         </div>

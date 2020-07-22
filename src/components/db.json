@@ -57,6 +57,14 @@
             "address": "רעננה הרצל 10",
             "shofarBlowerId": 9,
             "isPrivateMeeting": 0
+        },
+        {
+            "startTime": null,
+            "city": "פתח תקווה",
+            "street": "טבצ'ניק",
+            "appartment": "2",
+            "isPrivateMeeting": 1,
+            "isolatedName": "אדוה סבן"
         }
     ]
 }
