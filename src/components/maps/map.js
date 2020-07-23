@@ -127,9 +127,10 @@ const MapComp = (props) => {
     }
 
     const joinPublicMeeting = async (meetingInfo) => {
-        if (props.publicMap)
+        if (props.publicMap){
+        console.log(meetingInfo)
             props.history.push('/register', { type: 'generalUser', meetingInfo });
-        else {
+        }else {
             //join the isolator to the meeting
             let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
