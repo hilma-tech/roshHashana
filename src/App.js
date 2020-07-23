@@ -10,6 +10,7 @@ import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 import SBHomePage from './scenes/shofar_blower_home_page';
+import { SBProvider } from './ctx/shofar_blower_context';
 // import SimpleUserHome from "./scenes/Home";
 
 const Map = loadable(() => import('./components/maps/map'));
@@ -49,7 +50,7 @@ class App extends Component {
                             <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} />
                             <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
-                            <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBHomePage {...props} />} />
+                            <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBProvider><SBHomePage {...props} /></SBProvider>} />
                             <Route path="/register" component={(props) => <Register {...props} />} />
                         </Switch>
                     </div>

@@ -3,12 +3,12 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow
 
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 import Geocode from "react-geocode";
-import db from '../db.json'
 import _ from "lodash";
-import Auth from '../../modules/auth/Auth';
 import './map.scss';
 import MyMapDirectionsRenderer from './sb_map_directions_renderer';
 import MarkerGenerator from './marker_generator';
+import { useContext } from 'react';
+import { SBContext } from '../../ctx/shofar_blower_context';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -26,9 +26,9 @@ const PRIVATE_MEETING = 'private meeting';
 
 const ShofarBlowerMap = (props) => {
 
-    const [meetingsReqs, setMeetingsReqs] = useState(null);
-    const [myMeetings, setMyMeetings] = useState(null);
-    const [userData, setUserData] = useState(null);
+    const { openGenAlert,
+        userData, myMeetings, meetingsReqs,
+        setUserData, setMyMeetings, setMeetingsReqs } = useContext(SBContext)
 
     const [reqsLocs, setReqsLocs] = useState(null);
     const [myMLocs, setMyMLocs] = useState(null)
@@ -36,89 +36,85 @@ const ShofarBlowerMap = (props) => {
     const [center, setCenter] = useState({});
     const [isMarkerShown, setIsMarkerShown] = useState(false);
 
-    const privateLocInfo = (name) => (<div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{name}</div></div>
-        <div>לא ניתן להצטרף לתקיעה זו</div></div>)
+    const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
-    const publicLocInfo = (name, address, start_time) => (<div id="info-window-container">
-        <div className="info-window-header">תקיעה ציבורית</div>
-        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{name}</div></div>
+    const privateLocInfo = (iName, address, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית"}</div>
+        {iName ? <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{iName}</div></div> : null}
+        {address ? <div id="pub-shofar-blower-name-container"><img src={'/icons/address.svg'} /><div>{address}</div></div> : null}
+        {assign ? <div id="join-button">שיבוץ</div> : null}</div>)
+
+    const publicLocInfo = (address, start_time, assign = false, comments = '') => (<div id="info-window-container">
+        <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית"}</div>
         <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{start_time}</div></div>
+        <div>{comments}</div>
+        {assign ? <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{start_time}</div></div> : null}
         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-        <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-        <div id="join-button">הצטרף לתקיעה</div>
+        {assign ? <div id="join-button">שיבוץ</div> : null}
     </div>)
 
-    useEffect(() => {
-        (async () => {
-            let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/openSBRequests`, { headers: { Accept: "application/json", "Content-Type": "application/json" } }, true);
-            if (err || !mapContent) {
-                console.log("error getting sb map content ", err);
-            }
-            else if (mapContent && typeof mapContent === "object") {
-                if (!meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length)) setMeetingsReqs(mapContent.openReqs);
-                if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(mapContent.myMeetings)
-                if (!userData || (Array.isArray(userData) && !userData.length)) setUserData(mapContent.userData)
-            }
-        })();
-    }, []);
 
     useEffect(() => {
         (async () => {
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-            Geocode.setLanguage("he");
-            const centerAdr = (userData && Array.isArray(userData) && userData[0] && userData[0].name) ? `${userData[0].city || ""} ${userData[0].street || ""} ${userData[0].appartment || ""}` : "רעננה"
-            let [error, res] = await to(Geocode.fromAddress(centerAdr))
-            if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
-            try {
-                const newCenter = res.results[0].geometry.location;
-                if (newCenter !== center) setCenter(newCenter)
-            } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
+            if (userData && typeof userData === "object" && !Array.isArray(userData)) {
+                Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+                Geocode.setLanguage("he");
+                const centerAdr = (userData && typeof userData === "object" && userData.name) ? `${userData.city || ""} ${userData.street || ""} ${userData.appartment || ""}` : "רעננה"
+                let [error, res] = await to(Geocode.fromAddress(centerAdr))
+                if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
+                try {
+                    const newCenter = res.results[0].geometry.location;
+                    if (newCenter !== center) setCenter(newCenter)
+                } catch (e) { console.log(`ERROR getting ${centerAdr} geoCode, res.results[0].geometry.location `, e); }
+            }
         })();
     }, [userData])
 
     useEffect(() => {
         if (meetingsReqs && Array.isArray(meetingsReqs) && meetingsReqs.length
-            && (!reqsLocs || (Array.isArray(reqsLocs) && !reqsLocs.length))) setOpenReqsContent(meetingsReqs)
+            && (!reqsLocs || (Array.isArray(reqsLocs) && !reqsLocs.length))) {
+            setOpenReqsContent(meetingsReqs)
+            console.log('meetingsReqs: ', meetingsReqs);
+        }
     }, [meetingsReqs])
     useEffect(() => {
         //if dont have data in myLocs, but have data in myMeetings and in userData
         if (
             myMeetings && Array.isArray(myMeetings) && myMeetings.length
-            && (userData && Array.isArray(userData) && userData.length)
+            && (userData && typeof userData === "object" && userData.name)
             && (!myMLocs || (Array.isArray(myMLocs) && !myMLocs.length))
         ) {
             setMyMeetingsContent(myMeetings, userData)
+            console.log('myMeetings: ', myMeetings);
         }
     }, [myMeetings, userData])
 
 
     const setOpenReqsContent = async (reqsArr) => {
-        if (!reqsArr || !Array.isArray(reqsArr) || !reqsArr.length) { setReqsLocs([]); return; } //!
+        if (!reqsArr || !Array.isArray(reqsArr) || !reqsArr.length) { setReqsLocs([]); }
         //open requests meetings
-        // isolated location (private meetings)
         let newReqsLocs = []
         let meetReq;
         for (let i = 0; i < reqsArr.length; i++) {
             meetReq = reqsArr[i]
             let privateMeet = !meetReq.isPublicMeeting
-            const address = privateMeet ? `${meetReq.isolatedCity} ${meetReq.isolatedStreet} ${meetReq.isolatedAppartment}` : `${meetReq.publicMeetingCity} ${meetReq.publicMeetingStreet}`
+            const address = privateMeet ? `${meetReq.city} ${meetReq.street} ${meetReq.appartment}` : `${meetReq.city} ${meetReq.street}`
+            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+            Geocode.setLanguage("he");
             let [error, response] = await to(Geocode.fromAddress(address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${address}` }); continue; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
                     type: privateMeet ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
                     location: { lat, lng },
-                    info: privateMeet ? privateLocInfo(meetReq.isolatedName) : publicLocInfo(meetReq.sbName, address, meetReq.publicMeetingStartTime)
+                    info: privateMeet ? privateLocInfo(meetReq.name, address, true) : publicLocInfo(address, meetReq.startTime, true, meetReq.comments)
                 }
                 newReqsLocs.push(newLocObj)
-                if (i == reqsArr.length - 1) {
-                    setReqsLocs(newReqsLocs);
-                    // console.log('newReqsLocs: ', newReqsLocs);
-                }
             } catch (e) { console.log("err setSBMapContent, ", e); }
+            if (i == reqsArr.length - 1) {
+                console.log('newReqsLocs: ', newReqsLocs);
+                setReqsLocs(newReqsLocs);
+            }
         }
     }
 
@@ -128,7 +124,7 @@ const ShofarBlowerMap = (props) => {
         meetings.forEach(async (myMeeting, i, arr) => {
             const address = `${myMeeting.city} ${myMeeting.street}`;
             let [error, response] = await to(Geocode.fromAddress(address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
@@ -136,14 +132,13 @@ const ShofarBlowerMap = (props) => {
                     location: { lat, lng },
                     markerOptions: {
                         type: myMeeting.isPrivateMeeting ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
-                        info: myMeeting.isPrivateMeeting ? privateLocInfo(myMeeting.isolatedName) : publicLocInfo(myMeeting.isolatedName, address, myMeeting.startTime),
+                        info: myMeeting.isPrivateMeeting ? privateLocInfo(myMeeting.name) : publicLocInfo(myMeeting.name, address, myMeeting.startTime),
                     }
 
                 }
                 meetingsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i === arr.length - 1) { //end of forEach
-                // console.log('newSBLocs: ', newSBLocs);
                 setMyMLocs(meetingsLocs)
             }
         });
@@ -182,16 +177,13 @@ export default ShofarBlowerMap;
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
-        scaledSize: new window.google.maps.Size(50, 50),
-        origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(0, 0),
-        labelOrigin: new window.google.maps.Point(0, 60)
+        scaledSize: new window.google.maps.Size(100, 100),
+        // origin: new window.google.maps.Point(0, 0),
+        // anchor: new window.google.maps.Point(0, 0),
+        // labelOrigin: new window.google.maps.Point(0, 60),
     }
-
-    const userLocationLabel = { text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }
-    const userOrigin = props.userLocation ? { location: props.center, icon: userLocationIcon, label: userLocationLabel } : null;
-
-
+    const userLocationLabel = { text: 'אתה יוצא מכאן', color: "darkblue", fontWeight: "bold" }
+    const userOrigin = props.userLocation ? { location: props.center, icon: userLocationIcon } : null;
     return (
         <GoogleMap
             defaultZoom={16} //! change back to 20

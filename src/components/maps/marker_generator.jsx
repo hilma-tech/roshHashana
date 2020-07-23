@@ -25,9 +25,9 @@ const MarkerGenerator = (props) => {
 
     const icon = props.icon ? props.icon : {
         url: url,
-        scaledSize: (type === PRIVATE_MEETING) ? props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50) : new window.google.maps.Size(85, 85),
+        scaledSize: (type === PRIVATE_MEETING) ? (props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(85, 85),
         origin: new window.google.maps.Point(0, 0),
-        anchor: type === SHOFAR_BLOWER ? new window.google.maps.Point(35, -5) : new window.google.maps.Point(13, 5), // changes position of icon
+        anchor: new window.google.maps.Point(0, 0), // changes position of icon
     }
 
     return (

@@ -51,7 +51,8 @@ const MyMapDirectionsRenderer = (props) => {
     if (state.error) {
         return <h1>{state.error}</h1>;
     }
-    let isOrigin = false; let locationInfo;
+    
+    let locationInfo;
     return (
         <div>
             <Polyline
@@ -66,9 +67,7 @@ const MyMapDirectionsRenderer = (props) => {
             />
             {
                 places.map((place, i, arr) => {
-                    isOrigin = i == arr.length - 1;
                     locationInfo = { location: place.location, ...place.markerOptions }
-                    // if(isOrigin) return null
                     return <MarkerGenerator key={i} locationInfo={locationInfo} icon={place.icon || null} label={place.label || null} />
                 })
             }
