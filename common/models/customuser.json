@@ -196,6 +196,12 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "openSBRequests"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "getUserInfo"
     }
   ],
   "methods": {}

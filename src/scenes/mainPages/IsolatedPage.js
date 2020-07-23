@@ -16,7 +16,7 @@ export default class IsolatedPage extends Component {
     }
 
     openSettings = () => {
-        //TODO: go to settigns
+        this.props.history.push('/settings');
     }
 
     //cancel the request and delete the user
@@ -25,6 +25,8 @@ export default class IsolatedPage extends Component {
     }
 
     render() {
+        console.log('this.props.location', this.props.location);
+
         let name = '', address = '';
         if (this.props.location && this.props.location.state) {
             if (this.props.location.state.name)

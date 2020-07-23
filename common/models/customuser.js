@@ -4,6 +4,7 @@ let sendMsg = require('../../server/sendSms/SendSms.js')
 const moment = require('moment');
 const randomstring = require("randomstring");
 const to = require('../../server/common/to');
+const { options } = require('superagent');
 let msgText = `שלום`
 let msgText2 = `הקוד שלך הוא:`
 
@@ -171,6 +172,59 @@ module.exports = function (CustomUser) {
         }
     }
 
+    //get the user info according to his role
+    CustomUser.getUserInfo = async (role, options) => {
+        if (options.accessToken && options.accessToken.userId) {
+            let userInfo = {};
+            try {
+                //get the user info from customuser -> user address and phone number
+                userInfo = await CustomUser.findOne({ where: { id: options.accessToken.userId }, include: 'userCity', fields: { id: true, username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                if (role === 1) {
+                    //isolated
+                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: options.accessToken.userId }, fields: { public_phone: true, public_meeting: true } });
+                    userInfo.public_meeting = isolated.public_meeting;
+                    userInfo.public_phone = isolated.public_phone;
+                    return userInfo;
+                }
+                else if (role === 2) {
+                    //shofar blower 
+                    let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: options.accessToken.userId } });
+                    userInfo.can_blow_x_times = blower.can_blow_x_times;
+                    userInfo.volunteering_start_time = blower.volunteering_start_time;
+                    userInfo.volunteering_end_time = blower.volunteering_end_time;
+                    return userInfo;
+                }
+                else return userInfo; //general user
+            }
+            catch (err) {
+                throw err;
+            }
+
+        }
+    }
+
+    CustomUser.updateUserInfo = async (role, data, options) => {
+        if (options.accessToken && options.accessToken.userId) {
+            // try {
+            //     let 
+
+            //     if (role === 1) {
+            //         //isolated
+
+            //     }
+            //     if (role === 2) {
+            //         //shofar blower
+            //     }
+            //     else {
+            //         //general user
+            //     }
+            // } catch (error) {
+            //     throw error;
+            // }
+        }
+    }
+
+
     CustomUser.remoteMethod('createUser', {
         http: { verb: 'post' },
         accepts: [
@@ -201,6 +255,24 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
+    CustomUser.remoteMethod('getUserInfo', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'role', type: 'number' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    CustomUser.remoteMethod('updateUserInfo', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'role', type: 'number' },
+            { arg: 'data', type: 'object' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 
     CustomUser.openSBRequests = function (options, cb) {
         (async () => {

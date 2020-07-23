@@ -17,33 +17,35 @@ module.exports = function (Isolated) {
             //check if the city is exist in city table
             city = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
             //the city doesnt exist-> create the city
-            if (!city.id) {
-                try {
-                    city = await Isolated.app.models.City.addNewCity(data.city, options);
-                }
-                catch (err) {
-                    throw err;
-                }
+            if (!city || !city.id) {
+                city = await Isolated.app.models.City.addNewCity(data.city, options);
             }
-        } catch (error) {
+            let pubMeetId = null;
 
-            throw error;
-        }
+            //create public meeting
+            if (data.public_meeting) {
+                let meetData = [{
+                    city: city.id ? city.id : data.city,
+                    street: data.street,
+                    comments: data.comments,
+                    start_time: null
+                }]
+                pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+            }
 
+            let objToIsolated = {
+                "userIsolatedId": options.accessToken.userId,
+                "public_phone": data.public_phone,
+                "public_meeting": data.public_meeting,
+                "blowerMeetingId": pubMeetId
+            },
+                objToCU = {
+                    "cityId": city.id,
+                    "street": data.street,
+                    "appartment": data.appartment,
+                    "comments": data.comments
+                };
 
-        let objToIsolated = {
-            "userIsolatedId": options.accessToken.userId,
-            "public_phone": data.public_phone,
-            "public_meeting": data.public_meeting
-        },
-            objToCU = {
-                "cityId": city.id,
-                "street": data.street,
-                "appartment": data.appartment,
-                "comments": data.comments
-            };
-
-        try {
 
             let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
 
@@ -84,7 +86,7 @@ module.exports = function (Isolated) {
         }
         else return;
     }
-    
+
 
     Isolated.remoteMethod('InsertDataIsolated', {
         http: { verb: 'post' },

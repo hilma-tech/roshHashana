@@ -99,9 +99,8 @@ export default class IsolatedForm extends Component {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
 
         return (
-            <div id="isolated-form-container" className={`${this.state.openModal ? 'change-color' : ''}`}>
-
-                {!this.state.openModal ?
+            <>
+                <div id="isolated-form-container" style={{ opacity: this.state.openModal ? '0' : '1' }} >
                     <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                         <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                         <div className="msg-txt header">{`שלום ${name},`}</div>
@@ -148,14 +147,18 @@ export default class IsolatedForm extends Component {
                             <input type="submit" value="מצאו לי בעל תוקע" />
                         </form>
                     </div>
-                    : <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                        <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
-                        <div id="button" onClick={this.goToMainPage}>הבנתי תודה</div>
+                    <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
+                        <img id="shofar-img" src="/icons/shofar.png" />
+                    </BrowserView>
+                </div>
+                {this.state.openModal &&
+                    <div id="background">
+                        <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
+                            <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
+                            <div id="button" className="clickAble" onClick={this.goToMainPage}>הבנתי תודה</div>
+                        </div>
                     </div>}
-                {!this.state.openModal && <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
-                    <img id="shofar-img" src="/icons/shofar.png" />
-                </BrowserView>}
-            </div>
+            </>
         );
     }
 }

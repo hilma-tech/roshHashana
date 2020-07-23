@@ -18,7 +18,7 @@ module.exports = function (ShofarBlower) {
             //check if the city is exist in city table
             city = await ShofarBlower.app.models.City.findOne({ where: { "name": data.city } });
             //the city doesnt exist-> create the city
-            if (!city.id) {
+            if (!city || !city.id) {
                 try {
                     city = await ShofarBlower.app.models.City.addNewCity(data.city, options);
                 }
