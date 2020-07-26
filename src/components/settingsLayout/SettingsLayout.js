@@ -3,6 +3,9 @@ import Auth from '../../modules/auth/Auth';
 import './SettingsLayout.scss';
 
 //this component excepts to get settings content
+//props: 
+//      handleClose -> a function that handles when the user clicks on x
+//      children- it is not a prop, it is the content that inside <Settings> content </Settings>
 const Settings = (props) => {
 
     const handleClose = () => {
@@ -11,7 +14,7 @@ const Settings = (props) => {
     }
     const logOut = () => {
         window.location.href = window.location.origin
-      }
+    }
 
     return (
         <div id="settings-container" className="fade-in">

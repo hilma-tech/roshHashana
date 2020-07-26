@@ -202,6 +202,12 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "getUserInfo"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "updateUserInfo"
     }
   ],
   "methods": {}

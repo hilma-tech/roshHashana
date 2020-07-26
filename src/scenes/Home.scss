@@ -5,8 +5,16 @@
    background-position: center;
    background-repeat: no-repeat;
    background-size: cover;
-   height: 100vh;
+   height: 100%;
+   width: 100%;
+   position: absolute;
+   top: 0;
+   left: 0;
+   padding: 5% 2.5%;
 
+   .content-container {
+      margin: auto;
+   }
    #text1 {
       font-size: 205%;
       margin-top: 1%;
@@ -16,8 +24,11 @@
       color: #ffffff;
    }
    .coverImg {
-      height: 100vh;
-      width: 100vw;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       object-fit: cover;
    }
 
@@ -50,12 +61,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: fit-content;
 
       .mobileRegisterIsolator {
          background-color: #ffa62b;
          color: white;
          border: none;
-         padding: 2.5%;
+         padding: 2.5% 3.5%;
          width: 103%;
          font-size: 3vh;
          font-weight: bold;
@@ -76,5 +88,19 @@
    #text2 {
       font-size: 131%;
       margin-top: 30%;
+   }
+}
+
+@media only screen and (max-width: 1000px) {
+   .HomePage {
+      .mobileButtonForRegister {
+         margin-top: 5% !important;
+      }
+      .img-container {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         margin-top: 7%;
+      }
    }
 }

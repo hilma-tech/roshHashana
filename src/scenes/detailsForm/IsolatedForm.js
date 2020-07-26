@@ -51,6 +51,11 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא הכנס את שם העיר או היישוב' });
             return;
         }
+        if (!formChilds[1].value && !formChilds[2].value && !formChilds[6].value) {
+            this.setState({ errorMsg: 'אנא הכנס או שם רחוב ומספר בית או הערות המתארות את מקום מגוריך' });
+            return;
+        }
+
         let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value;
         //check if the address is correct
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
@@ -135,7 +140,7 @@ export default class IsolatedForm extends Component {
                                 <input className="clickAble" type="radio" name="preferance" />
                             </div>
 
-                            <input autoComplete={'off'} id="comments" type="text" placeholder="הערות" />
+                            <input autoComplete={'off'} id="comments" type="text" placeholder="הערות ותיאור הכתובת" />
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>

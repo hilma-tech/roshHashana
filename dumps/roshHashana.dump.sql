@@ -510,7 +510,7 @@ CREATE TABLE `shofar_blower` (
   `confirm` tinyint(1) unsigned DEFAULT '0',
   `can_blow_x_times` int(11) unsigned NOT NULL,
   `volunteering_start_time` datetime NOT NULL,
-  `volunteering_end_time` datetime NOT NULL,
+  `volunteering_max_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
