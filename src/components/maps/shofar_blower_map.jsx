@@ -132,7 +132,7 @@ const ShofarBlowerMap = (props) => {
                     location: { lat, lng },
                     markerOptions: {
                         type: myMeeting.isPrivateMeeting ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
-                        info: myMeeting.isPrivateMeeting ? privateLocInfo(myMeeting.name) : publicLocInfo(myMeeting.name, address, myMeeting.startTime),
+                        info: myMeeting.isPrivateMeeting ? privateLocInfo(myMeeting.name, myMeeting.startTime) : publicLocInfo(myMeeting.name, address, myMeeting.startTime),
                     }
 
                 }
