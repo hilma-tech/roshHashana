@@ -122,7 +122,10 @@ module.exports = function (CustomUser) {
                                     CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
                                         if (errCity) console.log('errCity', errCity);
                                         if (city) {
-                                            let address = res.street + ' ' + res.appartment + ' ' + res.comments + ', ' + city.name;
+                                            let street = res.street ? res.street : '';
+                                            let appartment = res.appartment ? res.appartment : '';
+                                            let comments = res.comments ? res.comments : '';
+                                            let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
                                             cb(null, { ok: "isolator with data", data: { name: res.name, address } })
                                         }
                                     });

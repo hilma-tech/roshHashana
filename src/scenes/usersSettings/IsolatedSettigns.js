@@ -1,21 +1,24 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import AutoComplete from '../../components/autocomplete/AutoComplete';
 import Auth from '../../modules/auth/Auth';
+import { MainContext } from '../../ctx/MainContext';
 import Geocode from "react-geocode";
 import './Settings.scss';
 
 const IsolatedSettings = (props) => {
 
-    const [isolatedInfo, setIsolatedInfo] = useState({});
-    const [openPersInfo, setOpenPersInfo] = useState(false);
+    const { cities, setCities } = useContext(MainContext);
     const [openBlowingSet, setOpenBlowingSet] = useState(false);
-    const [msgErr, setMsgErr] = useState('');
-    const [comments, setComments] = useState('');
-    const [name, setName] = useState('');
-    const [username, setUsername] = useState('');
-    const [city, setCity] = useState('');
-    const [street, setStreet] = useState('');
+    const [openPersInfo, setOpenPersInfo] = useState(false);
+    const [isolatedInfo, setIsolatedInfo] = useState({});
     const [appartment, setAppartment] = useState('');
+    const [comments, setComments] = useState('');
+    const [username, setUsername] = useState('');
+    const [msgErr, setMsgErr] = useState('');
+    const [street, setStreet] = useState('');
+    const [name, setName] = useState('');
+    const [city, setCity] = useState('');
 
 
     useEffect(() => {
@@ -32,12 +35,31 @@ const IsolatedSettings = (props) => {
                 setValues(res.appartment, setAppartment);
                 setValues(res.username, setUsername);
             }
+            if (!cities.length) {
+                getCities();
+            }
         })();
     }, []);
+
+    const getCities = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" }
+        }, true);
+        if (res) {
+            setCities(res);
+        }
+    }
 
     //a function that handles set state generically
     const setValues = (val, setFunc) => {
         setFunc(val);
+    }
+
+    const updateSelectedCity = (city) => {
+        let chosenCity;
+        if (city.name) chosenCity = city.name;
+        else chosenCity = city;
+        setValues(chosenCity, setCity);
     }
 
     const updateIsolatedInfo = async () => {
@@ -116,7 +138,18 @@ const IsolatedSettings = (props) => {
 
             <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
                 <div className="header">כתובת</div>
-                <input autoComplete={'off'} id="city" type="text" value={city} placeholder="עיר / יישוב" onChange={(e) => setValues(e.target.value, setCity)} />
+
+                <AutoComplete
+                    optionsArr={cities}
+                    placeholder="עיר / יישוב"
+                    canAddOption={true}
+                    displyField="name"
+                    inputValue={city}
+                    updateSelectOption={updateSelectedCity}
+                    updateText={updateSelectedCity}
+                    canAddOption={true}
+                />
+
                 <input autoComplete={'off'} id="street" type="text" value={street} placeholder="רחוב" onChange={(e) => setValues(e.target.value, setStreet)} />
                 <input autoComplete={'off'} id="appartment" type="text" value={appartment} placeholder="מספר בית / דירה" onChange={(e) => setValues(e.target.value, setAppartment)} />
 

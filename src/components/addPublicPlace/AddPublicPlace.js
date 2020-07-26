@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from "react";
+import React, { Fragment, Component, useEffect, useState } from "react";
 import AutoComplete from '../autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { createMuiTheme } from "@material-ui/core";
@@ -26,68 +26,67 @@ const materialTheme = createMuiTheme({
 });
 
 //public place form
-export default class AddPublicPlace extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            chosenTime: null,
-            chosenCity: ''
-        }
-    }
 
-    componentDidMount() {
-        this.props.updatePublicPlace(this.props.index, "time", this.state.chosenTime);
-    }
+const AddPublicPlace = (props) => {
+    const [chosenTime, setChosenTime] = useState(props.chosenTime ? props.chosenTime : null);
+    const [chosenCity, setChosenCity] = useState(props.chosenCity ? props.chosenCity : '');
+
+    useEffect(() => {
+        props.updatePublicPlace(props.index, 'time', chosenTime);
+    }, []);
 
     //update chosenTime state and the publicPlaces array according to user choise
-    changeChosenTime = (time) => {
-        this.setState({ chosenTime: time._d }, () => {
-            this.props.updatePublicPlace(this.props.index, "time", this.state.chosenTime);
-        });
+    const changeChosenTime = (time) => {
+        setChosenTime(time._d);
     }
+
+    useEffect(() => {
+        props.updatePublicPlace(props.index, 'time', chosenTime);
+    }, [chosenTime]);
+
+    useEffect(() => {
+        props.updatePublicPlace(props.index, 'city', chosenCity);
+    }, [chosenCity]);
 
     //update chosenCity state and the publicPlaces array according to user choise
-    updateCity = (city) => {
-        let chosenCity;
-        if (city.name) chosenCity = city.name;
-        else chosenCity = city;
-        this.setState({ chosenCity }, () => {
-            this.props.updatePublicPlace(this.props.index, "city", this.state.chosenCity);
-        });
+    const updateCity = (city) => {
+        let selectedCity;
+        if (city.name) selectedCity = city.name;
+        else selectedCity = city;
+        setChosenCity(selectedCity);
     }
+    return (
+        <div id="public-place-container">
+            {/* address inputs  */}
+            <AutoComplete
+                optionsArr={props.cities}
+                placeholder="עיר / יישוב"
+                canAddOption={true}
+                displyField="name"
+                inputValue={chosenCity}
+                updateSelectOption={updateCity}
+                updateText={updateCity}
+                canAddOption={true}
+            />
+            <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" onChange={(e) => props.updatePublicPlace(props.index, "street", e.target.value)} />
+            <input autoComplete={'off'} id="place-description" type="text" placeholder="תיאור המקום" onChange={(e) => props.updatePublicPlace(props.index, "placeDescription", e.target.value)} />
 
-    render() {
-        return (
-            <div id="public-place-container">
-                {/* address inputs  */}
-                <AutoComplete
-                    optionsArr={this.props.cities}
-                    placeholder="עיר / יישוב"
-                    canAddOption={true}
-                    displyField="name"
-                    inputValue={this.state.chosenCity}
-                    updateSelectOption={this.updateCity}
-                    updateText={this.updateCity}
-                    canAddOption={true}
-                />
-                <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" onChange={(e) => this.props.updatePublicPlace(this.props.index, "street", e.target.value)} />
-                <input autoComplete={'off'} id="place-description" type="text" placeholder="תיאור המקום" onChange={(e) => this.props.updatePublicPlace(this.props.index, "placeDescription", e.target.value)} />
+            {/* time input */}
+            <ThemeProvider theme={materialTheme}>
+                <MuiPickersUtilsProvider utils={MomentUtils}>
+                    <Fragment>
+                        <TimePicker
+                            placeholder="שעה"
+                            ampm={false}
+                            value={chosenTime}
+                            onChange={changeChosenTime}
+                            format={props.format}
+                        />
+                    </Fragment>
+                </MuiPickersUtilsProvider>
+            </ThemeProvider>
+        </div>
+    );
 
-                {/* time input */}
-                <ThemeProvider theme={materialTheme}>
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <Fragment>
-                            <TimePicker
-                                placeholder="שעה"
-                                ampm={false}
-                                value={this.state.chosenTime}
-                                onChange={this.changeChosenTime}
-                                format={this.props.format}
-                            />
-                        </Fragment>
-                    </MuiPickersUtilsProvider>
-                </ThemeProvider>
-            </div>
-        );
-    }
 }
+export default AddPublicPlace;

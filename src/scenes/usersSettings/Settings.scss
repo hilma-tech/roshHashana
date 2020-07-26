@@ -74,12 +74,29 @@
         text-align: center;
     }
 }
+label {
+    width: 100%;
+    #AllOpsContainer {
+        max-height: 10rem;
+        overflow: scroll;
+        width: 80%;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        .opContainer {
+            height: 2rem;
+            font-size: 1rem;
+            border: 1px solid #0000002e;
+        }
+    }
+}
 #name,
 #phone-number,
 #city,
 #street,
 #appartment,
 #comments,
+.autocompleteInput,
 input[type="number"] {
     @include input();
     font-size: 1.3rem;
@@ -92,6 +109,8 @@ input[type="number"] {
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
     }
+}
+.autocompleteInput {
 }
 .header,
 .header2 {

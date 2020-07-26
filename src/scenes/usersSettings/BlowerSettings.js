@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef, Fragment } from 'react';
+import React, { useEffect, useState, useRef, Fragment, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from "@material-ui/styles";
+import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import Auth from '../../modules/auth/Auth';
@@ -33,18 +35,19 @@ const format = 'HH:mm';
 
 const IsolatedSettings = (props) => {
 
-    const [blowerInfo, setBlowerInfo] = useState({});
-    const [settingsType, setSettingsType] = useState('');
-    const [msgErr, setMsgErr] = useState('');
-    const [name, setName] = useState('');
-    const [username, setUsername] = useState('');
-    const [city, setCity] = useState('');
-    const [street, setStreet] = useState('');
-    const [appartment, setAppartment] = useState('');
-    const [startTime, setStartTime] = useState('');
-    const [maxTime, setMaxTime] = useState('');
-    const [blowingTimes, setBlowingTimes] = useState('');
+    const { cities, setCities } = useContext(MainContext);
     const [publicMeetings, setPublicMeetings] = useState([]);
+    const [settingsType, setSettingsType] = useState('');
+    const [blowingTimes, setBlowingTimes] = useState('');
+    const [appartment, setAppartment] = useState('');
+    const [blowerInfo, setBlowerInfo] = useState({});
+    const [startTime, setStartTime] = useState('');
+    const [username, setUsername] = useState('');
+    const [maxTime, setMaxTime] = useState('');
+    const [msgErr, setMsgErr] = useState('');
+    const [street, setStreet] = useState('');
+    const [name, setName] = useState('');
+    const [city, setCity] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -63,8 +66,20 @@ const IsolatedSettings = (props) => {
                 setValues(res.can_blow_x_times, setBlowingTimes);
                 setValues(res.publicMeetings, setPublicMeetings);
             }
+            if (!cities.length) {
+                getCities();
+            }
         })();
     }, []);
+
+    const getCities = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" }
+        }, true);
+        if (res) {
+            setCities(res);
+        }
+    }
 
     //a function that handles set state generically
     const setValues = (val, setFunc) => {
@@ -77,6 +92,13 @@ const IsolatedSettings = (props) => {
             setSettingsType('');
         }
         else setSettingsType(e.target.id);
+    }
+
+    const updateSelectedCity = (city) => {
+        let chosenCity;
+        if (city.name) chosenCity = city.name;
+        else chosenCity = city;
+        setValues(chosenCity, setCity);
     }
 
     const updateIsolatedInfo = async () => {
@@ -174,7 +196,18 @@ const IsolatedSettings = (props) => {
                 </ThemeProvider>
 
                 <div className="header">כתובת יציאה</div>
-                <input autoComplete={'off'} id="city" type="text" placeholder="עיר / יישוב" value={city} onChange={(e) => setValues(e.target.value, setCity)} />
+
+                <AutoComplete
+                    optionsArr={cities}
+                    placeholder="עיר / יישוב"
+                    canAddOption={true}
+                    displyField="name"
+                    inputValue={city}
+                    updateSelectOption={updateSelectedCity}
+                    updateText={updateSelectedCity}
+                    canAddOption={true}
+                />
+
                 <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" value={street} onChange={(e) => setValues(e.target.value, setStreet)} />
                 <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
 
