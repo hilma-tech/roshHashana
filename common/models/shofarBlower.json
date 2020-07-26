@@ -110,15 +110,15 @@
                 "nullable": "N"
             }
         },
-        "volunteering_end_time": {
-            "type": "Date",
+        "volunteering_max_time": {
+            "type": "Number",
             "required": true,
             "length": null,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "volunteering_end_time",
-                "dataType": "datetime",
+                "columnName": "volunteering_max_time",
+                "dataType": "int",
                 "dataLength": null,
                 "dataPrecision": null,
                 "dataScale": null,

@@ -6,7 +6,7 @@ module.exports = function (ShofarBlower) {
     // {
     // "can_blow_x_times":1,
     //             "volunteering_start_time":1594563291554,
-    //             "volunteering_end_time":1594563291554,
+    //             "volunteering_max_time":1594563291554,
     //         "city" : "חיפה",
     //         "street": "פרויד",
     //         "appartment": "23",
@@ -30,12 +30,12 @@ module.exports = function (ShofarBlower) {
             throw error;
         }
 
-        console.log('data', new Date(data.volunteering_start_time), new Date(data.volunteering_end_time))
+        console.log('data', new Date(data.volunteering_start_time), new Date(data.volunteering_max_time))
         let objToBlower = {
             "userBlowerId": options.accessToken.userId,
             "can_blow_x_times": data.can_blow_x_times,
             "volunteering_start_time": data.volunteering_start_time,
-            "volunteering_end_time": data.volunteering_end_time
+            "volunteering_max_time": data.volunteering_max_time
         },
             objToCU = {
                 "cityId": city.id,

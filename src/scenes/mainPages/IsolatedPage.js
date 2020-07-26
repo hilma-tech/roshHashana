@@ -1,59 +1,71 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { isBrowser } from "react-device-detect";
 import Map from '../../components/maps/map';
+import Auth from '../../modules/auth/Auth';
 import './MainPage.scss';
 
-export default class IsolatedPage extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            openMap: false
-        }
+const IsolatedPage = (props) => {
+    const [openMap, setOpenMap] = useState(false);
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+
+    useEffect(() => {
+        (async () => {
+            if (props.location && props.location.state && props.location.state.name && props.location.state.address) {
+                setName(props.location.state.name);
+                setAddress(props.location.state.address);
+            }
+            else {
+                //TODO: לא בטוח זה נכנס לכאן
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${1}`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                }, true);
+                const city = res.userCity ? res.userCity.name : '';
+                const street = res.street ? res.street : '';
+                const appartment = res.appartment ? res.appartment : '';
+                const comments = res.comments ? res.comments : '';
+
+                setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
+                setName(res.name);
+            }
+
+        })();
+    }, []);
+
+    const closeOrOpenMap = () => {
+        setOpenMap(!openMap);
     }
 
-    closeOrOpenMap = () => {
-        this.setState({ openMap: !this.state.openMap });
-    }
-
-    openSettings = () => {
-        this.props.history.push('/settings');
+    const openSettings = () => {
+        props.history.push('/settings');
     }
 
     //cancel the request and delete the user
-    cancelRequest = () => {
+    const cancelRequest = () => {
 
     }
 
-    render() {
-        console.log('this.props.location', this.props.location);
-
-        let name = '', address = '';
-        if (this.props.location && this.props.location.state) {
-            if (this.props.location.state.name)
-                name = this.props.location.state.name;
-            if (this.props.location.state.address)
-                address = this.props.location.state.address;
-        }
-        return (
-            <>
-                <div id="isolated-page-container" className={`${this.state.openMap ? 'slide-out-top' : 'slide-in-top'}`} >
-                    <div className="settings clickAble" onClick={this.openSettings}><img src="/icons/settings.svg" /></div>
-                    <div className="content-container">
-                        <div>{`שלום ${name}`}</div>
-                        <div id="thank-you-msg">ותודה על התעניינותך במפגש תקיעת שופר.</div>
-                        <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
-                        <div>לכתובת:</div>
-                        <div id="address" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
-                        <div id="cancel-request" onClick={this.cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '40%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
-                        <div id="see-map" className="clickAble" onClick={this.closeOrOpenMap}>
-                            צפייה במפה
-                            <img src='/images/map.svg' />
-                        </div>
+    return (
+        <>
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
+                <div className="settings clickAble" onClick={openSettings}><img src="/icons/settings.svg" /></div>
+                <div className="content-container">
+                    <div>{`שלום ${name}`}</div>
+                    <div id="thank-you-msg">ותודה על התעניינותך במפגש תקיעת שופר.</div>
+                    <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
+                    <div>לכתובת:</div>
+                    <div id="address" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
+                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
+                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                        צפייה במפה
+                        <img src='/images/map.svg' />
                     </div>
-
                 </div>
-                {this.state.openMap && <Map closeMap={this.closeOrOpenMap} isolated />}
-            </>
-        );
-    }
+
+            </div>
+            {openMap && <Map closeMap={closeOrOpenMap} isolated />}
+        </>
+    );
 }
+
+export default IsolatedPage;

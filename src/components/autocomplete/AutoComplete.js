@@ -114,6 +114,7 @@ export default class AutocompleteComponent extends Component {
       <label className="autocompleteContainer">
 
         <input
+          type="text"
           ref={this.props.inputRef || null}
           style={this.props.inputStyle}
           className="autocompleteInput"

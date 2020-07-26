@@ -209,7 +209,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
         {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

@@ -21,6 +21,7 @@ class Register extends React.Component {
       key: "",
       alart: null,
       sendKey: false,
+      imgLoadedNum: 0
     };
     this.generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
     this.isolator1 = "אני רוצה לשמוע";
@@ -62,7 +63,7 @@ class Register extends React.Component {
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
-      let meetingId =this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null 
+      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
@@ -102,14 +103,14 @@ class Register extends React.Component {
             break;
           case "isolated with public meeting":
             console.log("להכניס אותו שוב לאיפה שהוא נירשם");
-             //TODO להכניס אותו שוב לאיפה שהוא נירשם
-  
-            break;   
+            //TODO להכניס אותו שוב לאיפה שהוא נירשם
+
+            break;
           case "public meeting already exists":
-             console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
+            console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
             //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
-  
-            break; 
+
+            break;
           default:
             this.setState({ status: "start", })
         }
@@ -139,17 +140,23 @@ class Register extends React.Component {
     }
   }
 
+  updateImgLoadedNum = () => {
+    let num = this.state.imgLoadedNum;
+    num++;
+    this.setState({ imgLoadedNum: num })
+  }
+
   render() {
 
     return (
-      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`}  >
+      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
           <a href="/" ><img id="go-back" src="/icons/go-back.svg" /></a>
           :
           <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
 
-        <div className=""><img style={{ width: isBrowser ? '26vw' : '68vw', marginTop: isBrowser ? "2%" : "27%" }} src="/images/header.svg" /></div>
+        <div className=""><img style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :

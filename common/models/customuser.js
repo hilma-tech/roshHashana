@@ -122,7 +122,10 @@ module.exports = function (CustomUser) {
                                     CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
                                         if (errCity) console.log('errCity', errCity);
                                         if (city) {
-                                            let address = res.street + ' ' + res.appartment + ' ' + res.comments + ', ' + city.name;
+                                            let street = res.street ? res.street : '';
+                                            let appartment = res.appartment ? res.appartment : '';
+                                            let comments = res.comments ? res.comments : '';
+                                            let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
                                             cb(null, { ok: "isolator with data", data: { name: res.name, address } })
                                         }
                                     });
@@ -217,7 +220,10 @@ module.exports = function (CustomUser) {
                     let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: options.accessToken.userId } });
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
-                    userInfo.volunteering_end_time = blower.volunteering_end_time;
+                    userInfo.volunteering_max_time = blower.volunteering_max_time;
+
+                    let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: options.accessToken.userId } });
+                    userInfo.publicMeetings = publicMeetings;
                     return userInfo;
                 }
                 else return userInfo; //general user
@@ -231,22 +237,47 @@ module.exports = function (CustomUser) {
 
     CustomUser.updateUserInfo = async (role, data, options) => {
         if (options.accessToken && options.accessToken.userId) {
-            // try {
-            //     let 
+            try {
+                let city;
+                if (data.city) {
+                    city = await CustomUser.app.models.city.findOne({ where: { name: data.city } });
+                }
+                let userData = {
+                    name: data.name,
+                    username: data.username,
+                    street: data.street ? data.street : null,
+                    appartment: data.appartment ? data.appartment : null,
+                    comments: data.comments ? data.comments : null,
+                    cityId: city ? city.id : null
+                }
+                let resCustomUser = await CustomUser.upsertWithWhere({ id: options.accessToken.userId }, userData);
 
-            //     if (role === 1) {
-            //         //isolated
+                if (role === 1) {
+                    //isolated
+                    let newIsoData = {
+                        userIsolatedId: options.accessToken.userId,
+                        public_phone: data.public_phone,
+                        public_meeting: data.public_meeting
+                    }
+                    let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: options.accessToken.userId }, newIsoData);
+                }
+                else if (role === 2) {
+                    //shofar blower
+                    console.log('data', data)
+                    let newBloData = {
+                        volunteering_max_time: data.volunteering_max_time,
+                        can_blow_x_times: data.can_blow_x_times,
+                        volunteering_start_time: data.volunteering_start_time
+                    }
+                    let resBlower = await CustomUser.app.models.ShofarBlower.upsertWithWhere({ userBlowerId: options.accessToken.userId }, newBloData);
 
-            //     }
-            //     if (role === 2) {
-            //         //shofar blower
-            //     }
-            //     else {
-            //         //general user
-            //     }
-            // } catch (error) {
-            //     throw error;
-            // }
+                    // TODO: update also all the public meetings
+                }
+                else return; //general user
+
+            } catch (error) {
+                throw error;
+            }
         }
     }
 
@@ -292,7 +323,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.remoteMethod('updateUserInfo', {
-        http: { verb: 'post' },
+        http: { verb: 'put' },
         accepts: [
             { arg: 'role', type: 'number' },
             { arg: 'data', type: 'object' },

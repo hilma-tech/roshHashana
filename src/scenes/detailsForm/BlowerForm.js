@@ -128,7 +128,7 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
-        let address = this.state.chosenCity + ' '+formChilds[7].value + ' '+formChilds[2].value;
+        let address = this.state.chosenCity + ' ' + formChilds[7].value + ' ' + formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
         let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
         // console.log(startTime,endTime )
@@ -146,7 +146,7 @@ export default class IsolatedForm extends Component {
                 let blowerDetails = {
                     "can_blow_x_times": formChilds[1].value,
                     "volunteering_start_time": startTime,
-                    "volunteering_end_time": endTime,
+                    "volunteering_max_time": this.state.walkTime,//endTime,
                     "city": this.state.chosenCity,
                     "street": formChilds[7].value,
                     "appartment": formChilds[8].value,

@@ -208,6 +208,12 @@
       "principalId": "ADMIN",
       "permission": "ALLOW",
       "property": "assignSB"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "updateUserInfo"
     }
   ],
   "methods": {}
