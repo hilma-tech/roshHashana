@@ -1,0 +1,34 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "msql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "roshHashana",
+    "password": "CarmelBot1010",
+    "name": "msql",
+    "user": "root",
+    "connector": "mysql"
+  },
+  "myEmailDataSource": {
+    "connector": "mail",
+    "transports": [
+      {
+        "service":"gmail",
+        "type": "smtp",
+        "host": "smtp.gmail.com",
+        "secure": true,
+        "port": 465,
+        "tls": {
+          "rejectUnauthorized": false
+        },
+        "auth": {
+          "user": "carmel6000dev@gmail.com",
+          "pass": "uhWFoFK$97r"
+        }
+      }
+    ]
+  }
+}

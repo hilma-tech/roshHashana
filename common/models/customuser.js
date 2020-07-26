@@ -56,7 +56,7 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.authenticationKey = (key, options, res, cb) => {
+    CustomUser.authenticationKey = (key, meetingId, options, res, cb) => {
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {
                 console.log("err", err1)
@@ -90,7 +90,7 @@ module.exports = function (CustomUser) {
                                         res.cookie('kloo', randomstring.generate(), { signed: true, expires });
                                         res.cookie('klk', randomstring.generate(), { signed: true, expires });
                                         res.cookie('olk', randomstring.generate(), { signed: true, expires });
-                                        CustomUser.checkStatus(result.userId, cb)
+                                        CustomUser.checkStatus(result.userId, meetingId, cb)
                                         // cb(null, { ok: true })
                                     },
                                         options, 5184000)
@@ -105,49 +105,75 @@ module.exports = function (CustomUser) {
             }
         })
     }
-    CustomUser.checkStatus = (userId, cb) => {
+    CustomUser.checkStatus = (userId, meetingId, cb) => {
         let status
         CustomUser.app.models.RoleMapping.findOne({ where: { principalId: userId } }, (err, resRole) => {
-            if (err) {
-                console.log("Err", err);
-            }
+            if (err)  console.log("Err", err);
             if (resRole) {
                 status = resRole.roleId
                 CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-                    if (err) {
-                        console.log("Err", err);
-                    }
+                    if (err)  console.log("Err", err);
                     if (res) {
-                        console.log(res, 'res');
-
-                        if (res.cityId == null && status === 2) {
-                            cb(null, { ok: "blower new", data: { name: res.name } })
-                        } else
-                            if ((res.cityId != null && status === 2)) {
-                                cb(null, { ok: "blower with data", data: { name: res.name } })
-                            } else
-                                if (res.cityId == null && status === 1) {
+                        switch (status) {
+                            case 1:
+                                if (res.cityId == null) {
                                     cb(null, { ok: "isolator new", data: { name: res.name } })
-                                } else
-                                    if (res.cityId != null && status === 1) {
-                                        CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
-                                            if (errCity) console.log('errCity', errCity);
-                                            if (city) {
-                                                let address = res.street + ' ' + res.appartment + ' ' + res.comments + ', ' + city.name;
-                                                cb(null, { ok: "isolator with data", data: { name: res.name, address } })
+                                } else {
+                                    CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
+                                        if (errCity) console.log('errCity', errCity);
+                                        if (city) {
+                                            let address = res.street + ' ' + res.appartment + ' ' + res.comments + ', ' + city.name;
+                                            cb(null, { ok: "isolator with data", data: { name: res.name, address } })
+                                        }
+                                    });
+                                }
+                                break;
+
+                            case 2:
+                                if (res.cityId == null) {
+                                    cb(null, { ok: "blower new", data: { name: res.name } })
+                                } else cb(null, { ok: "blower with data", data: { name: res.name } })
+                                break;
+
+                            case 3:
+                                CustomUser.app.models.isolated.findOne({ where: { userIsolatedId: res.id } }, (errIsolated, resIsolated) => {
+                                    if (errIsolated) console.log("errIsolated", errIsolated);
+                                    if (!resIsolated && meetingId !== null) {
+                                        //isolated with new public meeting 
+                                        CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
+                                            if (errPM) console.log("errPM", errPM);
+                                            if (resPM) {
+                                                cb(null, { ok: "isolated with new public meeting" })
                                             }
                                         });
-                                    } else
-                                        if (status == 3) {
+                                    } else if (resIsolated && resIsolated.public_meeting == 1) {
+                                        if (meetingId == null) {
+                                            //isolated with public meeting
                                             cb(null, { ok: "isolated with public meeting" })
-                                            //TODO להוסיף הרשמה של מבודד לפגישה ציבורית
-                                        } else cb(null, { ok: "problem" })
+
+                                        } else {
+                                            //public meeting already exists
+                                            cb(null, { ok: "public meeting already exists" })
+
+                                        }
+                                    }
+                                });
+
+                                break;
+                            default:
+                                cb(null, { ok: "problem" })
+                                break;
+                        }
+
+
                     }
                 })
             }
         })
 
     }
+
+
 
     CustomUser.getMapData = async (isPubMap = false, options) => {
 
@@ -239,6 +265,7 @@ module.exports = function (CustomUser) {
         http: { verb: 'get' },
         accepts: [
             { arg: 'key', type: 'string' },
+            { arg: 'meetingId', type: 'any' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
             { arg: 'res', type: 'object', http: { source: 'res' } }
 
@@ -349,7 +376,7 @@ module.exports = function (CustomUser) {
                 r = pubsRes[i]
                 if (r.blowerStatus === "req") {
                     pubReqs.push(r)
-                } else if(r.blowerStatus === "route") myPubRoutes.push(r)
+                } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
 

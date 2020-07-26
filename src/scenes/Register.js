@@ -3,14 +3,14 @@ import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { BrowserView, isBrowser } from "react-device-detect";
-let errKey = "קוד שגוי"
-let timeOut = "זמן הקוד פג"
-let SomethingMissing = "חסר שם או מספר טלפון לא תקין"
-const generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
+const errKey = "קוד שגוי"
+const timeOut = "זמן הקוד פג"
+const SomethingMissing = "חסר שם או מספר טלפון לא תקין"
+
 class Register extends React.Component {
   constructor(props) {
     super(props);
-    console.log(this.props.location);
+
 
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
@@ -22,10 +22,10 @@ class Register extends React.Component {
       alart: null,
       sendKey: false,
     };
+    this.generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
     this.isolator1 = "אני רוצה לשמוע";
     this.isolator2 = "תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
-    console.log("!!!", this.props.location.state.type, this.state.role)
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -61,7 +61,9 @@ class Register extends React.Component {
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}`, {
+      //TODO id for generalUser this.props.location.state.meetingInfo
+      let meetingId =this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null 
+      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
       });
@@ -93,11 +95,21 @@ class Register extends React.Component {
             this.props.history.push('isolated-main-page', { name: res.data.name, address: res.data.address });
 
             break;
-          case "isolated with public meeting":
+          case "isolated with new public meeting":
             console.log("להודיע לו שהוא נרשם");
             //TODO להודיע לו שהוא נרשם 
 
             break;
+          case "isolated with public meeting":
+            console.log("להכניס אותו שוב לאיפה שהוא נירשם");
+             //TODO להכניס אותו שוב לאיפה שהוא נירשם
+  
+            break;   
+          case "public meeting already exists":
+             console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
+            //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
+  
+            break; 
           default:
             this.setState({ status: "start", })
         }
@@ -128,7 +140,6 @@ class Register extends React.Component {
   }
 
   render() {
-    console.log(this.state.alart)
 
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`}  >
@@ -145,7 +156,7 @@ class Register extends React.Component {
           this.props.location.state.type === 'isolator' ?
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
             :
-            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{generalUser}</div>
+            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
 
         }
 
