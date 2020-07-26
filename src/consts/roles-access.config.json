@@ -5,7 +5,8 @@
             "AnotherComponent",
             "BlowerDetailsForm",
             "SBHomePage",
-            "BlowerSettings"
+            "BlowerSettings",
+            "SBAssignMeeting"
         ]
     },
     "SUPERADMIN": {

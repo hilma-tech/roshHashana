@@ -94,7 +94,7 @@ const MapComp = (props) => {
                     type: PRIVATE_MEETING,
                     location: { lat, lng },
                     info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
                         <div>לא ניתן להצטרף לתקיעה זו</div></div>
                 }
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
@@ -113,12 +113,12 @@ const MapComp = (props) => {
                     location: { lat, lng },
                     info: <div id="info-window-container">
                         <div className="info-window-header">תקיעה ציבורית</div>
-                        <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
-                        <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-                        <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{time}</div></div>
+                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                        <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
+                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{time}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                        <div id="join-button" className="clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                        <div className="join-button" className="clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                     </div>
                 };
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])

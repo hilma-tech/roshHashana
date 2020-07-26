@@ -108,11 +108,11 @@ module.exports = function (CustomUser) {
     CustomUser.checkStatus = (userId, meetingId, cb) => {
         let status
         CustomUser.app.models.RoleMapping.findOne({ where: { principalId: userId } }, (err, resRole) => {
-            if (err)  console.log("Err", err);
+            if (err) console.log("Err", err);
             if (resRole) {
                 status = resRole.roleId
                 CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-                    if (err)  console.log("Err", err);
+                    if (err) console.log("Err", err);
                     if (res) {
                         switch (status) {
                             case 1:
@@ -301,7 +301,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.openSBRequests = function (options, cb) {
+    CustomUser.mapInfoSB = function (options, cb) {
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
@@ -309,14 +309,24 @@ module.exports = function (CustomUser) {
             }
             const { userId } = options.accessToken
 
-            const userDataQ = `SELECT CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment FROM CustomUser LEFT JOIN city ON CustomUser.cityId = city.id WHERE CustomUser.id = ${userId}`
+            const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", 
+            CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment 
+            FROM shofar_blower 
+                LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
+                LEFT JOIN city ON CustomUser.cityId = city.id 
+            WHERE CustomUser.id = ${userId}`
+
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             allRes.userData = userDataErr || !userData ? true : userData
 
             //open PRIVATE meeting requests
-            const openPriReqsQ = /* request for private meetings */`SELECT IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment  FROM isolated JOIN CustomUser ON userIsolatedId  = CustomUser.id join city on city.id = CustomUser.cityId where public_meeting = 0 AND blowerMeetingId is null;`;
-            //open PUBLIC meeting requests and MY PUbLIC routes
+            const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
+            city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
+            FROM isolated 
+            JOIN CustomUser ON userIsolatedId  = CustomUser.id 
+            JOIN city on city.id = CustomUser.cityId 
+            WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
             /* 
             {startTime: "2020-07-20T07:15:27.000Z",
             city: 'צור הדסה',
@@ -325,8 +335,8 @@ module.exports = function (CustomUser) {
             signedCount: 0,
             blowerStatus: 'req'}
             */
-            const allPubsQ = `
-            SELECT start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount", 
+            const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
+            SELECT shofar_blower_pub.id AS "meetingId", start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
@@ -344,16 +354,18 @@ module.exports = function (CustomUser) {
             street: 'רכסים',
             appartment: '20',
             name: 'עדי',
-            isPrivateMeeting: 1}
+            isPublicMeeting: 1}
             */
             const priRouteMeetsQ = `
             SELECT 
+                isolated.id AS "meetingId", 
                 isolated.meeting_time AS "startTime", 
                 city.name AS "city", 
                 CustomUser.street,
                 CustomUser.appartment, 
                 CustomUser.name AS "name", 
-                IF(isolated.public_meeting = 1, false, true) AS "isPrivateMeeting" 
+                CustomUser.comments, 
+                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 
                 LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
                 LEFT JOIN city ON city.id = CustomUser.cityId 
@@ -379,12 +391,11 @@ module.exports = function (CustomUser) {
                 } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-
+            allRes.openReqs = [...priReqRes, ...pubReqs]
             return cb(null, allRes)
-
         })();
     }
-    CustomUser.remoteMethod('openSBRequests', {
+    CustomUser.remoteMethod('mapInfoSB', {
         http: { verb: 'get' },
         accepts: [
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
@@ -392,31 +403,45 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'string', root: true }
     });
 
-    CustomUser.assignSB = function (options, meetingObj, cb) {
-        if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
-        const { userId } = options.accessToken
+    CustomUser.assignSB = function (options, meetingObjs, cb) {
+        //check if user is confirmed by admin 
+        (async () => {
 
-        // meetingObj:
-        /* 
-        
-        {
-            isPublicMeeting: boolean,
-            meetingId: num,
-            startTime: date,
-            
-        }
-        
-        */
-
-
-
-
+            console.log('!assignSB!: meetingObjs:', meetingObjs);
+            if (!meetingObjs || !Array.isArray(meetingObjs)) return cb(true)
+            if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
+            const { userId } = options.accessToken;
+            // / meetingObj:
+            // {
+            //     isPublicMeeting: boolean,
+            //     meetingId: num,
+            //     startTime: date,
+            // }
+            let allRes = []
+            let formattedStartTime;
+            for (let meetingObj of meetingObjs) {
+                try {
+                    formattedStartTime = new Date(meetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
+                } catch (e) { console.log("wrong time: ", meetingObj.startTime, " ", e); return cb(true) }
+                console.log('meetingObj.isPublicMeeting: ', meetingObj.isPublicMeeting);
+                const blowerUpdateQ = meetingObj.isPublicMeeting ?
+                    `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} blowerId IS NULL`
+                    : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
+                console.log('blowerUpdateQ: ', blowerUpdateQ);
+                let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
+                console.log('blowerUpdateQ res: ', res);
+                if (err || !res) console.log('err: ', err);
+                allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
+            }
+            console.log('allRes: ', allRes);
+            return cb(null, allRes)
+        })();
     }
 
     CustomUser.remoteMethod('assignSB', {
         http: { verb: 'post' },
         accepts: [
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObj", type: "object" }
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObjs", type: "array" }
         ],
         returns: { arg: 'res', type: 'string', root: true }
     })
