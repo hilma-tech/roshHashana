@@ -1,18 +1,44 @@
+@import "../consts/generalStyles";
+
 .sb-assign-meeting-container {
-    position     :        absolute;
-    right     :        0;
-    top     :        0;
-    bottom     :        0;
-    height     :        100%;
-    width     :        30%;
-    background-color     :        white;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 30%;
+    background-color: white;
 }
 .sb-assign-meeting-mobile-container {
-    position    :    absolute;
-    height      :        100%;
-    width       :        100%;
-    top         :           0;
-    bottom      :           0;
-    right       :           0;
-    left        :           0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.sb-homepage-container {
+    background-color: $grey-bg;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    #settings-icon {
+        float: right;
+        margin-right: 4%;
+        margin-top: 4%;
+        width: 3rem;
+        height: 3rem;
+        filter: drop-shadow(6px 6px 6px gray);
+    }
+    .not-confirm-msg {
+        font-size: 1.5rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 }

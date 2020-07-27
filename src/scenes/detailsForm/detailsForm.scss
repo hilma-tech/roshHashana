@@ -218,6 +218,13 @@
                 border-bottom: 1px solid #00000040;
                 margin-bottom: 2%;
                 padding-top: 2%;
+                .close-icon {
+                    width: 0.7rem;
+                    height: 0.7rem;
+                    float: right;
+                    margin-right: 7%;
+                    margin-bottom: 3%;
+                }
             }
             #add-public-place {
                 display: flex;
@@ -266,13 +273,13 @@
                 cursor: pointer; /* Cursor on hover */
                 border-radius: 50%;
             }
-            &::-moz-range-thumb {
-                width: 1rem; /* Set a specific slider handle width */
-                height: 1rem; /* Slider handle height */
-                background: #3e3e3e; /* Green background */
-                cursor: pointer; /* Cursor on hover */
-                border-radius: 50%;
-            }
+            // &::-moz-range-thumb {
+            //     width: 1rem; /* Set a specific slider handle width */
+            //     height: 1rem; /* Slider handle height */
+            //     background: pink; /* Green background */
+            //     cursor: pointer; /* Cursor on hover */
+            //     border-radius: 50%;
+            // }
         }
     }
 
@@ -288,28 +295,28 @@
     top: 0;
     right: 0;
     background-color: #9b9b9b8f;
-    #modal-container {
-        background-color: $grey-bg;
-        width: 90%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        z-index: 1;
-        #modal-contnet {
-            font-size: 1.3rem;
-            color: #1e2e31;
-            padding: 5% 5%;
-        }
-        #button {
-            font-size: 1rem;
-            color: white;
-            width: fit-content;
-            background-color: #489fb5;
-            padding: 3% 8%;
-            margin: 7% auto;
-        }
+}
+#modal-container {
+    background-color: $grey-bg;
+    width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+    #modal-contnet {
+        font-size: 1.3rem;
+        color: #1e2e31;
+        padding: 5% 5%;
+    }
+    #button {
+        font-size: 1rem;
+        color: white;
+        width: fit-content;
+        background-color: #489fb5;
+        padding: 3% 8%;
+        margin: 7% auto;
     }
 }
 .modal-resize {

@@ -52,9 +52,14 @@ const SBHomePage = (props) => {
     }
 
     return (
-        <div>
+        <div className="sb-homepage-container">
             {
-                !userData ? <div>loading!</div> : ((typeof userData === "object" && userData.confirm !== undefined && userData.confirm == 0) ? <div>מנהל המערכת טרם אישר אותך</div> :
+                !userData ? <div>loading!</div> : ((typeof userData === "object" && userData.confirm !== undefined && userData.confirm == 0) ?
+                    <>
+                        <img src="/icons/settings.svg" id="settings-icon" onClick={() => props.history.push('/settings')} />
+                        <div className="not-confirm-msg">מנהל המערכת טרם אישר אותך</div>
+                    </>
+                    :
                     <>
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
 

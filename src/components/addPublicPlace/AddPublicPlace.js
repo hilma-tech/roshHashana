@@ -57,6 +57,7 @@ const AddPublicPlace = (props) => {
     }
     return (
         <div id="public-place-container">
+            {props.removePubPlace && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
             <AutoComplete
                 optionsArr={props.cities}

@@ -179,7 +179,7 @@ const IsolatedSettings = (props) => {
             <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
 
                 <div className="header">כמה פעמים תוכל לתקוע?</div>
-                <input type="number" value={blowingTimes} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
+                <input type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
 
                 <div className="header">שעת יציאה</div>
                 <ThemeProvider theme={materialTheme}>
