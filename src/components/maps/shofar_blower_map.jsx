@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
+import { SBContext } from '../../ctx/shofar_blower_context';
 
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 import Geocode from "react-geocode";
 import _ from "lodash";
-import './map.scss';
 import MyMapDirectionsRenderer from './sb_map_directions_renderer';
 import MarkerGenerator from './marker_generator';
-import { useContext } from 'react';
-import { SBContext } from '../../ctx/shofar_blower_context';
+import { dateWTimeFormatChange } from '../../fetch_and_utils';
+
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -28,7 +28,8 @@ const ShofarBlowerMap = (props) => {
 
     const { openGenAlert,
         userData, myMeetings, meetingsReqs,
-        setUserData, setMyMeetings, setMeetingsReqs } = useContext(SBContext)
+        setUserData, setMyMeetings, setMeetingsReqs,
+        setAssignMeetingInfo } = useContext(SBContext)
 
     const [reqsLocs, setReqsLocs] = useState(null);
     const [myMLocs, setMyMLocs] = useState(null)
@@ -38,18 +39,22 @@ const ShofarBlowerMap = (props) => {
 
     const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
-    const privateLocInfo = (iName, address, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית"}</div>
-        {iName ? <div id="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{iName}</div></div> : null}
-        {address ? <div id="pub-shofar-blower-name-container"><img src={'/icons/address.svg'} /><div>{address}</div></div> : null}
-        {assign ? <div id="join-button">שיבוץ</div> : null}</div>)
 
-    const publicLocInfo = (address, start_time, assign = false, comments = '') => (<div id="info-window-container">
+    const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית"}</div>
+        {/* iName, address, comments, startTime, meetingId */}
+        {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
+        {meetingData && meetingData.address && assign ? <div className="pub-address-container">{meetingData.address}</div> : (meetingData && meetingData.address ? <div className="pub-shofar-blower-name-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null)}
+        {meetingData && meetingData.startTime ? <div className="pub-address-container">{dateWTimeFormatChange(meetingData.startTime).join(" ")}</div> : null}
+        {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
+        {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
+
+    const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
         <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית"}</div>
-        <div id="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-        <div>{comments}</div>
-        {assign ? <div id="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{start_time}</div></div> : null}
-        <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-        {assign ? <div id="join-button">שיבוץ</div> : null}
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
+        {meetingData && meetingData.startTime ? <div className="pub-address-container">{meetingData.startTime}</div> : null}
+        {assign ? <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div> : null}
+        {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
+        {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
 
 
@@ -70,19 +75,14 @@ const ShofarBlowerMap = (props) => {
     }, [userData])
 
     useEffect(() => {
-        if (meetingsReqs && Array.isArray(meetingsReqs) && meetingsReqs.length
-            && (!reqsLocs || (Array.isArray(reqsLocs) && !reqsLocs.length))) {
+        if (meetingsReqs && Array.isArray(meetingsReqs)) {
             setOpenReqsContent(meetingsReqs)
-            console.log('meetingsReqs: ', meetingsReqs);
         }
     }, [meetingsReqs])
     useEffect(() => {
-        //if dont have data in myLocs, but have data in myMeetings and in userData
         if (
             myMeetings && Array.isArray(myMeetings) && myMeetings.length
-            && (userData && typeof userData === "object" && userData.name)
-            && (!myMLocs || (Array.isArray(myMLocs) && !myMLocs.length))
-        ) {
+            && (userData && typeof userData === "object" && userData.name)) {
             setMyMeetingsContent(myMeetings, userData)
             console.log('myMeetings: ', myMeetings);
         }
@@ -96,8 +96,9 @@ const ShofarBlowerMap = (props) => {
         let meetReq;
         for (let i = 0; i < reqsArr.length; i++) {
             meetReq = reqsArr[i]
-            let privateMeet = !meetReq.isPublicMeeting
-            const address = privateMeet ? `${meetReq.city} ${meetReq.street} ${meetReq.appartment}` : `${meetReq.city} ${meetReq.street}`
+            console.log('meetReq: ', meetReq);
+            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
+            meetReq.address = address;
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
             let [error, response] = await to(Geocode.fromAddress(address))
@@ -105,53 +106,56 @@ const ShofarBlowerMap = (props) => {
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
-                    type: privateMeet ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
+                    type: meetReq.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                     location: { lat, lng },
-                    info: privateMeet ? privateLocInfo(meetReq.name, address, true) : publicLocInfo(address, meetReq.startTime, true, meetReq.comments)
+                    info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
                 }
                 newReqsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i == reqsArr.length - 1) {
                 console.log('newReqsLocs: ', newReqsLocs);
                 setReqsLocs(newReqsLocs);
+                console.log('newReqsLocs: ', newReqsLocs);
             }
         }
     }
 
-    const setMyMeetingsContent = (meetings, userData) => {
+    const setMyMeetingsContent = (meetings) => {
         let meetingsLocs = []
         meetings = meetings.sort((a, b) => new Date(a.startTime).getTime() > new Date(b.startTime).getTime()) //?
         meetings.forEach(async (myMeeting, i, arr) => {
             const address = `${myMeeting.city} ${myMeeting.street}`;
+            myMeeting.address = address;
             let [error, response] = await to(Geocode.fromAddress(address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
-                    type: myMeeting.isPrivateMeeting ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
+                    type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                     location: { lat, lng },
+                    startTime: myMeeting.startTime,
+                    meetingId: myMeeting.meetingId,
                     markerOptions: {
-                        type: myMeeting.isPrivateMeeting ? PRIVATE_MEETING : SHOFAR_BLOWING_PUBLIC,
-                        info: myMeeting.isPrivateMeeting ? privateLocInfo(myMeeting.name) : publicLocInfo(myMeeting.name, address, myMeeting.startTime),
+                        type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
+                        info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false),
                     }
-
                 }
                 meetingsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i === arr.length - 1) { //end of forEach
                 setMyMLocs(meetingsLocs)
+                console.log('meetingsLocs: ', meetingsLocs);
             }
         });
     }
 
 
-    const addNewSBMeeting = (meetingInfo) => {
-
+    const handleAssign = (meetingInfo) => {
+        console.log('meetingInfo: ', meetingInfo);
+        setAssignMeetingInfo(meetingInfo)
     }
 
 
-
-    if (!reqsLocs && !myMLocs) return <div>LOADING...</div>;
     return (
         <div id="map-container">
             <MyMapComponent
@@ -160,6 +164,7 @@ const ShofarBlowerMap = (props) => {
                 myMeetingsLocs={myMLocs}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation
+                userData={userData}
                 isMarkerShown={isMarkerShown}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img src='/icons/loader.svg' />}
@@ -182,8 +187,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         // anchor: new window.google.maps.Point(0, 0),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
-    const userLocationLabel = { text: 'אתה יוצא מכאן', color: "darkblue", fontWeight: "bold" }
-    const userOrigin = props.userLocation ? { location: props.center, icon: userLocationIcon } : null;
+    const userOrigin = props.userLocation ? { location: props.center, icon: userLocationIcon, origin: true } : null;
     return (
         <GoogleMap
             defaultZoom={16} //! change back to 20
@@ -192,12 +196,14 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
             center={props.center}
         >
             <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-            {/* {props.userLocation && <MarkerGenerator position={props.center} label={{ text: 'אתה נמצא כאן', color: "black", fontWeight: "bold" }} icon={userLocationIcon} />} my location */}
             {props.reqsLocs && Array.isArray(props.reqsLocs) && props.reqsLocs.map((locationInfo, index) => {
                 return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
             })}
-            {Array.isArray(props.myMeetingsLocs) && props.myMeetingsLocs.length &&
-                <MyMapDirectionsRenderer places={[...props.myMeetingsLocs, userOrigin]} />}
+            {
+                Array.isArray(props.myMeetingsLocs) ?
+                    <MyMapDirectionsRenderer places={[userOrigin, ...props.myMeetingsLocs]} /> // origin muse be first
+                    : <MarkerGenerator position={props.center} icon={userLocationIcon} /> /* my location */
+            }
         </GoogleMap>
     );
 }));

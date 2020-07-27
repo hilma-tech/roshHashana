@@ -195,13 +195,19 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "openSBRequests"
+      "property": "mapInfoSB"
     },
     {
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "getUserInfo"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "ADMIN",
+      "permission": "ALLOW",
+      "property": "assignSB"
     },
     {
       "principalType": "ROLE",

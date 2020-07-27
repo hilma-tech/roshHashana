@@ -19,9 +19,9 @@
             margin-bottom: 4%;
             text-align: right;
         }
-        #pub-shofar-blower-name-container,
-        #pub-address-container,
-        #pub-start-time-container {
+        .pub-shofar-blower-name-container,
+        .pub-address-container,
+        .pub-start-time-container {
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -41,7 +41,8 @@
         .notes {
             margin-bottom: 4%;
         }
-        #join-button {
+        .join-button {
+            cursor: pointer;
             background-color: $orange;
             color: white;
             height: fit-content;
