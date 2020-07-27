@@ -18,12 +18,18 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            //get all cities for autocomplete
-            let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-                headers: { Accept: "application/json", "Content-Type": "application/json" }
-            }, true);
-            if (res) {
-                this.setState({ cities: res });
+            if (this.props.location && this.props.location.state && this.props.location.state.noDetails) {
+                //get all cities for autocomplete
+                let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" }
+                }, true);
+                if (res) {
+                    this.setState({ cities: res });
+                }
+            }
+            else {
+                this.props.history.push('/');
+                return;
             }
         })();
     }

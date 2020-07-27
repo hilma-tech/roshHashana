@@ -118,7 +118,7 @@ const MapComp = (props) => {
                         <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{time}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                        <div className="join-button" className="clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                        <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                     </div>
                 };
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])

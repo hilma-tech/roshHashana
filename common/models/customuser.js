@@ -268,7 +268,6 @@ module.exports = function (CustomUser) {
                 }
                 else if (role === 2) {
                     //shofar blower
-                    console.log('data', data)
                     let newBloData = {
                         volunteering_max_time: data.volunteering_max_time,
                         can_blow_x_times: data.can_blow_x_times,
