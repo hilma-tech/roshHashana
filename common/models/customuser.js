@@ -282,6 +282,13 @@ module.exports = function (CustomUser) {
     }
 
 
+    // CustomUser.deleteUser = async (role, options) => {
+
+    //     if(role===)
+
+    // }
+
+
     CustomUser.remoteMethod('createUser', {
         http: { verb: 'post' },
         accepts: [
@@ -327,6 +334,15 @@ module.exports = function (CustomUser) {
         accepts: [
             { arg: 'role', type: 'number' },
             { arg: 'data', type: 'object' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    CustomUser.remoteMethod('deleteUser', {
+        http: { verb: 'delete' },
+        accepts: [
+            { arg: 'role', type: 'number' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'res', type: 'object', root: true }
@@ -476,19 +492,5 @@ module.exports = function (CustomUser) {
         ],
         returns: { arg: 'res', type: 'string', root: true }
     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 };
