@@ -102,10 +102,13 @@
     .close-map-mobile {
         position: fixed;
         transform: translate(-25%, 0);
-        bottom: 15%;
+        bottom: 10%;
         left: 50%;
         width: 2.5rem;
         height: 2.5rem;
+    }
+    .close-map-mobile{
+        bottom: 15%;
     }
     .close-map:hover {
         animation-name: hover;

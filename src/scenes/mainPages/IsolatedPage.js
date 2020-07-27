@@ -56,7 +56,7 @@ const IsolatedPage = (props) => {
                 <div className="settings clickAble" onClick={openSettings}><img src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div>{`שלום ${name}`}</div>
-                    <div id="thank-you-msg">ותודה על התעניינותך במפגש תקיעת שופר.</div>
+                    <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
                     <div id="address" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
