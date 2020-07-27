@@ -1,7 +1,7 @@
 {
   "initial:before": {
     "loopback#favicon": {
-      "params": "./public/images/iconRoshHashana/favicon.ico" 
+      "params": "./public/iconRoshHashana/favicon.ico" 
     }
   },
   "initial": {
