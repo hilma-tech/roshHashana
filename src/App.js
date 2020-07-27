@@ -42,7 +42,7 @@ class App extends Component {
 
     render() {
 
-        const homePages = { SimpleUserHome: (props) => <IsolatedMainPage {...props} /> };
+        const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
 
         return (
             <Suspense fallback={<div>Loading...</div>}>

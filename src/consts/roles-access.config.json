@@ -5,7 +5,8 @@
             "SBHomePage",
             "BlowerSettings",
             "SBAssignMeeting"
-        ]
+        ],
+        "defaultHomePage": "SBHomePage"
     },
     "GENERALUSER": {
         "comps": [
@@ -18,6 +19,6 @@
             "IsolatedMainPage",
             "IsolatedSettings"
         ],
-        "defaultHomePage": "SimpleUserHome"
+        "defaultHomePage": "IsolatedHome"
     }
 }

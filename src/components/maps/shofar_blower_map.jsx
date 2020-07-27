@@ -25,7 +25,6 @@ const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
 const ShofarBlowerMap = (props) => {
-
     const { openGenAlert,
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
