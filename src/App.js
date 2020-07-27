@@ -29,20 +29,7 @@ const Register = loadable(() => import('./scenes/Register'));
 
 class App extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = { isAuth: false };
-
-    }
-
-    async componentDidMount() {
-
-        this.isAuth = await Auth.isAuthenticated();
-        this.setState({ isAuth: this.isAuth });
-    }
-
     render() {
-
         const homePages = { SimpleUserHome: (props) => <IsolatedMainPage {...props} /> };
 
         return (
@@ -50,16 +37,16 @@ class App extends Component {
                 <Router>
                     <div className="App">
                         <MainProvider>
-                            <Switch>
-                                <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
-                                {/* <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
+                                <Switch>
+                                    <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
+                                    {/* <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
                             <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} /> */}
-                                <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
-                                <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBProvider><SBHomePage {...props} /></SBProvider>} />
-                                <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
-                                <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
-                                <Route path="/register" component={(props) => <Register {...props} />} />
-                            </Switch>
+                                    <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
+                                    <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => { return <SBProvider><SBHomePage {...props} /></SBProvider> }} />
+                                    <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
+                                    <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
+                                    <Route path="/register" component={(props) => <Register {...props} />} />
+                                </Switch>
                         </MainProvider>
                     </div>
                 </Router>

@@ -17,11 +17,14 @@ const SBAssignMeeting = (props) => {
     }
 
 
-    const handleAssignment = async () => {
+    const handleAssignment = async (close) => {
         // assignSB(assignMeetingInfo, error => {
         //      openGenAlert({ text: error || "השתבצת בהצלחה" })
         // })
-
+        if (close === "close") {
+            setAssignMeetingInfo(null)
+            return;
+        }
         openGenAlert({ text: " ... " })
         //set new route and remove meetingId from reqs array
         setMyMeetings(mym => Array.isArray(mym) ? [...mym, assignMeetingInfo] : [assignMeetingInfo])
@@ -34,6 +37,7 @@ const SBAssignMeeting = (props) => {
         <div className={props.onMobile ? "sb-assign-meeting-mobile-container" : "sb-assign-meeting-container"} >
             {JSON.stringify(assignMeetingInfo)}
             <button onClick={handleAssignment} >assign</button>
+            <button onClick={() => { handleAssignment("close") }} >x</button>
         </div>
     );
 }
