@@ -93,7 +93,7 @@ class Register extends React.Component {
             break;
           case "isolator with data":
             console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
-            this.props.history.push('isolated-main-page', { name: res.data.name, address: res.data.address });
+            this.props.history.push('/', { name: res.data.name, address: res.data.address });
 
             break;
           case "isolated with new public meeting":
@@ -152,7 +152,7 @@ class Register extends React.Component {
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
           // <a href="/" >
-          <img id="go-back" src="/icons/go-back.svg" onClick={() => this.props.history.push('/', { fromRegister: true })} />
+          <img id="go-back" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
           // {/* </a> */}
           :
           <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
