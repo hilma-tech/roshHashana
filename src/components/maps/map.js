@@ -151,6 +151,7 @@ const MapComp = (props) => {
         <div id="map-container" className={'slide-in-bottom'}>
             <MyMapComponent
                 isolated={props.isolated}
+                findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
@@ -206,7 +207,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -223,7 +224,12 @@ const SearchBoxGenerator = (props) => {
         autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => {
             let place = autocomplete.getPlace();
-            props.changeCenter(place.geometry.location);
+            if (place.geometry) props.changeCenter(place.geometry.location);
+            else if (!place.geometry && place.name) {
+                //find the lat and lng of the place
+                props.findLocationCoords(place.name);
+            }
+            else return;
         })
     }, []);
 
