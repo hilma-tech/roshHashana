@@ -67,18 +67,18 @@
          background-color: #ffa62b;
          color: white;
          border: none;
-         padding: 2.5% 3.5%;
-         width: 103%;
+         padding: 3% 5%;
+         width: 20rem;
          font-size: 3vh;
          font-weight: bold;
-         margin-top: 12%;
+         margin-top: 10%;
       }
       .mobileRegisterBlower {
          background-color: #489fb5;
          color: white;
          border: none;
          padding: 2.5%;
-         width: 103%;
+         width: 20rem;
          font-size: 3vh;
          font-weight: bold;
          margin-top: 4%;
@@ -100,7 +100,11 @@
          display: flex;
          flex-direction: column;
          align-items: center;
-         margin-top: 7%;
+         margin-top: 2%;
+         width: fit-content;
+         height: fit-content;
+         margin-left: auto;
+         margin-right: auto;
       }
    }
 }

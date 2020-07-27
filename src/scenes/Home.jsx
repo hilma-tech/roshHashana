@@ -9,8 +9,7 @@ const Home = (props) => {
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
 
     const onClickRegister = (e) => {
-        console.log(e)
-        props.history.push("/register", { type: e });
+            props.history.push("/register", { type: e });
     }
 
     const updateNumImgLoaded = () => {
@@ -21,7 +20,7 @@ const Home = (props) => {
 
     return (
         <>
-            <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }}>
+            <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }} >
                 <div className="content-container" >
 
                     <img style={{ width: isBrowser ? '26vw' : '50vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />

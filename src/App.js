@@ -13,7 +13,6 @@ import SBHomePage from './scenes/shofar_blower_home_page';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
 // import SimpleUserHome from "./scenes/Home";
-
 const Map = loadable(() => import('./components/maps/map'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
@@ -52,9 +51,6 @@ class App extends Component {
                         <MainProvider>
                             <Switch>
                                 <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
-                                {/* <PrivateRoute path="/addDetails/isolated" compName="IsolatedDetailsForm" component={(props => <IsolatedForm {...props} />)} />
-                            <PrivateRoute path="/addDetails/shofar-blower" compName="BlowerDetailsForm" component={(props => <BlowerForm {...props} />)} /> */}
-                                <PrivateRoute path="/isolated-main-page" compName="IsolatedMainPage" component={(props => <IsolatedMainPage {...props} />)} />
                                 <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBProvider><SBHomePage {...props} /></SBProvider>} />
                                 <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                                 <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />

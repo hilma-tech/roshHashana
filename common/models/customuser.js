@@ -35,7 +35,9 @@ module.exports = function (CustomUser) {
                     "roleId": role
                 }
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
-                // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
+                if (process.env.REACT_APP_IS_PRODUCTION === "true") {
+                    sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
+                }
                 return ResCustom;
 
 
@@ -46,7 +48,10 @@ module.exports = function (CustomUser) {
                 }
 
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
-                // sendMsg.sendMsg(phone,`${msgText} ${name}, ${msgText2} ${resKey.key}`)
+                if (process.env.REACT_APP_IS_PRODUCTION === "true") {
+                    sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
+                }
+
                 return ResUpdateUser;
 
 

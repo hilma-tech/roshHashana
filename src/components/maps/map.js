@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import _ from "lodash";
 import Auth from '../../modules/auth/Auth';
 import './map.scss';
-import loadable from '@loadable/component';
+import { isBrowser } from 'react-device-detect';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
@@ -127,10 +127,10 @@ const MapComp = (props) => {
     }
 
     const joinPublicMeeting = async (meetingInfo) => {
-        if (props.publicMap){
-        console.log(meetingInfo)
+        if (props.publicMap) {
+            console.log(meetingInfo)
             props.history.push('/register', { type: 'generalUser', meetingInfo });
-        }else {
+        } else {
             //join the isolator to the meeting
             let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -160,7 +160,7 @@ const MapComp = (props) => {
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            <div className="close-map clickAble" onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
+            <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
         </div>
     );
 }

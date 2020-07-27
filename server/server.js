@@ -3,7 +3,7 @@
 //Modules auto loader, prebuild process (there's also a post build process on boot/modules-loader.js)
 
 require('../scripts/prebuild');
-
+require('dotenv').config();
 const cors = require('cors');
 var loopback = require('loopback');
 var boot = require('loopback-boot');
