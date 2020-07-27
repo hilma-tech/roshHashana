@@ -58,7 +58,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 1 || this.state.phone && this.state.phone[0] != 0) {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0) {
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {

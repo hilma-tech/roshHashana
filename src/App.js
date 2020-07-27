@@ -28,18 +28,6 @@ const Register = loadable(() => import('./scenes/Register'));
 
 class App extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = { isAuth: false };
-
-    }
-
-    async componentDidMount() {
-
-        this.isAuth = await Auth.isAuthenticated();
-        this.setState({ isAuth: this.isAuth });
-    }
-
     render() {
 
         const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
