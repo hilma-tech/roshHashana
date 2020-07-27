@@ -94,8 +94,18 @@ export default class IsolatedForm extends Component {
 
     //create another public place
     addPublicPlace = () => {
+        if (this.state.publicPlaces.length < 4) {
+            let publicPlaces = this.state.publicPlaces;
+            publicPlaces.push({});
+            this.setState({ publicPlaces });
+        }
+        else this.setState({ errorMsg: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
+    }
+
+    //remove the public meeting
+    removePubPlace = (index) => {
         let publicPlaces = this.state.publicPlaces;
-        publicPlaces.push({});
+        publicPlaces.splice(index, 1);
         this.setState({ publicPlaces });
     }
 
@@ -128,11 +138,21 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
+
+        if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
+            this.setState({ errorMsg: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
+            return;
+        }
+        if (formChilds[8].value.length > 5) {// check appartment value
+            this.setState({ errorMsg: 'מספר הדירה או הבית אינו תקין' });
+            return;
+        }
+
         let address = this.state.chosenCity + ' ' + formChilds[7].value + ' ' + formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
-        let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
+        // let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
         // console.log(startTime,endTime )
-        endTime.setFullYear(2020, 8, 20);
+        // endTime.setFullYear(2020, 8, 20);
         startTime.setFullYear(2020, 8, 20);
 
         //check if the address is correct
@@ -143,6 +163,7 @@ export default class IsolatedForm extends Component {
 
         await Geocode.fromAddress(address).then(
             async response => {
+                console.log(response, 'resjdkszj')
                 let blowerDetails = {
                     "can_blow_x_times": formChilds[1].value,
                     "volunteering_start_time": startTime,
@@ -239,6 +260,7 @@ export default class IsolatedForm extends Component {
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
                                         key={index}
+                                        removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
                                         cities={this.state.cities}
@@ -262,8 +284,9 @@ export default class IsolatedForm extends Component {
                 </div>
 
                 {this.state.openModal && <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                    <div id="modal-contnet">תודה!<br></br> לא מצאנו כרגע מחפשי תקיעת שופר בשעה ובמיקום שהגדרת.</div>
-                    <div id="button" className="clickAble">הבנתי תודה</div>
+                    <div id="modal-contnet">תודה!<br></br> בזכותך אנשים רבים ישמעו תקיעת שופר השנה.</div>
+                    <div id="modal-contnet">כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך.</div>
+                    <div id="button" className="clickAble" onClick={() => this.props.history.push('/')}>למפה</div>
                 </div>}
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>

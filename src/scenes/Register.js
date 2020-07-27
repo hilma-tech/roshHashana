@@ -86,7 +86,7 @@ class Register extends React.Component {
 
             break;
           case "blower with data":
-            this.props.history.push('/sb-map');
+            this.props.history.push('/');
 
             break;
           case "isolator new":
