@@ -58,7 +58,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 1 || this.state.phone && this.state.phone[0] != 0) {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0) {
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
@@ -82,18 +82,19 @@ class Register extends React.Component {
             break;
           case "blower new":
             console.log("קרוא לדף של רעות להרשמת תוקע בשופר ", res.data.name);
-            this.props.history.push('/addDetails/shofar-blower', { name: res.data.name });
+            this.props.history.push('/addDetails', { name: res.data.name });
 
             break;
           case "blower with data":
             this.props.history.push('/sb-map');
+
             break;
           case "isolator new":
-            this.props.history.push('/addDetails/isolated', { name: res.data.name });
+            this.props.history.push('/addDetails', { name: res.data.name });
             break;
           case "isolator with data":
             console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
-            this.props.history.push('isolated-main-page', { name: res.data.name, address: res.data.address });
+            this.props.history.push('/', { name: res.data.name, address: res.data.address });
 
             break;
           case "isolated with new public meeting":
@@ -113,6 +114,7 @@ class Register extends React.Component {
             break;
           default:
             this.setState({ status: "start", })
+            break;
         }
 
       }
@@ -149,11 +151,11 @@ class Register extends React.Component {
   render() {
 
     return (
-      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"}`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
+      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
-          <a href="/" ><img id="go-back" src="/icons/go-back.svg" /></a>
+          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
           :
-          <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
+          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
 
         <div className=""><img style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>

@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import _ from "lodash";
 import Auth from '../../modules/auth/Auth';
 import './map.scss';
-import loadable from '@loadable/component';
+import { isBrowser } from 'react-device-detect';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
@@ -127,10 +127,10 @@ const MapComp = (props) => {
     }
 
     const joinPublicMeeting = async (meetingInfo) => {
-        if (props.publicMap){
-        console.log(meetingInfo)
+        if (props.publicMap) {
+            console.log(meetingInfo)
             props.history.push('/register', { type: 'generalUser', meetingInfo });
-        }else {
+        } else {
             //join the isolator to the meeting
             let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -151,16 +151,17 @@ const MapComp = (props) => {
         <div id="map-container" className={'slide-in-bottom'}>
             <MyMapComponent
                 isolated={props.isolated}
+                findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img src='/icons/loader.svg' />}
+                loadingElement={<img style={{ position: 'fixed', top: "50%", left: '50%', transform: 'translate(-50%, -50%)' }} src='/icons/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            <div className="close-map clickAble" onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
+            <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
         </div>
     );
 }
@@ -197,7 +198,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         url: '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(0, 0),
+        // anchor: new window.google.maps.Point(0, 0),
     }
 
 
@@ -206,7 +207,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -223,7 +224,12 @@ const SearchBoxGenerator = (props) => {
         autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => {
             let place = autocomplete.getPlace();
-            props.changeCenter(place.geometry.location);
+            if (place.geometry) props.changeCenter(place.geometry.location);
+            else if (!place.geometry && place.name) {
+                //find the lat and lng of the place
+                props.findLocationCoords(place.name);
+            }
+            else return;
         })
     }, []);
 

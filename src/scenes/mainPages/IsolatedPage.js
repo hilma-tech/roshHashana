@@ -9,6 +9,9 @@ const IsolatedPage = (props) => {
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
 
+    if (!props.location || !props.location.state || !props.location.state.name || !props.location.state.address)
+        Auth.logout(window.location.href = window.location.origin);
+
     useEffect(() => {
         (async () => {
             if (props.location && props.location.state && props.location.state.name && props.location.state.address) {
@@ -16,19 +19,21 @@ const IsolatedPage = (props) => {
                 setAddress(props.location.state.address);
             }
             else {
-                //TODO: לא בטוח זה נכנס לכאן
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${1}`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
-                const city = res.userCity ? res.userCity.name : '';
-                const street = res.street ? res.street : '';
-                const appartment = res.appartment ? res.appartment : '';
-                const comments = res.comments ? res.comments : '';
+                console.log(res, 'res')
 
-                setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
-                setName(res.name);
+                if (res) {
+                    const city = res.userCity ? res.userCity.name : '';
+                    const street = res.street ? res.street : '';
+                    const appartment = res.appartment ? res.appartment : '';
+                    const comments = res.comments ? res.comments : '';
+
+                    setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
+                    setName(res.name)
+                }
             }
-
         })();
     }, []);
 
@@ -51,7 +56,7 @@ const IsolatedPage = (props) => {
                 <div className="settings clickAble" onClick={openSettings}><img src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div>{`שלום ${name}`}</div>
-                    <div id="thank-you-msg">ותודה על התעניינותך במפגש תקיעת שופר.</div>
+                    <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
                     <div id="address" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>

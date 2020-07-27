@@ -20,6 +20,7 @@
     Name - .env
     Write inside - REACT_APP_DOMAIN = "REACT_APP_DOMAIN"
                    REACT_APP_GOOGLE_KEY= "REACT_APP_GOOGLE_KEY"
+                   REACT_APP_IS_PRODUCTION="true/ false" (true- if you are in production, false if you work in localhost)
 
 5. Arrange the datasources
 

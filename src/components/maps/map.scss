@@ -71,7 +71,7 @@
             height: 2rem;
             padding: 0 12px;
             border-radius: 3px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 4px 4px 25px rgba(0, 0, 0, 0.3);
             font-size: 1rem;
             outline: none;
             text-overflow: ellipsis;
@@ -98,17 +98,21 @@
             height: 1.2rem !important;
         }
     }
-    .close-map {
+    .close-map,
+    .close-map-mobile {
         position: fixed;
-        transform: translate(-50%, -50%);
-        bottom: 0;
+        transform: translate(-25%, 0);
+        bottom: 10%;
         left: 50%;
         width: 2.5rem;
         height: 2.5rem;
-        &:hover {
-            animation-name: hover;
-            animation-duration: 0.5s;
-        }
+    }
+    .close-map-mobile{
+        bottom: 15%;
+    }
+    .close-map:hover {
+        animation-name: hover;
+        animation-duration: 0.5s;
     }
     @keyframes hover {
         0% {
