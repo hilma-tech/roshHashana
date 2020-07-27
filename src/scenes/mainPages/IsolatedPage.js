@@ -34,7 +34,6 @@ const IsolatedPage = (props) => {
                     setName(res.name)
                 }
             }
-
         })();
     }, []);
 
