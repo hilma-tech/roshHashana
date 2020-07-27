@@ -14,32 +14,47 @@ export const SBProvider = ({ children }) => {
     const [meetingsReqs, setMeetingsReqs] = useState(null);
 
     const [assignMeetingInfo, setAssignMeetingInfo] = useState(null)
-    const [startTimesToUpdate, setStartTimesToUpdate] = useState(null)
+    const [assigns, setAssigns] = useState(null)
+    const [startTimes, setStartTimes] = useState(null)
 
 
     useEffect(() => {
-        if (startTimesToUpdate && Array.isArray(startTimesToUpdate) && startTimesToUpdate.length) {
-            console.log('startTimesToUpdate: ', startTimesToUpdate);
-            assignSB(startTimesToUpdate, (error, res) => {
-                if (error || !res) openGenAlert({ text: error })
-                else if (Array.isArray(res)) {
-                    openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
+        console.log('ctx useEffect for assigns and for startTimes');
+        if (assigns && Array.isArray(assigns) && assigns.length && startTimes && typeof startTimes === "object") {
+            console.log('assigns: ', assigns);
+            console.log('startTimes: ', startTimes);
+
+            const toAssign = []
+
+            for (let i in assigns) {
+                for (let j in startTimes) {
+                    if (assigns[i].meetingId == startTimes[j].meetingId) {
+                        toAssign.push({ meetingId: assigns[i].meetingId, isPublicMeeting: assigns[i].isPublicMeeting, startTime: startTimes[j].startTime })
+                    }
                 }
-                else openGenAlert({ text: "שובצת בהצלחה" })
-            })
-        }
-        return () => {
-            if (startTimesToUpdate && Array.isArray(startTimesToUpdate) && startTimesToUpdate.length) {
-                assignSB(startTimesToUpdate, (error, res) => {
+            }
+
+            if (toAssign && toAssign.length)
+                assignSB(toAssign, (error, res) => {
+                    setAssigns(null);
                     if (error || !res) openGenAlert({ text: error })
                     else if (Array.isArray(res)) {
-                        openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
+                        let success = true
+                        for (let i in res) {
+                            if (!res[i] || !res[i].success) {
+                                openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
+                                success = false
+                                break;
+                            }
+                        }
+                        if (success) {
+                            openGenAlert({ text: "שובצת בהצלחה" })
+                        }
                     }
                     else openGenAlert({ text: "שובצת בהצלחה" })
                 })
-            }
         }
-    }, [startTimesToUpdate])
+    }, [assigns, startTimes])
 
 
     const closeAlert = () => { setShowAlert(false) }
@@ -60,7 +75,8 @@ export const SBProvider = ({ children }) => {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
-        startTimesToUpdate, setStartTimesToUpdate
+        assigns, setAssigns,
+        startTimes, setStartTimes
     }
 
     return <SBContext.Provider value={ctxValue} >

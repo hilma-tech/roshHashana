@@ -42,13 +42,13 @@ const ShofarBlowerMap = (props) => {
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
-        <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית"}</div>
-        {meetingData && meetingData.address ? <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
-        {meetingData && meetingData.startTime ? <div className="pub-address-container">{meetingData.startTime}</div> : null}
-        {assign ? <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div> : null}
-        {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
-        {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
-    </div>)
+            <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית"}</div>
+            {meetingData && meetingData.address ? <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
+            {meetingData && meetingData.startTime ? <div className="pub-address-container">{meetingData.startTime}</div> : null}
+            {assign ? <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div> : null}
+            {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
+            {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
+        </div>)
 
 
     useEffect(() => {
@@ -70,7 +70,7 @@ const ShofarBlowerMap = (props) => {
     }, [userData])
 
     useEffect(() => {
-        console.log('useEffect userOriginLoc ');
+        // console.log('useEffect userOriginLoc ');
         if (userOriginLoc && typeof userOriginLoc === "object") {
             if (meetingsReqs && Array.isArray(meetingsReqs)) {
                 setOpenReqsContent(meetingsReqs)
@@ -79,22 +79,30 @@ const ShofarBlowerMap = (props) => {
     }, [userOriginLoc])
 
     useEffect(() => {
-        console.log('useEffect reqsLocs ');
+        // console.log('useEffect reqsLocs ');
         if (reqsLocs && Array.isArray(reqsLocs)) {
             if (myMeetings && Array.isArray(myMeetings)) {
                 setMyMeetingsContent(myMeetings)
             }
         }
     }, [reqsLocs])
-
-
+    
+    
     useEffect(() => {
-        console.log('useEffect myMLocs ');
+        // console.log('useEffect myMLocs ');
         if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
             setAllMapData({ userData, userOriginLoc, reqsLocs, myMLocs })
-            console.log('<< myMLocs: ', myMLocs);
+            // console.log('<< myMLocs: ', myMLocs);
         }
     }, [myMLocs])
+    
+    
+    useEffect(() => {
+        // console.log("changed myMeetings");
+        if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
+            setMyMeetingsContent(myMeetings)
+        }
+    }, [myMeetings])
 
 
 
@@ -109,6 +117,7 @@ const ShofarBlowerMap = (props) => {
             meetReq.address = address;
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
+            // console.log('meetREQ: ', meetReq);
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${address}` }); continue; }
             try {
@@ -128,7 +137,6 @@ const ShofarBlowerMap = (props) => {
 
     const setMyMeetingsContent = (meetings) => {
         let meetingsLocs = []
-        meetings = meetings.sort((a, b) => new Date(a.startTime).getTime() > new Date(b.startTime).getTime()) //?
         meetings.forEach(async (myMeeting, i, arr) => {
             const address = `${myMeeting.city} ${myMeeting.street}`;
             myMeeting.address = address;
@@ -168,11 +176,6 @@ const ShofarBlowerMap = (props) => {
             <MyMapComponent
                 changeCenter={setCenter}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
-
-                // reqsLocs={reqsLocs}
-                // myMeetingsLocs={myMLocs}
-                // userOriginLoc={userOriginLoc}
-                // userData={userData}
 
                 data={allMapData}
 

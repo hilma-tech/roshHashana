@@ -3,6 +3,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker, Polyline, OverlayView, 
 
 import MarkerGenerator from './marker_generator';
 import SearchBoxGenerator from './search_box_generator'
+import { SBContext } from '../../ctx/shofar_blower_context';
 
 const mapOptions = {
     fullscreenControl: false,
@@ -109,10 +110,11 @@ export const calculateRoute = (google, setRouteCoordinates, userData, places) =>
 
 
 
-const getOverViewPath = (google, origin, stops, cb = () => { }) => {
+const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
     if (!stops || !stops.length) cb("no_stops")
     const travelMode = google.maps.TravelMode.WALKING
-    const waypoints = stops.map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
+    const waypoints = stops
+        .map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
     const destination = waypoints.pop().location
 
     console.log('> origin: ', { ...origin });
@@ -128,8 +130,26 @@ const getOverViewPath = (google, origin, stops, cb = () => { }) => {
         optimizeWaypoints: false
     }, (result, status) => {
         console.log('result: ', result);
-
+        if (status !== google.maps.DirectionsStatus.OK) {
+            return cb("אירעה שגיאה בטעינת המפה, עמכם הסליחה")
+        }
         let res = {}
+
+        res.startTimes = []
+        let leg;
+        let prevStartTimeVal
+        for (let i in stops) {
+            leg = result.routes[0].legs[i]
+            console.log('leg: ', leg);
+            console.log('leg.duration.value: ', leg.duration.value);
+            if (!res.startTimes[i - 1]) {
+                if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
+                prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
+            } else {
+                prevStartTimeVal = res.startTimes[i - 1].startTime
+            }
+            res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + Number(leg.duration.value) })
+        }
 
         res.overviewPath = result.routes[0].overview_path
 
@@ -140,11 +160,14 @@ const getOverViewPath = (google, origin, stops, cb = () => { }) => {
 
 
 export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
-    console.log('props.data: ', props.data);
     const { data } = props
     if (!data) return <div>loading</div>
 
-    const [routeCoordinates, setRouteCoordinates] = useState(null)
+    const { openGenAlert, userData,
+        setStartTimes, startTimes
+    } = useContext(SBContext)
+
+    const [routePath, setRoutePath] = useState(null)
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
@@ -157,15 +180,16 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     const stops = [...data.myMLocs]
 
     useEffect(() => {
-        getOverViewPath(window.google, userOrigin.location, stops,
+        getOverViewPath(window.google, userOrigin.location, stops, { userData },
             (err, res) => {
-                if (err) { console.log("err getoverviewpath ", err); return }
-
-                setRouteCoordinates(res.overviewPath)
+                if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+                let newStartTimes = res.startTimes;
+                if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                setRoutePath(res.overviewPath)
             })
-    }, [])
+    }, [props.data])
 
-
+    console.log('props.data: ', props.data);
     // if (Array.isArray(props.myMeetingsLocs) && !routeCoordinates) calculateRoute(window.google, setRouteCoordinates, props.userData, [userOrigin, ...props.myMeetingsLocs])
 
     return (
@@ -183,9 +207,9 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
             }) : null}
             {/* user location */} <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
-            {Array.isArray(routeCoordinates) ?
+            {Array.isArray(routePath) ?
                 <Polyline
-                    path={routeCoordinates}
+                    path={routePath}
                     geodesic={false}
                     options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeOpacity: 1, strokeWeight: 7, }}
                 />

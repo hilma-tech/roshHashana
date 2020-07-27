@@ -371,7 +371,7 @@ module.exports = function (CustomUser) {
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             allRes.userData = userDataErr || !userData ? true : userData
-
+            if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
             city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
@@ -392,7 +392,8 @@ module.exports = function (CustomUser) {
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
-            END blowerStatus
+            END blowerStatus,
+            true AS isPublicMeeting 
             FROM isolated 
                 RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
                 JOIN city ON city.id = shofar_blower_pub.cityId
@@ -472,16 +473,15 @@ module.exports = function (CustomUser) {
             let allRes = []
             let formattedStartTime;
             for (let meetingObj of meetingObjs) {
+                if (!new Date(meetingObj.startTime).getTime) continue;
                 try {
                     formattedStartTime = new Date(meetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
                 } catch (e) { console.log("wrong time: ", meetingObj.startTime, " ", e); return cb(true) }
-                console.log('meetingObj.isPublicMeeting: ', meetingObj.isPublicMeeting);
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
                     `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
                 console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
-                console.log('blowerUpdateQ res: ', res);
                 if (err || !res) console.log('err: ', err);
                 allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
             }
