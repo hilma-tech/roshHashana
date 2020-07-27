@@ -151,11 +151,9 @@ class Register extends React.Component {
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
-          // <a href="/" >
-          <img id="go-back" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
-          // {/* </a> */}
+          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
           :
-          <img id="go-back" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
+          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
 
         <div className=""><img style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>

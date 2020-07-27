@@ -1,24 +1,19 @@
 {
-    "ADMIN": {
+    "SHOFARBLOWER": {
         "comps": [
-            "DashboardMain",
-            "AnotherComponent",
             "BlowerDetailsForm",
             "SBHomePage",
             "BlowerSettings",
             "SBAssignMeeting"
         ]
     },
-    "SUPERADMIN": {
+    "GENERALUSER": {
         "comps": [
-            "DashboardMain",
-            "AnotherComponent",
             "GeneralUserSettings"
         ]
     },
-    "SIMPLEUSER": {
+    "ISOLATED": {
         "comps": [
-            "AnotherComponent",
             "IsolatedDetailsForm",
             "IsolatedMainPage",
             "IsolatedSettings"
