@@ -51,10 +51,10 @@ class App extends Component {
                         <MainProvider>
                             <Switch>
                                 <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
+                                <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
                                 <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBProvider><SBHomePage {...props} /></SBProvider>} />
                                 <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                                 <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
-                                <Route path="/register" component={(props) => <Register {...props} />} />
                             </Switch>
                         </MainProvider>
                     </div>
