@@ -97,7 +97,7 @@ export default class IsolatedForm extends Component {
         const appartment = document.getElementById('appartment');
         const comments = document.getElementById('comments');
         const address = street.value + ' ' + appartment.value + ' ' + comments.value + ', ' + this.state.chosenCity;
-        this.props.history.push('/isolated-main-page', { name, address });
+        this.props.history.push('/', { name, address });
     }
 
     render() {
