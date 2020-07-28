@@ -184,7 +184,7 @@ module.exports = function (CustomUser) {
 
                                         } else {
                                             //public meeting already exists
-                                            cb(null, { ok: "public meeting already exists" })
+                                            cb(null, { ok: "public meeting already exists", data: { name: res.name } })
 
                                         }
                                     }

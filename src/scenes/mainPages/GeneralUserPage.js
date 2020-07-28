@@ -5,9 +5,9 @@ import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
-
+import GeneralAlert from '../../components/modals/general_alert'
 const GeneralUserPage = (props) => {
-    const { userInfo, setUserInfo } = useContext(MainContext)
+    const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
     const [name, setName] = useState('');
     const [shofarBlowerName, setShofarBlowerName] = useState('');
@@ -16,12 +16,16 @@ const GeneralUserPage = (props) => {
 
     useEffect(() => {
         (async () => {
+            if (props.location && props.location.state && props.location.state.cantSignUpAgain && !sessionStorage.getItem("dontShowPopup")) {
+                openGenAlert({ text: "כבר נרשמת לתקיעה ציבורית, אינך יכול להירשם לתקיעה נוספת", isPopup: { okayText: "סגור" } })
+                sessionStorage.setItem("dontShowPopup", true)
+            }
             if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
                 console.log("from props")
-                if (props.location && props.location.state && props.location.state && props.location.state.name) {
+                if (props.location.state.name) {
                     setName(props.location.state.name);
                 }
-                if (props.location && props.location.state && props.location.state && props.location.state.meetingInfo) {
+                if (props.location.state.meetingInfo) {
                     setShofarBlowerName(props.location.state.meetingInfo.blowerName);
                     setAddress((props.location.state.meetingInfo.city ? `${props.location.state.meetingInfo.city}, ` : ``) + `${props.location.state.meetingInfo.street}, ${props.location.state.meetingInfo.comments}`);
                     setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
@@ -53,6 +57,14 @@ const GeneralUserPage = (props) => {
         })()
 
     }, []);
+    useEffect(() => {
+        return () => {
+            // Anything in here is fired on component unmount.
+            sessionStorage.removeItem("dontShowPopup")
+        }
+    }, [])
+
+
     //credits:
     // <div>Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" title="Vitaly Gorbachev">Vitaly Gorbachev</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     // <div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
@@ -68,11 +80,11 @@ const GeneralUserPage = (props) => {
     return (
         <>
             <div id="isolated-page-container"  >
-                <div className="header">
-                    <div ><img alt="backIcon" className="icon" src="/icons/go-back.svg" /></div>
+                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" }}>
+                    <div ><img alt="backIcon" onClick={() => { props.history.goBack() }} className="icon" src="/icons/go-back.svg" /></div>
                     <div className="clickAble" onClick={openSettings}><img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent">
+                <div className="content-container containerContent" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
                     <div className="content"  >{`שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
@@ -102,6 +114,7 @@ const GeneralUserPage = (props) => {
                 </div>
             </div>
             {openMap && <Map closeMap={closeOrOpenMap} publicMap />}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
         </>
     );
