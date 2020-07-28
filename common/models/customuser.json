@@ -158,6 +158,11 @@
       "model": "city",
       "type": "belongsTo",
       "foreignKey": "cityId"
+    },
+    "blowerPublic": {
+      "model": "shofarBlowerPub",
+      "type": "hasMany",
+      "foreignKey": "blowerId"
     }
   },
   "acls": [

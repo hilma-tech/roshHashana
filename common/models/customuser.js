@@ -111,6 +111,7 @@ module.exports = function (CustomUser) {
         })
     }
     CustomUser.checkStatus = (userId, meetingId, cb) => {
+        const { shofarBlowerPub } = CustomUser.app.models;
         let status
         CustomUser.app.models.RoleMapping.findOne({ where: { principalId: userId } }, (err, resRole) => {
             if (err) console.log("Err", err);
@@ -151,13 +152,36 @@ module.exports = function (CustomUser) {
                                         CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
                                             if (errPM) console.log("errPM", errPM);
                                             if (resPM) {
-                                                cb(null, { ok: "isolated with new public meeting" })
+                                                cb(null, { ok: "isolated with new public meeting", data: { name: res.name } })
                                             }
                                         });
                                     } else if (resIsolated && resIsolated.public_meeting == 1) {
+                                        console.log("resIsolated", resIsolated)
                                         if (meetingId == null) {
-                                            //isolated with public meeting
-                                            cb(null, { ok: "isolated with public meeting" })
+                                            shofarBlowerPub.findOne({
+                                                where: { id: resIsolated.blowerMeetingId },
+                                                include: ["blowerPublic", "meetingCity"]
+                                            },
+                                                (errPublicMeeting, resPublicMeeting) => {
+                                                    if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
+                                                    if (resPublicMeeting) {
+                                                        //isolated with public meeting
+                                                        cb(null, {
+                                                            ok: "isolated with public meeting",
+                                                            data:
+                                                            {
+                                                                name: res.name,
+                                                                meetingInfo: {
+                                                                    street: resPublicMeeting.street,
+                                                                    comments: resPublicMeeting.comments,
+                                                                    start_time: resPublicMeeting.start_time,
+                                                                    city: resPublicMeeting.meetingCity().name,
+                                                                    blowerName: resPublicMeeting.blowerPublic().name
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                })
 
                                         } else {
                                             //public meeting already exists
@@ -236,7 +260,9 @@ module.exports = function (CustomUser) {
                     userInfo.publicMeetings = publicMeetings;
                     return userInfo;
                 }
-                else return userInfo; //general user
+                else {
+                    return userInfo; //general user
+                }
             }
             catch (err) {
                 throw err;
