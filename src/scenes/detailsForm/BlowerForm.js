@@ -292,14 +292,7 @@ export default class IsolatedForm extends Component {
                 </div>
 
                 {this.state.openModal &&
-                    <Popup text={`תודה! \n בזכותך אנשים רבים ישמעו תקיעת שופר השנה. \n כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך. `} okayText="למפה" closeSelf={() => this.props.history.push('/')} />
-
-                    // <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                    //     <div id="modal-contnet">תודה!<br></br> בזכותך אנשים רבים ישמעו תקיעת שופר השנה.</div>
-                    //     <div id="modal-contnet">כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך.</div>
-                    //     <div id="button" className="clickAble" onClick={() => this.props.history.push('/')}>למפה</div>
-                    // </div>
-                }
+                    <Popup text={`תודה!\nבזכותך אנשים רבים ישמעו תקיעת שופר השנה.\nכאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך. `} okayText="למפה" closeSelf={() => this.props.history.push('/')} />}
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />
