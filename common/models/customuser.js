@@ -272,7 +272,7 @@ module.exports = function (CustomUser) {
                         INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
                         INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
                     WHERE
-                        isolated.userIsolatedId = ${userInfo.id}`
+                        isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, query)
                     if (errUserData) {
                         console.log("errUserData", errUserData)
