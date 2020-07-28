@@ -412,7 +412,7 @@ module.exports = function (CustomUser) {
                 return { res: 'SUCCESS' };
 
             } catch (error) {
-                throw error//{ err: 'FAILED' };
+                return { err: 'FAILED' };
             }
 
         }

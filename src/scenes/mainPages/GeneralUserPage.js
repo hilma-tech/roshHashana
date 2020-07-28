@@ -76,6 +76,17 @@ const GeneralUserPage = (props) => {
         props.history.push('/settings');
     }
 
+    //cancel the request and delete the user
+    const cancelRequest = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "DELETE",
+        });
+        if (res && res.res === 'SUCCESS') {
+            Auth.logout(window.location.href = window.location.origin);
+        }
+        // else  TODO: לשים הודעה שזה נכשל
+    }
 
     return (
         <>
@@ -104,7 +115,7 @@ const GeneralUserPage = (props) => {
                             </div>
 
                         </div>
-                        <div id="cancel-request" className="clickAble cancel">בטל השתתפותי בתקיעה זו</div>
+                        <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div>
                     </div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
