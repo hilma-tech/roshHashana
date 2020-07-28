@@ -42,6 +42,10 @@ const SBHomePage = (props) => {
             error && openGenAlert({ text: error })
             console.log("error getting sb map content ", err);
         }
+        if (mapContent === "NO_CITY") {
+            Auth.logout()
+            return;
+        }
         else if (mapContent && typeof mapContent === "object" && mapContent.userData && mapContent.userData[0]) {
             if (!meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length)) setMeetingsReqs(mapContent.openReqs)
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)

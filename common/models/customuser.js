@@ -370,6 +370,7 @@ module.exports = function (CustomUser) {
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             allRes.userData = userDataErr || !userData ? true : userData
+            if (!allRes.userData || !allRes.userData.cityId) return cb(null, "NO_CITY")
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
