@@ -241,7 +241,7 @@ module.exports = function (CustomUser) {
 
                 let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { id: true, username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });

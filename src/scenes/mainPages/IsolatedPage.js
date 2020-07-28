@@ -25,10 +25,10 @@ const IsolatedPage = (props) => {
                 console.log(res, 'res')
 
                 if (res) {
-                    const city = res.userCity ? res.userCity.name : '';
-                    const street = res.street ? res.street : '';
-                    const appartment = res.appartment ? res.appartment : '';
-                    const comments = res.comments ? res.comments : '';
+                    const city = res.userCity || '';
+                    const street = res.street || '';
+                    const appartment = res.appartment || '';
+                    const comments = res.comments || '';
 
                     setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
                     setName(res.name)
