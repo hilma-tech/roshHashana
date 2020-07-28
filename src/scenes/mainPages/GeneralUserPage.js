@@ -3,6 +3,7 @@ import { isBrowser } from "react-device-detect";
 import moment from "moment"
 import './MainPage.scss';
 import Map from '../../components/maps/map';
+import Auth from '../../modules/auth/Auth';
 
 const GeneralUserPage = (props) => {
     const [openMap, setOpenMap] = useState(false);
@@ -23,8 +24,15 @@ const GeneralUserPage = (props) => {
                     setAddress((props.location.state.meetingInfo.city ? `${props.location.state.meetingInfo.city}, ` : ``) + `${props.location.state.meetingInfo.street}, ${props.location.state.meetingInfo.comments}`);
                     setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
                 }
-            }else{
-                
+            } else {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                }, true);
+                console.log(res, 'res')
+
+                if (res) {
+                    console.log("res", res)
+                }
             }
 
         })()

@@ -260,7 +260,9 @@ module.exports = function (CustomUser) {
                     userInfo.publicMeetings = publicMeetings;
                     return userInfo;
                 }
-                else return userInfo; //general user
+                else {
+                    return userInfo; //general user
+                }
             }
             catch (err) {
                 throw err;
