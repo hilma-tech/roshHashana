@@ -115,7 +115,12 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
     const travelMode = google.maps.TravelMode.WALKING
     const waypoints = stops
         .map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
-    const destination = waypoints.pop().location
+    let destination;
+    try {
+        destination = waypoints.pop().location
+    } catch (e) {
+        destination = {}
+    }
 
     console.log('> origin: ', { ...origin });
     console.log('> waypoints: ', [...waypoints]);
@@ -180,7 +185,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     const stops = [...data.myMLocs]
 
     useEffect(() => {
-        getOverViewPath(window.google, userOrigin.location, stops, { userData },
+        if(Array.isArray(stops) && stops.length) getOverViewPath(window.google, userOrigin.location, stops, { userData },
             (err, res) => {
                 if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
                 let newStartTimes = res.startTimes;

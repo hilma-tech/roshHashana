@@ -148,7 +148,7 @@ const MapComp = (props) => {
 
     }
     return (
-        <div id="map-container" className={'slide-in-bottom'}>
+        <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
                 isolated={props.isolated}
                 findLocationCoords={findLocationCoords}

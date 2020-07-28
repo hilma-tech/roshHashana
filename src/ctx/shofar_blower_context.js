@@ -3,6 +3,7 @@ import { assignSB } from '../fetch_and_utils';
 
 export const SBContext = React.createContext()
 
+let assigning = false;
 export const SBProvider = ({ children }) => {
     //alerts
     let alertTO = null;
@@ -34,9 +35,11 @@ export const SBProvider = ({ children }) => {
                 }
             }
 
-            if (toAssign && toAssign.length)
+            if (!assigning && toAssign && toAssign.length){
+                assigning = true
                 assignSB(toAssign, (error, res) => {
                     setAssigns(null);
+                    assigning = false
                     if (error || !res) openGenAlert({ text: error })
                     else if (Array.isArray(res)) {
                         let success = true
@@ -53,6 +56,7 @@ export const SBProvider = ({ children }) => {
                     }
                     else openGenAlert({ text: "שובצת בהצלחה" })
                 })
+            }
         }
     }, [assigns, startTimes])
 
