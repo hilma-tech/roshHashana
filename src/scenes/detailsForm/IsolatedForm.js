@@ -62,7 +62,8 @@ export default class IsolatedForm extends Component {
             return;
         }
 
-        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value;
+        const comments = formChilds[6].value ? formChilds[6].value : ' ';
+        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value + ' ' + comments;
         //check if the address is correct
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
@@ -74,7 +75,7 @@ export default class IsolatedForm extends Component {
                     "city": this.state.chosenCity,
                     "street": formChilds[1].value,
                     "appartment": formChilds[2].value,
-                    "comments": formChilds[6].value,
+                    "comments": comments,
                     "public_meeting": formChilds[4].children[1].checked ? false : true
                 }
                 this.setState({ errorMsg: '' });

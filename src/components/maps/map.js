@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
-import Geocode from "react-geocode";
-import _ from "lodash";
-import Auth from '../../modules/auth/Auth';
-import './map.scss';
 import { isBrowser } from 'react-device-detect';
+import Auth from '../../modules/auth/Auth';
+import Geocode from "react-geocode";
+import { dateWTimeFormatChange } from '../../fetch_and_utils';
+import _ from "lodash";
+import './map.scss';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
@@ -63,7 +64,8 @@ const MapComp = (props) => {
             else {
                 let address = 'ירושלים';
                 if (mapInfo.userAddress) {
-                    address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment;
+                    const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
+                    address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
                 }
                 await findLocationCoords(address);
             }
@@ -85,7 +87,8 @@ const MapComp = (props) => {
 
         //private meetings
         mapInfo && mapInfo.privateMeetings && mapInfo.privateMeetings.forEach(async privateMeet => { // isolated location (private meetings)
-            const address = privateMeet.cityMeeting + ' ' + privateMeet.streetMeeting + ' ' + privateMeet.appartment;
+            const comments = privateMeet.commennts ? privateMeet.commennts : ' '
+            const address = privateMeet.cityMeeting + ' ' + privateMeet.streetMeeting + ' ' + privateMeet.appartment + ' ' + comments;
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
             try {
@@ -102,11 +105,12 @@ const MapComp = (props) => {
         });
 
         mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
-            const address = pub.city + ' ' + pub.street;
+            const comments = pub.commennts ? pub.commennts : ' '
+            const address = pub.city + ' ' + pub.street + ' ' + comments;
             const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
-                const time = `${new Date(pub.start_time).getHours() + ':' + new Date(pub.start_time).getMinutes()}`
+                const date = dateWTimeFormatChange(new Date(pub.start_time).toJSON());
                 const { lat, lng } = response.results[0].geometry.location;
                 let newLocObj = {
                     type: SHOFAR_BLOWING_PUBLIC,
@@ -115,14 +119,14 @@ const MapComp = (props) => {
                         <div className="info-window-header">תקיעה ציבורית</div>
                         <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
                         <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{time}</div></div>
+                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date[1]}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                         <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                     </div>
                 };
                 setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
-            } catch (e) { console.log("cought Geocode.fromAddress(pub.address)==", address, " : ", e); return; }
+            } catch (e) { return; }
         });
     }
 

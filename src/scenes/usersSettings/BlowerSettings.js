@@ -52,7 +52,7 @@ const IsolatedSettings = (props) => {
     useEffect(() => {
         (async () => {
             if (!Object.keys(blowerInfo).length) {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${2}`, {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 setValues(res, setBlowerInfo);
@@ -143,7 +143,7 @@ const IsolatedSettings = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "PUT",
-                    body: JSON.stringify({ "role": 2, "data": newData })
+                    body: JSON.stringify({ "data": newData })
                 }, true);
                 if (res) {
                     props.history.goBack();
