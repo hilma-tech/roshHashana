@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 import moment from "moment"
 import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
+import { MainContext } from '../../ctx/MainContext';
 
 const GeneralUserPage = (props) => {
+    const { userInfo, setUserInfo } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
-
     const [name, setName] = useState('');
     const [shofarBlowerName, setShofarBlowerName] = useState('');
     const [adress, setAddress] = useState('');
@@ -15,7 +16,8 @@ const GeneralUserPage = (props) => {
 
     useEffect(() => {
         (async () => {
-            if (props.location && props.location.state && props.location.state) {
+            if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
+                console.log("from props")
                 if (props.location && props.location.state && props.location.state && props.location.state.name) {
                     setName(props.location.state.name);
                 }
@@ -25,13 +27,26 @@ const GeneralUserPage = (props) => {
                     setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
                 }
             } else {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" },
-                }, true);
-                console.log(res, 'res')
-
-                if (res) {
-                    console.log("res", res)
+                if (!userInfo) {
+                    console.log("from server")
+                    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                        headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    }, true);
+                    if (res) {
+                        setUserInfo(res)
+                        setName(res.name);
+                        setShofarBlowerName(res.meetingInfo.blowerName);
+                        setAddress((res.meetingInfo.city ? `${res.meetingInfo.city}, ` : ``) + `${res.meetingInfo.street}, ${res.meetingInfo.comments}`);
+                        setTime(`${moment(res.meetingInfo.start_time).format("HH:mm")}`);
+                    }
+                } else {
+                    console.log("from context", userInfo)
+                    setName(userInfo.name);
+                    if (userInfo.meetingInfo) {
+                        setShofarBlowerName(userInfo.meetingInfo.blowerName);
+                        setAddress((userInfo.meetingInfo.city ? `${userInfo.meetingInfo.city}, ` : ``) + `${userInfo.meetingInfo.street}, ${userInfo.meetingInfo.comments}`);
+                        setTime(`${moment(userInfo.meetingInfo.start_time).format("HH:mm")}`);
+                    }
                 }
             }
 
