@@ -100,11 +100,15 @@ class Register extends React.Component {
           case "isolated with new public meeting":
             console.log("להודיע לו שהוא נרשם");
             //TODO להודיע לו שהוא נרשם 
+            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
+
 
             break;
           case "isolated with public meeting":
             console.log("להכניס אותו שוב לאיפה שהוא נירשם");
             //TODO להכניס אותו שוב לאיפה שהוא נירשם
+            this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
+
 
             break;
           case "public meeting already exists":
