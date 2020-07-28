@@ -211,6 +211,12 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "updateUserInfo"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "deleteUser"
     }
   ],
   "methods": {}

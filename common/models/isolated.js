@@ -31,7 +31,7 @@ module.exports = function (Isolated) {
                         let meetData = [{
                             city: city.id ? city.id : data.city,
                             street: data.street,
-                            comments: data.comments,
+                            comments: data.appartment + ' ' + data.comments,
                             start_time: null
                         }]
                         pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
