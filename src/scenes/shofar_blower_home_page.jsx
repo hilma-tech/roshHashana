@@ -67,7 +67,7 @@ const SBHomePage = (props) => {
                     </>
                     :
                     <>
-                        <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>
+                        <div className="settings clickAble" onClick={() => { props.history.push('/settings') }} ><img src="/icons/settings.svg" /></div>
                         <div className="not-confirm-msg">מנהל המערכת טרם אישר אותך</div>
                     </>
                 )

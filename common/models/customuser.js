@@ -424,7 +424,7 @@ module.exports = function (CustomUser) {
             blowerStatus: 'req'}
             */
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.isRequest, start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", city.name city, street, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
