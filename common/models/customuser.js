@@ -183,7 +183,7 @@ module.exports = function (CustomUser) {
                                                 })
                                         } else {
                                             //public meeting already exists
-                                            cb(null, { ok: "public meeting already exists" })
+                                            cb(null, { ok: "public meeting already exists", data: { name: res.name } })
 
                                         }
                                     }
@@ -271,7 +271,7 @@ module.exports = function (CustomUser) {
                         INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
                         INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
                     WHERE
-                        isolated.userIsolatedId = ${userInfo.id}`
+                        isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
                     if (errUserData) {
                         console.log("errUserData", errUserData)

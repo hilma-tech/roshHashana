@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
+import { MainContext } from '../../ctx/MainContext';
 
 const IsolatedSettings = (props) => {
+    const { userInfo, setUserInfo } = useContext(MainContext)
 
     const [isolatedInfo, setIsolatedInfo] = useState({});
     const [msgErr, setMsgErr] = useState('');
@@ -13,12 +15,23 @@ const IsolatedSettings = (props) => {
     useEffect(() => {
         (async () => {
             if (!Object.keys(isolatedInfo).length) {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" },
-                }, true);
-                setValues(res, setIsolatedInfo);
-                setValues(res.name, setName);
-                setValues(res.username, setUsername);
+                if (!userInfo) {
+                    console.log("from server")
+                    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                        headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    }, true);
+                    setUserInfo(res)
+                    setValues(res, setIsolatedInfo);
+                    setValues(res.name, setName);
+                    setValues(res.username, setUsername);
+                }
+                else {
+                    console.log("from context", userInfo)
+                    setValues(userInfo, setIsolatedInfo);
+                    setValues(userInfo.name, setName);
+                    setValues(userInfo.username, setUsername);
+
+                }
             }
         })();
     }, []);

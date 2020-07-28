@@ -112,6 +112,7 @@ class Register extends React.Component {
           case "public meeting already exists":
             console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
             //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
+            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name, cantSignUpAgain: true });
 
             break;
           default:
