@@ -12,56 +12,61 @@ module.exports = function (Isolated) {
     //                             "comments": null
     // }
     Isolated.InsertDataIsolated = async (data, options) => {
-        let city;
-        try {
-            //check if the city is exist in city table
-            city = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
-            //the city doesnt exist-> create the city
-            if (!city || !city.id) {
-                city = await Isolated.app.models.City.addNewCity(data.city, options);
+        if (options.accessToken && options.accessToken.userId) {
+            try {
+                let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
+                if (!isolatedInfo) {
+
+                    let city;
+                    //check if the city is exist in city table
+                    city = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
+                    //the city doesnt exist-> create the city
+                    if (!city || !city.id) {
+                        city = await Isolated.app.models.City.addNewCity(data.city, options);
+                    }
+                    let pubMeetId = null;
+
+                    //create public meeting
+                    if (data.public_meeting) {
+                        let meetData = [{
+                            city: city.id ? city.id : data.city,
+                            street: data.street,
+                            comments: data.appartment + ' ' + data.comments,
+                            start_time: null
+                        }]
+                        pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                    }
+
+                    let objToIsolated = {
+                        "userIsolatedId": options.accessToken.userId,
+                        "public_phone": data.public_phone,
+                        "public_meeting": data.public_meeting,
+                        "blowerMeetingId": pubMeetId
+                    },
+                        objToCU = {
+                            "cityId": city.id,
+                            "street": data.street,
+                            "appartment": data.appartment,
+                            "comments": data.comments
+                        };
+
+
+                    let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
+
+                    if (resRole.roleId === 1) {
+
+                        let resIsolated = await Isolated.create(objToIsolated);
+                        let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
+                        return { ok: true };
+                    } else {
+                        return { ok: false, err: "No permissions" };
+                    }
+                }
+            } catch (error) {
+                console.log("Can`t do create new isolated", error);
+                throw error;
+
             }
-            let pubMeetId = null;
-
-            //create public meeting
-            if (data.public_meeting) {
-                let meetData = [{
-                    city: city.id ? city.id : data.city,
-                    street: data.street,
-                    comments: data.comments,
-                    start_time: null
-                }]
-                pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
-            }
-
-            let objToIsolated = {
-                "userIsolatedId": options.accessToken.userId,
-                "public_phone": data.public_phone,
-                "public_meeting": data.public_meeting,
-                "blowerMeetingId": pubMeetId
-            },
-                objToCU = {
-                    "cityId": city.id,
-                    "street": data.street,
-                    "appartment": data.appartment,
-                    "comments": data.comments
-                };
-
-
-            let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
-
-            if (resRole.roleId === 1) {
-
-                let resIsolated = await Isolated.create(objToIsolated);
-                let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
-                return { ok: true };
-            } else {
-                return { ok: false, err: "No permissions" };
-            }
-
-        } catch (error) {
-            console.log("Can`t do create new isolated", error);
-            throw error;
-
         }
     }
 

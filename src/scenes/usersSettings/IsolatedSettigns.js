@@ -23,10 +23,12 @@ const IsolatedSettings = (props) => {
 
     useEffect(() => {
         (async () => {
-            if (!Object.keys(isolatedInfo).length) {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${1}`, {
+            console.log(isolatedInfo, 'isolatedInfo')
+            if (!isolatedInfo || !Object.keys(isolatedInfo).length) {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
+                console.log(res, 'res')
                 setValues(res, setIsolatedInfo);
                 setValues(res.comments ? res.comments : '', setComments);
                 setValues(res.name, setName);
@@ -84,7 +86,7 @@ const IsolatedSettings = (props) => {
         if (!streetVal) streetVal = isolatedInfo.street;
         if (!appartmentVal) appartmentVal = isolatedInfo.appartment;
 
-        let address = cityVal + ' ' + streetVal + ' ' + appartmentVal;
+        let address = cityVal + ' ' + streetVal + ' ' + appartmentVal + ' ' + comments;
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
         await Geocode.fromAddress(address).then(
@@ -104,7 +106,7 @@ const IsolatedSettings = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "PUT",
-                    body: JSON.stringify({ "role": 1, "data": newData })
+                    body: JSON.stringify({ "data": newData })
                 }, true);
                 if (res) {
                     props.history.push('/', { name: nameVal, address });

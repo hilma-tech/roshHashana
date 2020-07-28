@@ -19,7 +19,7 @@ const IsolatedPage = (props) => {
                 setAddress(props.location.state.address);
             }
             else {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${1}`, {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 console.log(res, 'res')

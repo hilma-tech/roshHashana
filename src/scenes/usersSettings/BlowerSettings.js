@@ -6,6 +6,7 @@ import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
@@ -52,7 +53,7 @@ const IsolatedSettings = (props) => {
     useEffect(() => {
         (async () => {
             if (!Object.keys(blowerInfo).length) {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo?role=${2}`, {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 setValues(res, setBlowerInfo);
@@ -143,7 +144,7 @@ const IsolatedSettings = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "PUT",
-                    body: JSON.stringify({ "role": 2, "data": newData })
+                    body: JSON.stringify({ "data": newData })
                 }, true);
                 if (res) {
                     props.history.goBack();
@@ -179,7 +180,7 @@ const IsolatedSettings = (props) => {
             <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
 
                 <div className="header">כמה פעמים תוכל לתקוע?</div>
-                <input type="number" value={blowingTimes} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
+                <input type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
 
                 <div className="header">שעת יציאה</div>
                 <ThemeProvider theme={materialTheme}>
@@ -212,7 +213,7 @@ const IsolatedSettings = (props) => {
                 <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
 
                 <div className="max-time header">סמן את זמן ההליכה</div>
-                <input type="range" min="10" max="120" value={maxTime} className="slider" onChange={(e) => setValues(e.target.value, setMaxTime)} />
+                <Slider value={maxTime} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
                 <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
             </div>
 

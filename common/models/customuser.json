@@ -198,9 +198,12 @@
     },
     {
       "principalType": "ROLE",
-      "principalId": "$everyone",
+      "principalId": "SHOFARBLOWER",
       "permission": "ALLOW",
-      "property": "mapInfoSB"
+      "property": [
+        "mapInfoSB",
+        "assignSB"
+      ]
     },
     {
       "principalType": "ROLE",
@@ -210,15 +213,15 @@
     },
     {
       "principalType": "ROLE",
-      "principalId": "ADMIN",
+      "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "assignSB"
+      "property": "updateUserInfo"
     },
     {
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "updateUserInfo"
+      "property": "deleteUser"
     }
   ],
   "methods": {}

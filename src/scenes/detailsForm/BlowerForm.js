@@ -3,9 +3,11 @@ import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { BrowserView, isBrowser } from "react-device-detect";
+import Popup from '../../components/modals/general_popup';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
@@ -43,19 +45,26 @@ export default class IsolatedForm extends Component {
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
             publicPlaces: [{}], //a list of all the public places that the shofar blower added,
-            walkTime: 10 //the total time the shofar blower wants to walk
+            walkTime: 15 //the total time the shofar blower wants to walk
         }
     }
 
     componentDidMount() {
         (async () => {
-            //get all cities for autocomplete
-            let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-                headers: { Accept: "application/json", "Content-Type": "application/json" }
-            }, true);
-            if (res) {
-                this.setState({ cities: res });
+            if (this.props.location && this.props.location.state && this.props.location.state.noDetails) {
+                //get all cities for autocomplete
+                let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" }
+                }, true);
+                if (res) {
+                    this.setState({ cities: res });
+                }
             }
+            else {
+                this.props.history.push('/');
+                return;
+            }
+
         })();
     }
 
@@ -94,14 +103,24 @@ export default class IsolatedForm extends Component {
 
     //create another public place
     addPublicPlace = () => {
+        if (this.state.publicPlaces.length < 4) {
+            let publicPlaces = this.state.publicPlaces;
+            publicPlaces.push({});
+            this.setState({ publicPlaces });
+        }
+        else this.setState({ errorMsg: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
+    }
+
+    //remove the public meeting
+    removePubPlace = (index) => {
         let publicPlaces = this.state.publicPlaces;
-        publicPlaces.push({});
+        publicPlaces.splice(index, 1);
         this.setState({ publicPlaces });
     }
 
     //update walk time
-    handleWalkTImeChange = (e) => {
-        this.setState({ walkTime: e.target.value });
+    handleWalkTImeChange = (event, newValue) => {
+        this.setState({ walkTime: newValue });
     }
 
     checkForMissingDataInPublicPlaces = async () => {
@@ -128,11 +147,21 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
+
+        if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
+            this.setState({ errorMsg: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
+            return;
+        }
+        if (formChilds[8].value.length > 5) {// check appartment value
+            this.setState({ errorMsg: 'מספר הדירה או הבית אינו תקין' });
+            return;
+        }
+
         let address = this.state.chosenCity + ' ' + formChilds[7].value + ' ' + formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
-        let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
+        // let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
         // console.log(startTime,endTime )
-        endTime.setFullYear(2020, 8, 20);
+        // endTime.setFullYear(2020, 8, 20);
         startTime.setFullYear(2020, 8, 20);
 
         //check if the address is correct
@@ -223,7 +252,7 @@ export default class IsolatedForm extends Component {
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>
-                        <input type="range" min="10" max="120" value={this.state.walkTime} className="slider" onChange={this.handleWalkTImeChange} />
+                        <Slider value={this.state.walkTime} min={15} max={180} onChange={this.handleWalkTImeChange} aria-labelledby="continuous-slider" />
                         <div>{`עד ${this.state.walkTime} דקות`}</div>
 
                         {/* public meeting or not */}
@@ -239,6 +268,7 @@ export default class IsolatedForm extends Component {
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
                                         key={index}
+                                        removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
                                         cities={this.state.cities}
@@ -261,10 +291,8 @@ export default class IsolatedForm extends Component {
                     </form>
                 </div>
 
-                {this.state.openModal && <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                    <div id="modal-contnet">תודה!<br></br> לא מצאנו כרגע מחפשי תקיעת שופר בשעה ובמיקום שהגדרת.</div>
-                    <div id="button" className="clickAble">הבנתי תודה</div>
-                </div>}
+                {this.state.openModal &&
+                    <Popup text={`תודה!\nבזכותך אנשים רבים ישמעו תקיעת שופר השנה.\nכאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך. `} okayText="למפה" closeSelf={() => this.props.history.push('/')} />}
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />

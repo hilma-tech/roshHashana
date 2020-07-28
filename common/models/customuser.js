@@ -231,27 +231,32 @@ module.exports = function (CustomUser) {
     }
 
     //get the user info according to his role
-    CustomUser.getUserInfo = async (role, options) => {
+    CustomUser.getUserInfo = async (options) => {
         if (options.accessToken && options.accessToken.userId) {
-            let userInfo = {};
+            console.log('heree')
             try {
+                const userId = options.accessToken.userId;
+                let role = await getUserRole(userId);
+                if (!role) return;
+
+                let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: options.accessToken.userId }, include: 'userCity', fields: { id: true, username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { id: true, username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
                 if (role === 1) {
                     //isolated
-                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: options.accessToken.userId }, fields: { public_phone: true, public_meeting: true } });
+                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
                     return userInfo;
                 }
                 else if (role === 2) {
                     //shofar blower 
-                    let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: options.accessToken.userId } });
+                    let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
                     userInfo.volunteering_max_time = blower.volunteering_max_time;
 
-                    let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: options.accessToken.userId } });
+                    let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
                     userInfo.publicMeetings = publicMeetings;
                     return userInfo;
                 }
@@ -264,9 +269,12 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.updateUserInfo = async (role, data, options) => {
+    CustomUser.updateUserInfo = async (data, options) => {
         if (options.accessToken && options.accessToken.userId) {
             try {
+                const userId = options.accessToken.userId;
+                let role = await getUserRole(userId);
+                if (!role) return;
                 let city;
                 if (data.city) {
                     city = await CustomUser.app.models.city.findOne({ where: { name: data.city } });
@@ -279,26 +287,25 @@ module.exports = function (CustomUser) {
                     comments: data.comments ? data.comments : null,
                     cityId: city ? city.id : null
                 }
-                let resCustomUser = await CustomUser.upsertWithWhere({ id: options.accessToken.userId }, userData);
+                let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
 
                 if (role === 1) {
                     //isolated
                     let newIsoData = {
-                        userIsolatedId: options.accessToken.userId,
+                        userIsolatedId: userId,
                         public_phone: data.public_phone,
                         public_meeting: data.public_meeting
                     }
-                    let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: options.accessToken.userId }, newIsoData);
+                    let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
                 else if (role === 2) {
                     //shofar blower
-                    console.log('data', data)
                     let newBloData = {
                         volunteering_max_time: data.volunteering_max_time,
                         can_blow_x_times: data.can_blow_x_times,
                         volunteering_start_time: data.volunteering_start_time
                     }
-                    let resBlower = await CustomUser.app.models.ShofarBlower.upsertWithWhere({ userBlowerId: options.accessToken.userId }, newBloData);
+                    let resBlower = await CustomUser.app.models.ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
 
                     // TODO: update also all the public meetings
                 }
@@ -310,12 +317,42 @@ module.exports = function (CustomUser) {
         }
     }
 
+    const getUserRole = async (userId) => {
+        let userRole = await CustomUser.app.models.RoleMapping.findOne({ where: { "principalId": userId }, fields: { roleId: true } });
+        if (!userRole) return null;
+        else return userRole.roleId;
+    }
 
-    // CustomUser.deleteUser = async (role, options) => {
+    CustomUser.deleteUser = async (options) => {
+        if (options.accessToken && options.accessToken.userId) {
+            try {
+                const userId = options.accessToken.userId;
+                let role = await getUserRole(userId);
+                if (!role) return;
+                if (role === 1) {
+                    //isolated
+                    //delete user info
+                    //if public meeting true, check if other users are registered to that public meeting 
+                    //if no users are registered ->> delete meeting
+                    //delete user
 
-    //     if(role===)
+                }
+                else if (role === 3) {
+                    //general user
+                    let deleteUserInfo = await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
+                    console.log(deleteUserInfo, 'res')
+                    let deleteUser = await CustomUser.destroyById(userId);
 
-    // }
+                }
+                else return;
+
+            } catch (error) {
+                throw error;
+            }
+
+        }
+
+    }
 
 
     CustomUser.remoteMethod('createUser', {
@@ -352,7 +389,6 @@ module.exports = function (CustomUser) {
     CustomUser.remoteMethod('getUserInfo', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'role', type: 'number' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'res', type: 'object', root: true }
@@ -361,7 +397,6 @@ module.exports = function (CustomUser) {
     CustomUser.remoteMethod('updateUserInfo', {
         http: { verb: 'put' },
         accepts: [
-            { arg: 'role', type: 'number' },
             { arg: 'data', type: 'object' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
@@ -371,7 +406,6 @@ module.exports = function (CustomUser) {
     CustomUser.remoteMethod('deleteUser', {
         http: { verb: 'delete' },
         accepts: [
-            { arg: 'role', type: 'number' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'res', type: 'object', root: true }
@@ -395,7 +429,8 @@ module.exports = function (CustomUser) {
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             allRes.userData = userDataErr || !userData ? true : userData
-
+            if (!allRes.userData || !allRes.userData.cityId) return cb(null, "NO_CITY")
+            if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
             city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
@@ -416,7 +451,8 @@ module.exports = function (CustomUser) {
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
-            END blowerStatus
+            END blowerStatus,
+            true AS isPublicMeeting 
             FROM isolated 
                 RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
                 JOIN city ON city.id = shofar_blower_pub.cityId
@@ -496,16 +532,15 @@ module.exports = function (CustomUser) {
             let allRes = []
             let formattedStartTime;
             for (let meetingObj of meetingObjs) {
+                if (!new Date(meetingObj.startTime).getTime) continue;
                 try {
                     formattedStartTime = new Date(meetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
                 } catch (e) { console.log("wrong time: ", meetingObj.startTime, " ", e); return cb(true) }
-                console.log('meetingObj.isPublicMeeting: ', meetingObj.isPublicMeeting);
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
                     `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
                 console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
-                console.log('blowerUpdateQ res: ', res);
                 if (err || !res) console.log('err: ', err);
                 allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
             }

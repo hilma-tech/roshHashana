@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { BrowserView, isBrowser } from "react-device-detect";
+import Popup from '../../components/modals/general_popup';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import './detailsForm.scss';
 
 export default class IsolatedForm extends Component {
@@ -18,12 +19,18 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            //get all cities for autocomplete
-            let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-                headers: { Accept: "application/json", "Content-Type": "application/json" }
-            }, true);
-            if (res) {
-                this.setState({ cities: res });
+            if (this.props.location && this.props.location.state && this.props.location.state.noDetails) {
+                //get all cities for autocomplete
+                let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" }
+                }, true);
+                if (res) {
+                    this.setState({ cities: res });
+                }
+            }
+            else {
+                this.props.history.push('/');
+                return;
             }
         })();
     }
@@ -56,7 +63,8 @@ export default class IsolatedForm extends Component {
             return;
         }
 
-        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value;
+        const comments = formChilds[6].value ? formChilds[6].value : ' ';
+        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value + ' ' + comments;
         //check if the address is correct
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
@@ -68,7 +76,7 @@ export default class IsolatedForm extends Component {
                     "city": this.state.chosenCity,
                     "street": formChilds[1].value,
                     "appartment": formChilds[2].value,
-                    "comments": formChilds[6].value,
+                    "comments": comments,
                     "public_meeting": formChilds[4].children[1].checked ? false : true
                 }
                 this.setState({ errorMsg: '' });
@@ -157,12 +165,7 @@ export default class IsolatedForm extends Component {
                     </BrowserView>
                 </div>
                 {this.state.openModal &&
-                    <div id="background">
-                        <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                            <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
-                            <div id="button" className="clickAble" onClick={this.goToMainPage}>הבנתי תודה</div>
-                        </div>
-                    </div>}
+                    <Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} />}
             </>
         );
     }

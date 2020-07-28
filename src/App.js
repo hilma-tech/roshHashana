@@ -30,18 +30,6 @@ const Register = loadable(() => import('./scenes/Register'));
 
 class App extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = { isAuth: false };
-
-    }
-
-    async componentDidMount() {
-
-        this.isAuth = await Auth.isAuthenticated();
-        this.setState({ isAuth: this.isAuth });
-    }
-
     render() {
 
         const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, GeneralUserPage: (props) => <GeneralUserPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
@@ -54,7 +42,6 @@ class App extends Component {
                             <Switch>
                                 <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                                 <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
-                                <PrivateRoute path="/sb-map" compName="SBHomePage" component={props => <SBProvider><SBHomePage {...props} /></SBProvider>} />
                                 <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                                 <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                             </Switch>
