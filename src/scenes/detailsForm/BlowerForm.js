@@ -3,9 +3,11 @@ import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { BrowserView, isBrowser } from "react-device-detect";
+import Popup from '../../components/modals/general_popup';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
@@ -43,7 +45,7 @@ export default class IsolatedForm extends Component {
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
             publicPlaces: [{}], //a list of all the public places that the shofar blower added,
-            walkTime: 10 //the total time the shofar blower wants to walk
+            walkTime: 15 //the total time the shofar blower wants to walk
         }
     }
 
@@ -117,8 +119,8 @@ export default class IsolatedForm extends Component {
     }
 
     //update walk time
-    handleWalkTImeChange = (e) => {
-        this.setState({ walkTime: e.target.value });
+    handleWalkTImeChange = (event, newValue) => {
+        this.setState({ walkTime: newValue });
     }
 
     checkForMissingDataInPublicPlaces = async () => {
@@ -170,7 +172,6 @@ export default class IsolatedForm extends Component {
 
         await Geocode.fromAddress(address).then(
             async response => {
-                console.log(response, 'resjdkszj')
                 let blowerDetails = {
                     "can_blow_x_times": formChilds[1].value,
                     "volunteering_start_time": startTime,
@@ -251,7 +252,7 @@ export default class IsolatedForm extends Component {
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>
-                        <input type="range" min="10" max="120" value={this.state.walkTime} className="slider" onChange={this.handleWalkTImeChange} />
+                        <Slider value={this.state.walkTime} min={15} max={180} onChange={this.handleWalkTImeChange} aria-labelledby="continuous-slider" />
                         <div>{`עד ${this.state.walkTime} דקות`}</div>
 
                         {/* public meeting or not */}
@@ -290,11 +291,15 @@ export default class IsolatedForm extends Component {
                     </form>
                 </div>
 
-                {this.state.openModal && <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                    <div id="modal-contnet">תודה!<br></br> בזכותך אנשים רבים ישמעו תקיעת שופר השנה.</div>
-                    <div id="modal-contnet">כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך.</div>
-                    <div id="button" className="clickAble" onClick={() => this.props.history.push('/')}>למפה</div>
-                </div>}
+                {this.state.openModal &&
+                    <Popup text={`תודה! \n בזכותך אנשים רבים ישמעו תקיעת שופר השנה. \n כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך. `} okayText="למפה" closeSelf={() => this.props.history.push('/')} />
+
+                    // <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
+                    //     <div id="modal-contnet">תודה!<br></br> בזכותך אנשים רבים ישמעו תקיעת שופר השנה.</div>
+                    //     <div id="modal-contnet">כאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך.</div>
+                    //     <div id="button" className="clickAble" onClick={() => this.props.history.push('/')}>למפה</div>
+                    // </div>
+                }
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />
