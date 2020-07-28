@@ -406,8 +406,8 @@ module.exports = function (CustomUser) {
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             console.log('userData: ', userData);
             if (!userData[0] || !userData[0].city) return cb(null, "NO_CITY")
-            if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             allRes.userData = userDataErr || !userData ? true : userData
+            if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
             city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
