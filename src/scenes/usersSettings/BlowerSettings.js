@@ -6,6 +6,7 @@ import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
@@ -212,7 +213,7 @@ const IsolatedSettings = (props) => {
                 <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
 
                 <div className="max-time header">סמן את זמן ההליכה</div>
-                <input type="range" min="10" max="120" value={maxTime} className="slider" onChange={(e) => setValues(e.target.value, setMaxTime)} />
+                <Slider value={maxTime} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
                 <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
             </div>
 
