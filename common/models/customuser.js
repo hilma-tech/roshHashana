@@ -395,7 +395,7 @@ module.exports = function (CustomUser) {
             }
             const { userId } = options.accessToken
 
-            const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", 
+            const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", volunteering_max_time*60000 AS "maxRouteDuration", 
             CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment 
             FROM shofar_blower 
                 LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
@@ -404,9 +404,10 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-            allRes.userData = userDataErr || !userData ? true : userData
-            if (!allRes.userData || !allRes.userData.cityId) return cb(null, "NO_CITY")
+            console.log('userData: ', userData);
+            if (!userData[0] || !userData[0].city) return cb(null, "NO_CITY")
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
+            allRes.userData = userDataErr || !userData ? true : userData
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
             city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
@@ -423,7 +424,7 @@ module.exports = function (CustomUser) {
             blowerStatus: 'req'}
             */
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.isRequest, start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
