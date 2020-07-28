@@ -260,7 +260,7 @@ module.exports = function (CustomUser) {
                     return userInfo;
                 }
                 else {
-                    const query = ` SELECT
+                    const genUserQ = ` SELECT
                         shofar_blower_pub.street,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
@@ -273,7 +273,7 @@ module.exports = function (CustomUser) {
                         INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
                     WHERE
                         isolated.userIsolatedId = ${userInfo.id}`
-                    let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, query)
+                    let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
                     if (errUserData) {
                         console.log("errUserData", errUserData)
                     }
