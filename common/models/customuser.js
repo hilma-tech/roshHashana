@@ -305,6 +305,9 @@ module.exports = function (CustomUser) {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
                 if (!role) return;
+                let userData = await CustomUser.findOne({ where: { id: userId }, fields: { name: true, username: true } });
+                userData.userId = userId;
+                CustomUser.app.models.usersArchive.addUserToArchive(userData);
                 if (role === 1) {
                     //isolated
                     //delete user info
@@ -313,14 +316,16 @@ module.exports = function (CustomUser) {
                     //delete user
 
                 }
-                else if (role === 3) {
+                else if (role === 2) {
+                    //shofar blower
+                }
+                else {
                     //general user
-                    let deleteUserInfo = await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
-                    console.log(deleteUserInfo, 'res')
-                    let deleteUser = await CustomUser.destroyById(userId);
+                    // let deleteUserInfo = await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
+                    // console.log(deleteUserInfo, 'res')
+                    // let deleteUser = await CustomUser.destroyById(userId);
 
                 }
-                else return;
 
             } catch (error) {
                 throw error;
