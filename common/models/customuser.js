@@ -156,7 +156,6 @@ module.exports = function (CustomUser) {
                                             }
                                         });
                                     } else if (resIsolated && resIsolated.public_meeting == 1) {
-                                        console.log("resIsolated", resIsolated)
                                         if (meetingId == null) {
                                             shofarBlowerPub.findOne({
                                                 where: { id: resIsolated.blowerMeetingId },
@@ -233,7 +232,7 @@ module.exports = function (CustomUser) {
     //get the user info according to his role
     CustomUser.getUserInfo = async (options) => {
         if (options.accessToken && options.accessToken.userId) {
-            console.log('heree')
+            // console.log('heree')
             try {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
@@ -261,7 +260,33 @@ module.exports = function (CustomUser) {
                     return userInfo;
                 }
                 else {
-                    return userInfo; //general user
+                    const query = ` SELECT
+                        shofar_blower_pub.street,
+                        shofar_blower_pub.comments,
+                        shofar_blower_pub.start_time,
+                        CustomUser.name AS blowerName,
+                        city.name 
+                    FROM 
+                        isolated
+                        RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+                        INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
+                        INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
+                    WHERE
+                        isolated.userIsolatedId = ${userInfo.id}`
+                    let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, query)
+                    if (errUserData) {
+                        console.log("errUserData", errUserData)
+                    }
+                    if (resUserData) {
+                        userInfo.meetingInfo = {
+                            street: resUserData[0].street,
+                            comments: resUserData[0].comments,
+                            start_time: resUserData[0].start_time,
+                            city: resUserData[0].name,
+                            blowerName: resUserData[0].blowerName
+                        }
+                        return userInfo; //general user
+                    }
                 }
             }
             catch (err) {
