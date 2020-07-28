@@ -20,8 +20,8 @@ const ShofarBlowerMap = (props) => {
         setUserData, setMyMeetings, setMeetingsReqs,
         setAssignMeetingInfo } = useContext(SBContext)
 
-    const [reqsLocs, setReqsLocs] = useState(null);
-    const [myMLocs, setMyMLocs] = useState(null)
+    const [reqsLocs, setReqsLocs] = useState(null); //keep null
+    const [myMLocs, setMyMLocs] = useState(null); //keep null
     const [routeCoordinates, setRouteCoordinates] = useState(null)
     const [userOriginLoc, setUserOriginLoc] = useState(null)
 
@@ -52,7 +52,7 @@ const ShofarBlowerMap = (props) => {
 
 
     useEffect(() => {
-        console.log('useEffect userData ');
+        console.log('useEffect userData ', userData);
         (async () => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
@@ -63,6 +63,7 @@ const ShofarBlowerMap = (props) => {
                 try {
                     const newCenter = res.results[0].geometry.location;
                     if (newCenter !== center) setCenter(newCenter)
+                    console.log('newCenter: ', newCenter);
                     setUserOriginLoc(newCenter)
                 } catch (e) { console.log(`ERROR getting ${centerAdr} geoCode, res.results[0].geometry.location `, e); }
             }
@@ -70,31 +71,40 @@ const ShofarBlowerMap = (props) => {
     }, [userData])
 
     useEffect(() => {
-        console.log('useEffect userOriginLoc ');
+        console.log('useEffect userOriginLoc ', userOriginLoc);
         if (userOriginLoc && typeof userOriginLoc === "object") {
             if (meetingsReqs && Array.isArray(meetingsReqs)) {
-                setOpenReqsContent(meetingsReqs)
+                meetingsReqs.length ? setOpenReqsContent(meetingsReqs) : setReqsLocs([])
             }
         }
     }, [userOriginLoc])
 
     useEffect(() => {
-        console.log('useEffect reqsLocs ');
+        console.log('useEffect reqsLocs ', reqsLocs);
         if (reqsLocs && Array.isArray(reqsLocs)) {
             if (myMeetings && Array.isArray(myMeetings)) {
-                setMyMeetingsContent(myMeetings)
+                myMeetings.length ? setMyMeetingsContent(myMeetings) : setMyMLocs([])
             }
         }
     }, [reqsLocs])
 
 
     useEffect(() => {
-        console.log('useEffect myMLocs ');
+        console.log('useEffect myMLocs ', myMLocs);
+        console.log('userData, userOriginLoc, reqsLocs, myMLocs: ', userData, userOriginLoc, reqsLocs, myMLocs);
         if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
             setAllMapData({ userData, userOriginLoc, reqsLocs, myMLocs })
-            console.log('<< myMLocs: ', myMLocs);
+            // console.log('<< myMLocs: ', myMLocs);
         }
     }, [myMLocs])
+
+
+    useEffect(() => {
+        // console.log("changed myMeetings");
+        if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
+            setMyMeetingsContent(myMeetings)
+        }
+    }, [myMeetings])
 
 
 
@@ -105,10 +115,11 @@ const ShofarBlowerMap = (props) => {
         let meetReq;
         for (let i = 0; i < reqsArr.length; i++) {
             meetReq = reqsArr[i]
-            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
+            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street} ${meetReq.comments}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
             meetReq.address = address;
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
+            // console.log('meetREQ: ', meetReq);
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${address}` }); continue; }
             try {
@@ -127,10 +138,10 @@ const ShofarBlowerMap = (props) => {
     }
 
     const setMyMeetingsContent = (meetings) => {
+        console.log('setMyMeetingsContent: meetings: ', meetings);
         let meetingsLocs = []
-        meetings = meetings.sort((a, b) => new Date(a.startTime).getTime() > new Date(b.startTime).getTime()) //?
         meetings.forEach(async (myMeeting, i, arr) => {
-            const address = `${myMeeting.city} ${myMeeting.street}`;
+            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street} ${myMeeting.comments}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
             myMeeting.address = address;
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
@@ -149,6 +160,7 @@ const ShofarBlowerMap = (props) => {
                 meetingsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i === arr.length - 1) { //end of forEach
+                console.log('setMyMLocs: ', meetingsLocs);
                 setMyMLocs(meetingsLocs);
             }
         });
@@ -164,15 +176,10 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div id="map-container">
+        <div className="map-container" id="sb-map-container">
             <MyMapComponent
                 changeCenter={setCenter}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
-
-                // reqsLocs={reqsLocs}
-                // myMeetingsLocs={myMLocs}
-                // userOriginLoc={userOriginLoc}
-                // userData={userData}
 
                 data={allMapData}
 

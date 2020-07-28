@@ -1,22 +1,29 @@
 @import "../consts/generalStyles";
 
-.sb-assign-meeting-container {
+#sb-map-container{
+    width: 70%;
+    height: 100%;
     position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    left: 0;
+}
+.sb-side-info-container {
+    // position: absolute;
+    // right: 0;
+    // top: 0;
+    // bottom: 0;
     height: 100%;
     width: 30%;
+    float:right;
     background-color: white;
 }
-.sb-assign-meeting-mobile-container {
+.sb-side-info-mobile-container {
     position: absolute;
-    height: 100%;
-    width: 100%;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
+    height: 100%;
+    width: 100%;
 }
 
 .sb-homepage-container {
