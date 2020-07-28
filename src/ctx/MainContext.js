@@ -8,6 +8,7 @@ export const MainProvider = ({ children }) => {
     let alertTO = null;
     const [showAlert, setShowAlert] = useState(false)
     const [cities, setCities] = useState([]);
+    const [userInfo, setUserInfo] = useState(null);
 
     const closeAlert = () => { setShowAlert(false) }
     const openGenAlert = (obj, popupCb = () => { }) => {
@@ -22,7 +23,8 @@ export const MainProvider = ({ children }) => {
 
     const ctxValue = {
         openGenAlert, showAlert,
-        cities, setCities
+        cities, setCities,
+        userInfo, setUserInfo
     }
 
     return <MainContext.Provider value={ctxValue} >

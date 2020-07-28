@@ -18,7 +18,7 @@ const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
 
-export const calculateRoute = (google, setRouteCoordinates, userData, places) => {
+const calculateRoute = (google, setRouteCoordinates, userData, places) => {
     console.log('places: ', places);
     if (!Array.isArray(places)) return
     // console.log('waypoints: ', waypoints);
@@ -54,7 +54,7 @@ export const calculateRoute = (google, setRouteCoordinates, userData, places) =>
                     for (let i in overViewCoords) {
                         coord = overViewCoords[i]
                         if (coord.lng() == result.routes[0].legs[legCnt].end_location.lng() && coord.lat() == result.routes[0].legs[legCnt].end_location.lat()) {
-                            // got to a coor which is a waypoint (a leg)
+                            // got to a coord which is a waypoint (a leg)
                             centerCoordsI = Math.floor((i + prevI) / 2)
                             centerL = overViewCoords[centerCoordsI]
                             duration = result.routes[0].legs[legCnt].duration.text
@@ -139,26 +139,25 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
             return cb("אירעה שגיאה בטעינת המפה, עמכם הסליחה")
         }
         let res = {}
-
-        res.startTimes = []
-        let leg;
-        let prevStartTimeVal
-        for (let i in stops) {
-            leg = result.routes[0].legs[i]
-            console.log('leg: ', leg);
-            console.log('leg.duration.value: ', leg.duration.value);
-            if (!res.startTimes[i - 1]) {
-                if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
-                prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
-            } else {
-                prevStartTimeVal = res.startTimes[i - 1].startTime
+        if (extraData && extraData.getTimes) {
+            res.startTimes = []
+            let leg;
+            let prevStartTimeVal
+            for (let i in stops) {
+                leg = result.routes[0].legs[i]
+                if (!res.startTimes[i - 1]) {
+                    if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
+                    prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
+                } else {
+                    prevStartTimeVal = res.startTimes[i - 1].startTime
+                }
+                res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + Number(leg.duration.value) })
             }
-            res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + Number(leg.duration.value) })
         }
-
         res.overviewPath = result.routes[0].overview_path
 
-        return cb(null, res)
+        cb(null, res)
+        return;
 
     })
 }
@@ -173,6 +172,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
+    const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
@@ -181,21 +181,70 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         // anchor: new window.google.maps.Point(0, 0),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
-    const userOrigin = { location: data.userOriginLoc, icon: userLocationIcon, origin: true }
-    const stops = [...data.myMLocs]
 
     useEffect(() => {
-        if(Array.isArray(stops) && stops.length) getOverViewPath(window.google, userOrigin.location, stops, { userData },
-            (err, res) => {
-                if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
-                let newStartTimes = res.startTimes;
-                if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
-                setRoutePath(res.overviewPath)
-            })
+        if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
+        const userOrigin = { location: data.userOriginLoc, icon: userLocationIcon, origin: true }
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const routeStops = [];
+        const constStopsB4 = [];
+        const constStopsAfer = [];
+        let meetingStartTime;
+        for (let i in data.myMLocs) {
+            meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
+            if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime < userEndTime)) // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
+                if (meetingStartTime < userStartTime) {
+                    console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
+                    constStopsB4.push(data.myMLocs[i])
+                } else {
+                    constStopsAfer.push(data.myMLocs[i])
+                }
+            else routeStops.push(data.myMLocs[i])
+        }
+        // console.log('constStopsB4: ', constStopsB4);
+        // console.log('constStopsAfer: ', constStopsAfer);
+
+        if (Array.isArray(routeStops) && routeStops.length) {
+            getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData },
+                (err, res) => {
+                    if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+                    let newStartTimes = res.startTimes;
+                    if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                    setRoutePath(res.overviewPath)
+                })
+        }
+        const b4StopsCb = (b4Err, b4Res) => {
+            console.log('b4Res: ', b4Res);
+            if (b4Err) {
+                console.log("err getoverviewpath for constStopsB4: ", constStopsB4, " err: ", b4Err); if (typeof b4Err === "string") { openGenAlert({ text: b4Err }); } return;
+            }
+            let overviewPaths = [];
+            b4Res && overviewPaths.push(b4Res.overviewPath)
+
+            if (Array.isArray(constStopsAfer) && constStopsAfer.length) {
+                getOverViewPath(window.google, constStopsB4.pop(), [...constStopsB4, userOrigin.location], null, (e, r) => afterStopsCb(e, r, overviewPaths))
+            } else afterStopsCb(null, null, overviewPaths)
+
+        }
+        const afterStopsCb = (afterErr, afterRes, overviewPaths) => {
+            if (afterErr) {
+                console.log("err getoverviewpath for constStopsAfter: ", constStopsB4, " err: ", afterErr); if (typeof afterErr === "string") { openGenAlert({ text: afterErr }); } return;
+            }
+            afterRes && overviewPaths.push(afterRes.overviewPath)
+            Array.isArray(overviewPaths) && setB4OrAfterRoutePath(overviewPaths)
+            console.log('setB4OrAfterRoutePath(to:): ', overviewPaths);
+        }
+
+        console.log('constStopsB4: ', constStopsB4);
+        if ((Array.isArray(constStopsB4) && constStopsB4.length) || (Array.isArray(constStopsAfer) && constStopsAfer.length)) {
+            if ((Array.isArray(constStopsB4) && constStopsB4.length)) getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null, b4StopsCb)
+            else b4StopsCb(null, null)
+        }
+
     }, [props.data])
 
-    console.log('props.data: ', props.data);
-    // if (Array.isArray(props.myMeetingsLocs) && !routeCoordinates) calculateRoute(window.google, setRouteCoordinates, props.userData, [userOrigin, ...props.myMeetingsLocs])
+    props.data && console.log('props.data: ', props.data);
 
     return (
         <GoogleMap
@@ -216,10 +265,22 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 <Polyline
                     path={routePath}
                     geodesic={false}
-                    options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeOpacity: 1, strokeWeight: 7, }}
+                    options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
                 />
                 : null
             }
+
+            {Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
+                b4OrAfterRoutePath.map((routePath, i) => (
+                    <Polyline
+                        key={"k" + i}
+                        path={routePath}
+                        geodesic={false}
+                        options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 5, strokeRepeat: "10px" }}
+                    />
+                ))
+                : null}
+
         </GoogleMap>
     );
 }));

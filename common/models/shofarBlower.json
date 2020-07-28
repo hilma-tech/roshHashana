@@ -16,11 +16,6 @@
         }
     },
     "relations": {
-        "blowerPublic": {
-            "model": "shofarBlowerPub",
-            "type": "hasMany",
-            "foreignKey": "blowerId"
-        },
         "UserToBlower": {
             "model": "CustomUser",
             "type": "belongsTo",

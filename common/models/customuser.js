@@ -111,6 +111,7 @@ module.exports = function (CustomUser) {
         })
     }
     CustomUser.checkStatus = (userId, meetingId, cb) => {
+        const { shofarBlowerPub } = CustomUser.app.models;
         let status
         CustomUser.app.models.RoleMapping.findOne({ where: { principalId: userId } }, (err, resRole) => {
             if (err) console.log("Err", err);
@@ -151,13 +152,35 @@ module.exports = function (CustomUser) {
                                         CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
                                             if (errPM) console.log("errPM", errPM);
                                             if (resPM) {
-                                                cb(null, { ok: "isolated with new public meeting" })
+                                                cb(null, { ok: "isolated with new public meeting", data: { name: res.name } })
                                             }
                                         });
                                     } else if (resIsolated && resIsolated.public_meeting == 1) {
                                         if (meetingId == null) {
-                                            //isolated with public meeting
-                                            cb(null, { ok: "isolated with public meeting" })
+                                            shofarBlowerPub.findOne({
+                                                where: { id: resIsolated.blowerMeetingId },
+                                                include: ["blowerPublic", "meetingCity"]
+                                            },
+                                                (errPublicMeeting, resPublicMeeting) => {
+                                                    if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
+                                                    if (resPublicMeeting) {
+                                                        //isolated with public meeting
+                                                        cb(null, {
+                                                            ok: "isolated with public meeting",
+                                                            data:
+                                                            {
+                                                                name: res.name,
+                                                                meetingInfo: {
+                                                                    street: resPublicMeeting.street,
+                                                                    comments: resPublicMeeting.comments,
+                                                                    start_time: resPublicMeeting.start_time,
+                                                                    city: resPublicMeeting.meetingCity().name,
+                                                                    blowerName: resPublicMeeting.blowerPublic().name
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                })
 
                                         } else {
                                             //public meeting already exists
@@ -209,7 +232,7 @@ module.exports = function (CustomUser) {
     //get the user info according to his role
     CustomUser.getUserInfo = async (options) => {
         if (options.accessToken && options.accessToken.userId) {
-            console.log('heree')
+            // console.log('heree')
             try {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
@@ -217,7 +240,7 @@ module.exports = function (CustomUser) {
 
                 let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { id: true, username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
@@ -236,7 +259,35 @@ module.exports = function (CustomUser) {
                     userInfo.publicMeetings = publicMeetings;
                     return userInfo;
                 }
-                else return userInfo; //general user
+                else {
+                    const genUserQ = ` SELECT
+                        shofar_blower_pub.street,
+                        shofar_blower_pub.comments,
+                        shofar_blower_pub.start_time,
+                        CustomUser.name AS blowerName,
+                        city.name 
+                    FROM 
+                        isolated
+                        RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+                        INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
+                        INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
+                    WHERE
+                        isolated.userIsolatedId = ${userInfo.id}`
+                    let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
+                    if (errUserData) {
+                        console.log("errUserData", errUserData)
+                    }
+                    if (resUserData) {
+                        userInfo.meetingInfo = {
+                            street: resUserData[0].street,
+                            comments: resUserData[0].comments,
+                            start_time: resUserData[0].start_time,
+                            city: resUserData[0].name,
+                            blowerName: resUserData[0].blowerName
+                        }
+                        return userInfo; //general user
+                    }
+                }
             }
             catch (err) {
                 throw err;
@@ -429,7 +480,7 @@ module.exports = function (CustomUser) {
             blowerStatus: 'req'}
             */
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.isRequest, start_time AS "startTime", city.name city, street, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", city.name city, street, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"

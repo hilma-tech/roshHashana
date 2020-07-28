@@ -17,7 +17,7 @@
     },
     "relations": {
         "blowerPublic": {
-            "model": "shofarBlower",
+            "model": "CustomUser",
             "type": "belongsTo",
             "foreignKey": "blowerId"
         },
@@ -140,7 +140,6 @@
             "property": "createNewPubMeeting"
         },
         {
-
             "principalType": "ROLE",
             "principalId": "$authenticated",
             "permission": "ALLOW",

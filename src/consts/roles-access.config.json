@@ -11,7 +11,8 @@
     "GENERALUSER": {
         "comps": [
             "GeneralUserSettings"
-        ]
+        ],
+        "defaultHomePage": "GeneralUserPage"
     },
     "ISOLATED": {
         "comps": [
