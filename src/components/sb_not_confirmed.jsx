@@ -36,11 +36,11 @@ const SBNotConfirmed = (props) => {
                     <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשתך</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
-                <img src='/images/map.svg' />
+                                <img src='/images/map.svg' />
                     </div>
                 </div>
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} isolated />} {/*general map with no option to assign yourself to the meetings */}
+            {openMap && <Map closeMap={closeOrOpenMap} blower />}{/*general map with no option to assign yourself to the meetings */}
         </>
     );
 }

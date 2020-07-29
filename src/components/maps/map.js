@@ -52,7 +52,7 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-            if (props.publicMap || props.isolated) await setPublicMapContent();
+            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
 
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -155,6 +155,7 @@ const MapComp = (props) => {
             <MyMapComponent
                 meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
+                blower={props.blower}
                 findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
@@ -199,7 +200,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: props.meetAddress ? '/icons/meetAddress.svg' : '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         // anchor: new window.google.maps.Point(0, 0),
@@ -214,7 +215,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }
