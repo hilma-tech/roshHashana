@@ -99,7 +99,7 @@ const SBHomePage = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {openMap && <Map closeMap={closeOrOpenMap} isolated />}{/*general map with no option to assign yourself to the meetings */}
+                        {openMap && <Map closeMap={closeOrOpenMap} blower />}{/*general map with no option to assign yourself to the meetings */}
                     </>
                 )
             }
