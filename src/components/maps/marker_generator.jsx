@@ -21,11 +21,11 @@ const MarkerGenerator = (props) => {
         if (!location || !location.lng || !location.lat) return null;
     }
 
-    const url = (type === PRIVATE_MEETING) ? props.isolated ? 'icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
-
+    let url = (type === PRIVATE_MEETING) ? props.isolated ? '/icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
+    
     const icon = props.icon ? props.icon : {
         url: url,
-        scaledSize: (type === PRIVATE_MEETING) ? (props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
+        scaledSize: (type === PRIVATE_MEETING) ? (props.isolated ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
         // anchor: new window.google.maps.Point(0, 0), // changes position of icon
     }

@@ -93,13 +93,13 @@ const SBHomePage = (props) => {
                                 <div>בזמן הקרוב נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
                                 <div>בברכה,<br></br>צוות יום תרועה.</div>
                                 <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשתך</div>
-                                {/* <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                                <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                                     צפייה במפה
                                 <img src='/images/map.svg' />
                                 </div>
-                                {openMap && <Map closeMap={closeOrOpenMap} isolated />} */}
                             </div>
                         </div>
+                        {openMap && <Map closeMap={closeOrOpenMap} isolated />}{/*general map with no option to assign yourself to the meetings */}
                     </>
                 )
             }
