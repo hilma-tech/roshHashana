@@ -39,7 +39,6 @@ export default class IsolatedForm extends Component {
         super(props);
         this.state = {
             errorMsg: '',
-            openModal: false, //open modal with a message to the user
             cities: [], // alist of all the cities
             chosenCity: '', //the city address of the shofar blower
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
@@ -138,8 +137,17 @@ export default class IsolatedForm extends Component {
         this.setState({ publicPlaces });
     }
 
+    handleKeyPress = (e) => {
+        const key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+            e.preventDefault();
+            return;
+        }
+    }
+
     //save all shofar blower details including public places
     saveShofarBlowerDetails = async (e) => {
+        console.log(e, 'e')
         e.preventDefault();
         const formChilds = e.target.children;
 
@@ -159,9 +167,6 @@ export default class IsolatedForm extends Component {
 
         let address = this.state.chosenCity + ' ' + formChilds[7].value + ' ' + formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
-        // let endTime = new Date(this.state.chosenTime + this.state.walkTime * 60000)
-        // console.log(startTime,endTime )
-        // endTime.setFullYear(2020, 8, 20);
         startTime.setFullYear(2020, 8, 20);
 
         //check if the address is correct
@@ -190,8 +195,7 @@ export default class IsolatedForm extends Component {
                     body: JSON.stringify({ data: blowerDetails })
                 }, true);
                 if (res) {
-                    //open modal with message
-                    this.setState({ openModal: true });
+                    this.props.history.push('/')
                 }
             },
             error => {
@@ -204,16 +208,16 @@ export default class IsolatedForm extends Component {
     render() {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         return (
-            <div id="isolated-form-container" className={`${this.state.openModal ? 'change-color' : ''}`}>
+            <div id="isolated-form-container">
 
-                <div className="form-container" style={{ width: isBrowser ? '40%' : '100%', opacity: this.state.openModal ? '0.2' : '1' }}>
+                <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                     <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                     <div className="msg-txt header"> {`שלום ${name}, `}</div>
                     <div className="msg-txt header">ותודה על הנכונות לעזור!</div>
                     <div className="msg-txt header">כמה שאלות, ונמשיך לקביעת המפגש</div>
 
 
-                    <form onSubmit={this.saveShofarBlowerDetails}>
+                    <form onSubmit={this.saveShofarBlowerDetails} onKeyPress={this.handleKeyPress}>
 
                         {/* shofar blowing times input */}
                         <div className="title">כמה פעמים תהיה מוכן לקיים תקיעת שופר באזורך?</div>
@@ -291,10 +295,7 @@ export default class IsolatedForm extends Component {
                     </form>
                 </div>
 
-                {this.state.openModal &&
-                    <Popup text={`תודה!\nבזכותך אנשים רבים ישמעו תקיעת שופר השנה.\nכאן תוכל לקבל את כל הפרטים ולבחור את נקודות המפגש המתאימות לך. `} okayText="למפה" closeSelf={() => this.props.history.push('/')} />}
-
-                <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0', opacity: this.state.openModal ? '0.2' : '1' }}>
+                <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" src="/icons/shofar.png" />
                 </BrowserView>
             </div>

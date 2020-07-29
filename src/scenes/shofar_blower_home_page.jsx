@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 
 import { SBContext } from '../ctx/shofar_blower_context';
@@ -39,8 +39,15 @@ const SBHomePage = (props) => {
     const closeOrOpenMap = () => {
         setOpenMap(!openMap);
     }
-    const cancelVolunteering =() => {
-        //TODO 
+    const cancelVolunteering = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "DELETE",
+        });
+        if (res && res.res === 'SUCCESS') {
+            Auth.logout(window.location.href = window.location.origin);
+        }
+        // else  TODO: לשים הודעה שזה נכשל
     }
 
     const fetchAndSetData = async () => {
@@ -52,6 +59,7 @@ const SBHomePage = (props) => {
             console.log("error getting sb map content ", err);
         }
         if (mapContent === "NO_CITY") {
+            console.log('hereee')
             Auth.logout()
             return;
         }
@@ -63,6 +71,7 @@ const SBHomePage = (props) => {
         }
         fetching = false
     }
+
 
     return (
         <div className="sb-homepage-container">

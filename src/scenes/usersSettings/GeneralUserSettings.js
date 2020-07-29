@@ -54,7 +54,7 @@ const IsolatedSettings = (props) => {
 
         if (!nameVal) nameVal = isolatedInfo.name;
         if (!usernameVal) usernameVal = isolatedInfo.username;
-        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
 
         let newData = {
             "name": nameVal,

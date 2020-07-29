@@ -120,7 +120,7 @@ const IsolatedSettings = (props) => {
         let maxTimeVal = maxTime;
 
         if (!nameVal) nameVal = blowerInfo.name;
-        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
 
@@ -219,7 +219,7 @@ const IsolatedSettings = (props) => {
                 <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
 
                 <div className="max-time header">סמן את זמן ההליכה</div>
-                <Slider value={maxTime} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
+                <Slider value={maxTime ? maxTime : 0} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
                 <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
             </div>
 
