@@ -1,4 +1,6 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useState,useContext } from 'react';
+import { isBrowser } from "react-device-detect";
+
 import { SBContext } from '../ctx/shofar_blower_context';
 
 import Auth from '../modules/auth/Auth';
@@ -8,13 +10,14 @@ import ShofarBlowerMap from '../components/maps/shofar_blower_map'
 import GeneralAlert from '../components/modals/general_alert'
 import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBRouteInfo from '../components/sb_route_info';
-
+import Map from '../components/maps/map';
 import './sb.scss'
 import '../components/maps/map.scss';
-
+import './mainPages/MainPage.scss';
 
 let fetching = false
 const SBHomePage = (props) => {
+    const [openMap, setOpenMap] = useState(false);
     const { showAlert, openGenAlert,
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
@@ -33,6 +36,12 @@ const SBHomePage = (props) => {
             }
         })();
     }, []);
+    const closeOrOpenMap = () => {
+        setOpenMap(!openMap);
+    }
+    const cancelVolunteering =() => {
+        //TODO 
+    }
 
     const fetchAndSetData = async () => {
         fetching = true
@@ -68,8 +77,20 @@ const SBHomePage = (props) => {
                     </>
                     :
                     <>
-                        <div className="settings clickAble" onClick={() => { props.history.push('/settings') }} ><img src="/icons/settings.svg" /></div>
-                        <div className="not-confirm-msg">מנהל המערכת טרם אישר אותך</div>
+                        <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
+                            <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>
+                            <div className="content-container">
+                                <div id="thank-you-msg">תודה על הרשמתך.</div>
+                                <div>בזמן הקרוב נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
+                                <div>בברכה,<br></br>צוות יום תרועה.</div>
+                                <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשתך</div>
+                                {/* <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                                    צפייה במפה
+                                <img src='/images/map.svg' />
+                                </div>
+                                {openMap && <Map closeMap={closeOrOpenMap} isolated />} */}
+                            </div>
+                        </div>
                     </>
                 )
             }

@@ -5,7 +5,7 @@ import './Register.scss';
 import { BrowserView, isBrowser } from "react-device-detect";
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
-const SomethingMissing = "חסר שם או מספר טלפון לא תקין"
+const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
   constructor(props) {
@@ -33,18 +33,16 @@ class Register extends React.Component {
 
   handleChange(event) {
     this.setState({ alart: null })
-    if (event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." ||
-      event.target.id === "name" && event.target.value.length < 20 ||
-      event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
-
-      this.setState({ [event.target.id]: event.target.value });
-
+    if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
+    event.target.id === "name" && event.target.value.length < 20 ||
+    event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") { 
+      this.setState({ [event.target.id]: event.target.value })
     }
-
+    
   }
-
+  
   async handleSubmit() {
-    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0) {
+    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -58,7 +56,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0) {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0 || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) {
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
@@ -114,6 +112,7 @@ class Register extends React.Component {
           case "public meeting already exists":
             console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
             //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
+            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name, cantSignUpAgain: true });
 
             break;
           default:
