@@ -149,8 +149,6 @@ const ShofarBlowerMap = (props) => {
             let [error, response] = await to(Geocode.fromAddress(address + ` ${myMeeting.comments || ""}`))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
             let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
-            console.log('myStartT: ', myStartT);
-            console.log('startTimes: ', startTimes);
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {

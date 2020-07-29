@@ -47,7 +47,7 @@ const SBHomePage = (props) => {
         if (res && res.res === 'SUCCESS') {
             Auth.logout(window.location.href = window.location.origin);
         }
-        // else  TODO: לשים הודעה שזה נכשל
+        else openGenAlert({ text: "סליחה, הפעולה נכשלה, נא נסו שנית מאוחר יותר" })
     }
 
     const fetchAndSetData = async () => {

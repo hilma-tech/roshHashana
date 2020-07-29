@@ -200,17 +200,17 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
             if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) { // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
-                    console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
+                    // console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
-                    console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
+                    // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
                     constStopsAfer.push(data.myMLocs[i])
                 }
             }
             else routeStops.push(data.myMLocs[i])
         }
-        console.log('constStopsB4: ', constStopsB4);
-        console.log('constStopsAfer: ', constStopsAfer);
+        // console.log('constStopsB4: ', constStopsB4);
+        // console.log('constStopsAfer: ', constStopsAfer);
 
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
             //get times only if there is a stop (a meeting) that doesn't have a start time
