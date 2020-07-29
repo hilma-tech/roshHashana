@@ -21,14 +21,10 @@ const SBAssignMeeting = (props) => {
 
 
     const handleAssignment = async (close) => {
-        // assignSB(assignMeetingInfo, error => {
-        //      openGenAlert({ text: error || "השתבצת בהצלחה" })
-        // })
         if (close === "close") {
             setAssignMeetingInfo(null)
             return;
         }
-        // openGenAlert({ text: " ... " })
         //set new route and remove meetingId from reqs array
         if (myMeetings.length == userData.can_blow_x_times) {
             openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבץ`, isPopup: { okayText: "הבנתי" } })

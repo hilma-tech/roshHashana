@@ -565,7 +565,7 @@ module.exports = function (CustomUser) {
                     formattedStartTime = new Date(meetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
                 } catch (e) { console.log("wrong time: ", meetingObj.startTime, " ", e); return cb(true) }
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
-                    `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} blowerId IS NULL`
+                    `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
                 console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)

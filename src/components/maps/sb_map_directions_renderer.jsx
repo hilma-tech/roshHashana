@@ -111,7 +111,7 @@ const calculateRoute = (google, setRouteCoordinates, userData, places) => {
 
 
 const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
-    if (!stops || !stops.length) cb("no_stops")
+    if (!stops || !stops.length) { console.log("no_stops_or_destination", origin, stops); cb(true) }
     const travelMode = google.maps.TravelMode.WALKING
     const waypoints = stops
         .map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
@@ -143,15 +143,17 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
             res.startTimes = []
             let leg;
             let prevStartTimeVal
+            let legDuration
             for (let i in stops) {
                 leg = result.routes[0].legs[i]
+                legDuration = Number(leg.duration.value) * 1000
                 if (!res.startTimes[i - 1]) {
                     if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
                     prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
                 } else {
                     prevStartTimeVal = res.startTimes[i - 1].startTime
                 }
-                res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + Number(leg.duration.value) })
+                res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
             }
         }
         res.overviewPath = result.routes[0].overview_path
@@ -187,23 +189,27 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         const userOrigin = { location: data.userOriginLoc, icon: userLocationIcon, origin: true }
         const userStartTime = new Date(userData.startTime).getTime()
         const userEndTime = userStartTime + userData.maxRouteDuration;
+        console.log('userStartTime: ', userStartTime);
+        console.log('userEndTime: ', userEndTime);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfer = [];
         let meetingStartTime;
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
-            if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime < userEndTime)) // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
+            if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) { // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
                     console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
+                    console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
                     constStopsAfer.push(data.myMLocs[i])
                 }
+            }
             else routeStops.push(data.myMLocs[i])
         }
-        // console.log('constStopsB4: ', constStopsB4);
-        // console.log('constStopsAfer: ', constStopsAfer);
+        console.log('constStopsB4: ', constStopsB4);
+        console.log('constStopsAfer: ', constStopsAfer);
 
         if (Array.isArray(routeStops) && routeStops.length) {
             getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData },
@@ -222,12 +228,14 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
             let overviewPaths = [];
             b4Res && overviewPaths.push(b4Res.overviewPath)
 
-            if (Array.isArray(constStopsAfer) && constStopsAfer.length) {
-                getOverViewPath(window.google, constStopsB4.pop(), [...constStopsB4, userOrigin.location], null, (e, r) => afterStopsCb(e, r, overviewPaths))
+            if (Array.isArray(constStopsAfer) && constStopsAfer.length) { //const meeting after get overview
+                let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
+                getOverViewPath(window.google, origin.location, constStopsAfer, null, (e, r) => afterStopsCb(e, r, overviewPaths))
             } else afterStopsCb(null, null, overviewPaths)
 
         }
         const afterStopsCb = (afterErr, afterRes, overviewPaths) => {
+            console.log('afterRes: ', afterRes);
             if (afterErr) {
                 console.log("err getoverviewpath for constStopsAfter: ", constStopsB4, " err: ", afterErr); if (typeof afterErr === "string") { openGenAlert({ text: afterErr }); } return;
             }
@@ -254,13 +262,16 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         >
             <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
 
-            {/* reqsLocs */ Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
-                return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-            }) : null}
-            {/* myMLocs */ Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
-                return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-            }) : null}
-            {/* user location */} <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
+            {/* reqsLocs */
+                Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
+                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
+                }) : null}
+            {/* myMLocs */
+                Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
+                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
+                }) : null}
+            {/* user location */}
+            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
             {Array.isArray(routePath) ?
                 <Polyline
                     path={routePath}
@@ -270,139 +281,18 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 : null
             }
 
-            {Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
-                b4OrAfterRoutePath.map((routePath, i) => (
-                    <Polyline
-                        key={"k" + i}
-                        path={routePath}
-                        geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 5, strokeRepeat: "10px" }}
-                    />
-                ))
-                : null}
+            {/* before and after route stops */
+                Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
+                    b4OrAfterRoutePath.map((routePath, i) => (
+                        <Polyline
+                            key={"k" + i}
+                            path={routePath}
+                            geodesic={false}
+                            options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 2 + Number(i*2) }}
+                        />
+                    ))
+                    : null}
 
         </GoogleMap>
     );
 }));
-
-
-
-// const MyMapDirectionsRenderer = (props) => {
-//     const { openGenAlert,
-//         userData, myMeetings, setMyMeetings,
-//         startTimesToUpdate, setStartTimesToUpdate } = useContext(SBContext)
-//     const [state, setState] = useState({
-//         lineCoordinates: null,
-//         markerCenter: null
-//     });
-//     const { places } = props; // [{ location: {}, isPublic: t/f,  }, { location: {} }]
-
-//     useEffect(() => {
-//         console.log('places: ', places);
-//         const travelMode = window.google.maps.TravelMode.WALKING
-//         const waypoints = places.map(p => ({
-//             location: p.location,
-//             stopover: true
-//         }))
-//         const origin = waypoints.shift().location;
-//         const destination = waypoints.length ? waypoints.pop().location : null;
-
-//         const directionsService = new window.google.maps.DirectionsService();
-//         directionsService.route(
-//             {
-//                 origin: origin,
-//                 destination: destination,
-//                 travelMode: travelMode,
-//                 waypoints: waypoints,
-//                 optimizeWaypoints: false
-//             },
-//             (result, status) => {
-//                 console.log('result: ', result);
-//                 if (status === window.google.maps.DirectionsStatus.OK) {
-//                     //OK
-//                     try {
-//                         const overViewCoords = result.routes[0].overview_path;
-//                         const legCnt = 0
-//                         let prevI = 0
-//                         let centerMarkers = []
-//                         let centerL, duration
-//                         let i
-//                         for (let j in overViewCoords) {
-//                             i = overViewCoords[j]
-//                             if (i.lng() == result.routes[0].legs[legCnt].end_location.lng() && i.lat() == result.routes[0].legs[legCnt].end_location.lat()) {
-//                                 console.log('equals:', i.lng() == result.routes[0].legs[legCnt].end_location.lng() && i.lat() == result.routes[0].legs[legCnt].end_location.lat());
-//                                 centerL = overViewCoords[Math.floor((i - prevI) / 2)]
-//                                 j < 10 && console.log('centerL: ', centerL);
-//                                 duration = result.routes[0].legs[legCnt].duration.text
-//                                 prevI = i;
-//                                 legCnt++;
-//                             }
-
-//                         }
-//                         setState(state => ({ ...state, lineCoordinates: overViewCoords, markerCenter: {} }));
-//                     } catch (e) { console.log("error getting overview path from DirectionsService() result", e) }
-//                     try {
-//                         console.log('origin: ', origin);
-//                         console.log('userData: ', userData);
-//                         let leg;
-//                         let start_loc, end_loc
-//                         let start_place, end_place
-//                         let leg_time
-//                         let newStartTimes = []
-//                         for (let i in result.routes[0].legs) {
-//                             leg = result.routes[0].legs[i]
-//                             console.log('leg: ', leg);
-//                             start_loc = { lng: leg.start_location.lng(), lat: leg.start_location.lat() }
-//                             end_loc = { lng: leg.end_location.lng(), lat: leg.end_location.lat() }
-//                             //find the meeting id of start_loc and of end_loc
-//                             start_place = places.find(p => p.location && p.location.lng == start_loc.lng)
-//                             end_place = places.find(p => p.location && p.location.lat == end_loc.lat)
-//                             if (start_place && start_place.origin) {
-//                                 leg_time = new Date(userData.startTime).getTime() + leg.duration.value
-//                                 console.log('calculated with origin, leg_time (mins): ', leg_time % 60000);
-//                                 newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type = PRIVATE_MEETING ? false : true, startTime: leg_time })
-//                                 continue
-//                             }
-//                             console.log('start_place && start_place.startTime: ', start_place && start_place.startTime);
-//                             if (start_place && start_place.startTime) {
-//                                 leg_time = new Date(start_place.startTime).getTime() + leg.duration.value
-//                                 console.log('calculated with prev stop: leg_time (mins): ', leg_time % 60000);
-//                                 newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type = PRIVATE_MEETING ? false : true, startTime: leg_time })
-//                             }
-//                         } // legs for end
-//                         // setMyMeetings()
-//                         // setStartTimesToUpdate(startTimes => Array.isArray(startTimes) ? startTimes.map(m => { let newM = newStartTimes.find(newM => newM.meetingId == m.meetingId); return newM || m }) : newStartTimes)
-//                         console.log('newStartTimes: ', newStartTimes);
-//                         // openGenAlert({ text: " כבר משבצים ... " })
-//                         //! ^
-
-//                     } catch (e) { console.log("error getting start times from result ", e); }
-//                 } else {
-//                     //failed
-//                     console.log('ERROR result: ', result);
-//                     openGenAlert({ text: " אירעה שגיאה, לא ניתן כעת להשתבץ לפגישה זו " })
-//                 }
-//             }
-//         );
-//     }, [])
-
-//     let locationInfo;
-//     return (
-//         <div>
-//             <Polyline
-//                 path={state.lineCoordinates}
-//                 geodesic={false}
-//                 options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeOpacity: 1, strokeWeight: 7, }}
-//             />
-//             {places.map((place, i) => {
-//                 locationInfo = { location: place.location, ...place.markerOptions }
-//                 return <MarkerGenerator key={i} locationInfo={locationInfo} icon={place.icon || null} label={place.label || null} />
-//             })}
-//             {state && state.markerCenter && state.markerCenter.location && state.markerCenter.duration ?
-//                 <MarkerGenerator locationInfo={{ location: state.markerCenter.location }} label={state.markerCenter.duration} /> : null}
-//         </div>
-//     );
-// }
-
-// export default MyMapDirectionsRenderer;
-
