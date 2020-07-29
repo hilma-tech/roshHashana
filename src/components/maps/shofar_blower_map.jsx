@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
+
 import { SBContext } from '../../ctx/shofar_blower_context';
+import { MainContext } from '../../ctx/MainContext';
 
 import Geocode from "react-geocode";
 import _ from "lodash";
-// import MyMapDirectionsRenderer from './sb_map_directions_renderer';
-import MarkerGenerator from './marker_generator';
+
 import { dateWTimeFormatChange } from '../../fetch_and_utils';
+
 import { MyMapComponent } from './sb_map_renderer'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -16,9 +18,12 @@ const PRIVATE_MEETING = 'private meeting';
 
 const ShofarBlowerMap = (props) => {
     const { openGenAlert,
-        userData, myMeetings, meetingsReqs,
+        myMeetings, meetingsReqs,
         setAssignMeetingInfo,
         startTimes } = useContext(SBContext)
+
+    const { userInfo: userData } = useContext(MainContext)
+
 
     const [reqsLocs, setReqsLocs] = useState(null); //keep null
     const [myMLocs, setMyMLocs] = useState(null); //keep null

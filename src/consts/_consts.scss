@@ -1,0 +1,19 @@
+// const colors
+$turquoise: #16697a;
+$orange: #ffa62b;
+$grey-bg: #f6f6f6;
+
+//mixins
+@mixin input {
+    border: black solid 1px;
+    margin: auto;
+    margin-bottom: 5%;
+    width: 80%;
+    height: 3rem;
+    padding-right: 5%;
+    font-size: 1rem;
+    background-color: transparent;
+    &::placeholder {
+        font-size: 1rem;
+    }
+}

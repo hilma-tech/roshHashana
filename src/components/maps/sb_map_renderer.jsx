@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, Polyline, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
+import { SBContext } from '../../ctx/shofar_blower_context';
+import { MainContext } from '../../ctx/MainContext';
 
 import MarkerGenerator from './marker_generator';
 import SearchBoxGenerator from './search_box_generator'
-import { SBContext } from '../../ctx/shofar_blower_context';
 
 const mapOptions = {
     fullscreenControl: false,
@@ -16,98 +17,6 @@ const mapOptions = {
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
-
-
-const calculateRoute = (google, setRouteCoordinates, userData, places) => {
-    console.log('places: ', places);
-    if (!Array.isArray(places)) return
-    // console.log('waypoints: ', waypoints);
-    const travelMode = google.maps.TravelMode.WALKING
-    const waypoints = places.map(p => ({
-        location: p.location,
-        stopover: true
-    }))
-    const origin = waypoints.shift().location;
-    const destination = waypoints.length ? waypoints.pop().location : null;
-    const directionsService = new google.maps.DirectionsService();
-    directionsService.route(
-        {
-            origin: origin,
-            destination: destination,
-            travelMode: travelMode,
-            waypoints: waypoints,
-            optimizeWaypoints: false
-        },
-        (result, status) => {
-            console.log('result: ', result);
-            if (status === google.maps.DirectionsStatus.OK) {
-                //OK
-                try {
-                    const overViewCoords = result.routes[0].overview_path;
-                    setRouteCoordinates(overViewCoords)
-                    const legCnt = 0
-                    let prevI = 0
-                    let centerMarkers = []
-                    let centerL, duration
-                    let coord
-                    let centerCoordsI;
-                    for (let i in overViewCoords) {
-                        coord = overViewCoords[i]
-                        if (coord.lng() == result.routes[0].legs[legCnt].end_location.lng() && coord.lat() == result.routes[0].legs[legCnt].end_location.lat()) {
-                            // got to a coord which is a waypoint (a leg)
-                            centerCoordsI = Math.floor((i + prevI) / 2)
-                            centerL = overViewCoords[centerCoordsI]
-                            duration = result.routes[0].legs[legCnt].duration.text
-                            centerMarkers.push({ location: centerL, duration })
-                            prevI = coord;
-                            legCnt++;
-                        }
-                    }
-                    console.log('centerMarkers: ', centerMarkers);
-                } catch (e) { console.log("error getting overview path from DirectionsService() result", e) }
-                try {
-                    let leg;
-                    let start_loc, end_loc
-                    let start_place, end_place
-                    let leg_time
-                    let newStartTimes = []
-                    for (let i in result.routes[0].legs) {
-                        leg = result.routes[0].legs[i]
-                        console.log('leg: ', leg);
-                        start_loc = { lng: leg.start_location.lng(), lat: leg.start_location.lat() }
-                        end_loc = { lng: leg.end_location.lng(), lat: leg.end_location.lat() }
-                        //find the meeting id of start_loc and of end_loc
-                        start_place = places.find(p => p.location && p.location.lng == start_loc.lng)
-                        end_place = places.find(p => p.location && p.location.lat == end_loc.lat)
-                        if (start_place && start_place.origin) {
-                            leg_time = new Date(userData.startTime).getTime() + leg.duration.value
-                            console.log('calculated with origin, leg_time (mins): ', leg_time % 60000);
-                            newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type == PRIVATE_MEETING ? false : true, startTime: leg_time })
-                            continue
-                        }
-                        console.log('start_place && start_place.startTime: ', start_place && start_place.startTime);
-                        if (start_place && start_place.startTime) {
-                            leg_time = new Date(start_place.startTime).getTime() + leg.duration.value
-                            console.log('calculated with prev stop: leg_time (mins): ', leg_time % 60000);
-                            newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type == PRIVATE_MEETING ? false : true, startTime: leg_time })
-                        }
-                    } // legs for end
-                    // setMyMeetings()
-                    // setStartTimesToUpdate(startTimes => Array.isArray(startTimes) ? startTimes.map(m => { let newM = newStartTimes.find(newM => newM.meetingId == m.meetingId); return newM || m }) : newStartTimes)
-                    console.log('newStartTimes: ', newStartTimes);
-                    // openGenAlert({ text: " כבר משבצים ... " })
-                    //! ^
-
-                } catch (e) { console.log("error getting start times from result ", e); }
-            } else {
-                //failed
-                console.log('ERROR result: ', result);
-                setRouteCoordinates(" אירעה שגיאה, לא ניתן כעת להשתבץ לפגישה זו ")
-            }
-        }
-    );
-};
-
 
 
 const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
@@ -169,10 +78,12 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     const { data } = props
     if (!data) return <div>loading</div>
 
-    const { openGenAlert, userData,
+    const { openGenAlert,
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)
+
+    const { userInfo: userData } = useContext(MainContext)
 
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
