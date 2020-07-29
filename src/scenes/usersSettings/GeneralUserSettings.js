@@ -49,6 +49,7 @@ const IsolatedSettings = (props) => {
         if (!nameVal) nameVal = isolatedInfo.name;
         if (!usernameVal) usernameVal = isolatedInfo.username;
         if (usernameVal.includes('.')) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
 
         let newData = {
             "name": nameVal,
@@ -62,6 +63,9 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": newData })
         }, true);
         if (res) {
+            userInfo.name = nameVal
+            userInfo.username = usernameVal
+            setUserInfo(userInfo)
             props.history.push('/', { name: nameVal });
         }
     }

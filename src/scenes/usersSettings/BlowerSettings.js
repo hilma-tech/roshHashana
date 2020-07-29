@@ -117,6 +117,7 @@ const IsolatedSettings = (props) => {
         if (usernameVal.includes('.')) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
+        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
 
         if (!streetVal) streetVal = blowerInfo.street;
         if (!appartmentVal) appartmentVal = blowerInfo.appartment;

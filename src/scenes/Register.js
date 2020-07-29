@@ -5,7 +5,7 @@ import './Register.scss';
 import { BrowserView, isBrowser } from "react-device-detect";
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
-const SomethingMissing = "חסר שם או מספר טלפון לא תקין"
+const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
   constructor(props) {
@@ -44,7 +44,7 @@ class Register extends React.Component {
   }
 
   async handleSubmit() {
-    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0) {
+    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -58,7 +58,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0) {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0 || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) {
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
