@@ -11,7 +11,7 @@ const GeneralUserPage = (props) => {
     const [openMap, setOpenMap] = useState(false);
     const [name, setName] = useState('');
     const [shofarBlowerName, setShofarBlowerName] = useState('');
-    const [adress, setAddress] = useState('');
+    const [address, setAddress] = useState('');
     const [time, setTime] = useState('');
 
     useEffect(() => {
@@ -105,7 +105,7 @@ const GeneralUserPage = (props) => {
                         </div>}
                         <div className="meetingDetail">
                             <img className="icon" src="/icons/location.svg" />
-                            <div  >{`${adress}`}</div>
+                            <div  >{`${address}`}</div>
                         </div>
                         <div className="meetingDetail">
                             <img className="icon clock" src="/icons/blueClock.svg" />
@@ -124,7 +124,7 @@ const GeneralUserPage = (props) => {
 
                 </div>
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} publicMap />}
+            {openMap && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
         </>
