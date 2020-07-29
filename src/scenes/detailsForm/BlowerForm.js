@@ -130,11 +130,12 @@ export default class IsolatedForm extends Component {
             }
             else if (!this.state.publicPlaces[i].city || !this.state.publicPlaces[i].street || !this.state.publicPlaces[i].time) {
                 this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
-                return;
+                return false;
             }
             else continue;
         }
         this.setState({ publicPlaces });
+        return true;
     }
 
     handleKeyPress = (e) => {
@@ -147,7 +148,6 @@ export default class IsolatedForm extends Component {
 
     //save all shofar blower details including public places
     saveShofarBlowerDetails = async (e) => {
-        console.log(e, 'e')
         e.preventDefault();
         const formChilds = e.target.children;
 
@@ -173,36 +173,37 @@ export default class IsolatedForm extends Component {
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
 
-        await this.checkForMissingDataInPublicPlaces();
+        let success = await this.checkForMissingDataInPublicPlaces();
+        if (success) {
+            await Geocode.fromAddress(address).then(
+                async response => {
+                    let blowerDetails = {
+                        "can_blow_x_times": formChilds[1].value,
+                        "volunteering_start_time": startTime,
+                        "volunteering_max_time": this.state.walkTime,//endTime,
+                        "city": this.state.chosenCity,
+                        "street": formChilds[7].value,
+                        "appartment": formChilds[8].value,
+                        "publicPlaces": this.state.publicPlaces
+                    }
+                    this.setState({ errorMsg: '' });
 
-        await Geocode.fromAddress(address).then(
-            async response => {
-                let blowerDetails = {
-                    "can_blow_x_times": formChilds[1].value,
-                    "volunteering_start_time": startTime,
-                    "volunteering_max_time": this.state.walkTime,//endTime,
-                    "city": this.state.chosenCity,
-                    "street": formChilds[7].value,
-                    "appartment": formChilds[8].value,
-                    "publicPlaces": this.state.publicPlaces
+                    //update shofar blower details
+                    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
+                        headers: { Accept: "application/json", "Content-Type": "application/json" },
+                        method: "POST",
+                        body: JSON.stringify({ data: blowerDetails })
+                    }, true);
+                    if (res) {
+                        this.props.history.push('/')
+                    }
+                },
+                error => {
+                    this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
+                    return;
                 }
-                this.setState({ errorMsg: '' });
-
-                //update shofar blower details
-                let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" },
-                    method: "POST",
-                    body: JSON.stringify({ data: blowerDetails })
-                }, true);
-                if (res) {
-                    this.props.history.push('/')
-                }
-            },
-            error => {
-                this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
-                return;
-            }
-        );
+            );
+        }
     }
 
     render() {
