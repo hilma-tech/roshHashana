@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { BrowserView, isBrowser } from "react-device-detect";
+import Popup from '../../components/modals/general_popup';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import './detailsForm.scss';
 
 export default class IsolatedForm extends Component {
@@ -164,12 +165,7 @@ export default class IsolatedForm extends Component {
                     </BrowserView>
                 </div>
                 {this.state.openModal &&
-                    <div id="background">
-                        <div id="modal-container" className={isBrowser ? 'modal-resize' : ''}>
-                            <div id="modal-contnet">תודה.<br></br> הפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה. <br></br><br></br>ביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת</div>
-                            <div id="button" className="clickAble" onClick={this.goToMainPage}>הבנתי תודה</div>
-                        </div>
-                    </div>}
+                    <Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} />}
             </>
         );
     }

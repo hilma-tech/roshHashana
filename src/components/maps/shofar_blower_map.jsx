@@ -17,7 +17,6 @@ const PRIVATE_MEETING = 'private meeting';
 const ShofarBlowerMap = (props) => {
     const { openGenAlert,
         userData, myMeetings, meetingsReqs,
-        setUserData, setMyMeetings, setMeetingsReqs,
         setAssignMeetingInfo } = useContext(SBContext)
 
     const [reqsLocs, setReqsLocs] = useState(null); //keep null
@@ -52,7 +51,6 @@ const ShofarBlowerMap = (props) => {
 
 
     useEffect(() => {
-        console.log('useEffect userData ', userData);
         (async () => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
@@ -71,7 +69,6 @@ const ShofarBlowerMap = (props) => {
     }, [userData])
 
     useEffect(() => {
-        console.log('useEffect userOriginLoc ', userOriginLoc);
         if (userOriginLoc && typeof userOriginLoc === "object") {
             if (meetingsReqs && Array.isArray(meetingsReqs)) {
                 meetingsReqs.length ? setOpenReqsContent(meetingsReqs) : setReqsLocs([])
@@ -80,7 +77,6 @@ const ShofarBlowerMap = (props) => {
     }, [userOriginLoc])
 
     useEffect(() => {
-        console.log('useEffect reqsLocs ', reqsLocs);
         if (reqsLocs && Array.isArray(reqsLocs)) {
             if (myMeetings && Array.isArray(myMeetings)) {
                 myMeetings.length ? setMyMeetingsContent(myMeetings) : setMyMLocs([])
@@ -90,8 +86,6 @@ const ShofarBlowerMap = (props) => {
 
 
     useEffect(() => {
-        console.log('useEffect myMLocs ', myMLocs);
-        console.log('userData, userOriginLoc, reqsLocs, myMLocs: ', userData, userOriginLoc, reqsLocs, myMLocs);
         if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
             setAllMapData({ userData, userOriginLoc, reqsLocs, myMLocs })
             // console.log('<< myMLocs: ', myMLocs);
@@ -106,6 +100,12 @@ const ShofarBlowerMap = (props) => {
         }
     }, [myMeetings])
 
+    useEffect(() => {
+        if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
+            setOpenReqsContent(meetingsReqs)
+        }
+    }, [meetingsReqs])
+
 
 
     const setOpenReqsContent = async (reqsArr) => {
@@ -113,9 +113,9 @@ const ShofarBlowerMap = (props) => {
         //open requests meetings
         let newReqsLocs = []
         let meetReq;
-        for (let i = 0; i < reqsArr.length; i++) {
+        for (let i in reqsArr) {
             meetReq = reqsArr[i]
-            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street} ${meetReq.comments}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
+            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street} ${meetReq.comments || ""}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
             meetReq.address = address;
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
@@ -137,11 +137,12 @@ const ShofarBlowerMap = (props) => {
         }
     }
 
-    const setMyMeetingsContent = (meetings) => {
-        console.log('setMyMeetingsContent: meetings: ', meetings);
+    const setMyMeetingsContent = async (meetings) => {
         let meetingsLocs = []
-        meetings.forEach(async (myMeeting, i, arr) => {
-            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street} ${myMeeting.comments}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
+        let myMeeting;
+        for (let i in meetings) {
+            myMeeting = meetings[i]
+            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street} ${myMeeting.comments || ""}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
             myMeeting.address = address;
             let [error, response] = await to(Geocode.fromAddress(address))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
@@ -152,6 +153,7 @@ const ShofarBlowerMap = (props) => {
                     location: { lat, lng },
                     startTime: myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
+                    constMeeting: myMeeting.constMeeting,
                     markerOptions: {
                         type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                         info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false),
@@ -159,11 +161,10 @@ const ShofarBlowerMap = (props) => {
                 }
                 meetingsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
-            if (i === arr.length - 1) { //end of forEach
-                console.log('setMyMLocs: ', meetingsLocs);
+            if (i == meetings.length - 1) { //end of forEach
                 setMyMLocs(meetingsLocs);
             }
-        });
+        } //end for 
     }
 
 

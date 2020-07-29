@@ -33,16 +33,14 @@ class Register extends React.Component {
 
   handleChange(event) {
     this.setState({ alart: null })
-    if (event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." ||
-      event.target.id === "name" && event.target.value.length < 20 ||
-      event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
-
-      this.setState({ [event.target.id]: event.target.value });
-
+    if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
+    event.target.id === "name" && event.target.value.length < 20 ||
+    event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") { 
+      this.setState({ [event.target.id]: event.target.value })
     }
-
+    
   }
-
+  
   async handleSubmit() {
     if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
@@ -100,16 +98,21 @@ class Register extends React.Component {
           case "isolated with new public meeting":
             console.log("להודיע לו שהוא נרשם");
             //TODO להודיע לו שהוא נרשם 
+            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
+
 
             break;
           case "isolated with public meeting":
             console.log("להכניס אותו שוב לאיפה שהוא נירשם");
             //TODO להכניס אותו שוב לאיפה שהוא נירשם
+            this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
+
 
             break;
           case "public meeting already exists":
             console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
             //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
+            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name, cantSignUpAgain: true });
 
             break;
           default:
@@ -181,7 +184,7 @@ class Register extends React.Component {
           </div>
           : <>
             <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} />
+              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
               <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
               <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
               <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >

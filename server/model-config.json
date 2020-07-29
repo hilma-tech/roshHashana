@@ -120,5 +120,9 @@
   "city": {
     "public": true,
     "dataSource": "msql"
+  },
+  "usersArchive": {
+    "public": true,
+    "dataSource": "msql"
   }
 }

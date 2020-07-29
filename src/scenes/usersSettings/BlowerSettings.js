@@ -6,6 +6,7 @@ import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
@@ -101,8 +102,14 @@ const IsolatedSettings = (props) => {
         setValues(chosenCity, setCity);
     }
 
-    const updateIsolatedInfo = async () => {
+    const handlePhoneChange = (e) => {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+            setValues(e.target.value, setUsername);
+        }
+    }
 
+    const updateIsolatedInfo = async () => {
+        // /^[a-z\u0590-\u05fe]+$/i
         let nameVal = name;
         let usernameVal = username;
         let cityVal = city;
@@ -113,7 +120,7 @@ const IsolatedSettings = (props) => {
         let maxTimeVal = maxTime;
 
         if (!nameVal) nameVal = blowerInfo.name;
-        if (usernameVal.includes('.')) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
 
@@ -168,7 +175,7 @@ const IsolatedSettings = (props) => {
                 <div className="header">שם מלא</div>
                 <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
                 <div className="header">טלפון</div>
-                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => setValues(e.target.value, setUsername)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
             </div>
 
             <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
@@ -212,7 +219,7 @@ const IsolatedSettings = (props) => {
                 <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
 
                 <div className="max-time header">סמן את זמן ההליכה</div>
-                <input type="range" min="10" max="120" value={maxTime} className="slider" onChange={(e) => setValues(e.target.value, setMaxTime)} />
+                <Slider value={maxTime} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
                 <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
             </div>
 

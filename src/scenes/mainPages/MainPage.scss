@@ -20,6 +20,12 @@
         top: 2%;
         left: 2%;
     }
+    .back{
+        width: fit-content;
+        position: absolute;
+        right: 3%;
+        top: 3%;      
+    }
     .content-container {
         position: absolute;
         width: 100%;
@@ -44,5 +50,61 @@
             display: flex;
             flex-direction: column;
         }
+        .content{
+            white-space: pre;
+            line-height: normal;
+            margin-bottom: 1.5rem;
+        }
+    }
+    .group-orange{
+        
+        width:3.5rem;
+    }
+    .icon{
+        width:2rem;
+    }
+   
+    .meetingDetailsContainer{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .meetingDetail{
+            display: flex;
+            color:black;
+            font-size: 1.3rem;
+            line-height: normal;
+
+            .clock{
+                margin-bottom: 2rem;
+            }
+            
+            .timeNote{
+                font-size: 1rem;
+            }
+            .icon{
+                margin-left: 2rem;
+            }
+          
+        }
+
+    }
+    .cancel{
+        margin-bottom:0 !important;
+        text-align: center;
+        font-weight: bold;
+    }
+    .containerContent{
+        position: absolute;
+        top:4rem;
+        }
+    .header{
+        position: absolute;
+        display:flex;
+        top:0;
+        width:100vw;
+        justify-content: space-between;
+        padding:0 1rem 0 1rem;
+        height: 3rem;
     }
 }

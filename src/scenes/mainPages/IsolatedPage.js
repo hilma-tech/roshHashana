@@ -25,10 +25,10 @@ const IsolatedPage = (props) => {
                 console.log(res, 'res')
 
                 if (res) {
-                    const city = res.userCity ? res.userCity.name : '';
-                    const street = res.street ? res.street : '';
-                    const appartment = res.appartment ? res.appartment : '';
-                    const comments = res.comments ? res.comments : '';
+                    const city = res.userCity || '';
+                    const street = res.street || '';
+                    const appartment = res.appartment || '';
+                    const comments = res.comments || '';
 
                     setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
                     setName(res.name)
@@ -46,8 +46,15 @@ const IsolatedPage = (props) => {
     }
 
     //cancel the request and delete the user
-    const cancelRequest = () => {
-
+    const cancelRequest = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "DELETE",
+        });
+        if (res && res.res === 'SUCCESS') {
+            Auth.logout(window.location.href = window.location.origin);
+        }
+        // else  TODO: לשים הודעה שזה נכשל
     }
 
     return (

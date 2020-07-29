@@ -132,7 +132,7 @@ const MapComp = (props) => {
 
     const joinPublicMeeting = async (meetingInfo) => {
         if (props.publicMap) {
-            console.log(meetingInfo)
+            // console.log(meetingInfo)s
             props.history.push('/register', { type: 'generalUser', meetingInfo });
         } else {
             //join the isolator to the meeting

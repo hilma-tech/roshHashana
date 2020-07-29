@@ -17,6 +17,8 @@ const Map = loadable(() => import('./components/maps/map'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
+const GeneralUserPage = loadable(() => import('./scenes/mainPages/GeneralUserPage'));
+
 const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedSettigns'));
 const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));
 const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSettings'));
@@ -30,7 +32,7 @@ class App extends Component {
 
     render() {
 
-        const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
+        const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, GeneralUserPage: (props) => <GeneralUserPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
 
         return (
             <Suspense fallback={<div>Loading...</div>}>

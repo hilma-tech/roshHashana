@@ -13,10 +13,10 @@ module.exports = function (shofarBlowerPub) {
     //this function except to get data = array!!!!
     shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options) => {
 
-        for (let i = 0; i < data.length; i++) {
+        if (options.accessToken && options.accessToken.userId) {
+            for (let i = 0; i < data.length; i++) {
 
-            let meetingData = data[i];
-            if (options.accessToken && options.accessToken.userId) {
+                let meetingData = data[i];
 
                 let city;
                 if (typeof meetingData.city !== 'number') { //sometimes this function gets already cityId so we don't need to find the city id
