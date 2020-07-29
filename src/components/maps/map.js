@@ -61,12 +61,11 @@ const MapComp = (props) => {
                 }, await findLocationCoords('ירושלים'));
             }
             else {
-                let address;
-                if (mapInfo.userAddress) {
+                let address = props.meetAddress || "ירושלים";
+                if (mapInfo.userAddress && mapInfo.userAddress[0].name) {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
                     address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
                 }
-                address = props.meetAddress || 'ירושלים';
                 await findLocationCoords(address);
             }
             setIsMarkerShown(true);
@@ -132,23 +131,23 @@ const MapComp = (props) => {
 
     const joinPublicMeeting = async (meetingInfo) => {
         if (props.publicMap) {
-            // console.log(meetingInfo)s
             props.history.push('/register', { type: 'generalUser', meetingInfo });
-        } else {
-            //join the isolator to the meeting
-            let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
-                headers: { Accept: "application/json", "Content-Type": "application/json" },
-                method: 'post',
-                body: JSON.stringify({ meetingInfo })
-            }, true);
-            if (res) {
-                // if(res.status==='OK')
-                //TODO: add msg of success 
-                // else 
-                //TODO: add msg of fail
-                console.log(res, 'res')
-            }
         }
+        // else {
+        //     //join the isolator to the meeting
+        //     let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
+        //         headers: { Accept: "application/json", "Content-Type": "application/json" },
+        //         method: 'post',
+        //         body: JSON.stringify({ meetingInfo })
+        //     }, true);
+        //     if (res) {
+        //         // if(res.status==='OK')
+        //         //TODO: add msg of success 
+        //         // else 
+        //         //TODO: add msg of fail
+        //         console.log(res, 'res')
+        //     }
+        // }
 
     }
     return (
