@@ -31,3 +31,39 @@
     transform: rotate(360deg);
   }
 }
+
+.alertMsg {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+
+  position: absolute;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.2rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  padding: 0 10px;
+  height: 2.5rem;
+  line-height: 2.5rem; //must be the same as the height
+  animation: alert-msg-animation;
+  animation-duration: 5s;
+  opacity: 0;
+  z-index: 1;
+}
+@keyframes alert-msg-animation {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
