@@ -20,10 +20,12 @@ const IsolatedSettings = (props) => {
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
-                    setUserInfo(res)
-                    setValues(res, setIsolatedInfo);
-                    setValues(res.name, setName);
-                    setValues(res.username, setUsername);
+                    if (res) {
+                        setUserInfo(res)
+                        setValues(res, setIsolatedInfo);
+                        setValues(res.name, setName);
+                        setValues(res.username, setUsername);
+                    }
                 }
                 else {
                     console.log("from context", userInfo)

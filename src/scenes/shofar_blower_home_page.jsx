@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { isBrowser } from "react-device-detect";
 
 import { MainContext } from '../ctx/MainContext';
 import { SBContext } from '../ctx/shofar_blower_context';
@@ -10,12 +9,11 @@ import ShofarBlowerMap from '../components/maps/shofar_blower_map'
 
 import GeneralAlert from '../components/modals/general_alert'
 import SBAssignMeeting from '../components/sb_assign_meeting';
-import SBRouteList from '../components/sb_route_info';
-import Map from '../components/maps/map';
-import './sb.scss'
-import '../components/maps/map.scss';
-import './mainPages/MainPage.scss';
 import SBNotConfirmed from '../components/sb_not_confirmed';
+
+import './sb.scss'
+import './mainPages/MainPage.scss';
+import SBSideInfo from '../components/sb_side_info';
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -73,15 +71,13 @@ const SBHomePage = (props) => {
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBRouteList history={props.history} />}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo history={props.history} />}
 
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
                     </>
                     :
-                    <>
-                        {/* USER IS NOT CONFIRMED */}
-                        <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
-                    </>
+                    /* USER IS NOT CONFIRMED */
+                    <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
                 )
             }
 
