@@ -170,7 +170,8 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     if (!data) return <div>loading</div>
 
     const { openGenAlert, userData,
-        setStartTimes, startTimes
+        setStartTimes, startTimes,
+        setMyMeetings
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -199,29 +200,38 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
             if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) { // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
-                    console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
+                    // console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
-                    console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
+                    // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
                     constStopsAfer.push(data.myMLocs[i])
                 }
             }
             else routeStops.push(data.myMLocs[i])
         }
-        console.log('constStopsB4: ', constStopsB4);
-        console.log('constStopsAfer: ', constStopsAfer);
+        // console.log('constStopsB4: ', constStopsB4);
+        // console.log('constStopsAfer: ', constStopsAfer);
 
-        if (Array.isArray(routeStops) && routeStops.length) {
-            getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData },
+        if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
+            //get times only if there is a stop (a meeting) that doesn't have a start time
+            //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
+            let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
+            getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData },
                 (err, res) => {
                     if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
                     let newStartTimes = res.startTimes;
                     if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                    const getMyST = (mId) => {
+                        let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
+                        if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
+                        return false
+                    }
+                    getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
                     setRoutePath(res.overviewPath)
                 })
         }
         const b4StopsCb = (b4Err, b4Res) => {
-            console.log('b4Res: ', b4Res);
+            // console.log('b4Res: ', b4Res);s
             if (b4Err) {
                 console.log("err getoverviewpath for constStopsB4: ", constStopsB4, " err: ", b4Err); if (typeof b4Err === "string") { openGenAlert({ text: b4Err }); } return;
             }
@@ -235,16 +245,16 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
         }
         const afterStopsCb = (afterErr, afterRes, overviewPaths) => {
-            console.log('afterRes: ', afterRes);
+            // console.log('afterRes: ', afterRes);
             if (afterErr) {
                 console.log("err getoverviewpath for constStopsAfter: ", constStopsB4, " err: ", afterErr); if (typeof afterErr === "string") { openGenAlert({ text: afterErr }); } return;
             }
             afterRes && overviewPaths.push(afterRes.overviewPath)
             Array.isArray(overviewPaths) && setB4OrAfterRoutePath(overviewPaths)
-            console.log('setB4OrAfterRoutePath(to:): ', overviewPaths);
+            // console.log('setB4OrAfterRoutePath(to:): ', overviewPaths);
         }
 
-        console.log('constStopsB4: ', constStopsB4);
+        // console.log('constStopsB4: ', constStopsB4);
         if ((Array.isArray(constStopsB4) && constStopsB4.length) || (Array.isArray(constStopsAfer) && constStopsAfer.length)) {
             if ((Array.isArray(constStopsB4) && constStopsB4.length)) getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null, b4StopsCb)
             else b4StopsCb(null, null)
@@ -288,7 +298,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                             key={"k" + i}
                             path={routePath}
                             geodesic={false}
-                            options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 2 + Number(i*2) }}
+                            options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 2 + Number(i * 2) }}
                         />
                     ))
                     : null}

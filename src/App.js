@@ -44,13 +44,11 @@ const App = (props) => {
     }, [])
 
     const handleInternetOffline = () => {
-        console.log('handleInternetOffline: ');
         showAlert('אין חיבור לאינטרנט')
         window.addEventListener('online', handleInternetOnline);
     }
 
     const handleInternetOnline = () => {
-        console.log('handleInternetOnline: ');
         showAlert('החיבור חזר');
     }
 
@@ -65,7 +63,6 @@ const App = (props) => {
 
     const homePages = { IsolatedHome: (props) => <IsolatedMainPage {...props} />, GeneralUserPage: (props) => <GeneralUserPage {...props} />, SBHomePage: (props) => <SBProvider><SBHomePage {...props} /></SBProvider> };
 
-    console.log('alertVis: ', alertVis);
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Router>

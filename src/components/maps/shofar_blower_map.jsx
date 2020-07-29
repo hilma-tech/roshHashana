@@ -6,7 +6,7 @@ import _ from "lodash";
 // import MyMapDirectionsRenderer from './sb_map_directions_renderer';
 import MarkerGenerator from './marker_generator';
 import { dateWTimeFormatChange } from '../../fetch_and_utils';
-import { MyMapComponent } from './sb_map_directions_renderer'
+import { MyMapComponent } from './sb_map_renderer'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -17,7 +17,8 @@ const PRIVATE_MEETING = 'private meeting';
 const ShofarBlowerMap = (props) => {
     const { openGenAlert,
         userData, myMeetings, meetingsReqs,
-        setAssignMeetingInfo } = useContext(SBContext)
+        setAssignMeetingInfo,
+        startTimes } = useContext(SBContext)
 
     const [reqsLocs, setReqsLocs] = useState(null); //keep null
     const [myMLocs, setMyMLocs] = useState(null); //keep null
@@ -32,19 +33,20 @@ const ShofarBlowerMap = (props) => {
     const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
 
-    const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית"}</div>
+    const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
         {/* iName, address, comments, startTime, meetingId */}
         {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
-        {meetingData && meetingData.address && assign ? <div className="pub-address-container">{meetingData.address}</div> : (meetingData && meetingData.address ? <div className="pub-shofar-blower-name-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null)}
-        {meetingData && meetingData.startTime ? <div className="pub-address-container">{dateWTimeFormatChange(meetingData.startTime).join(" ")}</div> : null}
+        {meetingData && meetingData.address ? <div className="pub-address-container">{meetingData.address}</div> : null}
+        {/* {meetingData && meetingData.startTime ? <div className="pub-address-container">{dateWTimeFormatChange(meetingData.startTime).join(" ")}</div> : null} */}
+        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
         {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
-        <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית"}</div>
+        <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
         {meetingData && meetingData.address ? <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
-        {meetingData && meetingData.startTime ? <div className="pub-address-container">{meetingData.startTime}</div> : null}
-        {assign ? <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div> : null}
+        {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
+        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
         {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
@@ -115,12 +117,12 @@ const ShofarBlowerMap = (props) => {
         let meetReq;
         for (let i in reqsArr) {
             meetReq = reqsArr[i]
-            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street} ${meetReq.comments || ""}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
+            const address = meetReq.isPublicMeeting ? `${meetReq.city} ${meetReq.street}` : `${meetReq.city} ${meetReq.street} ${meetReq.appartment}`
             meetReq.address = address;
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
             // console.log('meetREQ: ', meetReq);
-            let [error, response] = await to(Geocode.fromAddress(address))
+            let [error, response] = await to(Geocode.fromAddress(address + ` ${meetReq.comments || ""}`))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${address}` }); continue; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
@@ -142,22 +144,20 @@ const ShofarBlowerMap = (props) => {
         let myMeeting;
         for (let i in meetings) {
             myMeeting = meetings[i]
-            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street} ${myMeeting.comments || ""}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
+            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
             myMeeting.address = address;
-            let [error, response] = await to(Geocode.fromAddress(address))
+            let [error, response] = await to(Geocode.fromAddress(address + ` ${myMeeting.comments || ""}`))
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
+            let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
             try {
                 const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
                     type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                     location: { lat, lng },
-                    startTime: myMeeting.startTime,
+                    startTime: myStartT && myStartT.startTime ? myStartT.startTime : myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
                     constMeeting: myMeeting.constMeeting,
-                    markerOptions: {
-                        type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
-                        info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false),
-                    }
+                    info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false),
                 }
                 meetingsLocs.push(newLocObj)
             } catch (e) { console.log("err setSBMapContent, ", e); }
