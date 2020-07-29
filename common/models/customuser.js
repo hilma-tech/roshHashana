@@ -181,7 +181,6 @@ module.exports = function (CustomUser) {
                                                         })
                                                     }
                                                 })
-
                                         } else {
                                             //public meeting already exists
                                             cb(null, { ok: "public meeting already exists", data: { name: res.name } })
@@ -232,7 +231,6 @@ module.exports = function (CustomUser) {
     //get the user info according to his role
     CustomUser.getUserInfo = async (options) => {
         if (options.accessToken && options.accessToken.userId) {
-            // console.log('heree')
             try {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
@@ -260,6 +258,7 @@ module.exports = function (CustomUser) {
                     return userInfo;
                 }
                 else {
+                    //general user
                     const genUserQ = ` SELECT
                         shofar_blower_pub.street,
                         shofar_blower_pub.comments,
@@ -356,25 +355,64 @@ module.exports = function (CustomUser) {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
                 if (!role) return;
+
+                let userData = await CustomUser.findOne({ where: { id: userId }, fields: { name: true, username: true } });
+                userData.userId = userId;
+                //add deleted user to the archive
+                CustomUser.app.models.usersArchive.addUserToArchive(userData);
+
                 if (role === 1) {
                     //isolated
+                    let isolatedInfo = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_meeting: true, blowerMeetingId: true } });
+                    if (isolatedInfo.public_meeting) {
+                        //check the user's public meeting and see if there are other isolated registered in the meeting
+                        //go to public meetings and check if the meeting has people in it or blower
+                        let participantsNum = await CustomUser.app.models.Isolated.count({ and: [{ 'blowerMeetingId': isolatedInfo.blowerMeetingId }, { public_meeting: 1 }] });
+                        if (participantsNum <= 1) {
+                            // if not delete the meeting
+                            await CustomUser.app.models.shofarBlowerPub.destroyById(isolatedInfo.blowerMeetingId);
+
+                        }
+                    }
                     //delete user info
-                    //if public meeting true, check if other users are registered to that public meeting 
-                    //if no users are registered ->> delete meeting
-                    //delete user
+                    await CustomUser.app.models.Isolated.destroyAll({ 'userIsolatedId': userId });
+                }
+                else if (role === 2) {//shofar blower
+                    //find all blower's public meetings
+                    let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
+                        `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
+                         from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
+                         where (blowerId = 10) 
+                         group by shofar_blower_pub.id `);
+                    if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
+                        let meetingsToUpdate = [], meetingsToDelete = [];
+
+                        //sort all public meetings according to delete or update
+                        for (let i in resPublicMeeting) {
+                            const meet = resPublicMeeting[i];
+                            if (meet.participantsNum > 0) meetingsToUpdate.push(meet.meetingId);
+                            else meetingsToDelete.push(meet.meetingId);
+                        }
+                        //change blower id in the meeting to null
+                        meetingsToUpdate.length > 0 && await CustomUser.app.models.shofarBlowerPub.updateAll({ id: { inq: meetingsToUpdate } }, { blowerId: null });
+                        //delete the meeting
+                        meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
+                    }
+
+                    await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+                    //TODO: להודיע למבודדים שבוטלה להם הפגישה
+                    await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
 
                 }
-                else if (role === 3) {
+                else {
                     //general user
-                    let deleteUserInfo = await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
-                    console.log(deleteUserInfo, 'res')
-                    let deleteUser = await CustomUser.destroyById(userId);
-
+                    await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
                 }
-                else return;
+                await CustomUser.destroyById(userId);
+                return { res: 'SUCCESS' };
 
             } catch (error) {
-                throw error;
+                return { err: 'FAILED' };
             }
 
         }

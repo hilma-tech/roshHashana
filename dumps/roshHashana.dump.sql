@@ -447,6 +447,32 @@ LOCK TABLES `isolated` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `users_archive`
+--
+
+DROP TABLE IF EXISTS `users_archive`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users_archive` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `username` varchar(512) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users_archive`
+--
+
+LOCK TABLES `users_archive` WRITE;
+/*!40000 ALTER TABLE `users_archive` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users_archive` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `keys`
 --
 

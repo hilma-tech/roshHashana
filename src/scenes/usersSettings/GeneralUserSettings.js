@@ -41,6 +41,12 @@ const IsolatedSettings = (props) => {
         setFunc(val);
     }
 
+    const handlePhoneChange = (e) => {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+            setValues(e.target.value, setUsername);
+        }
+    }
+
     const updateIsolatedInfo = async () => {
 
         let nameVal = name;
@@ -48,13 +54,14 @@ const IsolatedSettings = (props) => {
 
         if (!nameVal) nameVal = isolatedInfo.name;
         if (!usernameVal) usernameVal = isolatedInfo.username;
-        if (usernameVal.includes('.')) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
+        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
 
         let newData = {
             "name": nameVal,
             "username": usernameVal,
         }
+
         setMsgErr('');
         //update isolated details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
@@ -76,7 +83,7 @@ const IsolatedSettings = (props) => {
                 <div className="header">שם מלא</div>
                 <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
                 <div className="header">טלפון</div>
-                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => setValues(e.target.value, setUsername)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
             </div>
             <div className="err-msg">{msgErr}</div>
         </SettingsLayout>

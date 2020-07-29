@@ -46,8 +46,15 @@ const IsolatedPage = (props) => {
     }
 
     //cancel the request and delete the user
-    const cancelRequest = () => {
-
+    const cancelRequest = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "DELETE",
+        });
+        if (res && res.res === 'SUCCESS') {
+            Auth.logout(window.location.href = window.location.origin);
+        }
+        // else  TODO: לשים הודעה שזה נכשל
     }
 
     return (

@@ -102,8 +102,14 @@ const IsolatedSettings = (props) => {
         setValues(chosenCity, setCity);
     }
 
-    const updateIsolatedInfo = async () => {
+    const handlePhoneChange = (e) => {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+            setValues(e.target.value, setUsername);
+        }
+    }
 
+    const updateIsolatedInfo = async () => {
+        // /^[a-z\u0590-\u05fe]+$/i
         let nameVal = name;
         let usernameVal = username;
         let cityVal = city;
@@ -114,7 +120,7 @@ const IsolatedSettings = (props) => {
         let maxTimeVal = maxTime;
 
         if (!nameVal) nameVal = blowerInfo.name;
-        if (usernameVal.includes('.')) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
@@ -170,7 +176,7 @@ const IsolatedSettings = (props) => {
                 <div className="header">שם מלא</div>
                 <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
                 <div className="header">טלפון</div>
-                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => setValues(e.target.value, setUsername)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
             </div>
 
             <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
