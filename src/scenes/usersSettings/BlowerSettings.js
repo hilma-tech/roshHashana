@@ -11,7 +11,8 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
 import './Settings.scss';
-
+import './blowerSettings.scss';
+import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
@@ -87,7 +88,17 @@ const IsolatedSettings = (props) => {
         setFunc(val);
     }
 
+    const addPublicPlace = () => {
+        if (publicMeetings.length < 4) {
+            let publicPlaces = publicMeetings;
+            publicPlaces.push({});
+            console.log(publicPlaces)
+            setPublicMeetings([...publicPlaces]);
+            setMsgErr('');
 
+        }
+        else setMsgErr('לא ניתן להוסיף עוד תקיעות ציבוריות ');
+    }
     const changeSettingsType = (e) => {
         if (e.target.id === settingsType) {
             setSettingsType('');
@@ -101,7 +112,11 @@ const IsolatedSettings = (props) => {
         else chosenCity = city;
         setValues(chosenCity, setCity);
     }
-
+    const removePubPlace = (i) => {
+        let publicPlaces = [...publicMeetings];
+        publicPlaces.splice(i, 1);
+        setPublicMeetings(publicPlaces)
+    }
     const handlePhoneChange = (e) => {
         if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
             setValues(e.target.value, setUsername);
@@ -120,7 +135,7 @@ const IsolatedSettings = (props) => {
         let maxTimeVal = maxTime;
 
         if (!nameVal) nameVal = blowerInfo.name;
-        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] !== "0") { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
@@ -144,7 +159,8 @@ const IsolatedSettings = (props) => {
                     "appartment": appartmentVal,
                     "volunteering_max_time": maxTimeVal,
                     "can_blow_x_times": blowingTimesVal,
-                    "volunteering_start_time": startTimeVal
+                    "volunteering_start_time": startTimeVal,
+                    "publicMeetings": publicMeetings
                 }
                 setMsgErr('');
                 //update isolated details
@@ -162,6 +178,11 @@ const IsolatedSettings = (props) => {
                 return;
             }
         );
+    }
+    const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        let publicPlaces = publicMeetings;
+        publicPlaces[index][keyName] = publicPlaceVal;
+        setPublicMeetings(publicPlaces)
     }
 
     return (
@@ -230,7 +251,21 @@ const IsolatedSettings = (props) => {
             </div>
 
             <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
-
+                {publicMeetings && cities.length != 0 && publicMeetings.map((place, index) => {
+                    return <div key={index}><AddPublicPlace
+                        removePubPlace={removePubPlace}
+                        index={index}
+                        format={format}
+                        cities={cities}
+                        updatePublicPlace={updatePublicPlace}
+                        inSettings={true}
+                        info={place ? place : undefined}
+                    /><hr style={{ marginBottom: "5%" }} /></div>
+                })}
+                <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
+                    <div id="plus">+</div>
+                    <div>הוסף תקיעה במקום ציבורי</div>
+                </div>
             </div>
             <div className="err-msg">{msgErr}</div>
         </SettingsLayout>

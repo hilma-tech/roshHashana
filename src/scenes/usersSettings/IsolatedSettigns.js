@@ -83,7 +83,7 @@ const IsolatedSettings = (props) => {
         if (!nameVal) nameVal = isolatedInfo.name;
         if (!usernameVal) usernameVal = isolatedInfo.username;
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
-        if (usernameVal[0] !== 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] !== "0") { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!streetVal && !appartmentVal && !comments) {
             setMsgErr('אנא הכנס או שם רחוב ומספר בית או הערות המתארות את מקום מגוריך');
             return;

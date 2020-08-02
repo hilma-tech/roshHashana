@@ -30,10 +30,18 @@ const materialTheme = createMuiTheme({
 const AddPublicPlace = (props) => {
     const [chosenTime, setChosenTime] = useState(props.chosenTime ? props.chosenTime : null);
     const [chosenCity, setChosenCity] = useState(props.chosenCity ? props.chosenCity : '');
-
+    const [street, setStreet] = useState('');
+    const [comments, setComments] = useState('');
     useEffect(() => {
+        if (Object.keys(props.info).length !== 0) {
+            setChosenTime(props.info.start_time)
+            let city = props.cities.find(city => city.id === props.info.cityId)
+            setChosenCity(city.name)
+            setStreet(props.info.street)
+            setComments(props.info.comments)
+        }
         props.updatePublicPlace(props.index, 'time', chosenTime);
-    }, []);
+    }, [props.info]);
 
     //update chosenTime state and the publicPlaces array according to user choise
     const changeChosenTime = (time) => {
@@ -50,6 +58,7 @@ const AddPublicPlace = (props) => {
 
     //update chosenCity state and the publicPlaces array according to user choise
     const updateCity = (city) => {
+        props.updatePublicPlace(props.index, 'cityId', city.id);
         let selectedCity;
         if (city.name) selectedCity = city.name;
         else selectedCity = city;
@@ -57,7 +66,7 @@ const AddPublicPlace = (props) => {
     }
     return (
         <div id="public-place-container">
-            {props.removePubPlace && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
+            {props.removePubPlace && !props.inSettings && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
             <AutoComplete
                 optionsArr={props.cities}
@@ -69,8 +78,30 @@ const AddPublicPlace = (props) => {
                 updateText={updateCity}
                 canAddOption={true}
             />
-            <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" onChange={(e) => props.updatePublicPlace(props.index, "street", e.target.value)} />
-            <input autoComplete={'off'} id="place-description" type="text" placeholder="תיאור המקום" onChange={(e) => props.updatePublicPlace(props.index, "placeDescription", e.target.value)} />
+            <input
+                autoComplete={'off'}
+                id="street"
+                type="text"
+                placeholder="רחוב"
+                value={street}
+                onChange={
+                    (e) => {
+                        setStreet(e.target.value);
+                        props.updatePublicPlace(props.index, "street", e.target.value)
+                    }
+                } />
+            <input
+                autoComplete={'off'}
+                id="place-description"
+                type="text"
+                placeholder="תיאור המקום"
+                value={comments}
+                onChange={
+                    (e) => {
+                        setComments(e.target.value)
+                        props.updatePublicPlace(props.index, "placeDescription", e.target.value)
+                    }
+                } />
 
             {/* time input */}
             <ThemeProvider theme={materialTheme}>
@@ -86,6 +117,12 @@ const AddPublicPlace = (props) => {
                     </Fragment>
                 </MuiPickersUtilsProvider>
             </ThemeProvider>
+            {props.removePubPlace && props.inSettings &&
+                <div className="clickAble"
+                    style={{ textDecoration: "underline" }}
+                    onClick={() => props.removePubPlace(props.index)} >
+                    הסר תקיעה זו מהמסלול שלי ומהמאגר
+                </div>}
         </div>
     );
 
