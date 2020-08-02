@@ -20,11 +20,12 @@ export const SBProvider = ({ children }) => {
     const [totalTime, setTotalTime] = useState(null)
     const [totalLength, setTotalLength] = useState(null)
 
-
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
         const startTimeRoute = new Date(myMeetings[0].startTime).getTime()
+        if(!startTimeRoute) return null
         const endTimeRoute = new Date(myMeetings[myMeetings.length - 1].startTime).getTime()
+        if(!endTimeRoute) return null
         return endTimeRoute - startTimeRoute
     }
     const getTotalLength = () => {
@@ -34,7 +35,7 @@ export const SBProvider = ({ children }) => {
     useEffect(() => {
         if (startTimes) setTotalLength(getTotalLength())
         if (Array.isArray(myMeetings) && myMeetings.length) setTotalTime(getTotalTime())
-    }, [startTimes])
+    }, [startTimes, myMeetings])
 
 
     useEffect(() => {

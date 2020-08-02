@@ -6,15 +6,20 @@ import { MainContext } from '../../ctx/MainContext';
 import Geocode from "react-geocode";
 import _ from "lodash";
 
-import { dateWTimeFormatChange } from '../../fetch_and_utils';
+import { SBMapComponent } from './sb_map_renderer'
 
-import { MyMapComponent } from './sb_map_renderer'
+import { dateWTimeFormatChange } from '../../fetch_and_utils';
+import { isBrowser } from "react-device-detect";
+
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
+
+
+
 
 const ShofarBlowerMap = (props) => {
     const { openGenAlert,
@@ -181,19 +186,23 @@ const ShofarBlowerMap = (props) => {
     }
 
 
+
     return (
-        <div className="map-container" id="sb-map-container">
-            <MyMapComponent
+        <div className={isBrowser ? "sb-map-container" : "sb-map-container-mobile"} id="sb-map-container">
+
+            <SBMapComponent
                 changeCenter={setCenter}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
                 data={allMapData}
+                history={props.history}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img src='/icons/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
+
         </div>
     );
 }

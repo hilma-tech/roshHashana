@@ -1,12 +1,9 @@
-import React, { useRef, useEffect } from 'react';
-import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
+import React, { useEffect } from 'react';
 
-import _ from "lodash";
-
-const SearchBoxGenerator = (props) => {
+export const SBSearchBoxGenerator = (props) => {
 
     useEffect(() => {
-        const input = document.getElementById('search-input');
+        const input = document.getElementById('sb-search-input');
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => {
@@ -21,17 +18,17 @@ const SearchBoxGenerator = (props) => {
     }, []);
 
     return (
-        <div id="search-input-container">
+        <div className="sb-search-input-container">
             <input
-                id="search-input"
+                onBlur={(e) => { try { e.target.value = "" } catch (e) { console.log("er", e); } }}
+                id="sb-search-input"
                 type="text"
                 placeholder="חיפוש"
             />
-            <img id="search-icon" src="/icons/search.svg" />
+            <img id="sb-search-icon" src="/icons/search.svg" />
         </div>
     );
 }
-export default SearchBoxGenerator;
 
 
 

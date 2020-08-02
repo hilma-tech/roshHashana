@@ -4,10 +4,10 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext'
 
 const SBRouteList = (props) => {
-    const { myMeetings, totalTime, totalLength } = useContext(SBContext)
     const { userInfo } = useContext(MainContext)
-    if (!Array.isArray(myMeetings)) myMeetings = [];
-
+    const sbCtxVal = useContext(SBContext)
+    const { totalTime, totalLength } = sbCtxVal;
+    let myMeetings = Array.isArray(sbCtxVal.myMeetings) ? [...sbCtxVal.myMeetings] : [];
 
     const myRoute = [userInfo, ...myMeetings]
 
@@ -17,9 +17,9 @@ const SBRouteList = (props) => {
     const tt = msTT ? Math.floor(msTT / 60000) : "---" //in minutes
 
     let length = !isNaN(Number(totalLength)) ? totalLength : false
-    let lengthUnits =  `מטרים`
-    if(length && length > 1000){
-        lengthUnits =  `ק"מ`
+    let lengthUnits = `מטרים`
+    if (length && length > 1000) {
+        lengthUnits = `ק"מ`
         length = totalLength / 1000
     }
 
@@ -42,16 +42,16 @@ const SBRouteList = (props) => {
             </div>
             <div className="sb-list">
                 {myRoute.map((m, i) => {
-                    console.log('m: ', m);
                     return (
-                        <div className="meeting-in-route" >
+                        <div key={"sb-route-list-" + i} className="meeting-in-route" >
                             <div className="meeting-in-route-img-container" >
                                 <div className="meeting-in-route-img">{i}</div>
                                 {/* shofar image when i == 0  */}
                             </div>
                             <div className="meeting-in-route-info-container">
-                                <div clasName="meeting-in-route-title" >{i == 0 ? "נקודת יציאה" : (m.isPublicMeeting ? "קריאה ציבורית" : m.name)}</div>
-                                <div clasName="meeting-in-route-location" >{m.city + " " + m.street}</div>
+                                <div className="meeting-in-route-title" >{i == 0 ? "נקודת יציאה" : (m.isPublicMeeting ? "קריאה ציבורית" : m.name)}</div>
+                                <div className="meeting-in-route-location" >{m.city + " " + m.street + (!m.isPublicMeeting && m.appartment ? (" " + m.appartment) : "" )}</div>
+                                <div className="meeting-in-route-comments" >{m.comments || ""}</div>
                             </div>
                         </div>
                     );

@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, Polyline, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
+
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
 import MarkerGenerator from './marker_generator';
-import SearchBoxGenerator from './search_box_generator'
+import { SBSearchBoxGenerator } from './search_box_generator'
+
+import { CONSTS } from '../../const_messages';
+
+import { isBrowser } from "react-device-detect";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import SBAllMeetingsList from '../sb_all_meetings_list';
 
 const mapOptions = {
     fullscreenControl: false,
@@ -68,7 +76,7 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
                     if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
                     prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
                 } else {
-                    prevStartTimeVal = res.startTimes[i - 1].startTime
+                    prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
                 }
                 res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
             }
@@ -82,7 +90,7 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 }
 
 
-export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
+export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { data } = props
     if (!data) return <div>loading</div>
 
@@ -95,6 +103,9 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
+    const [genMap, setGenMap] = useState(false)
+    const [showMeetingsList, setShowMeetingsList] = useState(false)
+    const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
@@ -106,11 +117,9 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
-        const userOrigin = { location: data.userOriginLoc, icon: userLocationIcon, origin: true }
+        const userOrigin = { location: data.userOriginLoc, /* icon: userLocationIcon, */ origin: true } //! check if need userLocationIcon here
         const userStartTime = new Date(userData.startTime).getTime()
         const userEndTime = userStartTime + userData.maxRouteDuration;
-        console.log('userStartTime: ', userStartTime);
-        console.log('userEndTime: ', userEndTime);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfer = [];
@@ -139,7 +148,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 (err, res) => {
                     if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
                     let newStartTimes = res.startTimes;
-                    if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                    if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
                     const getMyST = (mId) => {
                         let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
                         if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
@@ -181,8 +190,10 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     }, [props.data])
 
-    props.data && console.log('props.data: ', props.data);
 
+    const changeMap = (e) => {
+        setGenMap(v => !v)
+    }
 
     var israelPolygon = new window.google.maps.Polygon({
         paths: israelCoords,
@@ -204,15 +215,62 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         strictBounds: false
     }
 
-    
+    props.data && console.log('props.data: ', props.data);
+    let sideListTO = null;
+    const closeSideMeetingsList = () => {
+        sideListTO && clearTimeout(sideListTO)
+        if (showMeetingsList) sideListTO = setTimeout(() => { setShowMeetingsList(false) }, 400)
+        setShowMeetingsListAni(false)
+    }
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
             defaultOptions={mapOptions}
             center={props.center}
+            onClick={closeSideMeetingsList}
+            onDrag={closeSideMeetingsList}
         >
-            <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+            {
+                genMap ?
+                    <BringAllGenMapInfo
+                    />
+                    :
+                    <BringAllSBMapInfo
+                        data={data}
+                        b4OrAfterRoutePath={b4OrAfterRoutePath}
+                        routePath={routePath}
+                    />
+            }
+            {/* user location */}
+            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
 
+            <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
+                {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>}
+                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+                    :
+                    <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
+                        <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
+                        <div className="list-switch-text">הצג מחפשים ברשימה</div>
+                    </div>}
+                {showMeetingsList ?
+                    <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
+                        <SBAllMeetingsList />
+                    </div>
+                    : null
+                }
+
+            </div>
+
+        </GoogleMap>
+    );
+}));
+
+const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => {
+
+
+    return (
+        <>
             {/* reqsLocs */
                 Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
                     return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
@@ -221,8 +279,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
                     return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
                 }) : null}
-            {/* user location */}
-            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
+
             {Array.isArray(routePath) ?
                 <Polyline
                     path={routePath}
@@ -244,6 +301,15 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                     ))
                     : null}
 
-        </GoogleMap>
+        </>
     );
-}));
+}
+
+const BringAllGenMapInfo = () => {
+    /*
+        todo: רעות אני צריכה אותך פה בשביל להביא את המידע מהמפה הכללית, אי אפשר להביא את כל ה
+        todo: Map component
+        todo: כי יש צורך *רק* בנקודות ציון יעני, אני צריכה לשמור על *כל* שאר הדברים שלי, נגיד הכפתור לעבור בין המפות
+    */
+    return <></>
+}

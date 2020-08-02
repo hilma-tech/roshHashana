@@ -39,7 +39,7 @@ const SBAssignMeeting = (props) => {
 
 
     return (
-        <div className={props.onMobile ? "sb-side-info-mobile-container" : "sb-side-info-container"} >
+        <div>
             {JSON.stringify(assignMeetingInfo)}
             <button onClick={handleAssignment} >assign</button>
             <button onClick={() => { handleAssignment("close") }} >x</button>

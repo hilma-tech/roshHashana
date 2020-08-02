@@ -10,10 +10,10 @@ import ShofarBlowerMap from '../components/maps/shofar_blower_map'
 import GeneralAlert from '../components/modals/general_alert'
 import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBNotConfirmed from '../components/sb_not_confirmed';
-
-import './sb.scss'
-import './mainPages/MainPage.scss';
 import SBSideInfo from '../components/sb_side_info';
+
+import './mainPages/MainPage.scss';
+import './sb.scss'
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -51,7 +51,7 @@ const SBHomePage = (props) => {
         }
         if (mapContent === "NO_CITY") {
             Auth.logout()
-            return;
+            // return;
         }
         else if (mapContent && typeof mapContent === "object" && mapContent.userData && mapContent.userData[0]) {
             if (!meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length)) setMeetingsReqs(mapContent.openReqs)
@@ -71,7 +71,7 @@ const SBHomePage = (props) => {
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo history={props.history} />}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
                     </>
