@@ -1,53 +1,37 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 
 import _ from "lodash";
 
 const SearchBoxGenerator = (props) => {
-    const searchBoxRef = useRef()
 
-    const handlePlacesChange = () => {
-        let places = searchBoxRef.current.getPlaces();
-        // console.log('places: ', places);
-        const bounds = new window.google.maps.LatLngBounds();
-        // console.log(bounds, '1');
-        places.forEach(place => {
-            if (place.geometry.viewport) {
-                bounds.union(place.geometry.viewport)
-            } else {
-                bounds.extend(place.geometry.location)
+    useEffect(() => {
+        const input = document.getElementById('search-input');
+        let autocomplete = new window.google.maps.places.Autocomplete(input);
+        autocomplete.setComponentRestrictions({ "country": "il" });
+        autocomplete.addListener("place_changed", () => {
+            let place = autocomplete.getPlace();
+            if (place.geometry) props.changeCenter(place.geometry.location);
+            else if (!place.geometry && place.name) {
+                //find the lat and lng of the place
+                props.findLocationCoords(place.name);
             }
-        });
-        // console.log(bounds, '2');
-
-
-        const nextMarkers = places.map(place => ({
-            position: place.geometry.location,
-        }));
-        const nextCenter = _.get(nextMarkers, '0.position', props.center);
-        props.changeCenter(nextCenter);
-        // this.SearchBoxRef.current.map.fitBounds(bounds);
-    }
-
-
+            else return;
+        })
+    }, []);
 
     return (
-        <SearchBox
-            strictBounds={true}
-            ref={searchBoxRef}
-            controlPosition={window.google.maps.ControlPosition.TOP_CENTER}
-            onPlacesChanged={handlePlacesChange}
-        >
-            <div id="search-input-container">
-                <input
-                    id="search-input"
-                    type="text"
-                    placeholder="חיפוש"
-                />
-                <img id="search-icon" src="/icons/search.svg" />
-            </div>
-        </SearchBox>
+        <div id="search-input-container">
+            <input
+                id="search-input"
+                type="text"
+                placeholder="חיפוש"
+            />
+            <img id="search-icon" src="/icons/search.svg" />
+        </div>
     );
 }
-
 export default SearchBoxGenerator;
+
+
+

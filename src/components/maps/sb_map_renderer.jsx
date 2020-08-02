@@ -13,6 +13,14 @@ const mapOptions = {
     mapTypeControl: false,
     componentRestrictions: { country: "il" }
 };
+const israelCoords = [
+    { lat: 32.863532, lng: 35.889902 },
+    { lat: 33.458826, lng: 35.881345 },
+    { lat: 33.107715, lng: 35.144508 },
+    { lat: 31.296718, lng: 34.180102 },
+    { lat: 29.486869, lng: 34.881321 },
+    { lat: 29.551662, lng: 34.984779 },
+];
 
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
@@ -175,6 +183,28 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     props.data && console.log('props.data: ', props.data);
 
+
+    var israelPolygon = new window.google.maps.Polygon({
+        paths: israelCoords,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    var bounds = new window.google.maps.LatLngBounds();
+    for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
+        for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
+            bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
+        }
+    }
+    mapOptions.restriction = {
+        latLngBounds: bounds,
+        strictBounds: false
+    }
+
+    
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
