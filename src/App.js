@@ -12,6 +12,10 @@ import ResetPassword from './modules/auth/client/components/ResetPassword';
 import SBHomePage from './scenes/shofar_blower_home_page';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
+
+import "./consts/generalStyles.scss"
+
+
 // import SimpleUserHome from "./scenes/Home";
 const Map = loadable(() => import('./components/maps/map'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));

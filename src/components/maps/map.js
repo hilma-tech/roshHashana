@@ -7,7 +7,7 @@ import Geocode from "react-geocode";
 import { dateWTimeFormatChange } from '../../fetch_and_utils';
 import _ from "lodash";
 import './map.scss';
-
+import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
     { lat: 32.863532, lng: 35.889902 },
@@ -115,7 +115,7 @@ const MapComp = (props) => {
             const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
-                const date = dateWTimeFormatChange(new Date(pub.start_time).toJSON());
+                const date = moment(pub.start_time).format("HH:mm");
                 const { lat, lng } = response.results[0].geometry.location;
                 let newLocObj = {
                     type: SHOFAR_BLOWING_PUBLIC,
@@ -124,7 +124,7 @@ const MapComp = (props) => {
                         <div className="info-window-header">תקיעה ציבורית</div>
                         <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
                         <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date[1]}</div></div>
+                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                         <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>

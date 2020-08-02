@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, Polyline, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
 
-import MarkerGenerator from './marker_generator';
-import SearchBoxGenerator from './search_box_generator'
 import { SBContext } from '../../ctx/shofar_blower_context';
+import { MainContext } from '../../ctx/MainContext';
+
+import MarkerGenerator from './marker_generator';
+import { SBSearchBoxGenerator } from './search_box_generator'
+
+import { CONSTS } from '../../const_messages';
+
+import { isBrowser } from "react-device-detect";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import SBAllMeetingsList from '../sb_all_meetings_list';
 
 const mapOptions = {
     fullscreenControl: false,
@@ -12,102 +21,18 @@ const mapOptions = {
     mapTypeControl: false,
     componentRestrictions: { country: "il" }
 };
+const israelCoords = [
+    { lat: 32.863532, lng: 35.889902 },
+    { lat: 33.458826, lng: 35.881345 },
+    { lat: 33.107715, lng: 35.144508 },
+    { lat: 31.296718, lng: 34.180102 },
+    { lat: 29.486869, lng: 34.881321 },
+    { lat: 29.551662, lng: 34.984779 },
+];
 
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
-
-
-const calculateRoute = (google, setRouteCoordinates, userData, places) => {
-    console.log('places: ', places);
-    if (!Array.isArray(places)) return
-    // console.log('waypoints: ', waypoints);
-    const travelMode = google.maps.TravelMode.WALKING
-    const waypoints = places.map(p => ({
-        location: p.location,
-        stopover: true
-    }))
-    const origin = waypoints.shift().location;
-    const destination = waypoints.length ? waypoints.pop().location : null;
-    const directionsService = new google.maps.DirectionsService();
-    directionsService.route(
-        {
-            origin: origin,
-            destination: destination,
-            travelMode: travelMode,
-            waypoints: waypoints,
-            optimizeWaypoints: false
-        },
-        (result, status) => {
-            console.log('result: ', result);
-            if (status === google.maps.DirectionsStatus.OK) {
-                //OK
-                try {
-                    const overViewCoords = result.routes[0].overview_path;
-                    setRouteCoordinates(overViewCoords)
-                    const legCnt = 0
-                    let prevI = 0
-                    let centerMarkers = []
-                    let centerL, duration
-                    let coord
-                    let centerCoordsI;
-                    for (let i in overViewCoords) {
-                        coord = overViewCoords[i]
-                        if (coord.lng() == result.routes[0].legs[legCnt].end_location.lng() && coord.lat() == result.routes[0].legs[legCnt].end_location.lat()) {
-                            // got to a coord which is a waypoint (a leg)
-                            centerCoordsI = Math.floor((i + prevI) / 2)
-                            centerL = overViewCoords[centerCoordsI]
-                            duration = result.routes[0].legs[legCnt].duration.text
-                            centerMarkers.push({ location: centerL, duration })
-                            prevI = coord;
-                            legCnt++;
-                        }
-                    }
-                    console.log('centerMarkers: ', centerMarkers);
-                } catch (e) { console.log("error getting overview path from DirectionsService() result", e) }
-                try {
-                    let leg;
-                    let start_loc, end_loc
-                    let start_place, end_place
-                    let leg_time
-                    let newStartTimes = []
-                    for (let i in result.routes[0].legs) {
-                        leg = result.routes[0].legs[i]
-                        console.log('leg: ', leg);
-                        start_loc = { lng: leg.start_location.lng(), lat: leg.start_location.lat() }
-                        end_loc = { lng: leg.end_location.lng(), lat: leg.end_location.lat() }
-                        //find the meeting id of start_loc and of end_loc
-                        start_place = places.find(p => p.location && p.location.lng == start_loc.lng)
-                        end_place = places.find(p => p.location && p.location.lat == end_loc.lat)
-                        if (start_place && start_place.origin) {
-                            leg_time = new Date(userData.startTime).getTime() + leg.duration.value
-                            console.log('calculated with origin, leg_time (mins): ', leg_time % 60000);
-                            newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type == PRIVATE_MEETING ? false : true, startTime: leg_time })
-                            continue
-                        }
-                        console.log('start_place && start_place.startTime: ', start_place && start_place.startTime);
-                        if (start_place && start_place.startTime) {
-                            leg_time = new Date(start_place.startTime).getTime() + leg.duration.value
-                            console.log('calculated with prev stop: leg_time (mins): ', leg_time % 60000);
-                            newStartTimes.push({ meetingId: end_place.meetingId, isPublicMeeting: end_place.type == PRIVATE_MEETING ? false : true, startTime: leg_time })
-                        }
-                    } // legs for end
-                    // setMyMeetings()
-                    // setStartTimesToUpdate(startTimes => Array.isArray(startTimes) ? startTimes.map(m => { let newM = newStartTimes.find(newM => newM.meetingId == m.meetingId); return newM || m }) : newStartTimes)
-                    console.log('newStartTimes: ', newStartTimes);
-                    // openGenAlert({ text: " כבר משבצים ... " })
-                    //! ^
-
-                } catch (e) { console.log("error getting start times from result ", e); }
-            } else {
-                //failed
-                console.log('ERROR result: ', result);
-                setRouteCoordinates(" אירעה שגיאה, לא ניתן כעת להשתבץ לפגישה זו ")
-            }
-        }
-    );
-};
-
 
 
 const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
@@ -151,7 +76,7 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
                     if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
                     prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
                 } else {
-                    prevStartTimeVal = res.startTimes[i - 1].startTime
+                    prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
                 }
                 res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
             }
@@ -165,17 +90,22 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 }
 
 
-export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
+export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { data } = props
     if (!data) return <div>loading</div>
 
-    const { openGenAlert, userData,
+    const { openGenAlert,
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)
 
+    const { userInfo: userData } = useContext(MainContext)
+
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
+    const [genMap, setGenMap] = useState(false)
+    const [showMeetingsList, setShowMeetingsList] = useState(false)
+    const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
@@ -187,11 +117,9 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
-        const userOrigin = { location: data.userOriginLoc, icon: userLocationIcon, origin: true }
+        const userOrigin = { location: data.userOriginLoc, /* icon: userLocationIcon, */ origin: true } //! check if need userLocationIcon here
         const userStartTime = new Date(userData.startTime).getTime()
         const userEndTime = userStartTime + userData.maxRouteDuration;
-        console.log('userStartTime: ', userStartTime);
-        console.log('userEndTime: ', userEndTime);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfer = [];
@@ -220,7 +148,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 (err, res) => {
                     if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
                     let newStartTimes = res.startTimes;
-                    if (newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                    if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
                     const getMyST = (mId) => {
                         let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
                         if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
@@ -262,16 +190,87 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
     }, [props.data])
 
-    props.data && console.log('props.data: ', props.data);
 
+    const changeMap = (e) => {
+        setGenMap(v => !v)
+    }
+
+    var israelPolygon = new window.google.maps.Polygon({
+        paths: israelCoords,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    var bounds = new window.google.maps.LatLngBounds();
+    for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
+        for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
+            bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
+        }
+    }
+    mapOptions.restriction = {
+        latLngBounds: bounds,
+        strictBounds: false
+    }
+
+    props.data && console.log('props.data: ', props.data);
+    let sideListTO = null;
+    const closeSideMeetingsList = () => {
+        sideListTO && clearTimeout(sideListTO)
+        if (showMeetingsList) sideListTO = setTimeout(() => { setShowMeetingsList(false) }, 400)
+        setShowMeetingsListAni(false)
+    }
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
             defaultOptions={mapOptions}
             center={props.center}
+            onClick={closeSideMeetingsList}
+            onDrag={closeSideMeetingsList}
         >
-            <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+            {
+                genMap ?
+                    <BringAllGenMapInfo
+                    />
+                    :
+                    <BringAllSBMapInfo
+                        data={data}
+                        b4OrAfterRoutePath={b4OrAfterRoutePath}
+                        routePath={routePath}
+                    />
+            }
+            {/* user location */}
+            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
 
+            <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
+                {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>}
+                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+                    :
+                    <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
+                        <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
+                        <div className="list-switch-text">הצג מחפשים ברשימה</div>
+                    </div>}
+                {showMeetingsList ?
+                    <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
+                        <SBAllMeetingsList />
+                    </div>
+                    : null
+                }
+
+            </div>
+
+        </GoogleMap>
+    );
+}));
+
+const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => {
+
+
+    return (
+        <>
             {/* reqsLocs */
                 Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
                     return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
@@ -280,8 +279,7 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                 Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
                     return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
                 }) : null}
-            {/* user location */}
-            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
+
             {Array.isArray(routePath) ?
                 <Polyline
                     path={routePath}
@@ -303,6 +301,15 @@ export const MyMapComponent = withScriptjs(withGoogleMap((props) => {
                     ))
                     : null}
 
-        </GoogleMap>
+        </>
     );
-}));
+}
+
+const BringAllGenMapInfo = () => {
+    /*
+        todo: רעות אני צריכה אותך פה בשביל להביא את המידע מהמפה הכללית, אי אפשר להביא את כל ה
+        todo: Map component
+        todo: כי יש צורך *רק* בנקודות ציון יעני, אני צריכה לשמור על *כל* שאר הדברים שלי, נגיד הכפתור לעבור בין המפות
+    */
+    return <></>
+}

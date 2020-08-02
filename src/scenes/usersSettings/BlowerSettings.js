@@ -11,7 +11,7 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
 import './Settings.scss';
-
+import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
@@ -87,12 +87,32 @@ const IsolatedSettings = (props) => {
         setFunc(val);
     }
 
+    const addPublicPlace = () => {
+        if (publicMeetings.length < 4) {
+            let publicPlaces = publicMeetings;
+            publicPlaces.push({});
+            console.log(publicPlaces)
+            setPublicMeetings([...publicPlaces]);
+            setMsgErr('');
 
+        }
+        else setMsgErr('לא ניתן להוסיף עוד תקיעות ציבוריות ');
+    }
     const changeSettingsType = (e) => {
         if (e.target.id === settingsType) {
             setSettingsType('');
         }
         else setSettingsType(e.target.id);
+    }
+    const changeSettingsTypeWithParameter = (newSettingsType) => {
+        if (newSettingsType === settingsType) {
+            setSettingsType('');
+        }
+        else {
+            setTimeout(() => {
+                setSettingsType(newSettingsType)
+            }, 0);
+        };
     }
 
     const updateSelectedCity = (city) => {
@@ -101,7 +121,11 @@ const IsolatedSettings = (props) => {
         else chosenCity = city;
         setValues(chosenCity, setCity);
     }
-
+    const removePubPlace = (i) => {
+        let publicPlaces = [...publicMeetings];
+        publicPlaces.splice(i, 1);
+        setPublicMeetings(publicPlaces)
+    }
     const handlePhoneChange = (e) => {
         if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
             setValues(e.target.value, setUsername);
@@ -144,7 +168,8 @@ const IsolatedSettings = (props) => {
                     "appartment": appartmentVal,
                     "volunteering_max_time": maxTimeVal,
                     "can_blow_x_times": blowingTimesVal,
-                    "volunteering_start_time": startTimeVal
+                    "volunteering_start_time": startTimeVal,
+                    "publicMeetings": publicMeetings
                 }
                 setMsgErr('');
                 //update isolated details
@@ -163,12 +188,18 @@ const IsolatedSettings = (props) => {
             }
         );
     }
+    const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        let publicPlaces = publicMeetings;
+        publicPlaces[index][keyName] = publicPlaceVal;
+        setPublicMeetings(publicPlaces)
+    }
 
     return (
         <SettingsLayout handleClose={updateIsolatedInfo}>
             <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
-                <div>פרטים אישיים</div>
-                <div>{settingsType === 'personal-info' ? '-' : '+'}</div>
+                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
+                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
+                    className="noSelect">{settingsType === 'personal-info' ? '-' : '+'}</div>
             </div>
 
             <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
@@ -180,8 +211,8 @@ const IsolatedSettings = (props) => {
             </div>
 
             <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div >הגדרות מפת התקיעות</div>
-                <div>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>הגדרות מפת התקיעות</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
             </div>
 
             <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
@@ -225,15 +256,29 @@ const IsolatedSettings = (props) => {
             </div>
 
             <div id="public-blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div >תקיעות ציבוריות</div>
-                <div>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
             </div>
 
             <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
-
+                {publicMeetings && cities.length != 0 && publicMeetings.map((place, index) => {
+                    return <div key={index}><AddPublicPlace
+                        removePubPlace={removePubPlace}
+                        index={index}
+                        format={format}
+                        cities={cities}
+                        updatePublicPlace={updatePublicPlace}
+                        inSettings={true}
+                        info={place ? place : undefined}
+                    /><hr style={{ marginBottom: "5%" }} /></div>
+                })}
+                <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
+                    <div id="plus">+</div>
+                    <div>הוסף תקיעה במקום ציבורי</div>
+                </div>
             </div>
             <div className="err-msg">{msgErr}</div>
-        </SettingsLayout>
+        </SettingsLayout >
     );
 }
 export default IsolatedSettings;

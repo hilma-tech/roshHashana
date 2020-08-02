@@ -1,4 +1,4 @@
-@import "../../consts/generalStyles";
+@import "../../consts/consts.scss";
 #settings-container {
     width: 100%;
     height: 100%;
@@ -36,4 +36,10 @@
         margin-right: 2%;
         margin-bottom: 3%;
     }
+        #public-place-container{
+        color:black !important;
+        .MuiInput-underline:after {
+           border-bottom: none;
+        }  
+}
 }
