@@ -33,7 +33,7 @@ const AddPublicPlace = (props) => {
     const [street, setStreet] = useState('');
     const [comments, setComments] = useState('');
     useEffect(() => {
-        if (Object.keys(props.info).length !== 0) {
+        if (props.info && Object.keys(props.info).length !== 0) {
             setChosenTime(props.info.start_time)
             let city = props.cities.find(city => city.id === props.info.cityId)
             setChosenCity(city.name)
