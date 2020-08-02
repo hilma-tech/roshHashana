@@ -11,7 +11,6 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
 import './Settings.scss';
-import './blowerSettings.scss';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 const materialTheme = createMuiTheme({
     overrides: {
