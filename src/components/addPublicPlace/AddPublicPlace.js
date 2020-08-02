@@ -34,11 +34,13 @@ const AddPublicPlace = (props) => {
     const [comments, setComments] = useState('');
     useEffect(() => {
         if (props.info && Object.keys(props.info).length !== 0) {
-            setChosenTime(props.info.start_time)
-            let city = props.cities.find(city => city.id === props.info.cityId)
-            setChosenCity(city.name)
-            setStreet(props.info.street)
-            setComments(props.info.comments)
+            console.log("props.info", props.info)
+            let city
+            props.info.start_time && setChosenTime(props.info.start_time)
+            if (props.info.cityId) city = props.cities.find(city => city.id === props.info.cityId)
+            city && setChosenCity(city.name)
+            props.info.street && setStreet(props.info.street)
+            props.info.comments && setComments(props.info.comments)
         }
         props.updatePublicPlace(props.index, 'time', chosenTime);
     }, [props.info]);
