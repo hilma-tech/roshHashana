@@ -104,6 +104,16 @@ const IsolatedSettings = (props) => {
         }
         else setSettingsType(e.target.id);
     }
+    const changeSettingsTypeWithParameter = (newSettingsType) => {
+        if (newSettingsType === settingsType) {
+            setSettingsType('');
+        }
+        else {
+            setTimeout(() => {
+                setSettingsType(newSettingsType)
+            }, 0);
+        };
+    }
 
     const updateSelectedCity = (city) => {
         let chosenCity;
@@ -187,8 +197,9 @@ const IsolatedSettings = (props) => {
     return (
         <SettingsLayout handleClose={updateIsolatedInfo}>
             <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
-                <div>פרטים אישיים</div>
-                <div>{settingsType === 'personal-info' ? '-' : '+'}</div>
+                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
+                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
+                    className="noSelect">{settingsType === 'personal-info' ? '-' : '+'}</div>
             </div>
 
             <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
@@ -200,8 +211,8 @@ const IsolatedSettings = (props) => {
             </div>
 
             <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div >הגדרות מפת התקיעות</div>
-                <div>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>הגדרות מפת התקיעות</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
             </div>
 
             <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
@@ -245,8 +256,8 @@ const IsolatedSettings = (props) => {
             </div>
 
             <div id="public-blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div >תקיעות ציבוריות</div>
-                <div>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות</div>
+                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
             </div>
 
             <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
@@ -267,7 +278,7 @@ const IsolatedSettings = (props) => {
                 </div>
             </div>
             <div className="err-msg">{msgErr}</div>
-        </SettingsLayout>
+        </SettingsLayout >
     );
 }
 export default IsolatedSettings;
