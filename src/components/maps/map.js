@@ -52,8 +52,7 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-
-            if (props.publicMap || props.isolated) await setPublicMapContent();
+            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
 
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -62,8 +61,8 @@ const MapComp = (props) => {
                 }, await findLocationCoords('ירושלים'));
             }
             else {
-                let address = 'ירושלים';
-                if (mapInfo.userAddress) {
+                let address = props.meetAddress || "ירושלים";
+                if (mapInfo.userAddress && mapInfo.userAddress[0].name) {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
                     address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
                 }
@@ -74,7 +73,7 @@ const MapComp = (props) => {
         })();
     }, [mapInfo])
 
-    const findLocationCoords = async (address = 'ירושלים') => {
+    const findLocationCoords = async (address) => {
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
         try {
@@ -132,29 +131,31 @@ const MapComp = (props) => {
 
     const joinPublicMeeting = async (meetingInfo) => {
         if (props.publicMap) {
-            // console.log(meetingInfo)s
             props.history.push('/register', { type: 'generalUser', meetingInfo });
-        } else {
-            //join the isolator to the meeting
-            let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
-                headers: { Accept: "application/json", "Content-Type": "application/json" },
-                method: 'post',
-                body: JSON.stringify({ meetingInfo })
-            }, true);
-            if (res) {
-                // if(res.status==='OK')
-                //TODO: add msg of success 
-                // else 
-                //TODO: add msg of fail
-                console.log(res, 'res')
-            }
         }
+        // else {
+        //     //join the isolator to the meeting
+        //     let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
+        //         headers: { Accept: "application/json", "Content-Type": "application/json" },
+        //         method: 'post',
+        //         body: JSON.stringify({ meetingInfo })
+        //     }, true);
+        //     if (res) {
+        //         // if(res.status==='OK')
+        //         //TODO: add msg of success 
+        //         // else 
+        //         //TODO: add msg of fail
+        //         console.log(res, 'res')
+        //     }
+        // }
 
     }
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
+                meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
+                blower={props.blower}
                 findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
@@ -199,7 +200,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         // anchor: new window.google.maps.Point(0, 0),
@@ -212,9 +213,9 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
-        {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} /> : null} {/* my location */}
+        {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

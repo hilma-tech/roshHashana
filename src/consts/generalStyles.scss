@@ -1,26 +1,10 @@
-//general colors
-$turquoise: #16697a;
-$orange: #ffa62b;
-$grey-bg: #f6f6f6;
+/*
+* here are css / scss that are imported in App.js (and these classes can be used anywhare)
+*/
 
 //general classes
 .clickAble {
     cursor: pointer;
-}
-
-//mixins
-@mixin input {
-    border: black solid 1px;
-    margin: auto;
-    margin-bottom: 5%;
-    width: 80%;
-    height: 3rem;
-    padding-right: 5%;
-    font-size: 1rem;
-    background-color: transparent;
-    &::placeholder {
-        font-size: 1rem;
-    }
 }
 
 //general animations

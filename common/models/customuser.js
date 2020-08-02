@@ -85,20 +85,25 @@ module.exports = function (CustomUser) {
                             CustomUser.findOne({ where: { keyId: resKey.id } }, (err, resUser) => {
                                 if (err) return cb(err, null);
                                 if (resUser) {
-                                    console.log("Login secess")
-                                    CustomUser.directLoginAs(resUser.id, resUser.role, (err, result) => {
-                                        let expires = new Date(Date.now() + 5184000000);
-                                        res.cookie('access_token', result.__data.id, { signed: true, expires });
-                                        res.cookie('klo', result.__data.klo, { signed: false, expires });
-                                        res.cookie('kl', result.__data.kl, { signed: false, expires });
-                                        // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
-                                        res.cookie('kloo', randomstring.generate(), { signed: true, expires });
-                                        res.cookie('klk', randomstring.generate(), { signed: true, expires });
-                                        res.cookie('olk', randomstring.generate(), { signed: true, expires });
-                                        CustomUser.checkStatus(result.userId, meetingId, cb)
-                                        // cb(null, { ok: true })
-                                    },
-                                        options, 5184000)
+                                    CustomUser.app.models.RoleMapping.findOne({ where: { principalId: resUser.id } }, (err, resRole) => {
+                                        if (err) console.log("Err", err);
+                                        if (resRole) {
+                                            console.log("Login secess")
+                                            CustomUser.directLoginAs(resUser.id, resRole.roleId, (err, result) => {
+                                                let expires = new Date(Date.now() + 5184000000);
+                                                res.cookie('access_token', result.__data.id, { signed: true, expires });
+                                                res.cookie('klo', result.__data.klo, { signed: false, expires });
+                                                res.cookie('kl', result.__data.kl, { signed: false, expires });
+                                                // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
+                                                res.cookie('kloo', randomstring.generate(), { signed: true, expires });
+                                                res.cookie('klk', randomstring.generate(), { signed: true, expires });
+                                                res.cookie('olk', randomstring.generate(), { signed: true, expires });
+                                                CustomUser.checkStatus(result.userId, meetingId, resRole, cb)
+                                                // cb(null, { ok: true })
+                                            },
+                                                options, 5184000)
+                                        }
+                                    })
                                 }
                             })
                         }
@@ -110,94 +115,89 @@ module.exports = function (CustomUser) {
             }
         })
     }
-    CustomUser.checkStatus = (userId, meetingId, cb) => {
+    CustomUser.checkStatus = (userId, meetingId,resRole, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
         let status
-        CustomUser.app.models.RoleMapping.findOne({ where: { principalId: userId } }, (err, resRole) => {
+        status = resRole.roleId
+        CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err) console.log("Err", err);
-            if (resRole) {
-                status = resRole.roleId
-                CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-                    if (err) console.log("Err", err);
-                    if (res) {
-                        switch (status) {
-                            case 1:
-                                if (res.cityId == null) {
-                                    cb(null, { ok: "isolator new", data: { name: res.name } })
-                                } else {
-                                    CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
-                                        if (errCity) console.log('errCity', errCity);
-                                        if (city) {
-                                            let street = res.street ? res.street : '';
-                                            let appartment = res.appartment ? res.appartment : '';
-                                            let comments = res.comments ? res.comments : '';
-                                            let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
-                                            cb(null, { ok: "isolator with data", data: { name: res.name, address } })
-                                        }
-                                    });
+            if (res) {
+                switch (status) {
+                    case 1:
+                        if (res.cityId == null) {
+                            cb(null, { ok: "isolator new", data: { name: res.name } })
+                        } else {
+                            CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
+                                if (errCity) console.log('errCity', errCity);
+                                if (city) {
+                                    let street = res.street ? res.street : '';
+                                    let appartment = res.appartment ? res.appartment : '';
+                                    let comments = res.comments ? res.comments : '';
+                                    let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
+                                    cb(null, { ok: "isolator with data", data: { name: res.name, address } })
                                 }
-                                break;
+                            });
+                        }
+                        break;
 
-                            case 2:
-                                if (res.cityId == null) {
-                                    cb(null, { ok: "blower new", data: { name: res.name } })
-                                } else cb(null, { ok: "blower with data", data: { name: res.name } })
-                                break;
+                    case 2:
+                        if (res.cityId == null) {
+                            cb(null, { ok: "blower new", data: { name: res.name } })
+                        } else cb(null, { ok: "blower with data", data: { name: res.name } })
+                        break;
 
-                            case 3:
-                                CustomUser.app.models.isolated.findOne({ where: { userIsolatedId: res.id } }, (errIsolated, resIsolated) => {
-                                    if (errIsolated) console.log("errIsolated", errIsolated);
-                                    if (!resIsolated && meetingId !== null) {
-                                        //isolated with new public meeting 
-                                        CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
-                                            if (errPM) console.log("errPM", errPM);
-                                            if (resPM) {
-                                                cb(null, { ok: "isolated with new public meeting", data: { name: res.name } })
-                                            }
-                                        });
-                                    } else if (resIsolated && resIsolated.public_meeting == 1) {
-                                        if (meetingId == null) {
-                                            shofarBlowerPub.findOne({
-                                                where: { id: resIsolated.blowerMeetingId },
-                                                include: ["blowerPublic", "meetingCity"]
-                                            },
-                                                (errPublicMeeting, resPublicMeeting) => {
-                                                    if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
-                                                    if (resPublicMeeting) {
-                                                        //isolated with public meeting
-                                                        cb(null, {
-                                                            ok: "isolated with public meeting",
-                                                            data:
-                                                            {
-                                                                name: res.name,
-                                                                meetingInfo: {
-                                                                    street: resPublicMeeting.street,
-                                                                    comments: resPublicMeeting.comments,
-                                                                    start_time: resPublicMeeting.start_time,
-                                                                    city: resPublicMeeting.meetingCity().name,
-                                                                    blowerName: resPublicMeeting.blowerPublic().name
-                                                                }
-                                                            }
-                                                        })
-                                                    }
-                                                })
-                                        } else {
-                                            //public meeting already exists
-                                            cb(null, { ok: "public meeting already exists", data: { name: res.name } })
-
-                                        }
+                    case 3:
+                        CustomUser.app.models.isolated.findOne({ where: { userIsolatedId: res.id } }, (errIsolated, resIsolated) => {
+                            if (errIsolated) console.log("errIsolated", errIsolated);
+                            if (!resIsolated && meetingId !== null) {
+                                //isolated with new public meeting 
+                                CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
+                                    if (errPM) console.log("errPM", errPM);
+                                    if (resPM) {
+                                        cb(null, { ok: "isolated with new public meeting", data: { name: res.name } })
                                     }
                                 });
+                            } else if (resIsolated && resIsolated.public_meeting == 1) {
+                                if (meetingId == null) {
+                                    shofarBlowerPub.findOne({
+                                        where: { id: resIsolated.blowerMeetingId },
+                                        include: ["blowerPublic", "meetingCity"]
+                                    },
+                                        (errPublicMeeting, resPublicMeeting) => {
+                                            if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
+                                            if (resPublicMeeting) {
+                                                //isolated with public meeting
+                                                cb(null, {
+                                                    ok: "isolated with public meeting",
+                                                    data:
+                                                    {
+                                                        name: res.name,
+                                                        meetingInfo: {
+                                                            street: resPublicMeeting.street,
+                                                            comments: resPublicMeeting.comments,
+                                                            start_time: resPublicMeeting.start_time,
+                                                            city: resPublicMeeting.meetingCity().name,
+                                                            blowerName: resPublicMeeting.blowerPublic().name
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        })
+                                } else {
+                                    //public meeting already exists
+                                    cb(null, { ok: "public meeting already exists", data: { name: res.name } })
 
-                                break;
-                            default:
-                                cb(null, { ok: "problem" })
-                                break;
-                        }
+                                }
+                            }
+                        });
+
+                        break;
+                    default:
+                        cb(null, { ok: "problem" })
+                        break;
+                }
 
 
-                    }
-                })
             }
         })
 
@@ -627,7 +627,7 @@ module.exports = function (CustomUser) {
                     formattedStartTime = new Date(meetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
                 } catch (e) { console.log("wrong time: ", meetingObj.startTime, " ", e); return cb(true) }
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
-                    `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} blowerId IS NULL`
+                    `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
                 console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)

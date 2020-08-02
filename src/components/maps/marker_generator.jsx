@@ -21,11 +21,11 @@ const MarkerGenerator = (props) => {
         if (!location || !location.lng || !location.lat) return null;
     }
 
-    const url = (type === PRIVATE_MEETING) ? props.isolated ? 'icons/single.svg' : '/icons/single-blue.svg' : props.isolated ? '/icons/group.svg' : '/icons/group-orange.svg';
+    let url = (type === PRIVATE_MEETING) ? (props.isolated || props.blower) ? '/icons/single.svg' : '/icons/single-blue.svg' : (props.isolated || props.blower) ? '/icons/group.svg' : '/icons/group-orange.svg';
 
     const icon = props.icon ? props.icon : {
         url: url,
-        scaledSize: (type === PRIVATE_MEETING) ? (props.isolated ? new window.google.maps.Size(85, 85) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(85, 85),
+        scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
         // anchor: new window.google.maps.Point(0, 0), // changes position of icon
     }
@@ -36,7 +36,7 @@ const MarkerGenerator = (props) => {
             label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
             position={props.position ? props.position : { lat: location.lat, lng: location.lng }}>
-            {!props.isolated && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
+            {!props.isolated && !props.blower && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>
     );
 }

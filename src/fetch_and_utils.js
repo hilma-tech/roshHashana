@@ -1,5 +1,5 @@
 import Auth from './modules/auth/Auth'
-
+import { CONSTS } from './const_messages'
 
 export const assignSB = async (meetingObjs, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
@@ -15,7 +15,32 @@ export const assignSB = async (meetingObjs, cb = () => { }) => {
     return
 }
 
+export const deleteUser = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "DELETE",
+    });
+    if (res && res.res === 'SUCCESS') {
+        Auth.logout(window.location.href = window.location.origin);
+        cb(false) //no error
+    }
+    else
+        cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "סליחה, הפעולה נכשלה, נא נסו שנית מאוחר יותר") //yes error
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+// ***************************** UTILS ********************************** //
 export const dateFormatChange = (date, noDay) => {
     // changes date to the format: dd/mm/yy
     date = date.substring(0, 10);

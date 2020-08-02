@@ -99,6 +99,14 @@ export default class IsolatedForm extends Component {
         );
     }
 
+    handleKeyPress = (e) => {
+        const key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+            e.preventDefault();
+            return;
+        }
+    }
+
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const street = document.getElementById('street');
@@ -120,7 +128,7 @@ export default class IsolatedForm extends Component {
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
                         <div className="msg-txt">הפרטים שלך הם:</div>
-                        <form onSubmit={this.saveIsolatedDetails}>
+                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress}>
 
                             <AutoComplete
                                 optionsArr={this.state.cities}
