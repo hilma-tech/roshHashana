@@ -23,6 +23,7 @@ var mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
+    disableDefaultUI: true
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -33,6 +34,7 @@ const MapComp = (props) => {
 
     const [allLocations, setAllLocations] = useState([]);
     const [center, setCenter] = useState({});
+    const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
 
@@ -57,7 +59,10 @@ const MapComp = (props) => {
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     let newCenter = { lat: position.coords.latitude, lng: position.coords.longitude };
-                    if (newCenter !== center) setCenter(newCenter);
+                    if (newCenter !== center) {
+                        setCenter(newCenter);
+                        setSelfLocation(newCenter);
+                    }
                 }, await findLocationCoords('ירושלים'));
             }
             else {
@@ -66,19 +71,20 @@ const MapComp = (props) => {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
                     address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
                 }
-                await findLocationCoords(address);
+                await findLocationCoords(address, true);
             }
             setIsMarkerShown(true);
 
         })();
     }, [mapInfo])
 
-    const findLocationCoords = async (address) => {
+    const findLocationCoords = async (address, isSelfLoc = false) => {
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
         try {
             const newCenter = res.results[0].geometry.location;
             if (newCenter !== center) setCenter(newCenter);
+            if (isSelfLoc) setSelfLocation(newCenter);
         } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
     }
 
@@ -153,6 +159,7 @@ const MapComp = (props) => {
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
+                selfLocation={selfLocation}
                 meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
                 blower={props.blower}
@@ -213,7 +220,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
-        {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
+        {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
