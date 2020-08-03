@@ -113,6 +113,7 @@ export default class IsolatedForm extends Component {
         });
     }
     goToMainPage = () => {
+        //TODO Shani set  this.props.history.push address
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const street = document.getElementById('street');
         const appartment = document.getElementById('appartment');

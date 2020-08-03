@@ -25,12 +25,8 @@ const IsolatedPage = (props) => {
                 console.log(res, 'res')
 
                 if (res) {
-                    const city = res.userCity || '';
-                    const street = res.street || '';
-                    const appartment = res.appartment || '';
-                    const comments = res.comments || '';
 
-                    setAddress(city + ' ' + street + ' ' + appartment + ' ' + comments);
+                    setAddress(res.address);
                     setName(res.name)
                 }
             }
@@ -66,7 +62,7 @@ const IsolatedPage = (props) => {
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
-                    <div id="address" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
+                    <div id="address-info" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה

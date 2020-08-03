@@ -21,13 +21,13 @@ const GeneralUserPage = (props) => {
                 sessionStorage.setItem("dontShowPopup", true)
             }
             if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
-                console.log("from props")
+                console.log("from props", props)
                 if (props.location.state.name) {
                     setName(props.location.state.name);
                 }
                 if (props.location.state.meetingInfo) {
                     setShofarBlowerName(props.location.state.meetingInfo.blowerName);
-                    setAddress((props.location.state.meetingInfo.city ? `${props.location.state.meetingInfo.city}, ` : ``) + `${props.location.state.meetingInfo.street}, ${props.location.state.meetingInfo.comments}`);
+                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments}`);
                     setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
                 }
             } else {
@@ -40,7 +40,7 @@ const GeneralUserPage = (props) => {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
-                        setAddress((res.meetingInfo.city ? `${res.meetingInfo.city}, ` : ``) + `${res.meetingInfo.street}, ${res.meetingInfo.comments}`);
+                        setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments}`);
                         setTime(`${moment(res.meetingInfo.start_time).format("HH:mm")}`);
                     }
                 } else {
@@ -48,7 +48,7 @@ const GeneralUserPage = (props) => {
                     setName(userInfo.name);
                     if (userInfo.meetingInfo) {
                         setShofarBlowerName(userInfo.meetingInfo.blowerName);
-                        setAddress((userInfo.meetingInfo.city ? `${userInfo.meetingInfo.city}, ` : ``) + `${userInfo.meetingInfo.street}, ${userInfo.meetingInfo.comments}`);
+                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments}`);
                         setTime(`${moment(userInfo.meetingInfo.start_time).format("HH:mm")}`);
                     }
                 }

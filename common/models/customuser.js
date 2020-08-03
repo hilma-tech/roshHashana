@@ -114,10 +114,9 @@ module.exports = function (CustomUser) {
             }
         })
     }
-
-    CustomUser.checkStatus = (userId, meetingId,resRole, cb) => {
+    CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
-        let status  = resRole.roleId
+        let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err || !res) { console.log("Err", err);} //todo: return cb(true?)
             if (res) {
@@ -133,7 +132,7 @@ module.exports = function (CustomUser) {
                             //         let appartment = res.appartment ? res.appartment : '';
                             //         let comments = res.comments ? res.comments : '';
                             //         let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
-                                    cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
+                            cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
                             //     }
                             // });
                         }
@@ -160,7 +159,7 @@ module.exports = function (CustomUser) {
                                 if (meetingId == null) {
                                     shofarBlowerPub.findOne({
                                         where: { id: resIsolated.blowerMeetingId },
-                                        include: ["blowerPublic", "meetingCity"]
+                                        include: ["blowerPublic"]
                                     },
                                         (errPublicMeeting, resPublicMeeting) => {
                                             if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
@@ -179,7 +178,7 @@ module.exports = function (CustomUser) {
                                                         //     blowerName: resPublicMeeting.blowerPublic().name
                                                         // }
                                                         meetingInfo: {
-                                                            address: res.address,
+                                                            address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
                                                             start_time: resPublicMeeting.start_time,
                                                             blowerName: resPublicMeeting.blowerPublic().name
@@ -213,20 +212,49 @@ module.exports = function (CustomUser) {
     CustomUser.getMapData = async (isPubMap = false, options) => {
 
         //get all private meetings
-        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser, `select isolatedUser.name AS "isolatedName", city.name AS "cityMeeting", isolatedUser.street "streetMeeting", isolatedUser.appartment, isolatedUser.comments, blowerUser.name AS "blowerName" FROM isolated left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId left join city on isolatedUser.cityId = city.id left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId where isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
+        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
+            `select 
+            isolatedUser.name AS "isolatedName", 
+            isolatedUser.address,
+            isolatedUser.comments,
+            blowerUser.name AS "blowerName"
+            FROM 
+            isolated 
+            left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId 
+            left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId
+            where 
+            isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
-            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser, `select blowerUser.name AS "blowerName", city.name AS "city", shofar_blower_pub.id, shofar_blower_pub.street, shofar_blower_pub.comments , shofar_blower_pub.start_time from shofar_blower_pub LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId LEFT JOIN city on city.id = shofar_blower_pub.cityId where blowerId is not null;`);
+            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
+                `select
+                blowerUser.name AS "blowerName",
+                shofar_blower_pub.id,
+                shofar_blower_pub.address,
+                shofar_blower_pub.comments ,
+                shofar_blower_pub.start_time
+                from
+                shofar_blower_pub
+                LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId 
+                where blowerId is not null;`);
             if (errPublic) throw errPublic;
 
             if (resPublic) {
                 let userAddress;
                 //get user address if it is not public map
                 if (!isPubMap) {
-                    let [err, address] = await executeMySqlQuery(CustomUser, `select city.name, CustomUser.street, CustomUser.appartment from CustomUser left join city on CustomUser.cityId = city.id where CustomUser.id = ${options.accessToken.userId};`)
+
+                    let [err, address] = await executeMySqlQuery(CustomUser,
+                        `select
+                         CustomUser.address
+                         from
+                         CustomUser
+                         where CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
-                    if (address) userAddress = address;
+                    if (address) {
+                        userAddress = address;
+                    }
                 }
                 return { userAddress, privateMeetings: resPrivate, publicMeetings: resPublic };
             }
@@ -243,7 +271,7 @@ module.exports = function (CustomUser) {
 
                 let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true } });
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
@@ -265,16 +293,14 @@ module.exports = function (CustomUser) {
                 else {
                     //general user
                     const genUserQ = ` SELECT
-                        shofar_blower_pub.street,
+                        shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
-                        CustomUser.name AS blowerName,
-                        city.name 
+                        CustomUser.name AS blowerName
                     FROM 
                         isolated
                         RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
                         INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
-                        INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
                     WHERE
                         isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
@@ -283,10 +309,9 @@ module.exports = function (CustomUser) {
                     }
                     if (resUserData) {
                         userInfo.meetingInfo = {
-                            street: resUserData[0].street,
+                            address: resUserData[0].address,
                             comments: resUserData[0].comments,
                             start_time: resUserData[0].start_time,
-                            city: resUserData[0].name,
                             blowerName: resUserData[0].blowerName
                         }
                         return userInfo; //general user
@@ -308,16 +333,11 @@ module.exports = function (CustomUser) {
                 let role = await getUserRole(userId);
                 if (!role) return;
                 let city;
-                if (data.city) {
-                    city = await CustomUser.app.models.city.findOne({ where: { name: data.city } });
-                }
                 let userData = {
                     name: data.name,
                     username: data.username,
-                    street: data.street ? data.street : null,
-                    appartment: data.appartment ? data.appartment : null,
+                    address: data.address,
                     comments: data.comments ? data.comments : null,
-                    cityId: city ? city.id : null
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
