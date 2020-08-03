@@ -1,6 +1,19 @@
 import Auth from './modules/auth/Auth'
 import { CONSTS } from './const_messages'
 
+
+export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ data: blowerDetails })
+    }, true);
+    if (res) {
+        typeof cb === 'function' && cb(false)
+    }
+}
+
+
 export const assignSB = async (meetingObjs, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
         method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingObjs })

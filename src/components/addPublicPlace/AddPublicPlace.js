@@ -5,6 +5,7 @@ import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import { ThemeProvider } from "@material-ui/styles";
+import { FormSearchBoxGenerator } from "../maps/search_box_generator";
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -28,18 +29,17 @@ const materialTheme = createMuiTheme({
 //public place form
 
 const AddPublicPlace = (props) => {
-    const [chosenTime, setChosenTime] = useState(props.chosenTime ? props.chosenTime : null);
-    const [chosenCity, setChosenCity] = useState(props.chosenCity ? props.chosenCity : '');
-    const [street, setStreet] = useState('');
+    const [chosenTime, setChosenTime] = useState(null);
+    const [address, setAddress] = useState('');
     const [comments, setComments] = useState('');
+
     useEffect(() => {
         if (props.info && Object.keys(props.info).length !== 0) {
             console.log("props.info", props.info)
             let city
             props.info.start_time && setChosenTime(props.info.start_time)
             if (props.info.cityId) city = props.cities.find(city => city.id === props.info.cityId)
-            city && setChosenCity(city.name)
-            props.info.street && setStreet(props.info.street)
+            city && setAddress(city.name)
             props.info.comments && setComments(props.info.comments)
         }
         props.updatePublicPlace(props.index, 'time', chosenTime);
@@ -55,43 +55,19 @@ const AddPublicPlace = (props) => {
     }, [chosenTime]);
 
     useEffect(() => {
-        props.updatePublicPlace(props.index, 'city', chosenCity);
-    }, [chosenCity]);
+        props.updatePublicPlace(props.index, 'address', address);
+    }, [address]);
 
-    //update chosenCity state and the publicPlaces array according to user choise
-    const updateCity = (city) => {
-        props.updatePublicPlace(props.index, 'cityId', city.id);
-        let selectedCity;
-        if (city.name) selectedCity = city.name;
-        else selectedCity = city;
-        setChosenCity(selectedCity);
+    //update chosenCity state and the publicPlaces array according to user choice
+    const updateCity = (address) => {
+        props.updatePublicPlace(props.index, 'address', address);
+        setAddress(address);
     }
     return (
         <div id="public-place-container">
             {props.removePubPlace && !props.inSettings && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
-            <AutoComplete
-                optionsArr={props.cities}
-                placeholder="עיר / יישוב"
-                canAddOption={true}
-                displyField="name"
-                inputValue={chosenCity}
-                updateSelectOption={updateCity}
-                updateText={updateCity}
-                canAddOption={true}
-            />
-            <input
-                autoComplete={'off'}
-                id="street"
-                type="text"
-                placeholder="רחוב"
-                value={street}
-                onChange={
-                    (e) => {
-                        setStreet(e.target.value);
-                        props.updatePublicPlace(props.index, "street", e.target.value)
-                    }
-                } />
+            <FormSearchBoxGenerator uId={'form-search-input-2'} second onAddressChange={updateCity} />
             <input
                 autoComplete={'off'}
                 id="place-description"

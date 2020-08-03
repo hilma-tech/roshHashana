@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export const SBSearchBoxGenerator = (props) => {
 
@@ -32,3 +32,52 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
+export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
+    const autoCompleteInput = useRef()
+
+    useEffect(() => {
+        //so we have window.google
+        if(second) init()
+        window.init = init
+        const script = document.createElement('script')
+        script.async = true;
+        script.defer = true;
+        script.id = "mapScript";
+        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}&callback=init`
+        document.head.appendChild(script);
+
+        return () => {
+            let script = document.getElementById('mapScript')
+            document.head.removeChild(script);
+        }
+        //end of: so we have window.google
+    }, []);
+
+    const init = () => {
+        const input = document.getElementById(uId);
+        console.log('input: ', input);
+        if (!input) return;
+        let autocomplete = new window.google.maps.places.Autocomplete(input);
+        autocomplete.setComponentRestrictions({ "country": "il" });
+        autocomplete.addListener("place_changed", () => { handlePlaceChange(autocomplete) })
+    }
+
+    const handlePlaceChange = (autocomplete) => {
+        let placeInfo = autocomplete.getPlace();
+        let place = placeInfo.geometry && placeInfo.formatted_address ? placeInfo.formatted_address : true
+        onAddressChange(place)
+    }
+
+    return (
+        <div className="form-search-input-container">
+            <input
+                ref={autoCompleteInput}
+                autocomplete={'off'}
+                id={uId}
+                type="text"
+                placeholder="מיקום"
+                onChange={() => { onAddressChange("NOT_A_VALID_ADDRESS") }}
+            />
+        </div>
+    );
+}

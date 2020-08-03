@@ -36,7 +36,7 @@ const format = 'HH:mm';
 
 const IsolatedSettings = (props) => {
 
-    const { cities, setCities } = useContext(MainContext);
+    const { cities, setCities, openGenAlert } = useContext(MainContext);
     const [publicMeetings, setPublicMeetings] = useState([]);
     const [settingsType, setSettingsType] = useState('');
     const [blowingTimes, setBlowingTimes] = useState('');
@@ -56,6 +56,7 @@ const IsolatedSettings = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
+                if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
                 setValues(res, setBlowerInfo);
                 setValues(res.name, setName);
                 setValues(res.userCity ? res.userCity.name : '', setCity);

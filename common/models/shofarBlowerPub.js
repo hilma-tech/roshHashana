@@ -10,8 +10,9 @@ module.exports = function (shofarBlowerPub) {
     //     "blowerId": 4
     // },]
 
-    //this function except to get data = array!!!!
+    //this function excepts to get data as an array!!!!
     shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options) => {
+        if (!Array.isArray(data)) { console.log("cannot get data in createNewPubMeeting cos not an array. data:", data); return; }
         let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {
             for (let i = 0; i < data.length; i++) {
@@ -39,8 +40,7 @@ module.exports = function (shofarBlowerPub) {
                 }
 
                 let newPubMeeting = {
-                    "cityId": city ? city.id : meetingData.city,
-                    "street": meetingData.street,
+                    "address": meetingData.address,
                     "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId

@@ -44,12 +44,10 @@ const ShofarBlowerMap = (props) => {
 
 
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
-        {/* iName, address, comments, startTime, meetingId */}
         {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container">{meetingData.address}</div> : null}
-        {/* {meetingData && meetingData.startTime ? <div className="pub-address-container">{dateWTimeFormatChange(meetingData.startTime).join(" ")}</div> : null} */}
         <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
-        {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
+        {meetingData && meetingData.comments ? <div className="pub-address-container" >{meetingData.comments}</div> : null}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
@@ -188,7 +186,7 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div className={isBrowser ? "sb-map-container" : "sb-map-container-mobile"} id="sb-map-container">
+        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
 
             <SBMapComponent
                 changeCenter={setCenter}

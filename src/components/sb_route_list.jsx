@@ -50,7 +50,7 @@ const SBRouteList = (props) => {
                             </div>
                             <div className="meeting-in-route-info-container">
                                 <div className="meeting-in-route-title" >{i == 0 ? "נקודת יציאה" : (m.isPublicMeeting ? "קריאה ציבורית" : m.name)}</div>
-                                <div className="meeting-in-route-location" >{m.city + " " + m.street + (!m.isPublicMeeting && m.appartment ? (" " + m.appartment) : "" )}</div>
+                                <div className="meeting-in-route-location" >{m.address || ""}</div>
                                 <div className="meeting-in-route-comments" >{m.comments || ""}</div>
                             </div>
                         </div>

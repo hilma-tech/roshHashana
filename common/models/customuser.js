@@ -118,7 +118,7 @@ module.exports = function (CustomUser) {
         const { shofarBlowerPub } = CustomUser.app.models;
         let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-            if (err) console.log("Err", err);
+            if (err || !res) { console.log("Err", err);} //todo: return cb(true?)
             if (res) {
                 switch (status) {
                     case 1:
@@ -159,7 +159,7 @@ module.exports = function (CustomUser) {
                                 if (meetingId == null) {
                                     shofarBlowerPub.findOne({
                                         where: { id: resIsolated.blowerMeetingId },
-                                        include: ["blowerPublic", "meetingCity"]
+                                        include: ["blowerPublic"]
                                     },
                                         (errPublicMeeting, resPublicMeeting) => {
                                             if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
@@ -178,7 +178,7 @@ module.exports = function (CustomUser) {
                                                         //     blowerName: resPublicMeeting.blowerPublic().name
                                                         // }
                                                         meetingInfo: {
-                                                            address: res.address,
+                                                            address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
                                                             start_time: resPublicMeeting.start_time,
                                                             blowerName: resPublicMeeting.blowerPublic().name
@@ -296,7 +296,7 @@ module.exports = function (CustomUser) {
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
-                        CustomUser.name AS blowerName,
+                        CustomUser.name AS blowerName
                     FROM 
                         isolated
                         RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
@@ -333,16 +333,11 @@ module.exports = function (CustomUser) {
                 let role = await getUserRole(userId);
                 if (!role) return;
                 let city;
-                if (data.city) {
-                    city = await CustomUser.app.models.city.findOne({ where: { name: data.city } });
-                }
                 let userData = {
                     name: data.name,
                     username: data.username,
-                    street: data.street ? data.street : null,
-                    appartment: data.appartment ? data.appartment : null,
+                    address: data.address,
                     comments: data.comments ? data.comments : null,
-                    cityId: city ? city.id : null
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
@@ -530,47 +525,35 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.mapInfoSB = function (options, cb) {
+    CustomUser.mapInfoSB = function (options, cb) { //! changed to use address and not street, city and appartment
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
                 return cb(true);
             }
             const { userId } = options.accessToken
-console.log("userId",userId)
-            const userDataQ = 
-            `SELECT 
-            shofar_blower.confirm, 
-            shofar_blower.can_blow_x_times, 
-            volunteering_start_time AS "startTime",
-             volunteering_max_time*60000 AS "maxRouteDuration", 
-             CustomUser.name,CustomUser.address 
-             FROM shofar_blower LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
-             WHERE CustomUser.id = ${userId}`
-console.log(userDataQ)
+
+            const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", volunteering_max_time*60000 AS "maxRouteDuration", 
+            CustomUser.name, CustomUser.address  
+            FROM shofar_blower 
+                LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
+            WHERE CustomUser.id = ${userId}`
+
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             console.log('userData: ', userData);
-            if (!userData[0] || !userData[0].address) return cb(null, "NO_address")
+            if (!userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
-            const openPriReqsQ = /* request for private meetings */
-            `SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
-            CustomUser.address, CustomUser.comments 
+            const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
+            CustomUser.address  
             FROM isolated 
-            JOIN CustomUser ON userIsolatedId  = CustomUser.id  
+                JOIN CustomUser ON userIsolatedId  = CustomUser.id 
             WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
-            /* 
-            {startTime: "2020-07-20T07:15:27.000Z",
-            city: 'צור הדסה',
-            street: 'רכסים',
-            isPublicRoute: 1,
-            signedCount: 0,
-            blowerStatus: 'req'}
-            */
+            
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", address, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", shofar_blower_pub.address, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
@@ -582,20 +565,11 @@ console.log(userDataQ)
             GROUP BY shofar_blower_pub.id ORDER BY start_time`
 
             //my PRIVATE routes
-            /* 
-            {startTime: null,
-            city: 'צור הדסה',
-            street: 'רכסים',
-            appartment: '20',
-            name: 'עדי',
-            isPublicMeeting: 1}
-            */
             const priRouteMeetsQ = `
             SELECT 
                 isolated.id AS "meetingId", 
                 isolated.meeting_time AS "startTime", 
                 CustomUser.address,
-                CustomUser.name AS "name", 
                 CustomUser.comments, 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 

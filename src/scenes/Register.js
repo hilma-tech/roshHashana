@@ -56,7 +56,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0 || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) {
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0 || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
