@@ -62,51 +62,21 @@
         "nullable": "Y"
       }
     },
-    "cityId": {
-      "type": "Number",
-      "required": false,
-      "length": 255,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "cityId",
-        "dataType": "int",
-        "dataLength": 255,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "N"
-      }
-    },
-    "street": {
+    "address": {
       "type": "String",
       "required": false,
-      "length": 50,
+      "length": 400,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "street",
-        "dataType": "varchar",
-        "dataLength": 50,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
+          "columnName": "address",
+          "dataType": "varchar",
+          "dataLength": 400,
+          "dataPrecision": null,
+          "dataScale": null,
+          "nullable": "Y"
       }
-    },
-    "appartment": {
-      "type": "String",
-      "required": false,
-      "length": 50,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "appartment",
-        "dataType": "varchar",
-        "dataLength": 50,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
-      }
-    },
+  },
     "comments": {
       "type": "String",
       "required": false,
@@ -153,11 +123,6 @@
       "model": "isolated",
       "type": "hasMany",
       "foreignKey": "userIsolatedId"
-    },
-    "userCity": {
-      "model": "city",
-      "type": "belongsTo",
-      "foreignKey": "cityId"
     },
     "blowerPublic": {
       "model": "shofarBlowerPub",

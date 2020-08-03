@@ -16,16 +16,6 @@
         }
     },
     "relations": {
-        "userCity": {
-            "model": "CustomUser",
-            "type": "hasMany",
-            "foreignKey": "cityId"
-        },
-        "meetingCity": {
-            "model": "CustomUser",
-            "type": "hasMany",
-            "foreignKey": "cityId"
-        }
     },
     "properties": {
         "id": {
