@@ -172,7 +172,7 @@ const MapComp = (props) => {
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img style={{ position: 'fixed', top: "50%", left: '50%', transform: 'translate(-50%, -50%)' }} src='/icons/loader.svg' />}
+                loadingElement={<img className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />

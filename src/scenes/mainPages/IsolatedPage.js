@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { MainContext } from '../../ctx/MainContext';
+
 import { isBrowser } from "react-device-detect";
-import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
+
+import Map from '../../components/maps/map';
+
+import { CONSTS } from '../../const_messages';
+import GeneralAlert from '../../components/modals/general_alert';
+
 import './MainPage.scss';
 
 const IsolatedPage = (props) => {
+    const { showAlert, openGenAlert } = useContext(MainContext);
     const [openMap, setOpenMap] = useState(false);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
@@ -42,15 +50,18 @@ const IsolatedPage = (props) => {
     }
 
     //cancel the request and delete the user
-    const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "DELETE",
-        });
-        if (res && res.res === 'SUCCESS') {
-            Auth.logout(window.location.href = window.location.origin);
-        }
-        // else  TODO: לשים הודעה שזה נכשל
+    const cancelRequest = () => {
+        openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
+            if (!continuE) return
+            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                method: "DELETE",
+            });
+            if (res && res.res === 'SUCCESS') {
+                Auth.logout(window.location.href = window.location.origin);
+            }
+            else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+        })
     }
 
     return (
@@ -72,6 +83,8 @@ const IsolatedPage = (props) => {
 
             </div>
             {openMap && <Map closeMap={closeOrOpenMap} isolated />}
+
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
     );
 }

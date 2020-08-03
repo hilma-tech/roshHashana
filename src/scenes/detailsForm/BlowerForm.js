@@ -14,6 +14,7 @@ import Geocode from "react-geocode";
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateSBDetails } from '../../fetch_and_utils';
+import { CONSTS } from '../../const_messages';
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -42,7 +43,7 @@ export default class IsolatedForm extends Component {
         this.state = {
             errorMsg: '',
             cities: [], // alist of all the cities
-            address: '', //the city address of the shofar blower
+            address: '', //the address of the shofar blower
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
             publicPlaces: [{}], //a list of all the public places that the shofar blower added,
@@ -62,7 +63,7 @@ export default class IsolatedForm extends Component {
                 }
             }
             else {
-                // this.props.history.push('/');
+                this.props.history.push('/');
                 return;
             }
 
@@ -115,9 +116,8 @@ export default class IsolatedForm extends Component {
         this.setState({ walkTime: newValue });
     }
 
-    handleAddressChange = (placeName) => {
-        this.setState({ address: placeName })
-        console.log('setState to address: ', placeName);
+    handleAddressChange = (address) => {
+        this.setState({ address })
     }
 
     checkForMissingDataInPublicPlaces = async () => {
@@ -149,13 +149,8 @@ export default class IsolatedForm extends Component {
     saveShofarBlowerDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
-        console.log('formChilds: ', formChilds); //!
 
         if (!formChilds[1].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
-            console.log('formChilds[1].value: ', formChilds[1].value);
-            console.log('this.state.chosenTime: ', this.state.chosenTime);
-            console.log('this.state.address: ', this.state.address);
-            console.log('this.state.address.length: ', this.state.address.length);
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
@@ -166,7 +161,7 @@ export default class IsolatedForm extends Component {
         }
         // check address
         const { address } = this.state
-        if (address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) {
+        if (address === CONSTS.NOT_A_VALID_ADDRESS || (typeof address === "boolean" && address === true)) {
             //if true, is not one from google (see handlePlaceChange:func in search_box_generator)
             this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
@@ -240,7 +235,7 @@ export default class IsolatedForm extends Component {
                         {/* address inputs */}
                         <div className="title">מה הכתובת ממנה אתה יוצא?</div>
                         <div id="comment">נא לרשום את הכתובת המלאה</div>
-                        <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1'/>
+                        <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1' />
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>

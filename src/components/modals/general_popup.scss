@@ -1,3 +1,4 @@
+@import '../../consts/_consts.scss';
 
 .popup-alert-full-window {
   //full window for background opacity
@@ -29,17 +30,8 @@
     padding: 2.5vh 10vw;
     border-radius: 10px;
 
-    // .popup-alert {
-    //with text and buttons
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: space-evenly;
-    // margin: 0 auto;
-    // width: 70vw;
-    // position: relative;
-    // height: 100%;
     #popup-text {
-      color: pink;
+      color: black;
     }
 
     .popup-buttons-container {
@@ -58,17 +50,16 @@
         }
       }
       .popup-okay {
-        background-color: palevioletred;
+        background-color: $turquoise;
         color: white;
-        border: 1px solid palevioletred;
+        border: 1px solid $turquoise;
       }
 
       .popup-cancel {
         background-color: white;
-        color: palevioletred;
-        border: 1px solid palevioletred;
+        color: $turquoise;
+        border: 1px solid $turquoise;
       }
     }
-    // }
   }
 }

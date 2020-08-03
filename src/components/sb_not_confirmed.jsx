@@ -5,20 +5,27 @@ import { isBrowser } from "react-device-detect";
 
 import Map from './maps/map';
 import '../components/maps/map.scss';
+import { useContext } from 'react';
+import { MainContext } from '../ctx/MainContext';
 
 
 
 const SBNotConfirmed = (props) => {
+    const { openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
 
 
     const closeOrOpenMap = () => {
         setOpenMap(!openMap);
     }
-    const cancelVolunteering = async () => {
-        deleteUser((error) => {
-            if (error) props.openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+    const cancelVolunteering = () => {
+        openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, (continuE) => {
+            if (!continuE) return
+            deleteUser((error) => {
+                if (error) props.openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+            })
         })
+
     }
 
 

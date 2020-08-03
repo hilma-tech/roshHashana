@@ -13,6 +13,17 @@ export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
     }
 }
 
+export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/InsertDataIsolated`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ data: isolatedDetails })
+    }, true);
+    if (res) {
+        typeof cb === "function" && cb(false)
+    } else if (err) return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err)
+}
+
 
 export const assignSB = async (meetingObjs, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
