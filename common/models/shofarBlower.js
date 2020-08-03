@@ -1,4 +1,5 @@
 'use strict';
+const to = require('../../server/common/to');
 
 module.exports = function (ShofarBlower) {
     //role = 2
@@ -47,7 +48,9 @@ module.exports = function (ShofarBlower) {
                         let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
                         //if the shofar blower added publicPlaces,
                         if (data.publicPlaces) {
-                            let resPublicMeetings = await ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options);
+                            let [resPublicMeetings, errPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options));
+                            if (resPublicMeetings) console.log("resPublicMeetings", resPublicMeetings)
+                            if (errPublicMeetings) console.log("errPublicMeetings", errPublicMeetings)
                         }
                         return { ok: true };
                     } else {
