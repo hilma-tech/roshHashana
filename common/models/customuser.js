@@ -332,7 +332,6 @@ module.exports = function (CustomUser) {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
                 if (!role) return;
-                let city;
                 let userData = {
                     name: data.name,
                     username: data.username,
