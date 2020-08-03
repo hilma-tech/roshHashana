@@ -159,7 +159,7 @@ module.exports = function (CustomUser) {
                                 if (meetingId == null) {
                                     shofarBlowerPub.findOne({
                                         where: { id: resIsolated.blowerMeetingId },
-                                        include: ["blowerPublic", "meetingCity"]
+                                        include: ["blowerPublic"]
                                     },
                                         (errPublicMeeting, resPublicMeeting) => {
                                             if (errPublicMeeting) console.log("errPublicMeeting", errPublicMeeting);
@@ -178,7 +178,7 @@ module.exports = function (CustomUser) {
                                                         //     blowerName: resPublicMeeting.blowerPublic().name
                                                         // }
                                                         meetingInfo: {
-                                                            address: res.address,
+                                                            address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
                                                             start_time: resPublicMeeting.start_time,
                                                             blowerName: resPublicMeeting.blowerPublic().name
@@ -268,7 +268,7 @@ module.exports = function (CustomUser) {
 
                 let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId },fields: { username: true, name: true, address:true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true } });
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
@@ -293,7 +293,7 @@ module.exports = function (CustomUser) {
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
-                        CustomUser.name AS blowerName,
+                        CustomUser.name AS blowerName
                     FROM 
                         isolated
                         RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
