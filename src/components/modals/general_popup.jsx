@@ -3,8 +3,8 @@ import React from 'react'
 import './general_popup.scss'
 
 
-const GeneralAlert = ({ text, okayText, cancelText, closeSelf, popupCb: cb }) => {
-
+const GeneralPopup = ({ text, okayText, cancelText, closeSelf, popupCb: cb }) => {
+    
     return (
         <div className="popup-alert-full-window" >
             <div className="popup-alert-container">
@@ -18,4 +18,4 @@ const GeneralAlert = ({ text, okayText, cancelText, closeSelf, popupCb: cb }) =>
     )
 }
 
-export default GeneralAlert;
+export default GeneralPopup;
