@@ -67,10 +67,11 @@ const MapComp = (props) => {
             }
             else {
                 let address = props.meetAddress || "ירושלים";
-                if (mapInfo.userAddress && mapInfo.userAddress[0].name) {
+                if (mapInfo.userAddress && mapInfo.userAddress[0].address) {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
-                    address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
+                    address = mapInfo.userAddress[0].address + ' ' + comments;
                 }
+
                 await findLocationCoords(address, true);
             }
             setIsMarkerShown(true);

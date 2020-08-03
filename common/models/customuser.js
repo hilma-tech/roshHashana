@@ -244,14 +244,17 @@ module.exports = function (CustomUser) {
                 let userAddress;
                 //get user address if it is not public map
                 if (!isPubMap) {
+                 
                     let [err, address] = await executeMySqlQuery(CustomUser,
                         `select
-                         CustomUser.address,
+                         CustomUser.address
                          from
                          CustomUser
                          where CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
-                    if (address) userAddress = address;
+                    if (address){
+                        userAddress = address;
+                    }
                 }
                 return { userAddress, privateMeetings: resPrivate, publicMeetings: resPublic };
             }
