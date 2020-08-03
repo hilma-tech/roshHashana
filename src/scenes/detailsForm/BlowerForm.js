@@ -89,7 +89,6 @@ export default class IsolatedForm extends Component {
     //update the public meeting that the shofar blower added
     updatePublicPlace = (index, keyName, publicPlaceVal) => {
         let publicPlaces = this.state.publicPlaces;
-
         publicPlaces[index][keyName] = publicPlaceVal;
         this.setState({ publicPlaces });
     }
@@ -118,21 +117,23 @@ export default class IsolatedForm extends Component {
 
     handleAddressChange = (placeName) => {
         this.setState({ address: placeName })
+        console.log('setState to address: ', placeName);
     }
 
     checkForMissingDataInPublicPlaces = async () => {
         let publicPlaces = this.state.publicPlaces;
-        for (let i = 0; i < this.state.publicPlaces.length; i++) {
-            if (!this.state.publicPlaces[i].city && !this.state.publicPlaces[i].street && !this.state.publicPlaces[i].time) {
+        let updateArrInState = false;
+        for (let i in publicPlaces) {
+            if (!publicPlaces[i].address && !publicPlaces[i].time) {
+                updateArrInState = true;
                 publicPlaces.splice(i, 1);
             }
-            else if (!this.state.publicPlaces[i].city || !this.state.publicPlaces[i].street || !this.state.publicPlaces[i].time) {
+            else if (!publicPlaces[i].address || !publicPlaces[i].time) {
                 this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
                 return false;
             }
-            else continue;
         }
-        this.setState({ publicPlaces });
+        updateArrInState && this.setState({ publicPlaces });
         return true;
     }
 
@@ -151,6 +152,10 @@ export default class IsolatedForm extends Component {
         console.log('formChilds: ', formChilds); //!
 
         if (!formChilds[1].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
+            console.log('formChilds[1].value: ', formChilds[1].value);
+            console.log('this.state.chosenTime: ', this.state.chosenTime);
+            console.log('this.state.address: ', this.state.address);
+            console.log('this.state.address.length: ', this.state.address.length);
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
@@ -161,9 +166,10 @@ export default class IsolatedForm extends Component {
         }
         // check address
         const { address } = this.state
-        if (typeof address === "boolean" && address === true) {
+        if (address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) {
             //if true, is not one from google (see handlePlaceChange:func in search_box_generator)
             this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
+            return;
         }
 
         let startTime = new Date(this.state.chosenTime);
@@ -186,6 +192,8 @@ export default class IsolatedForm extends Component {
         updateSBDetails(blowerDetails, (error) => {
             if (!error) {
                 this.props.history.push('/')
+            } else {
+                this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
             }
         })
     }
@@ -232,7 +240,7 @@ export default class IsolatedForm extends Component {
                         {/* address inputs */}
                         <div className="title">מה הכתובת ממנה אתה יוצא?</div>
                         <div id="comment">נא לרשום את הכתובת המלאה</div>
-                        <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} />
+                        <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1'/>
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>
@@ -255,7 +263,6 @@ export default class IsolatedForm extends Component {
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
-                                        cities={this.state.cities}
                                         updatePublicPlace={this.updatePublicPlace}
                                     />
                                 })}

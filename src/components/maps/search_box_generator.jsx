@@ -32,18 +32,20 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange }) => {
+export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
     const autoCompleteInput = useRef()
 
     useEffect(() => {
         //so we have window.google
-        window.init = initHandler
+        if(second) init()
+        window.init = init
         const script = document.createElement('script')
         script.async = true;
         script.defer = true;
         script.id = "mapScript";
         script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}&callback=init`
         document.head.appendChild(script);
+
         return () => {
             let script = document.getElementById('mapScript')
             document.head.removeChild(script);
@@ -51,9 +53,10 @@ export const FormSearchBoxGenerator = ({ onAddressChange }) => {
         //end of: so we have window.google
     }, []);
 
-    const initHandler = () => {
-        const input = document.getElementById('form-search-input');
-        // if (!input) return;
+    const init = () => {
+        const input = document.getElementById(uId);
+        console.log('input: ', input);
+        if (!input) return;
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => { handlePlaceChange(autocomplete) })
@@ -66,12 +69,14 @@ export const FormSearchBoxGenerator = ({ onAddressChange }) => {
     }
 
     return (
-        <div className="sb-search-input-container">
+        <div className="form-search-input-container">
             <input
                 ref={autoCompleteInput}
-                id="form-search-input"
+                autocomplete={'off'}
+                id={uId}
                 type="text"
                 placeholder="מיקום"
+                onChange={() => { onAddressChange("NOT_A_VALID_ADDRESS") }}
             />
         </div>
     );

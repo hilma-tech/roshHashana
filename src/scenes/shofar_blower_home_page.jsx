@@ -49,7 +49,7 @@ const SBHomePage = (props) => {
             error && openGenAlert({ text: error })
             console.log("error getting sb map content ", err);
         }
-        if (mapContent === "NO_CITY") {
+        if (mapContent === "NO_ADDRESS") {
             Auth.logout()
             // return;
         }

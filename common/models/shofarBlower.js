@@ -2,12 +2,12 @@
 const to = require('../../server/common/to');
 
 module.exports = function (ShofarBlower) {
-    //role = 2
+    const SHOFAR_BLOWER_ROLE = 2
 
     // {
-    // "can_blow_x_times":1,
-    //             "volunteering_start_time":1594563291554,
-    //             "volunteering_max_time":1594563291554,
+    //         "can_blow_x_times":1,
+    //         "volunteering_start_time":1594563291554,
+    //         "volunteering_max_time":1594563291554,
     //         "city" : "חיפה",
     //         "street": "פרויד",
     //         "appartment": "23",
@@ -16,17 +16,12 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
         if (options.accessToken && options.accessToken.userId) {
             try {
+                console.log('data: ', data);
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
                 if (!blowerInfo) {
-                    let city;
-                    //check if the city is exist in city table
-                    city = await ShofarBlower.app.models.City.findOne({ where: { "name": data.city } });
-                    //the city doesnt exist-> create the city
-                    if (!city || !city.id) {
-                        city = await ShofarBlower.app.models.City.addNewCity(data.city, options);
-                    }
-
-
+                    if (!data.address || !data.address.length) return "כתובת אינה תקינה"
+                    if(data.address === "NOT_A_VALID_ADDRESS" || || (typeof address === "boolean" && address === true)) return 'נא לבחור מיקום מהרשימה הנפתחת'
+                    data.address = data.address.substring(0, 398) // shouldn't be more than 400 
                     let objToBlower = {
                         "userBlowerId": options.accessToken.userId,
                         "can_blow_x_times": data.can_blow_x_times,
@@ -34,16 +29,14 @@ module.exports = function (ShofarBlower) {
                         "volunteering_max_time": data.volunteering_max_time
                     },
                         objToCU = {
-                            "cityId": city.id,
-                            "street": data.street,
-                            "appartment": data.appartment,
+                            "address": data.address,
                             "comments": null
                         };
 
 
 
                     let resRole = await ShofarBlower.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
-                    if (resRole.roleId === 2) {
+                    if (resRole.roleId === SHOFAR_BLOWER_ROLE) {
                         let resBlower = await ShofarBlower.create(objToBlower)
                         let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
                         //if the shofar blower added publicPlaces,
@@ -57,9 +50,8 @@ module.exports = function (ShofarBlower) {
                         return { ok: false, err: "No permissions" };
                     }
                 }
-
             } catch (error) {
-                console.log("Can`t do create new isolated", error);
+                console.log("Can`t create new isolated", error);
                 throw error;
             }
         }

@@ -505,7 +505,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.mapInfoSB = function (options, cb) {
+    CustomUser.mapInfoSB = function (options, cb) { //! changed to use address and not street, city and appartment
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
@@ -514,35 +514,26 @@ module.exports = function (CustomUser) {
             const { userId } = options.accessToken
 
             const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", volunteering_max_time*60000 AS "maxRouteDuration", 
-            CustomUser.name, city.name AS "city", CustomUser.street, CustomUser.appartment 
+            CustomUser.name, CustomUser.address  
             FROM shofar_blower 
                 LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
-                LEFT JOIN city ON CustomUser.cityId = city.id 
             WHERE CustomUser.id = ${userId}`
 
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
             console.log('userData: ', userData);
-            if (!userData[0] || !userData[0].city) return cb(null, "NO_CITY")
+            if (!userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
-            city.name AS "city", CustomUser.street, CustomUser.appartment, CustomUser.comments 
+            CustomUser.address  
             FROM isolated 
-            JOIN CustomUser ON userIsolatedId  = CustomUser.id 
-            JOIN city on city.id = CustomUser.cityId 
+                JOIN CustomUser ON userIsolatedId  = CustomUser.id 
             WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
-            /* 
-            {startTime: "2020-07-20T07:15:27.000Z",
-            city: 'צור הדסה',
-            street: 'רכסים',
-            isPublicRoute: 1,
-            signedCount: 0,
-            blowerStatus: 'req'}
-            */
+            
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", city.name city, street, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", shofar_blower_pub.address, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
@@ -550,32 +541,19 @@ module.exports = function (CustomUser) {
             true AS isPublicMeeting 
             FROM isolated 
                 RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
-                JOIN city ON city.id = shofar_blower_pub.cityId
             WHERE (blowerId IS NULL OR blowerId = ${userId}) 
             GROUP BY shofar_blower_pub.id ORDER BY start_time`
 
             //my PRIVATE routes
-            /* 
-            {startTime: null,
-            city: 'צור הדסה',
-            street: 'רכסים',
-            appartment: '20',
-            name: 'עדי',
-            isPublicMeeting: 1}
-            */
             const priRouteMeetsQ = `
             SELECT 
                 isolated.id AS "meetingId", 
                 isolated.meeting_time AS "startTime", 
-                city.name AS "city", 
-                CustomUser.street,
-                CustomUser.appartment, 
-                CustomUser.name AS "name", 
+                CustomUser.address,
                 CustomUser.comments, 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 
                 LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
-                LEFT JOIN city ON city.id = CustomUser.cityId 
             WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
 
             let [priReqErr, priReqRes] = await executeMySqlQuery(CustomUser, openPriReqsQ);
