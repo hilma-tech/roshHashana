@@ -115,12 +115,12 @@ module.exports = function (CustomUser) {
             }
         })
     }
-    CustomUser.checkStatus = (userId, meetingId,resRole, cb) => {
+    CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
         let status
         status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-            if (err) console.log("Err", err);
+            if (err || !res) { console.log("Err", err);} //todo: return cb(true?)
             if (res) {
                 switch (status) {
                     case 1:
