@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import Auth from '../../modules/auth/Auth';
-import { MainContext } from '../../ctx/MainContext';
 import Geocode from "react-geocode";
 import './Settings.scss';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
+import { MainContext } from '../../ctx/MainContext';
+import GeneralAlert from '../../components/modals/general_alert';
 
 const IsolatedSettings = (props) => {
+    const { openGenAlert, showAlert } = useContext(MainContext);
 
     const [openBlowingSet, setOpenBlowingSet] = useState(false);
     const [openPersInfo, setOpenPersInfo] = useState(false);
@@ -16,6 +18,7 @@ const IsolatedSettings = (props) => {
     const [msgErr, setMsgErr] = useState('');
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
+    const [locationMsgErr, setLocationMsgErr] = useState('');
 
 
     useEffect(() => {
@@ -49,7 +52,10 @@ const IsolatedSettings = (props) => {
             setValues(e.target.value, setUsername);
         }
     }
-
+    const handleAddressChange = (placeName) => {
+        setAddress(placeName)
+        console.log('setState to address: ', placeName);
+    }
     const updateIsolatedInfo = async () => {
 
         let nameVal = name;
@@ -61,7 +67,10 @@ const IsolatedSettings = (props) => {
         if (!usernameVal) usernameVal = isolatedInfo.username;
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
         if (usernameVal[0] !== "0") { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
-
+        if (address === "NOT_A_VALID_ADDRESS") {
+            openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
+            setLocationMsgErr('הכתובת שהזנת אינה תקינה'); return;
+        }
 
 
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
@@ -95,49 +104,55 @@ const IsolatedSettings = (props) => {
     }
 
     return (
-        <SettingsLayout handleClose={updateIsolatedInfo}>
-            <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
-                <div>פרטים אישיים</div>
-                <div>{openPersInfo ? '-' : '+'}</div>
-            </div>
-
-            <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
-                <div className="header">שם מלא</div>
-                <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
-                <div className="header">טלפון</div>
-                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
-            </div>
-
-            <div id="blowing-set-btn" className="clickAble" onClick={() => setOpenBlowingSet(!openBlowingSet)}>
-                <div >הגדרות לתקיעה בשופר</div>
-                <div>{openPersInfo ? '-' : '+'}</div>
-            </div>
-
-            <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
-                <div className="header">כתובת</div>
-                <input id="address" type="text" placeholder="כתובת" value={address} onChange={(e) => setValues(e.target.value, setAddress)} />
-
-                <div className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
-                <div className="checkbox-container ">
-                    <div className="header">בפתח הבית</div>
-                    <input className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? false : true} />
+        <>
+            <SettingsLayout handleClose={updateIsolatedInfo}>
+                <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
+                    <div>פרטים אישיים</div>
+                    <div>{openPersInfo ? '-' : '+'}</div>
                 </div>
 
-                <div className="checkbox-container ">
-                    <div className="header">בחלון או במרפסת הפונה לרחוב</div>
-                    <input id="public-meeting" className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? true : false} />
+                <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
+                    <div className="header">שם מלא</div>
+                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
+                    <div className="header">טלפון</div>
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                 </div>
 
-                <div className="header">הערות ותיאור הכתובת</div>
-                <input autoComplete={'off'} id="comments" type="text" placeholder={comments} value={comments} onChange={(e) => setValues(e.target.value, setComments)} />
-
-                <div className="checkbox-container approval header">
-                    <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                    <input id="public-phone" className="clickAble" type="checkbox" defaultChecked={isolatedInfo.public_phone} ></input>
+                <div id="blowing-set-btn" className="clickAble" onClick={() => setOpenBlowingSet(!openBlowingSet)}>
+                    <div >הגדרות לתקיעה בשופר</div>
+                    <div>{openPersInfo ? '-' : '+'}</div>
                 </div>
-            </div>
-            <div className="err-msg">{msgErr}</div>
-        </SettingsLayout>
+
+                <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
+                    <div className="header">כתובת</div>
+                    {console.log("address", address)}
+                    <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={address} />
+                    <div className="err-msg">{locationMsgErr}</div>
+
+                    <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
+                    <div className="checkbox-container ">
+                        <div className="header">בפתח הבית</div>
+                        <input className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? false : true} />
+                    </div>
+
+                    <div className="checkbox-container ">
+                        <div className="header">בחלון או במרפסת הפונה לרחוב</div>
+                        <input id="public-meeting" className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? true : false} />
+                    </div>
+
+                    <div className="header">הערות ותיאור הכתובת</div>
+                    <input autoComplete={'off'} id="comments" type="text" placeholder={comments} value={comments} onChange={(e) => setValues(e.target.value, setComments)} />
+
+                    <div className="checkbox-container approval header">
+                        <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
+                        <input id="public-phone" className="clickAble" type="checkbox" defaultChecked={isolatedInfo.public_phone} ></input>
+                    </div>
+                </div>
+                <div className="err-msg">{msgErr}</div>
+            </SettingsLayout>
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+        </>
+
     );
 }
 export default IsolatedSettings;

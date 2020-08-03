@@ -277,6 +277,7 @@ module.exports = function (CustomUser) {
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
+                    console.log("userInfo", userInfo)
                     return userInfo;
                 }
                 else if (role === 2) {

@@ -34,7 +34,7 @@ export const SBSearchBoxGenerator = (props) => {
 
 export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className }) => {
     const autoCompleteInput = useRef()
-
+    console.log("defaultValue", defaultValue)
     useEffect(() => {
         //so we have window.google
         if (window.google && window.google.maps) { init(); return; }
