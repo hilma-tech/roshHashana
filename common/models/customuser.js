@@ -244,7 +244,7 @@ module.exports = function (CustomUser) {
 
                 let userInfo = {};
                 //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId }, include: 'userCity', fields: { username: true, cityId: true, name: true, street: true, appartment: true, comments: true } });
+                userInfo = await CustomUser.findOne({ where: { id: userId },fields: { username: true, name: true, address:true, comments: true } });
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
@@ -266,16 +266,14 @@ module.exports = function (CustomUser) {
                 else {
                     //general user
                     const genUserQ = ` SELECT
-                        shofar_blower_pub.street,
+                        shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
                         CustomUser.name AS blowerName,
-                        city.name 
                     FROM 
                         isolated
                         RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
                         INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
-                        INNER JOIN  city ON  shofar_blower_pub.cityId = city.id 
                     WHERE
                         isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
@@ -284,10 +282,9 @@ module.exports = function (CustomUser) {
                     }
                     if (resUserData) {
                         userInfo.meetingInfo = {
-                            street: resUserData[0].street,
+                            address: resUserData[0].address,
                             comments: resUserData[0].comments,
                             start_time: resUserData[0].start_time,
-                            city: resUserData[0].name,
                             blowerName: resUserData[0].blowerName
                         }
                         return userInfo; //general user
