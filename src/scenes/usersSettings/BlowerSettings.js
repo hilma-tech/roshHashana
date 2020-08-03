@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, Fragment, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
@@ -11,6 +10,8 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
 import './Settings.scss';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
+
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 const materialTheme = createMuiTheme({
     overrides: {
@@ -40,15 +41,13 @@ const IsolatedSettings = (props) => {
     const [publicMeetings, setPublicMeetings] = useState([]);
     const [settingsType, setSettingsType] = useState('');
     const [blowingTimes, setBlowingTimes] = useState('');
-    const [appartment, setAppartment] = useState('');
+    const [address, setAddress] = useState('');
     const [blowerInfo, setBlowerInfo] = useState({});
     const [startTime, setStartTime] = useState('');
     const [username, setUsername] = useState('');
     const [maxTime, setMaxTime] = useState('');
     const [msgErr, setMsgErr] = useState('');
-    const [street, setStreet] = useState('');
     const [name, setName] = useState('');
-    const [city, setCity] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -57,11 +56,10 @@ const IsolatedSettings = (props) => {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
+                console.log("res.address", res)
                 setValues(res, setBlowerInfo);
                 setValues(res.name, setName);
-                setValues(res.userCity ? res.userCity.name : '', setCity);
-                setValues(res.street, setStreet);
-                setValues(res.appartment, setAppartment);
+                setValues(res.address, setAddress);
                 setValues(res.username, setUsername);
                 setValues(res.volunteering_start_time, setStartTime);
                 setValues(res.volunteering_max_time, setMaxTime);
@@ -116,12 +114,7 @@ const IsolatedSettings = (props) => {
         };
     }
 
-    const updateSelectedCity = (city) => {
-        let chosenCity;
-        if (city.name) chosenCity = city.name;
-        else chosenCity = city;
-        setValues(chosenCity, setCity);
-    }
+
     const removePubPlace = (i) => {
         let publicPlaces = [...publicMeetings];
         publicPlaces.splice(i, 1);
@@ -132,14 +125,14 @@ const IsolatedSettings = (props) => {
             setValues(e.target.value, setUsername);
         }
     }
-
+    const handleAddressChange = (placeName) => {
+        setAddress(placeName)
+        console.log('setState to address: ', placeName);
+    }
     const updateIsolatedInfo = async () => {
         // /^[a-z\u0590-\u05fe]+$/i
         let nameVal = name;
         let usernameVal = username;
-        let cityVal = city;
-        let streetVal = street;
-        let appartmentVal = appartment;
         let startTimeVal = startTime;
         let blowingTimesVal = blowingTimes;
         let maxTimeVal = maxTime;
@@ -147,16 +140,12 @@ const IsolatedSettings = (props) => {
         if (!nameVal) nameVal = blowerInfo.name;
         if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
-        if (!cityVal) cityVal = blowerInfo.userCity ? blowerInfo.userCity.name : '';
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
 
-        if (!streetVal) streetVal = blowerInfo.street;
-        if (!appartmentVal) appartmentVal = blowerInfo.appartment;
         if (!maxTimeVal) maxTimeVal = blowerInfo.volunteering_max_time;
         if (!blowingTimesVal) blowingTimesVal = blowerInfo.can_blow_x_times;
         if (!startTimeVal) startTimeVal = blowerInfo.volunteering_start_time;
 
-        let address = cityVal + ' ' + streetVal + ' ' + appartmentVal;
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
         await Geocode.fromAddress(address).then(
@@ -164,9 +153,7 @@ const IsolatedSettings = (props) => {
                 let newData = {
                     "name": nameVal,
                     "username": usernameVal,
-                    "city": cityVal,
-                    "street": streetVal,
-                    "appartment": appartmentVal,
+                    "ddress": address,
                     "volunteering_max_time": maxTimeVal,
                     "can_blow_x_times": blowingTimesVal,
                     "volunteering_start_time": startTimeVal,
@@ -237,20 +224,7 @@ const IsolatedSettings = (props) => {
 
                 <div className="header">כתובת יציאה</div>
 
-                <AutoComplete
-                    optionsArr={cities}
-                    placeholder="עיר / יישוב"
-                    canAddOption={true}
-                    displyField="name"
-                    inputValue={city}
-                    updateSelectOption={updateSelectedCity}
-                    updateText={updateSelectedCity}
-                    canAddOption={true}
-                />
-
-                <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" value={street} onChange={(e) => setValues(e.target.value, setStreet)} />
-                <input autoComplete={'off'} id="appartment" type="text" placeholder="מספר בית / דירה" value={appartment} onChange={(e) => setValues(e.target.value, setAppartment)} />
-
+                <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId='address' deafault={address} />
                 <div className="max-time header">סמן את זמן ההליכה</div>
                 <Slider value={maxTime ? maxTime : 0} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
                 <div className="max-time-val">{`עד ${maxTime} דקות`}</div>

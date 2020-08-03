@@ -32,12 +32,13 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
+export const FormSearchBoxGenerator = ({ onAddressChange, second, uId, deafault }) => {
+    console.log("deafault", deafault)
     const autoCompleteInput = useRef()
 
     useEffect(() => {
         //so we have window.google
-        if(second) init()
+        if (second) init()
         window.init = init
         const script = document.createElement('script')
         script.async = true;
@@ -71,6 +72,7 @@ export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
     return (
         <div className="form-search-input-container">
             <input
+                deafault={deafault}
                 ref={autoCompleteInput}
                 autocomplete={'off'}
                 id={uId}
