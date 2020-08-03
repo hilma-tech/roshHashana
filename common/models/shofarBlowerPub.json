@@ -25,11 +25,6 @@
             "model": "isolated",
             "type": "hasMany",
             "foreignKey": "blowerMeetingId"
-        },
-        "meetingCity": {
-            "model": "city",
-            "type": "belongsTo",
-            "foreignKey": "cityId"
         }
     },
     "properties": {
@@ -50,31 +45,16 @@
                 "nullable": "N"
             }
         },
-        "cityId": {
-            "type": "String",
-            "required": true,
-            "length": 50,
-            "precision": null,
-            "scale": null,
-            "mysql": {
-                "columnName": "cityId",
-                "dataType": "varchar",
-                "dataLength": 50,
-                "dataPrecision": null,
-                "dataScale": null,
-                "nullable": "N"
-            }
-        },
-        "street": {
+        "address": {
             "type": "String",
             "required": false,
-            "length": 50,
+            "length": 400,
             "precision": null,
             "scale": null,
             "mysql": {
-                "columnName": "street",
+                "columnName": "address",
                 "dataType": "varchar",
-                "dataLength": 50,
+                "dataLength": 400,
                 "dataPrecision": null,
                 "dataScale": null,
                 "nullable": "Y"

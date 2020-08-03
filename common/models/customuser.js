@@ -74,7 +74,6 @@ module.exports = function (CustomUser) {
             } else {
                 const newTime = moment(new Date())
                 const endTime = moment(resKey.date_key).add(10, 'm');
-                //TODO לבדוק אם צריך לזהות שהקוד הגיע מאותו מקום שרשם את הטלפון הזה 
                 if (newTime.isBefore(endTime)) {
                     CustomUser.app.models.keys.destroyById(resKey.id, (err2, resdelet) => {
                         if (err2) {
@@ -117,31 +116,30 @@ module.exports = function (CustomUser) {
     }
     CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
-        let status
-        status = resRole.roleId
+        let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err) console.log("Err", err);
             if (res) {
                 switch (status) {
                     case 1:
-                        if (res.cityId == null) {
+                        if (res.address == null) {
                             cb(null, { ok: "isolator new", data: { name: res.name } })
                         } else {
-                            CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
-                                if (errCity) console.log('errCity', errCity);
-                                if (city) {
-                                    let street = res.street ? res.street : '';
-                                    let appartment = res.appartment ? res.appartment : '';
-                                    let comments = res.comments ? res.comments : '';
-                                    let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
-                                    cb(null, { ok: "isolator with data", data: { name: res.name, address } })
-                                }
-                            });
+                            // CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
+                            //     if (errCity) console.log('errCity', errCity);
+                            //     if (city) {
+                            //         let street = res.street ? res.street : '';
+                            //         let appartment = res.appartment ? res.appartment : '';
+                            //         let comments = res.comments ? res.comments : '';
+                            //         let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
+                            cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
+                            //     }
+                            // });
                         }
                         break;
 
                     case 2:
-                        if (res.cityId == null) {
+                        if (res.address == null) {
                             cb(null, { ok: "blower new", data: { name: res.name } })
                         } else cb(null, { ok: "blower with data", data: { name: res.name } })
                         break;
@@ -172,11 +170,17 @@ module.exports = function (CustomUser) {
                                                     data:
                                                     {
                                                         name: res.name,
+                                                        // meetingInfo: {
+                                                        //     street: resPublicMeeting.street,
+                                                        //     comments: resPublicMeeting.comments,
+                                                        //     start_time: resPublicMeeting.start_time,
+                                                        //     city: resPublicMeeting.meetingCity().name,
+                                                        //     blowerName: resPublicMeeting.blowerPublic().name
+                                                        // }
                                                         meetingInfo: {
-                                                            street: resPublicMeeting.street,
+                                                            address: res.address,
                                                             comments: resPublicMeeting.comments,
                                                             start_time: resPublicMeeting.start_time,
-                                                            city: resPublicMeeting.meetingCity().name,
                                                             blowerName: resPublicMeeting.blowerPublic().name
                                                         }
                                                     }
@@ -211,7 +215,7 @@ module.exports = function (CustomUser) {
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `select 
             isolatedUser.name AS "isolatedName", 
-            isolatedUser.adress,
+            isolatedUser.address,
             isolatedUser.comments,
             blowerUser.name AS "blowerName"
             FROM 
@@ -227,7 +231,7 @@ module.exports = function (CustomUser) {
                 `select
                 blowerUser.name AS "blowerName",
                 shofar_blower_pub.id,
-                shofar_blower_pub.adress,
+                shofar_blower_pub.address,
                 shofar_blower_pub.comments ,
                 shofar_blower_pub.start_time
                 from
@@ -242,7 +246,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
                     let [err, address] = await executeMySqlQuery(CustomUser,
                         `select
-                         CustomUser.adress,
+                         CustomUser.address,
                          from
                          CustomUser
                          where CustomUser.id = ${options.accessToken.userId};`)
