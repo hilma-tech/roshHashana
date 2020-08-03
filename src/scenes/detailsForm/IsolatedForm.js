@@ -35,7 +35,7 @@ export default class IsolatedForm extends Component {
         e.preventDefault();
         const formChilds = e.target.children;
         const { address } = this.state
-        
+
         //cheked address
         if (!address || address === '') {
             this.setState({ errorMsg: 'אנא הכנס מיקום' });
@@ -54,7 +54,7 @@ export default class IsolatedForm extends Component {
             "comments": comments,
             "public_meeting": formChilds[2].children[1].checked ? false : true
         }
-        
+
         //update isolated details
         this.setState({ errorMsg: '' });
 
@@ -126,8 +126,9 @@ export default class IsolatedForm extends Component {
                         <img id="shofar-img" src="/icons/shofar.png" />
                     </BrowserView>
                 </div>
-                {this.state.openModal &&
-                    <Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} />}
+                {this.state.openModal ?
+                    <div id="override-popup-container" ><Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} /></div>
+                    : null}
             </>
         );
     }
