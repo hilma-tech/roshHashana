@@ -111,7 +111,8 @@ const MapComp = (props) => {
 
         mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
             const comments = pub.commennts ? pub.commennts : ' '
-            const address = pub.city + ' ' + pub.street + ' ' + comments;
+            const address = pub.adress
+            console.log("pub.adress", pub.adress)
             const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
