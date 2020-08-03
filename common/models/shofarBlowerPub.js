@@ -41,7 +41,7 @@ module.exports = function (shofarBlowerPub) {
                 let newPubMeeting = {
                     "cityId": city ? city.id : meetingData.city,
                     "street": meetingData.street,
-                    "comments": meetingData.placeDescription,
+                    "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId
                 }
