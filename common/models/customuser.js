@@ -210,8 +210,9 @@ module.exports = function (CustomUser) {
 
 
     CustomUser.getMapData = async (isPubMap = false, options) => {
+        // map data for all maps (except for shofar blower map)
 
-        //get all private meetings
+        //get all private meetings  
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `select 
             isolatedUser.name AS "isolatedName", 
@@ -246,11 +247,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `select
-                         CustomUser.address
-                         from
-                         CustomUser
-                         where CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
