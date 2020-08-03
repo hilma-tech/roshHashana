@@ -32,12 +32,12 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
+export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue }) => {
     const autoCompleteInput = useRef()
 
     useEffect(() => {
         //so we have window.google
-        if(second) init()
+        if (window.google && window.google.maps) { init(); return; }
         window.init = init
         const script = document.createElement('script')
         script.async = true;
@@ -72,7 +72,8 @@ export const FormSearchBoxGenerator = ({ onAddressChange, second, uId }) => {
         <div className="form-search-input-container">
             <input
                 ref={autoCompleteInput}
-                autocomplete={'off'}
+                defaultValue={defaultValue}
+                autoComplete={'off'}
                 id={uId}
                 type="text"
                 placeholder="מיקום"

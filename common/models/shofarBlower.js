@@ -19,9 +19,10 @@ module.exports = function (ShofarBlower) {
                 console.log('data: ', data);
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
                 if (!blowerInfo) {
-                    if (!data.address || !data.address.length) return "כתובת אינה תקינה"
-                    if(data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) return 'נא לבחור מיקום מהרשימה הנפתחת'
+                    if (!data.address || !data.address.length) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
+                    if (data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
                     data.address = data.address.substring(0, 398) // shouldn't be more than 400 
+                    
                     let objToBlower = {
                         "userBlowerId": options.accessToken.userId,
                         "can_blow_x_times": data.can_blow_x_times,
@@ -32,8 +33,6 @@ module.exports = function (ShofarBlower) {
                             "address": data.address,
                             "comments": null
                         };
-
-
 
                     let resRole = await ShofarBlower.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
                     if (resRole.roleId === SHOFAR_BLOWER_ROLE) {
