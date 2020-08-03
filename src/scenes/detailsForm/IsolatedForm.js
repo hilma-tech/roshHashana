@@ -5,6 +5,9 @@ import Popup from '../../components/modals/general_popup';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
 import './detailsForm.scss';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
+import { updateIsolatedDetails } from '../../fetch_and_utils';
+import { CONSTS } from '../../const_messages';
 
 export default class IsolatedForm extends Component {
     constructor(props) {
@@ -12,92 +15,56 @@ export default class IsolatedForm extends Component {
         this.state = {
             errorMsg: '',
             openModal: false,
-            cities: [],
+            address: '',
             chosenCity: '',
             approval: true
         }
-    }
-
-    componentDidMount() {
-        (async () => {
-            if (this.props.location && this.props.location.state && this.props.location.state.noDetails) {
-                //get all cities for autocomplete
-                let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" }
-                }, true);
-                if (res) {
-                    this.setState({ cities: res });
-                }
-            }
-            else {
-                this.props.history.push('/');
-                return;
-            }
-        })();
     }
 
     goBack = () => {
         this.props.history.goBack();
     }
 
-
     //update the chosen city
-    updateCity = (city) => {
-        let chosenCity;
-        if (city.name) chosenCity = city.name;
-        else chosenCity = city;
-        this.setState({ chosenCity });
+    setAddress = (address) => {
+        this.setState({ address });
     }
 
     //save the isolated details
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
-
-        //cheked if the user inserted a city
-        if (this.state.chosenCity === '') {
-            this.setState({ errorMsg: 'אנא הכנס את שם העיר או היישוב' });
+        const { address } = this.state
+        
+        //cheked address
+        if (!address || address === '') {
+            this.setState({ errorMsg: 'אנא הכנס מיקום' });
             return;
         }
-        if (!formChilds[1].value && !formChilds[2].value && !formChilds[6].value) {
-            this.setState({ errorMsg: 'אנא הכנס או שם רחוב ומספר בית או הערות המתארות את מקום מגוריך' });
+        if (address === CONSTS.NOT_A_VALID_ADDRESS || (typeof address === "boolean" && address === true)) {
+            this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
 
-        const comments = formChilds[6].value ? formChilds[6].value : ' ';
-        let address = this.state.chosenCity + ' ' + formChilds[1].value + ' ' + formChilds[2].value + ' ' + comments;
-        //check if the address is correct
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-        Geocode.setLanguage("he");
+        const comments = formChilds[4].value ? formChilds[4].value : ' ';
 
-        await Geocode.fromAddress(address).then(
-            async response => {
-                let isolatedDetails = {
-                    "public_phone": formChilds[7].children[1].checked,
-                    "city": this.state.chosenCity,
-                    "street": formChilds[1].value,
-                    "appartment": formChilds[2].value,
-                    "comments": comments,
-                    "public_meeting": formChilds[4].children[1].checked ? false : true
-                }
-                this.setState({ errorMsg: '' });
+        let isolatedDetails = {
+            "public_phone": formChilds[5].children[1].checked,
+            "address": address,
+            "comments": comments,
+            "public_meeting": formChilds[2].children[1].checked ? false : true
+        }
+        
+        //update isolated details
+        this.setState({ errorMsg: '' });
 
-                //update isolated details
-                let [res, err] = await Auth.superAuthFetch(`/api/isolateds/InsertDataIsolated`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" },
-                    method: "POST",
-                    body: JSON.stringify({ data: isolatedDetails })
-                }, true);
-                if (res) {
-                    //open modal with message
-                    this.setState({ openModal: true });
-                }
-            },
-            error => {
-                this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
-                return;
+        updateIsolatedDetails(isolatedDetails, (error) => {
+            if (!error) {
+                //open modal with message
+                this.setState({ openModal: true });
             }
-        );
+            else this.setState({ errorMsg: "אירעה שגיאה בעת שמירת הפרטים, נא נסו שנית מאוחר יותר" })
+        })
     }
 
     handleKeyPress = (e) => {
@@ -108,17 +75,11 @@ export default class IsolatedForm extends Component {
         }
     }
     checkboxChange = (e) => {
-        this.setState({
-            approval: e.target.checked
-        });
+        this.setState({ approval: e.target.checked });
     }
     goToMainPage = () => {
-        //TODO Shani set  this.props.history.push address
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
-        const street = document.getElementById('street');
-        const appartment = document.getElementById('appartment');
-        const comments = document.getElementById('comments');
-        const address = street.value + ' ' + appartment.value + ' ' + comments.value + ', ' + this.state.chosenCity;
+        const { address } = this.state
         this.props.history.push('/', { name, address });
     }
 
@@ -136,20 +97,7 @@ export default class IsolatedForm extends Component {
                         <div className="msg-txt">הפרטים שלך הם:</div>
                         <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress}>
 
-                            <AutoComplete
-                                optionsArr={this.state.cities}
-                                placeholder="עיר / יישוב"
-                                canAddOption={true}
-                                displyField="name"
-                                inputValue={this.state.chosenCity}
-                                updateSelectOption={this.updateCity}
-                                updateText={this.updateCity}
-                                canAddOption={true}
-                            />
-
-                            <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" />
-                            <input autoComplete={'off'} id="appartment" type="text" placeholder="דירה/ בניין" />
-
+                            <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">

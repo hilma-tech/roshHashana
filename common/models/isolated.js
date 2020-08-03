@@ -1,38 +1,24 @@
 'use strict';
 
 module.exports = function (Isolated) {
-    //role = 1
-    // {
-    //     "userIsolatedId" : 4,
-    //         "public_phone": 0,
-    //             "public_meeting" : 1,
-    //                 "city" : "חיפה",
-    //                     "street": "פרויד",
-    //                         "appartment": "23",
-    //                             "comments": null
-    // }
+    const ISOLATED_ROLE = 1
+
     Isolated.InsertDataIsolated = async (data, options) => {
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
                 if (!isolatedInfo) {
-
-                    let city;
-                    //check if the city is exist in city table
-                    city = await Isolated.app.models.City.findOne({ where: { "name": data.city } });
-                    //the city doesnt exist-> create the city
-                    if (!city || !city.id) {
-                        city = await Isolated.app.models.City.addNewCity(data.city, options);
-                    }
                     let pubMeetId = null;
+                    if (!data.address || !data.address.length) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
+                    if (data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+                    data.address = data.address.substring(0, 398) // shouldn't be more than 400 
 
                     //create public meeting
                     if (data.public_meeting) {
                         let meetData = [{
-                            city: city.id ? city.id : data.city,
-                            street: data.street,
-                            comments: data.appartment + ' ' + data.comments,
-                            start_time: null
+                            "address": data.address,
+                            "comments": data.comments,
+                            "start_time": null
                         }]
                         pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
                     }
@@ -44,16 +30,14 @@ module.exports = function (Isolated) {
                         "blowerMeetingId": pubMeetId
                     },
                         objToCU = {
-                            "cityId": city.id,
-                            "street": data.street,
-                            "appartment": data.appartment,
+                            "address": data.address,
                             "comments": data.comments
                         };
 
 
                     let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
 
-                    if (resRole.roleId === 1) {
+                    if (resRole.roleId === ISOLATED_ROLE) {
 
                         let resIsolated = await Isolated.create(objToIsolated);
                         let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);

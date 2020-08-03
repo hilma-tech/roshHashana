@@ -67,7 +67,7 @@ const ShofarBlowerMap = (props) => {
                 Geocode.setLanguage("he");
                 const centerAdr = `${userData.city || ""} ${userData.street || ""} ${userData.appartment || ""}`
                 let [error, res] = await to(Geocode.fromAddress(centerAdr))
-                if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
+                if (error || !res) { openGenAlert({ text: "אירעה שגיאה בטעינת המפה, נא נסו שנית מאוחר יותר" }); console.log("error getting geoCode of ירושלים: ", error); return; }
                 try {
                     const newCenter = res.results[0].geometry.location;
                     if (newCenter !== center) setCenter(newCenter)
