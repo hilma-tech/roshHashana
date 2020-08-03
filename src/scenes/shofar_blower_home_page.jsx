@@ -18,7 +18,8 @@ import './sb.scss'
 let fetching = false
 const SBHomePage = (props) => {
 
-    const { showAlert, openGenAlert,
+    const { showAlert, openGenAlert } = useContext(MainContext)
+    const {
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
         assignMeetingInfo } = useContext(SBContext)
@@ -80,7 +81,6 @@ const SBHomePage = (props) => {
                     <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
                 )
             }
-
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </div>
     );

@@ -18,7 +18,6 @@ export const MainProvider = ({ children }) => {
         if (obj.isPopup) alertObj.isPopup = { ...obj.isPopup, popupCb, closeSelf: () => { setShowAlert(false) } }
         setShowAlert(alertObj)
         if (!obj.isPopup && !obj.noTimeout) alertTO = setTimeout(closeAlert, 5000)
-
     }
 
     const ctxValue = {

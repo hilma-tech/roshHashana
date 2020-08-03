@@ -34,10 +34,9 @@ export const SBSearchBoxGenerator = (props) => {
 
 export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className }) => {
     const autoCompleteInput = useRef()
-    console.log("defaultValue", defaultValue)
     useEffect(() => {
-        //so we have window.google
         if (window.google && window.google.maps) { init(); return; }
+        //so we have window.google
         window.init = init
         const script = document.createElement('script')
         script.async = true;
@@ -50,12 +49,10 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
             let script = document.getElementById('mapScript')
             document.head.removeChild(script);
         }
-        //end of: so we have window.google
     }, []);
 
     const init = () => {
         const input = document.getElementById(uId);
-        // console.log('input: ', input);
         if (!input) return;
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ "country": "il" });
