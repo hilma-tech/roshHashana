@@ -1,29 +1,340 @@
-@import "../consts/generalStyles";
-
-#sb-map-container{
+@import "../consts/consts.scss";
+.sb-map-container-mobile {
+    width: 100%;
+    height: 80%;
+}
+.sb-map-container {
     width: 70%;
     height: 100%;
+}
+#sb-map-container {
     position: absolute;
     left: 0;
+    .sb-overmap-container {
+        position: fixed;
+        height: fit-content;
+        width: fit-content;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding-left: 25px;
+        padding-top: 25px;
+        .map-change-all {
+            margin-top: 0;
+            box-sizing: border-box;
+            border: 1px solid transparent;
+            background-color: white;
+            height: 2rem;
+            line-height: 2rem;
+            padding: 0 12px;
+            border-radius: 30px;
+            box-shadow: 0px 3px 6px #00000029;
+            font-size: 1rem;
+            outline: none;
+            text-overflow: ellipsis;
+        }
+        .map-change-mobile {
+            width: fit-content;
+        }
+        .map-change {
+            width: 10rem;
+        }
+    }
+    .sb-overmap-container-mobile {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+        padding-top: 0 !important;
+        margin-top: 5px !important;
+    }
+    .sb-search-input-container {
+        width: fit-content;
+        height: fit-content;
+        margin: auto;
+        margin-right: 15px;
+
+        width: 15rem;
+        height: 2rem;
+        border-radius: 30px;
+        box-shadow: 0px 3px 6px #00000029;
+        background-color: white;
+        #sb-search-input {
+            height: 100%;
+            margin-top: 0;
+            box-sizing: border-box;
+            padding: 0 12px;
+            border: 0;
+            font-size: 1rem;
+            outline: none;
+            text-overflow: ellipsis;
+        }
+        #sb-search-icon {
+            width: 1rem;
+        }
+    }
 }
-.sb-side-info-container {
-    // position: absolute;
-    // right: 0;
-    // top: 0;
-    // bottom: 0;
+#sb-side-list-container {
+    background-color: white;
+    padding: 20px 40px;
+    #sb-route-list-top {
+        height: 80px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .list-switch-container {
+            background-color: $orange;
+            min-width: 50%;
+            width: fit-content;
+            padding: 10px;
+            height: 40%;
+            line-height: 100%;
+            border-radius: 30px;
+            box-shadow: 0px -3px 6px #00000029;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-evenly;
+            .list-switch-text {
+                margin-right: 5px;
+            }
+            .list-switch-icon {
+            }
+        }
+    }
+    #sb-meetings-list-top {
+        height: 80px;
+        width: 100%;
+        display: flex;
+        img {
+            width: 1.5rem;
+        }
+    }
+    .sb-side-list-content {
+        width: 100%;
+        height: unset;
+        .sb-side-list-title {
+            color: $turquoise;
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+        .under-title {
+            color: $light-blue;
+            font-size: 1.2rem;
+        }
+        .sb-list {
+            // all lists - my route -and- all meetings
+            overflow-wrap: break-word;
+            // overflow-y: scroll;
+            // height: unset;
+        }
+        .open-meeting-in-list {
+            display: flex;
+            flex-direction: row;
+            align-self: baseline;
+            align-items: center;
+            justify-content: space-between;
+
+            width: 100%;
+            background-color: white;
+            padding: 5px 15px;
+            box-shadow: 0px 3px 6px #00000029;
+            margin-top: 1.5rem;
+            .open-meeting-in-list-info {
+                .open-meeting-in-list-title {
+                    font-weight: bold;
+                }
+                .open-meeting-in-list-location {
+                }
+                .open-meeting-in-list-commets {
+                }
+            }
+            .open-meeting-in-list-button {
+                background-color: $orange;
+                padding: 0 1rem;
+                cursor: pointer;
+                &:active {
+                    color: grey;
+                    -moz-user-select: none;
+                    -webkit-user-select: none;
+                }
+            }
+        }
+        .meeting-in-route {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+
+            .meeting-in-route-img-container {
+                width: 35px;
+                height: 35px;
+                .meeting-in-route-img {
+                    width: 100%;
+                    height: 100%;
+                    line-height: 35px;
+                    border-radius: 50%;
+                    background-color: $light-blue;
+                    color: white;
+                    border: 2px solid $blue-border;
+                }
+            }
+            .meeting-in-route-info-container {
+                display: flex;
+                flex-direction: column;
+                align-self: baseline;
+                justify-content: center;
+                width: 80%;
+                background-color: white;
+                padding: 5px 15px;
+                box-shadow: 0px 3px 6px #00000029;
+                .meeting-in-route-title {
+                    width: fit-content;
+                    font-weight: bold;
+                }
+                .meeting-in-route-location {
+                    width: fit-content;
+                }
+                .meeting-in-route-comments {
+                    width: fit-content;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}
+.list-switch-container-mobile {
+    //diff location on mobile.. oh and diff style
+    background-color: $orange;
+    max-width: 50%;
+    padding: 10px;
+    height: 40%;
+    line-height: 100%;
+    border-radius: 0 30px 30px 0;
+    box-shadow: 0px -3px 6px #00000029;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    .list-switch-text {
+        margin-right: 5px;
+    }
+    .list-switch-icon {
+    }
+}
+.open-side-list {
+    -webkit-animation: open-meetings-mobile 0.4s ease-in-out both;
+    animation: open-meetings-mobile 0.4s ease-in-out both;
+}
+.close-side-list {
+    -webkit-animation: close-meetings-mobile 0.4s ease-in-out both;
+    animation: close-meetings-mobile 0.4s ease-in-out both;
+}
+@keyframes open-meetings-mobile {
+    0% {
+        left: -80%;
+    }
+    100% {
+        left: 0;
+    }
+}
+@keyframes close-meetings-mobile {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: -80%;
+    }
+}
+
+.sb-side-list-content-mobile {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 80%;
+    background-color: $light-grey-bg;
+    padding: 20px 40px;
+    z-index: 2; //! todo, route list is over it! (on mobile)
+    .sb-side-list-title {
+        color: $turquoise;
+        font-size: 1.7rem;
+        font-weight: bold;
+    }
+    .sb-list {
+        // all lists - my route -and- all meetings
+        overflow-wrap: break-word;
+    }
+    .open-meeting-in-list {
+        display: flex;
+        flex-direction: row;
+        align-self: baseline;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+        background-color: white;
+        padding: 5px 15px;
+        box-shadow: 0px 3px 6px #00000029;
+        margin-top: 1.5rem;
+        .open-meeting-in-list-info {
+            .open-meeting-in-list-title {
+                font-weight: bold;
+            }
+            .open-meeting-in-list-location {
+            }
+            .open-meeting-in-list-commets {
+            }
+        }
+        .open-meeting-in-list-button {
+            background-color: $orange;
+            padding: 0 1rem;
+            cursor: pointer;
+            &:active {
+                color: grey;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+            }
+        }
+    }
+}
+.sb-side-list-container {
     height: 100%;
     width: 30%;
-    float:right;
-    background-color: white;
+    float: right;
 }
-.sb-side-info-mobile-container {
-    position: absolute;
-    top: 0;
+.sb-side-list-mobile-container {
+    position: fixed;
     bottom: 0;
     right: 0;
     left: 0;
-    height: 100%;
+    top: 80%;
+
     width: 100%;
+    z-index: 1;
+    .blue-line-container {
+        width: 100%;
+        height: fit-content;
+        padding: 2px;
+        .blue-line {
+            width: 3rem;
+            margin: auto;
+            background-color: $light-blue;
+            height: 2px;
+        }
+    }
 }
 
 .sb-homepage-container {
@@ -47,5 +358,29 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+}
+.open-animation {
+    -webkit-animation: open-side-mobile 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+    animation: open-side-mobile 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+.close-animation {
+    -webkit-animation: close-side-mobile 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+    animation: close-side-mobile 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+@keyframes open-side-mobile {
+    0% {
+        top: 80%;
+    }
+    100% {
+        top: 0;
+    }
+}
+@keyframes close-side-mobile {
+    0% {
+        top: 0;
+    }
+    100% {
+        top: 80%;
     }
 }

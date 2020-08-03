@@ -12,7 +12,7 @@ module.exports = function (shofarBlowerPub) {
 
     //this function except to get data = array!!!!
     shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options) => {
-
+        let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {
             for (let i = 0; i < data.length; i++) {
 
@@ -41,20 +41,20 @@ module.exports = function (shofarBlowerPub) {
                 let newPubMeeting = {
                     "cityId": city ? city.id : meetingData.city,
                     "street": meetingData.street,
-                    "comments": meetingData.placeDescription,
+                    "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId
                 }
+                meetingDataArray.push(newPubMeeting)
+            }
+            try {
 
-                try {
+                //create new public meeting
+                let res = await shofarBlowerPub.create(meetingDataArray);
+                if (res) return res.id;
 
-                    //create new public meeting
-                    let res = await shofarBlowerPub.create(newPubMeeting);
-                    if (res) return res.id;
-
-                } catch (error) {
-                    throw error;
-                }
+            } catch (error) {
+                throw error;
             }
         }
     }

@@ -13,7 +13,8 @@ export default class IsolatedForm extends Component {
             errorMsg: '',
             openModal: false,
             cities: [],
-            chosenCity: ''
+            chosenCity: '',
+            approval: true
         }
     }
 
@@ -106,7 +107,11 @@ export default class IsolatedForm extends Component {
             return;
         }
     }
-
+    checkboxChange = (e) => {
+        this.setState({
+            approval: e.target.checked
+        });
+    }
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const street = document.getElementById('street');
@@ -160,7 +165,7 @@ export default class IsolatedForm extends Component {
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                                <input className="clickAble" type="checkbox" ></input>
+                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" ></input>
                             </div>
 
                             <div className="err-msg">{this.state.errorMsg}</div>

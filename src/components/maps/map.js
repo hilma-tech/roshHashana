@@ -7,7 +7,7 @@ import Geocode from "react-geocode";
 import { dateWTimeFormatChange } from '../../fetch_and_utils';
 import _ from "lodash";
 import './map.scss';
-
+import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 const israelCoords = [
     { lat: 32.863532, lng: 35.889902 },
@@ -23,6 +23,7 @@ var mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
+    disableDefaultUI: true
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -33,6 +34,7 @@ const MapComp = (props) => {
 
     const [allLocations, setAllLocations] = useState([]);
     const [center, setCenter] = useState({});
+    const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
 
@@ -52,12 +54,15 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-            if (props.publicMap || props.isolated) await setPublicMapContent();
+            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
 
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     let newCenter = { lat: position.coords.latitude, lng: position.coords.longitude };
-                    if (newCenter !== center) setCenter(newCenter);
+                    if (newCenter !== center) {
+                        setCenter(newCenter);
+                        setSelfLocation(newCenter);
+                    }
                 }, await findLocationCoords('ירושלים'));
             }
             else {
@@ -66,19 +71,20 @@ const MapComp = (props) => {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
                     address = mapInfo.userAddress[0].name + ' ' + mapInfo.userAddress[0].street + ' ' + mapInfo.userAddress[0].appartment + ' ' + comments;
                 }
-                await findLocationCoords(address);
+                await findLocationCoords(address, true);
             }
             setIsMarkerShown(true);
 
         })();
     }, [mapInfo])
 
-    const findLocationCoords = async (address) => {
+    const findLocationCoords = async (address, isSelfLoc = false) => {
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log("error getting geoCode of ירושלים: ", error); return; }
         try {
             const newCenter = res.results[0].geometry.location;
             if (newCenter !== center) setCenter(newCenter);
+            if (isSelfLoc) setSelfLocation(newCenter);
         } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
     }
 
@@ -109,7 +115,7 @@ const MapComp = (props) => {
             const [error, response] = await to(Geocode.fromAddress(address));
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
             try {
-                const date = dateWTimeFormatChange(new Date(pub.start_time).toJSON());
+                const date = moment(pub.start_time).format("HH:mm");
                 const { lat, lng } = response.results[0].geometry.location;
                 let newLocObj = {
                     type: SHOFAR_BLOWING_PUBLIC,
@@ -118,7 +124,7 @@ const MapComp = (props) => {
                         <div className="info-window-header">תקיעה ציבורית</div>
                         <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
                         <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
-                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date[1]}</div></div>
+                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                         <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
@@ -153,8 +159,10 @@ const MapComp = (props) => {
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
+                selfLocation={selfLocation}
                 meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
+                blower={props.blower}
                 findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
@@ -199,7 +207,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: props.meetAddress ? '/icons/meetAddress.svg' : '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         // anchor: new window.google.maps.Point(0, 0),
@@ -212,9 +220,9 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         center={props.center}
     >
         <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
-        {props.userLocation ? <MarkerGenerator position={props.center} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
+        {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

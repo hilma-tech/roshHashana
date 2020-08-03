@@ -1,4 +1,4 @@
-@import "../../consts/generalStyles";
+@import "../../consts/consts.scss";
 .map-container {
     position: fixed;
     top: 0;
@@ -110,16 +110,16 @@
     .close-map-mobile{
         bottom: 15%;
     }
-    .close-map:hover {
-        animation-name: hover;
-        animation-duration: 0.5s;
-    }
+    // .close-map:hover {
+    //     animation-name: hover;
+    //     animation-duration: 0.5s;
+    // }
     @keyframes hover {
         0% {
-            bottom: 0;
+            bottom: 15%;
         }
         100% {
-            bottom: 2%;
+            bottom: 17%;
         }
     }
 }

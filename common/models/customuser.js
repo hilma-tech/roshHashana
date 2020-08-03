@@ -302,6 +302,7 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.updateUserInfo = async (data, options) => {
+        const { shofarBlowerPub } = CustomUser.app.models;
         if (options.accessToken && options.accessToken.userId) {
             try {
                 const userId = options.accessToken.userId;
@@ -320,7 +321,6 @@ module.exports = function (CustomUser) {
                     cityId: city ? city.id : null
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
-
                 if (role === 1) {
                     //isolated
                     let newIsoData = {
@@ -338,8 +338,32 @@ module.exports = function (CustomUser) {
                         volunteering_start_time: data.volunteering_start_time
                     }
                     let resBlower = await CustomUser.app.models.ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
+                    // update also all the public meetings
+                    const [resDeletePublicMeetings, errDeletePublicMeetings] = await to(shofarBlowerPub.destroyAll({ blowerId: userId }))
+                    if (errDeletePublicMeetings) {
+                        console.log("errDeletePublicMeetings", errDeletePublicMeetings)
+                    }
+                    let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => {
+                        if (publicMeeting.cityId && publicMeeting.street && (publicMeeting.time || publicMeeting.start_time) && userId) {
+                            return true; // skip
+                        }
+                        return false;
+                    })
 
-                    // TODO: update also all the public meetings
+                    publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
+                        return {
+                            cityId: publicMeeting.cityId,
+                            street: publicMeeting.street,
+                            comments: publicMeeting.placeDescription || publicMeeting.comments,
+                            start_time: publicMeeting.time || publicMeeting.start_time,
+                            blowerId: userId
+                        }
+                    })
+                    const [resCreatePublicMeetings, errCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
+                    if (errDeletePublicMeetings) {
+                        console.log("errCreatePublicMeetings", errCreatePublicMeetings)
+                    }
+
                 }
                 else return; //general user
 
