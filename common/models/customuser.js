@@ -219,7 +219,7 @@ module.exports = function (CustomUser) {
             left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId 
             left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId
             where 
-             isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
+            isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
