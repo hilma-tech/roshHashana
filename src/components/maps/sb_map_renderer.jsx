@@ -95,7 +95,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     if (err) return null;
     if (!data) return <img className="loader" src='/images/loader.svg' />
 
-    const { openGenAlert,
+    const { openGenAlert } = useContext(MainContext)
+    const {
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)

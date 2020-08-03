@@ -22,7 +22,10 @@ const PRIVATE_MEETING = 'private meeting';
 
 
 const ShofarBlowerMap = (props) => {
-    const { openGenAlert,
+
+    const { openGenAlert } = useContext(MainContext)
+
+    const {
         myMeetings, meetingsReqs,
         setAssignMeetingInfo,
         startTimes } = useContext(SBContext)
@@ -65,7 +68,7 @@ const ShofarBlowerMap = (props) => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
                 Geocode.setLanguage("he");
-                const centerAdr = `${userData.city || ""} ${userData.street || ""} ${userData.appartment || ""}`
+                const centerAdr = userData.address + (userData.comments ? userData.comments : "")
                 let [error, res] = await to(Geocode.fromAddress(centerAdr))
                 if (error || !res) { setErr(true); openGenAlert({ text: "אירעה שגיאה בטעינת המפה, נא נסו שנית מאוחר יותר" }); console.log("error getting geoCode of ירושלים: ", error); return; }
                 try {
@@ -197,7 +200,7 @@ const ShofarBlowerMap = (props) => {
                 history={props.history}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img src='/icons/loader.svg' />}
+                loadingElement={<img className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
