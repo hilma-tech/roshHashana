@@ -114,11 +114,9 @@ module.exports = function (CustomUser) {
             }
         })
     }
-
-
-    CustomUser.checkStatus = (userId, meetingId,resRole, cb) => {
+    CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
-        let status  = resRole.roleId
+        let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err) console.log("Err", err);
             if (res) {
@@ -134,7 +132,7 @@ module.exports = function (CustomUser) {
                             //         let appartment = res.appartment ? res.appartment : '';
                             //         let comments = res.comments ? res.comments : '';
                             //         let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
-                                    cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
+                            cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
                             //     }
                             // });
                         }
@@ -214,18 +212,44 @@ module.exports = function (CustomUser) {
     CustomUser.getMapData = async (isPubMap = false, options) => {
 
         //get all private meetings
-        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser, `select isolatedUser.name AS "isolatedName", city.name AS "cityMeeting", isolatedUser.street "streetMeeting", isolatedUser.appartment, isolatedUser.comments, blowerUser.name AS "blowerName" FROM isolated left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId left join city on isolatedUser.cityId = city.id left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId where isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
+        let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
+            `select 
+            isolatedUser.name AS "isolatedName", 
+            isolatedUser.address,
+            isolatedUser.comments,
+            blowerUser.name AS "blowerName"
+            FROM 
+            isolated 
+            left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId 
+            left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId
+            where 
+            isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
-            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser, `select blowerUser.name AS "blowerName", city.name AS "city", shofar_blower_pub.id, shofar_blower_pub.street, shofar_blower_pub.comments , shofar_blower_pub.start_time from shofar_blower_pub LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId LEFT JOIN city on city.id = shofar_blower_pub.cityId where blowerId is not null;`);
+            let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
+                `select
+                blowerUser.name AS "blowerName",
+                shofar_blower_pub.id,
+                shofar_blower_pub.address,
+                shofar_blower_pub.comments ,
+                shofar_blower_pub.start_time
+                from
+                shofar_blower_pub
+                LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId 
+                where blowerId is not null;`);
             if (errPublic) throw errPublic;
 
             if (resPublic) {
                 let userAddress;
                 //get user address if it is not public map
                 if (!isPubMap) {
-                    let [err, address] = await executeMySqlQuery(CustomUser, `select city.name, CustomUser.street, CustomUser.appartment from CustomUser left join city on CustomUser.cityId = city.id where CustomUser.id = ${options.accessToken.userId};`)
+                    let [err, address] = await executeMySqlQuery(CustomUser,
+                        `select
+                         CustomUser.address,
+                         from
+                         CustomUser
+                         where CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) userAddress = address;
                 }
