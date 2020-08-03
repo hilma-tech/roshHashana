@@ -126,7 +126,12 @@ const MapComp = (props) => {
                     info: <div id="info-window-container">
                         <div className="info-window-header">תקיעה ציבורית</div>
                         <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
-                        <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{address}</div></div>
+                        <div className="pub-address-container">
+                            <img src={'/icons/address.svg'} />
+                            <div style={{ textAlign: "right" }}>
+                                {address}
+                            </div>
+                        </div>
                         <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
                         <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                         <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
