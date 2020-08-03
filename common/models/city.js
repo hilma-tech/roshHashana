@@ -4,7 +4,7 @@ module.exports = function (City) {
 
     City.getAllCities = async () => {
         try {
-            let res = await City.find({ fields: "name" });
+            let res = await City.find({fields:{name:true,id:true}});
             return res;
         } catch (error) {
             throw error;

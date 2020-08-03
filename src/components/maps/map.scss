@@ -110,10 +110,10 @@
     .close-map-mobile{
         bottom: 15%;
     }
-    .close-map:hover {
-        animation-name: hover;
-        animation-duration: 0.5s;
-    }
+    // .close-map:hover {
+    //     animation-name: hover;
+    //     animation-duration: 0.5s;
+    // }
     @keyframes hover {
         0% {
             bottom: 15%;
