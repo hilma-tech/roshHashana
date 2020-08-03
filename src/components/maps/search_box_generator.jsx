@@ -32,13 +32,12 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange, second, uId, deafault }) => {
-    console.log("deafault", deafault)
+export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className }) => {
     const autoCompleteInput = useRef()
 
     useEffect(() => {
         //so we have window.google
-        if (second) init()
+        if (window.google && window.google.maps) { init(); return; }
         window.init = init
         const script = document.createElement('script')
         script.async = true;
@@ -56,7 +55,7 @@ export const FormSearchBoxGenerator = ({ onAddressChange, second, uId, deafault 
 
     const init = () => {
         const input = document.getElementById(uId);
-        console.log('input: ', input);
+        // console.log('input: ', input);
         if (!input) return;
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ "country": "il" });
@@ -65,17 +64,19 @@ export const FormSearchBoxGenerator = ({ onAddressChange, second, uId, deafault 
 
     const handlePlaceChange = (autocomplete) => {
         let placeInfo = autocomplete.getPlace();
-        let place = placeInfo.geometry && placeInfo.formatted_address ? placeInfo.formatted_address : true
+        let place = placeInfo.geometry && placeInfo.formatted_address ? placeInfo.formatted_address : "NOT_A_VALID_ADDRESS"
         onAddressChange(place)
     }
 
     return (
         <div className="form-search-input-container">
             <input
-                deafault={deafault}
+                deafault={defaultValue}
                 ref={autoCompleteInput}
-                autocomplete={'off'}
+                defaultValue={defaultValue}
+                autoComplete={'off'}
                 id={uId}
+                className={className}
                 type="text"
                 placeholder="מיקום"
                 onChange={() => { onAddressChange("NOT_A_VALID_ADDRESS") }}

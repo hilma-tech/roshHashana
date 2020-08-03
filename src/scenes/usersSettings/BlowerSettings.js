@@ -13,6 +13,7 @@ import './Settings.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
+import GeneralAlert from '../../components/modals/general_alert';
 const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
@@ -37,8 +38,8 @@ const format = 'HH:mm';
 
 const IsolatedSettings = (props) => {
 
-    const { cities, setCities, openGenAlert } = useContext(MainContext);
-    const [publicMeetings, setPublicMeetings] = useState([]);
+    const { openGenAlert, showAlert } = useContext(MainContext);
+    const [publicMeetings, setPublicMeetings] = useState([])
     const [settingsType, setSettingsType] = useState('');
     const [blowingTimes, setBlowingTimes] = useState('');
     const [address, setAddress] = useState('');
@@ -48,6 +49,7 @@ const IsolatedSettings = (props) => {
     const [maxTime, setMaxTime] = useState('');
     const [msgErr, setMsgErr] = useState('');
     const [name, setName] = useState('');
+    const [locationMsgErr, setLocationMsgErr] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -56,7 +58,6 @@ const IsolatedSettings = (props) => {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
-                console.log("res.address", res)
                 setValues(res, setBlowerInfo);
                 setValues(res.name, setName);
                 setValues(res.address, setAddress);
@@ -66,20 +67,9 @@ const IsolatedSettings = (props) => {
                 setValues(res.can_blow_x_times, setBlowingTimes);
                 setValues(res.publicMeetings, setPublicMeetings);
             }
-            if (!cities.length) {
-                getCities();
-            }
         })();
     }, []);
 
-    const getCities = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" }
-        }, true);
-        if (res) {
-            setCities(res);
-        }
-    }
 
     //a function that handles set state generically
     const setValues = (val, setFunc) => {
@@ -140,6 +130,20 @@ const IsolatedSettings = (props) => {
         if (!nameVal) nameVal = blowerInfo.name;
         if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
+        if (address === "NOT_A_VALID_ADDRESS") {
+            openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
+            setLocationMsgErr('הכתובת שהזנת אינה תקינה'); return;
+        }
+        for (let i = 0; i < publicMeetings.length; i++) {
+            if (publicMeetings[i].address === "NOT_A_VALID_ADDRESS") {
+                let publicPlaces = publicMeetings;
+                publicPlaces[i].errMsg = "הכתובת שהזנת אינה תקינה";
+                setPublicMeetings(publicPlaces)
+                openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
+                return
+            }
+        }
+
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
 
         if (!maxTimeVal) maxTimeVal = blowerInfo.volunteering_max_time;
@@ -153,7 +157,7 @@ const IsolatedSettings = (props) => {
                 let newData = {
                     "name": nameVal,
                     "username": usernameVal,
-                    "ddress": address,
+                    "address": address,
                     "volunteering_max_time": maxTimeVal,
                     "can_blow_x_times": blowingTimesVal,
                     "volunteering_start_time": startTimeVal,
@@ -183,77 +187,82 @@ const IsolatedSettings = (props) => {
     }
 
     return (
-        <SettingsLayout handleClose={updateIsolatedInfo}>
-            <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
-                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
-                <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
-                    className="noSelect">{settingsType === 'personal-info' ? '-' : '+'}</div>
-            </div>
-
-            <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
-
-                <div className="header">שם מלא</div>
-                <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
-                <div className="header">טלפון</div>
-                <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
-            </div>
-
-            <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>הגדרות מפת התקיעות</div>
-                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
-            </div>
-
-            <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
-
-                <div className="header">כמה פעמים תוכל לתקוע?</div>
-                <input type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
-
-                <div className="header">שעת יציאה</div>
-                <ThemeProvider theme={materialTheme}>
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                        <Fragment>
-                            <TimePicker
-                                ampm={false}
-                                value={startTime}
-                                onChange={(time) => setValues(time._d, setStartTime)}
-                                format={format}
-                            />
-                        </Fragment>
-                    </MuiPickersUtilsProvider>
-                </ThemeProvider>
-
-                <div className="header">כתובת יציאה</div>
-
-                <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId='address' deafault={address} />
-                <div className="max-time header">סמן את זמן ההליכה</div>
-                <Slider value={maxTime ? maxTime : 0} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
-                <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
-            </div>
-
-            <div id="public-blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות</div>
-                <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
-            </div>
-
-            <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
-                {publicMeetings && cities.length != 0 && publicMeetings.map((place, index) => {
-                    return <div key={index}><AddPublicPlace
-                        removePubPlace={removePubPlace}
-                        index={index}
-                        format={format}
-                        cities={cities}
-                        updatePublicPlace={updatePublicPlace}
-                        inSettings={true}
-                        info={place ? place : undefined}
-                    /><hr style={{ marginBottom: "5%" }} /></div>
-                })}
-                <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
-                    <div id="plus">+</div>
-                    <div>הוסף תקיעה במקום ציבורי</div>
+        <>
+            <SettingsLayout handleClose={updateIsolatedInfo}>
+                <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
+                    <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
+                    <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
+                        className="noSelect">{settingsType === 'personal-info' ? '-' : '+'}</div>
                 </div>
-            </div>
-            <div className="err-msg">{msgErr}</div>
-        </SettingsLayout >
+
+                <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
+
+                    <div className="header">שם מלא</div>
+                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
+                    <div className="header">טלפון</div>
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                </div>
+
+                <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
+                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>הגדרות מפת התקיעות</div>
+                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('blowing-set-btn')}>{settingsType === 'blowing-set-btn' ? '-' : '+'}</div>
+                </div>
+
+                <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
+
+                    <div className="header">כמה פעמים תוכל לתקוע?</div>
+                    <input type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
+
+                    <div className="header">שעת יציאה</div>
+                    <ThemeProvider theme={materialTheme}>
+                        <MuiPickersUtilsProvider utils={MomentUtils}>
+                            <Fragment>
+                                <TimePicker
+                                    ampm={false}
+                                    value={startTime}
+                                    onChange={(time) => setValues(time._d, setStartTime)}
+                                    format={format}
+                                />
+                            </Fragment>
+                        </MuiPickersUtilsProvider>
+                    </ThemeProvider>
+
+                    <div className="header">כתובת יציאה</div>
+
+                    <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId='address' defaultValue={address} />
+                    <div className="err-msg" style={{ marginBottom: "1rem" }}>{locationMsgErr}</div>
+
+                    <div style={{ marginTop: "5%" }} className="max-time header">סמן את זמן ההליכה</div>
+                    <Slider value={maxTime ? maxTime : 0} min={15} max={180} onChange={(e, val) => setValues(val, setMaxTime)} aria-labelledby="continuous-slider" />
+                    <div className="max-time-val">{`עד ${maxTime} דקות`}</div>
+                </div>
+
+                <div id="public-blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
+                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות</div>
+                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
+                </div>
+
+                <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
+                    {publicMeetings && publicMeetings.map((place, index) => {
+                        return <div key={index}><AddPublicPlace
+                            removePubPlace={removePubPlace}
+                            index={index}
+                            format={format}
+                            updatePublicPlace={updatePublicPlace}
+                            inSettings={true}
+                            info={place ? place : undefined}
+                        /><hr style={{ marginBottom: "5%" }} /></div>
+                    })}
+                    <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
+                        <div id="plus">+</div>
+                        <div>הוסף תקיעה במקום ציבורי</div>
+                    </div>
+                </div>
+                <div className="err-msg">{msgErr}</div>
+            </SettingsLayout >
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+
+        </>
     );
 }
 export default IsolatedSettings;
