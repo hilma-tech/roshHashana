@@ -8,17 +8,14 @@ import './Settings.scss';
 
 const IsolatedSettings = (props) => {
 
-    const { cities, setCities } = useContext(MainContext);
     const [openBlowingSet, setOpenBlowingSet] = useState(false);
     const [openPersInfo, setOpenPersInfo] = useState(false);
     const [isolatedInfo, setIsolatedInfo] = useState({});
-    const [appartment, setAppartment] = useState('');
     const [comments, setComments] = useState('');
     const [username, setUsername] = useState('');
     const [msgErr, setMsgErr] = useState('');
-    const [street, setStreet] = useState('');
     const [name, setName] = useState('');
-    const [city, setCity] = useState('');
+    const [address, setAddress] = useState('');
 
 
     useEffect(() => {
@@ -32,37 +29,20 @@ const IsolatedSettings = (props) => {
                 setValues(res, setIsolatedInfo);
                 setValues(res.comments ? res.comments : '', setComments);
                 setValues(res.name, setName);
-                setValues(res.userCity ? res.userCity.name : '', setCity);
-                setValues(res.street, setStreet);
-                setValues(res.appartment, setAppartment);
                 setValues(res.username, setUsername);
+                setValues(res.address, setAddress);
+
             }
-            if (!cities.length) {
-                getCities();
-            }
+
         })();
     }, []);
 
-    const getCities = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" }
-        }, true);
-        if (res) {
-            setCities(res);
-        }
-    }
 
     //a function that handles set state generically
     const setValues = (val, setFunc) => {
         setFunc(val);
     }
 
-    const updateSelectedCity = (city) => {
-        let chosenCity;
-        if (city.name) chosenCity = city.name;
-        else chosenCity = city;
-        setValues(chosenCity, setCity);
-    }
 
     const handlePhoneChange = (e) => {
         if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
@@ -74,9 +54,6 @@ const IsolatedSettings = (props) => {
 
         let nameVal = name;
         let usernameVal = username;
-        let cityVal = city;
-        let streetVal = street;
-        let appartmentVal = appartment;
         let public_meeting = document.getElementById('public-meeting');
         let public_phone = document.getElementById('public-phone');
 
@@ -84,16 +61,9 @@ const IsolatedSettings = (props) => {
         if (!usernameVal) usernameVal = isolatedInfo.username;
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
         if (usernameVal[0] !== "0") { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
-        if (!streetVal && !appartmentVal && !comments) {
-            setMsgErr('אנא הכנס או שם רחוב ומספר בית או הערות המתארות את מקום מגוריך');
-            return;
-        }
 
-        if (!cityVal) cityVal = isolatedInfo.userCity ? isolatedInfo.userCity.name : '';
-        if (!streetVal) streetVal = isolatedInfo.street;
-        if (!appartmentVal) appartmentVal = isolatedInfo.appartment;
 
-        let address = cityVal + ' ' + streetVal + ' ' + appartmentVal + ' ' + comments;
+
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
         await Geocode.fromAddress(address).then(
@@ -102,9 +72,7 @@ const IsolatedSettings = (props) => {
                     "name": nameVal,
                     "username": usernameVal,
                     "public_phone": public_phone.checked,
-                    "city": cityVal,
-                    "street": streetVal,
-                    "appartment": appartmentVal,
+                    "address": address,
                     "comments": comments,
                     "public_meeting": public_meeting.checked ? 1 : 0
                 }
@@ -147,20 +115,7 @@ const IsolatedSettings = (props) => {
 
             <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
                 <div className="header">כתובת</div>
-
-                <AutoComplete
-                    optionsArr={cities}
-                    placeholder="עיר / יישוב"
-                    canAddOption={true}
-                    displyField="name"
-                    inputValue={city}
-                    updateSelectOption={updateSelectedCity}
-                    updateText={updateSelectedCity}
-                    canAddOption={true}
-                />
-
-                <input autoComplete={'off'} id="street" type="text" value={street} placeholder="רחוב" onChange={(e) => setValues(e.target.value, setStreet)} />
-                <input autoComplete={'off'} id="appartment" type="text" value={appartment} placeholder="מספר בית / דירה" onChange={(e) => setValues(e.target.value, setAppartment)} />
+                <input id="address" type="text" placeholder="כתובת" value={address} onChange={(e) => setValues(e.target.value, setAddress)} />
 
                 <div className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                 <div className="checkbox-container ">

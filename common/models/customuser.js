@@ -244,7 +244,7 @@ module.exports = function (CustomUser) {
                 let userAddress;
                 //get user address if it is not public map
                 if (!isPubMap) {
-                 
+
                     let [err, address] = await executeMySqlQuery(CustomUser,
                         `select
                          CustomUser.address
@@ -252,7 +252,7 @@ module.exports = function (CustomUser) {
                          CustomUser
                          where CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
-                    if (address){
+                    if (address) {
                         userAddress = address;
                     }
                 }
@@ -333,16 +333,11 @@ module.exports = function (CustomUser) {
                 let role = await getUserRole(userId);
                 if (!role) return;
                 let city;
-                if (data.city) {
-                    city = await CustomUser.app.models.city.findOne({ where: { name: data.city } });
-                }
                 let userData = {
                     name: data.name,
                     username: data.username,
-                    street: data.street ? data.street : null,
-                    appartment: data.appartment ? data.appartment : null,
+                    address: data.address,
                     comments: data.comments ? data.comments : null,
-                    cityId: city ? city.id : null
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
