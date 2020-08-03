@@ -20,7 +20,7 @@ module.exports = function (ShofarBlower) {
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
                 if (!blowerInfo) {
                     if (!data.address || !data.address.length) return "כתובת אינה תקינה"
-                    if(data.address === "NOT_A_VALID_ADDRESS" || || (typeof address === "boolean" && address === true)) return 'נא לבחור מיקום מהרשימה הנפתחת'
+                    if(data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) return 'נא לבחור מיקום מהרשימה הנפתחת'
                     data.address = data.address.substring(0, 398) // shouldn't be more than 400 
                     let objToBlower = {
                         "userBlowerId": options.accessToken.userId,
