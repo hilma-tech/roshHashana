@@ -74,6 +74,7 @@ const App = (props) => {
                     {alertVis ? <div ref={alertRef} className="alertMsg" >{alertVis}</div> : null}
                     <MainProvider>
                         <Switch>
+                            <Route path="/addDetails" component={(props) => <BlowerForm {...props} />} />
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />

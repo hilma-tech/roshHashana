@@ -12,6 +12,8 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import Geocode from "react-geocode";
 import './detailsForm.scss';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
+import { updateSBDetails } from '../../fetch_and_utils';
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -40,7 +42,7 @@ export default class IsolatedForm extends Component {
         this.state = {
             errorMsg: '',
             cities: [], // alist of all the cities
-            chosenCity: '', //the city address of the shofar blower
+            address: '', //the city address of the shofar blower
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
             publicPlaces: [{}], //a list of all the public places that the shofar blower added,
@@ -60,7 +62,7 @@ export default class IsolatedForm extends Component {
                 }
             }
             else {
-                this.props.history.push('/');
+                // this.props.history.push('/');
                 return;
             }
 
@@ -69,14 +71,6 @@ export default class IsolatedForm extends Component {
 
     goBack = () => {
         this.props.history.goBack();
-    }
-
-    //update the city of the shofar blower
-    updateCity = (city) => {
-        let chosenCity;
-        if (city.name) chosenCity = city.name;
-        else chosenCity = city;
-        this.setState({ chosenCity });
     }
 
     //update the start time the shofar blower wants to start his volunteering
@@ -95,7 +89,6 @@ export default class IsolatedForm extends Component {
     //update the public meeting that the shofar blower added
     updatePublicPlace = (index, keyName, publicPlaceVal) => {
         let publicPlaces = this.state.publicPlaces;
-
         publicPlaces[index][keyName] = publicPlaceVal;
         this.setState({ publicPlaces });
     }
@@ -122,19 +115,25 @@ export default class IsolatedForm extends Component {
         this.setState({ walkTime: newValue });
     }
 
+    handleAddressChange = (placeName) => {
+        this.setState({ address: placeName })
+        console.log('setState to address: ', placeName);
+    }
+
     checkForMissingDataInPublicPlaces = async () => {
         let publicPlaces = this.state.publicPlaces;
-        for (let i = 0; i < this.state.publicPlaces.length; i++) {
-            if (!this.state.publicPlaces[i].city && !this.state.publicPlaces[i].street && !this.state.publicPlaces[i].time) {
+        let updateArrInState = false;
+        for (let i in publicPlaces) {
+            if (!publicPlaces[i].address && !publicPlaces[i].time) {
+                updateArrInState = true;
                 publicPlaces.splice(i, 1);
             }
-            else if (!this.state.publicPlaces[i].city || !this.state.publicPlaces[i].street || !this.state.publicPlaces[i].time) {
+            else if (!publicPlaces[i].address || !publicPlaces[i].time) {
                 this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
                 return false;
             }
-            else continue;
         }
-        this.setState({ publicPlaces });
+        updateArrInState && this.setState({ publicPlaces });
         return true;
     }
 
@@ -150,8 +149,13 @@ export default class IsolatedForm extends Component {
     saveShofarBlowerDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
+        console.log('formChilds: ', formChilds); //!
 
-        if (!formChilds[1].value || !this.state.chosenTime || !this.state.chosenCity || !formChilds[7].value || !formChilds[8].value) {
+        if (!formChilds[1].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
+            console.log('formChilds[1].value: ', formChilds[1].value);
+            console.log('this.state.chosenTime: ', this.state.chosenTime);
+            console.log('this.state.address: ', this.state.address);
+            console.log('this.state.address.length: ', this.state.address.length);
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
@@ -160,54 +164,47 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
-        if (formChilds[8].value.length > 5) {// check appartment value
-            this.setState({ errorMsg: 'מספר הדירה או הבית אינו תקין' });
+        // check address
+        const { address } = this.state
+        if (address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) {
+            //if true, is not one from google (see handlePlaceChange:func in search_box_generator)
+            this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
 
-        let address = this.state.chosenCity + ' ' + formChilds[7].value + ' ' + formChilds[2].value;
         let startTime = new Date(this.state.chosenTime);
         startTime.setFullYear(2020, 8, 20);
 
-        //check if the address is correct
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-        Geocode.setLanguage("he");
-
         let success = await this.checkForMissingDataInPublicPlaces();
-        if (success) {
-            await Geocode.fromAddress(address).then(
-                async response => {
-                    let blowerDetails = {
-                        "can_blow_x_times": formChilds[1].value,
-                        "volunteering_start_time": startTime,
-                        "volunteering_max_time": this.state.walkTime,//endTime,
-                        "city": this.state.chosenCity,
-                        "street": formChilds[7].value,
-                        "appartment": formChilds[8].value,
-                        "publicPlaces": this.state.publicPlaces
-                    }
-                    this.setState({ errorMsg: '' });
-
-                    //update shofar blower details
-                    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
-                        headers: { Accept: "application/json", "Content-Type": "application/json" },
-                        method: "POST",
-                        body: JSON.stringify({ data: blowerDetails })
-                    }, true);
-                    if (res) {
-                        this.props.history.push('/')
-                    }
-                },
-                error => {
-                    this.setState({ errorMsg: 'הכתובת אינה תקינה, אנא בדוק אותה' });
-                    return;
-                }
-            );
+        if (!success) {
+            return;
         }
+        let blowerDetails = {
+            "can_blow_x_times": formChilds[1].value,
+            "volunteering_start_time": startTime,
+            "volunteering_max_time": this.state.walkTime,//endTime,
+            "address": this.state.address, //!
+            "publicPlaces": this.state.publicPlaces
+        }
+        this.setState({ errorMsg: '' });
+        console.log("valid");
+        //update shofar blower details
+        updateSBDetails(blowerDetails, (error) => {
+            if (!error) {
+                this.props.history.push('/')
+            } else {
+                this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
+            }
+        })
     }
 
     render() {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
+
+        // var input = document.getElementById('locationTextField');
+        // var autocomplete = new google.maps.places.Autocomplete(input);
+
+
         return (
             <div id="isolated-form-container">
 
@@ -242,18 +239,8 @@ export default class IsolatedForm extends Component {
 
                         {/* address inputs */}
                         <div className="title">מה הכתובת ממנה אתה יוצא?</div>
-                        <AutoComplete
-                            optionsArr={this.state.cities}
-                            placeholder="עיר / יישוב"
-                            canAddOption={true}
-                            displyField="name"
-                            inputValue={this.state.chosenCity}
-                            updateSelectOption={this.updateCity}
-                            updateText={this.updateCity}
-                            canAddOption={true}
-                        />
-                        <input autoComplete={'off'} id="street" type="text" placeholder="רחוב" />
-                        <input autoComplete={'off'} id="appartment" type="text" placeholder="דירה/ בניין" />
+                        <div id="comment">נא לרשום את הכתובת המלאה</div>
+                        <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1'/>
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>
@@ -276,7 +263,6 @@ export default class IsolatedForm extends Component {
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
-                                        cities={this.state.cities}
                                         updatePublicPlace={this.updatePublicPlace}
                                     />
                                 })}

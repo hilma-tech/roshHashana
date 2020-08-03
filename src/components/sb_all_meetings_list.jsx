@@ -19,7 +19,7 @@ const SBAllMeetingsList = ({ mobile }) => {
                 return <div className="open-meeting-in-list" key={"sb-meetings-list-" + i} >
                     <div className="open-meeting-in-list-info">
                         <div className="open-meeting-in-list-title" >{m.isPublicMeeting ? "קריאה ציבורית" : m.name}</div>
-                        <div className="open-meeting-in-list-location" >{m.city + " " + m.street + (!m.isPublicMeeting && m.appartment ? (" " + m.appartment) : "")}</div>
+                        <div className="open-meeting-in-list-location" >{m.address || ""}</div>
                         <div className="open-meeting-in-list-comments" >{m.comments || ""}</div>
                     </div>
                     <div className="open-meeting-in-list-button" onClick={() => handleAssign(m)} >
