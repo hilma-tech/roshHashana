@@ -117,7 +117,7 @@ const MapComp = (props) => {
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
             const date = moment(pub.start_time).format("HH:mm");
-            const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
+            const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     let newLocObj = {
