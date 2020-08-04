@@ -50,6 +50,7 @@ const IsolatedSettings = (props) => {
     const [msgErr, setMsgErr] = useState('');
     const [name, setName] = useState('');
     const [locationMsgErr, setLocationMsgErr] = useState('');
+    const [blowingTimesMsgErr, setBlowingTimesMsgErr] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -126,7 +127,14 @@ const IsolatedSettings = (props) => {
         let startTimeVal = startTime;
         let blowingTimesVal = blowingTimes;
         let maxTimeVal = maxTime;
-
+        if (blowingTimes < 0) {
+            openGenAlert({ text: 'מספר הפעמים שתוכל לתקוע לא יכול להיות שלילי' });
+            setBlowingTimesMsgErr('מספר הפעמים שתוכל לתקוע לא יכול להיות שלילי'); return;
+        }
+        if (blowingTimes > 20) {
+            openGenAlert({ text: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
+            setBlowingTimesMsgErr('לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים'); return;
+        }
         if (!nameVal) nameVal = blowerInfo.name;
         if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
         if (!usernameVal) usernameVal = blowerInfo.username;
@@ -211,9 +219,10 @@ const IsolatedSettings = (props) => {
                 <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
 
                     <div className="header">כמה פעמים תוכל לתקוע?</div>
-                    <input type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
+                    <input id="blowingTimes" type="number" value={blowingTimes} maxLength={2} onChange={(e) => setValues(e.target.value, setBlowingTimes)} />
+                    <div className="err-msg">{blowingTimesMsgErr}</div>
 
-                    <div className="header">שעת יציאה</div>
+                    <div style={{ marginTop: "5%" }} className="header">שעת יציאה</div>
                     <ThemeProvider theme={materialTheme}>
                         <MuiPickersUtilsProvider utils={MomentUtils}>
                             <Fragment>

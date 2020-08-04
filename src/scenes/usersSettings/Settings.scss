@@ -109,7 +109,7 @@ input[type="number"] {
         -webkit-appearance: none;
     }
 }
-#address,.address
+#address,.address, #blowingTimes
     {
         @include input();
         font-size: 1.3rem;
