@@ -150,10 +150,8 @@ const ShofarBlowerMap = (props) => {
         let myMeeting;
         for (let i in meetings) {
             myMeeting = meetings[i]
-            const address = myMeeting.isPublicMeeting ? `${myMeeting.city} ${myMeeting.street}` : `${myMeeting.city} ${myMeeting.street} ${myMeeting.appartment}`
-            myMeeting.address = address;
-            let [error, response] = await to(Geocode.fromAddress(address + ` ${myMeeting.comments || ""}`))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${address}` }); return; }
+            let [error, response] = await to(Geocode.fromAddress(myMeeting.address + ` ${myMeeting.comments || ""}`))
+            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${myMeeting.address}` }); return; }
             let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
             try {
                 const { lat, lng } = response.results[0].geometry.location;

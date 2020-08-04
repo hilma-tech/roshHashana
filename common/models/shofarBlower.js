@@ -8,9 +8,7 @@ module.exports = function (ShofarBlower) {
     //         "can_blow_x_times":1,
     //         "volunteering_start_time":1594563291554,
     //         "volunteering_max_time":1594563291554,
-    //         "city" : "חיפה",
-    //         "street": "פרויד",
-    //         "appartment": "23",
+    //         "address",
     //         "comments": null
     //     }
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {

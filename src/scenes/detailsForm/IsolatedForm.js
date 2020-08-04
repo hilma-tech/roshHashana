@@ -16,7 +16,6 @@ export default class IsolatedForm extends Component {
             errorMsg: '',
             openModal: false,
             address: '',
-            chosenCity: '',
             approval: true
         }
     }
@@ -25,7 +24,7 @@ export default class IsolatedForm extends Component {
         this.props.history.goBack();
     }
 
-    //update the chosen city
+    //update the chosen address
     setAddress = (address) => {
         this.setState({ address });
     }
