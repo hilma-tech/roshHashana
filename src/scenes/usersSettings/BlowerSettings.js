@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment, useContext } from 'react';
+import React, { useRef, useEffect, useState, Fragment, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from "@material-ui/styles";
@@ -55,6 +55,8 @@ const IsolatedSettings = (props) => {
                 if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
                 setVals(res);
                 setOriginalVals(res)
+                publicMeetingsChanged = false;
+
             }
         })();
     }, []);
@@ -69,6 +71,7 @@ const IsolatedSettings = (props) => {
     }
 
     const addPublicPlace = () => {
+        console.log("addPublicPlace")
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
@@ -98,6 +101,7 @@ const IsolatedSettings = (props) => {
 
 
     const removePubPlace = (i) => {
+        console.log("removePubPlace")
         publicMeetingsChanged = true
         let publicPlaces = [...vals.publicMeetings];
         publicPlaces.splice(i, 1);
@@ -122,7 +126,7 @@ const IsolatedSettings = (props) => {
             }
         }
         if (fromX) {
-            console.log("updateData", updateData)
+            console.log("publicMeetingsChanged", publicMeetingsChanged)
             if (publicMeetingsChanged || (updateData && Object.keys(updateData).length !== 0)) {
                 openGenAlert({
                     text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,

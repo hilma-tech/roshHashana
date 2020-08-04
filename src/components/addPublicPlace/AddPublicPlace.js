@@ -55,7 +55,7 @@ const AddPublicPlace = (props) => {
         props.updatePublicPlace(props.index, 'address', address);
     }, [address]);
 
-    //update chosenAddress state and the publicPlaces array according to user choice
+    // update chosenAddress state and the publicPlaces array according to user choice
     const updateAddress = (address) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
