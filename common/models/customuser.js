@@ -61,7 +61,8 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.authenticationKey = (key, meetingId, options, res, cb) => {
+    CustomUser.authenticationKey = (key, meetingId,role, options, res, cb) => {
+        const { RoleMapping } = CustomUser.app.models;
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {
                 console.log("err", err1)
@@ -81,27 +82,22 @@ module.exports = function (CustomUser) {
                             cb(err2, null)
                         }
                         if (resdelet) {
-                            CustomUser.findOne({ where: { keyId: resKey.id } }, (err, resUser) => {
-                                if (err) return cb(err, null);
+                            CustomUser.findOne({ where: { keyId: resKey.id } }, (err3, resUser) => {
+                                if (err3) return cb(err3, null);
                                 if (resUser) {
-                                    CustomUser.app.models.RoleMapping.findOne({ where: { principalId: resUser.id } }, (err, resRole) => {
-                                        if (err) console.log("Err", err);
+                                    RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
+                                        if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            console.log("Login secess")
-                                            CustomUser.directLoginAs(resUser.id, resRole.roleId, (err, result) => {
-                                                let expires = new Date(Date.now() + 5184000000);
-                                                res.cookie('access_token', result.__data.id, { signed: true, expires });
-                                                res.cookie('klo', result.__data.klo, { signed: false, expires });
-                                                res.cookie('kl', result.__data.kl, { signed: false, expires });
-                                                // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
-                                                res.cookie('kloo', randomstring.generate(), { signed: true, expires });
-                                                res.cookie('klk', randomstring.generate(), { signed: true, expires });
-                                                res.cookie('olk', randomstring.generate(), { signed: true, expires });
-                                                CustomUser.checkStatus(result.userId, meetingId, resRole, cb)
-                                                // cb(null, { ok: true })
-                                            },
-                                                options, 5184000)
+                                            if (resRole.roleId != role && !resUser.address) {
+                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                                    if (err5) console.log("Err5", err5);
+                                                    if (resNewRole) {
+                                                        CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
+                                                    }
+                                                })
+                                            }else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
                                         }
+
                                     })
                                 }
                             })
@@ -114,27 +110,36 @@ module.exports = function (CustomUser) {
             }
         })
     }
-    CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
+
+CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =>{
+    console.log("Login secess")
+    CustomUser.directLoginAs(userId, roleId, (err, result) => {
+        let expires = new Date(Date.now() + 5184000000);
+        res.cookie('access_token', result.__data.id, { signed: true, expires });
+        res.cookie('klo', result.__data.klo, { signed: false, expires });
+        res.cookie('kl', result.__data.kl, { signed: false, expires });
+        // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
+        res.cookie('kloo', randomstring.generate(), { signed: true, expires });
+        res.cookie('klk', randomstring.generate(), { signed: true, expires });
+        res.cookie('olk', randomstring.generate(), { signed: true, expires });
+        CustomUser.checkStatus(userId, meetingId, roleId, cb)
+        // cb(null, { ok: true })
+    },
+        options, 5184000)
+}
+    CustomUser.checkStatus = (userId, meetingId, roleId, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
-        let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err || !res) { console.log("Err", err); } //todo: return cb(true?)
             if (res) {
-                switch (status) {
+                switch (roleId) {
                     case 1:
                         if (res.address == null) {
                             cb(null, { ok: "isolator new", data: { name: res.name } })
                         } else {
-                            // CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
-                            //     if (errCity) console.log('errCity', errCity);
-                            //     if (city) {
-                            //         let street = res.street ? res.street : '';
-                            //         let appartment = res.appartment ? res.appartment : '';
-                            //         let comments = res.comments ? res.comments : '';
-                            //         let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
+
                             cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
-                            //     }
-                            // });
+
                         }
                         break;
 
@@ -170,13 +175,7 @@ module.exports = function (CustomUser) {
                                                     data:
                                                     {
                                                         name: res.name,
-                                                        // meetingInfo: {
-                                                        //     street: resPublicMeeting.street,
-                                                        //     comments: resPublicMeeting.comments,
-                                                        //     start_time: resPublicMeeting.start_time,
-                                                        //     city: resPublicMeeting.meetingCity().name,
-                                                        //     blowerName: resPublicMeeting.blowerPublic().name
-                                                        // }
+
                                                         meetingInfo: {
                                                             address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
@@ -482,6 +481,7 @@ module.exports = function (CustomUser) {
         accepts: [
             { arg: 'key', type: 'string' },
             { arg: 'meetingId', type: 'any' },
+            { arg: 'role', type: 'number' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
             { arg: 'res', type: 'object', http: { source: 'res' } }
 
