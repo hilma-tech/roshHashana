@@ -3,7 +3,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import Geocode from "react-geocode";
 import _ from "lodash";
 
 import { SBMapComponent } from './sb_map_renderer'
@@ -66,16 +65,9 @@ const ShofarBlowerMap = (props) => {
     useEffect(() => {
         (async () => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
-                Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-                Geocode.setLanguage("he");
-                const centerAdr = userData.address + (userData.comments ? userData.comments : "")
-                let [error, res] = await to(Geocode.fromAddress(centerAdr))
-                if (error || !res) { setErr(true); openGenAlert({ text: "אירעה שגיאה בטעינת המפה, נא נסו שנית מאוחר יותר" }); console.log("error getting geoCode of ירושלים: ", error); return; }
-                try {
-                    const newCenter = res.results[0].geometry.location;
-                    if (newCenter !== center) setCenter(newCenter)
-                    setUserOriginLoc(newCenter)
-                } catch (e) { console.log(`ERROR getting ${centerAdr} geoCode, res.results[0].geometry.location `, e); }
+                const newCenter = { lat: userData.lat, lng: userData.lng };
+                if (newCenter !== center) setCenter(newCenter)
+                setUserOriginLoc(newCenter)
             }
         })();
     }, [userData])
@@ -126,19 +118,19 @@ const ShofarBlowerMap = (props) => {
         let meetReq;
         for (let i in reqsArr) {
             meetReq = reqsArr[i]
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-            Geocode.setLanguage("he");
-            let [error, response] = await to(Geocode.fromAddress(meetReq.address + ` ${meetReq.comments || ""}`))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${meetReq.address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${meetReq.address}` }); continue; }
-            try {
-                const { lat, lng } = response.results[0].geometry.location;
-                const newLocObj = {
-                    type: meetReq.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
-                    location: { lat, lng },
-                    info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
-                }
-                newReqsLocs.push(newLocObj)
-            } catch (e) { console.log("err setSBMapContent, ", e); }
+            // Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+            // Geocode.setLanguage("he");
+            // let [error, response] = await to(Geocode.fromAddress(meetReq.address + ` ${meetReq.comments || ""}`))
+            // if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${meetReq.address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${meetReq.address}` }); continue; }
+            // try {
+            // const { lat, lng } = response.results[0].geometry.location;
+            const newLocObj = {
+                type: meetReq.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
+                location: { lat: meetReq.lat, lng: meetReq.lng },
+                info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
+            }
+            newReqsLocs.push(newLocObj)
+            // } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i == reqsArr.length - 1) {
                 setReqsLocs(newReqsLocs);
             }
@@ -150,14 +142,14 @@ const ShofarBlowerMap = (props) => {
         let myMeeting;
         for (let i in meetings) {
             myMeeting = meetings[i]
-            let [error, response] = await to(Geocode.fromAddress(myMeeting.address + ` ${myMeeting.comments || ""}`))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${myMeeting.address}` }); return; }
+            // let [error, response] = await to(Geocode.fromAddress(myMeeting.address + ` ${myMeeting.comments || ""}`))
+            // if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${myMeeting.address}` }); return; }
             let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
             try {
-                const { lat, lng } = response.results[0].geometry.location;
+                // const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
                     type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
-                    location: { lat, lng },
+                    location: { lat: myMeeting.lat, lng: myMeeting.lng },
                     startTime: myStartT && myStartT.startTime ? myStartT.startTime : myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
                     constMeeting: myMeeting.constMeeting,
