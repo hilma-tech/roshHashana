@@ -113,12 +113,34 @@ const IsolatedSettings = (props) => {
     }
 
 
-    const updateIsolatedInfo = async () => {
+    const updateIsolatedInfo = async (fromX) => {
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
             if ((field === "publicMeetings" && publicMeetingsChanged) || vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
+            }
+        }
+        if (fromX) {
+            console.log("updateData", updateData)
+            if (publicMeetingsChanged || (updateData && Object.keys(updateData).length !== 0)) {
+                openGenAlert({
+                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
+                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
+                },
+                    (res) => {
+                        if (res) {
+                            props.history.goBack();
+                            return
+                        } else {
+                            return
+                        }
+                    })
+                return
+            } else {
+                props.history.goBack();
+                return
+
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
@@ -194,7 +216,8 @@ const IsolatedSettings = (props) => {
                 isPopup: { okayText: "אישור" }
             },
                 (res) => {
-                    props.history.goBack();
+                    if (res)
+                        props.history.goBack();
                 })
         }
     }
@@ -208,7 +231,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { props.history.goBack(); }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
