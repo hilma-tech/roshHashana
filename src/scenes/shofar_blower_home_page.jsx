@@ -67,7 +67,7 @@ const SBHomePage = (props) => {
     return (
         <div className="sb-homepage-container">
             {
-                !userData && !meetingsReqs && !myMeetings ? <img className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
+                !userData && !meetingsReqs && !myMeetings ? <img alt="" className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}

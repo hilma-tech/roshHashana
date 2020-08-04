@@ -111,7 +111,6 @@ const IsolatedSettings = (props) => {
     }
     const handleAddressChange = (placeName) => {
         setValues(placeName, 'address')
-        console.log('setState to address: ', placeName);
     }
 
 

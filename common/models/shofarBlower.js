@@ -14,7 +14,6 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
         if (options.accessToken && options.accessToken.userId) {
             try {
-                console.log('data: ', data);
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
                 if (!blowerInfo) {
                     if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }

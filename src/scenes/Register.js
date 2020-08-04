@@ -31,11 +31,17 @@ class Register extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+    if (Auth.isAuthenticated()) {
+      return this.props.history.push('/');
+    }
+  }
+
   handleChange(event) {
     this.setState({ alart: null })
     if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
-      event.target.id === "name" && event.target.value.length < 20 ||
-      event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
+      (event.target.id === "name" && event.target.value.length < 20) ||
+      (event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".")) {
       this.setState({ [event.target.id]: event.target.value })
     }
 
@@ -56,7 +62,7 @@ class Register extends React.Component {
         return
 
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || this.state.phone && this.state.phone[0] != 0 || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
@@ -79,40 +85,33 @@ class Register extends React.Component {
 
             break;
           case "blower new":
-            console.log("קרוא לדף של רעות להרשמת תוקע בשופר ", res.data.name);
             this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
 
             break;
           case "blower with data":
-            console.log("להציג הרשמה לתוקע");
             this.props.history.push('/');
 
             break;
           case "isolator new":
-            console.log("להציג הרשמה למבודד");
             this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
             break;
           case "isolator with data":
-            console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
             this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
 
             break;
           case "isolated with new public meeting":
-            console.log("להודיע לו שהוא נרשם");
             //TODO להודיע לו שהוא נרשם 
             this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
 
 
             break;
           case "isolated with public meeting":
-            console.log("להכניס אותו שוב לאיפה שהוא נירשם");
             //TODO להכניס אותו שוב לאיפה שהוא נירשם
             this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
 
 
             break;
           case "public meeting already exists":
-            console.log("להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית");
             //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
             this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name, cantSignUpAgain: true });
 
@@ -158,12 +157,12 @@ class Register extends React.Component {
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
-          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
+          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
           :
-          <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
+          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
         }
 
-        <div className=""><img style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        <div className=""><img alt="" style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :

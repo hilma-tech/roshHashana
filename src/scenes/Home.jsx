@@ -9,7 +9,7 @@ const Home = (props) => {
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
 
     const onClickRegister = (e) => {
-            props.history.push("/register", { type: e });
+        props.history.push("/register", { type: e });
     }
 
     const updateNumImgLoaded = () => {
@@ -23,7 +23,7 @@ const Home = (props) => {
             <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }} >
                 <div className="content-container" >
 
-                    <img style={{ width: isBrowser ? '26vw' : '50vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
+                    <img alt="" style={{ width: isBrowser ? '26vw' : '50vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
                         <div >תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
                     </div>
@@ -36,12 +36,12 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img style={{ width: '5vw', marginTop: "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '5vw', marginTop: "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
                     </>
                         : <>
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", fontWeight: 'bold', marginTop: "12%" }}>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
-                            <div onClick={() => setOpenMap(true)} className="img-container"><img style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
+                            <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
                 </div>
             </div>

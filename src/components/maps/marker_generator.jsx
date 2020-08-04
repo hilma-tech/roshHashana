@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 
 import { Marker, InfoWindow } from "react-google-maps";
 
-const SHOFAR_BLOWER = 'shofar_blower';
-const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
 const MarkerGenerator = (props) => {

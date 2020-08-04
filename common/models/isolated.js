@@ -4,7 +4,6 @@ module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
-        console.log('data: ', data);
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
@@ -17,9 +16,7 @@ module.exports = function (Isolated) {
                     //create public meeting
                     if (data.public_meeting) {
                         let meetData = [{
-                            "address": data.address[0],
-                            "lng": data.address[1].lng,
-                            "lat": data.address[1].lat,
+                            "address": data.address,
                             "comments": data.comments,
                             "start_time": null
                         }]

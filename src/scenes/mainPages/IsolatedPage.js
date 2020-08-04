@@ -17,9 +17,6 @@ const IsolatedPage = (props) => {
     const [address, setAddress] = useState('');
     const [comment, setComment] = useState('');
 
-    if (!props.location || !props.location.state || !props.location.state.name || !props.location.state.address)
-        Auth.logout(window.location.href = window.location.origin);
-
     useEffect(() => {
         (async () => {
             if (props.location && props.location.state && props.location.state.name && props.location.state.address) {
@@ -31,9 +28,11 @@ const IsolatedPage = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
-                console.log(res, 'res')
-
                 if (res) {
+                    if (res.errmMsg && res.errmMsg === 'LOG_OUT') {
+                        Auth.logout(window.location.href = window.location.origin);
+                        return;
+                    }
                     setName(res.name)
                     setAddress(res.address);
                     setComment(res.comments);
@@ -68,7 +67,7 @@ const IsolatedPage = (props) => {
     return (
         <>
             <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
-                <div className="settings clickAble" onClick={openSettings}><img src="/icons/settings.svg" /></div>
+                <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div>{`שלום ${name}`}</div>
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
@@ -79,7 +78,7 @@ const IsolatedPage = (props) => {
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
-                        <img src='/images/map.svg' />
+                        <img alt="" src='/images/map.svg' />
                     </div>
                 </div>
 
