@@ -34,7 +34,6 @@ const AddPublicPlace = (props) => {
 
     useEffect(() => {
         if (props.info && Object.keys(props.info).length !== 0) {
-            console.log("props.info", props.info)
             props.info.start_time && setChosenTime(props.info.start_time)
             props.info.address && setAddress(props.info.address)
             props.info.comments && setComments(props.info.comments)
@@ -62,7 +61,7 @@ const AddPublicPlace = (props) => {
     }
     return (
         <div id="public-place-container">
-            {props.removePubPlace && !props.inSettings && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
+            {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
             <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={address} className="address" />
             {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}

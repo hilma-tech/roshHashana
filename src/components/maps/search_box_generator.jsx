@@ -25,7 +25,7 @@ export const SBSearchBoxGenerator = (props) => {
                 type="text"
                 placeholder="חיפוש"
             />
-            <img id="sb-search-icon" src="/icons/search.svg" />
+            <img id="sb-search-icon" alt="" src="/icons/search.svg" />
         </div>
     );
 }

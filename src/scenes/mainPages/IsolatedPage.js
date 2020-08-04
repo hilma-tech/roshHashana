@@ -31,7 +31,6 @@ const IsolatedPage = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
-                console.log(res, 'res')
 
                 if (res) {
                     setName(res.name)
@@ -68,7 +67,7 @@ const IsolatedPage = (props) => {
     return (
         <>
             <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
-                <div className="settings clickAble" onClick={openSettings}><img src="/icons/settings.svg" /></div>
+                <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div>{`שלום ${name}`}</div>
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
@@ -79,7 +78,7 @@ const IsolatedPage = (props) => {
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
-                        <img src='/images/map.svg' />
+                        <img alt="" src='/images/map.svg' />
                     </div>
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
@@ -25,12 +25,10 @@ const IsolatedSettings = (props) => {
 
     useEffect(() => {
         (async () => {
-            console.log(isolatedInfo, 'isolatedInfo')
             if (!isolatedInfo || !Object.keys(isolatedInfo).length) {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
-                console.log(res, 'res')
                 setValues(res, setIsolatedInfo);
                 setValues(res.comments ? res.comments : '', setComments);
                 setValues(res.name, setName);
@@ -56,7 +54,6 @@ const IsolatedSettings = (props) => {
     }
     const handleAddressChange = (placeName) => {
         setAddress(placeName)
-        console.log('setState to address: ', placeName);
     }
     const updateIsolatedInfo = async () => {
 
@@ -72,7 +69,7 @@ const IsolatedSettings = (props) => {
             openGenAlert({ text: 'השם שהזנת אינו תקין' })
             setNameMsgErr('השם שהזנת אינו תקין');
             return;
-        } console.log("usernameVal", usernameVal)
+        }
 
         if (usernameVal[0] != 0) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
@@ -141,7 +138,6 @@ const IsolatedSettings = (props) => {
 
                 <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
                     <div className="header">כתובת</div>
-                    {console.log("address", address)}
                     <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={address} />
                     <div className="err-msg">{locationMsgErr}</div>
 

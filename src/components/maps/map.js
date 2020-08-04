@@ -4,7 +4,6 @@ import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import _ from "lodash";
 import './map.scss';
 import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -26,7 +25,6 @@ var mapOptions = {
     clickableIcons: false
 };
 
-const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
@@ -93,9 +91,7 @@ const MapComp = (props) => {
     const setPublicMapContent = async () => {
         //private meetings
         mapInfo && mapInfo.privateMeetings && mapInfo.privateMeetings.forEach(async privateMeet => { // isolated location (private meetings)
-            const comments = privateMeet.commennts ? privateMeet.commennts : ' '
             if (!privateMeet.address) return
-            const address = privateMeet.address + ' ' + comments;
             const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
@@ -103,7 +99,7 @@ const MapComp = (props) => {
                         type: PRIVATE_MEETING,
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                            <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
                             <div>לא ניתן להצטרף לתקיעה זו</div></div>
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
@@ -125,14 +121,14 @@ const MapComp = (props) => {
                         location: { lat, lng },
                         info: <div id="info-window-container">
                             <div className="info-window-header">תקיעה ציבורית</div>
-                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                            <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
                             <div className="pub-address-container">
-                                <img src={'/icons/address.svg'} />
+                                <img alt="" src={'/icons/address.svg'} />
                                 <div style={{ textAlign: "right" }}>
                                     {address}
                                 </div>
                             </div>
-                            <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
+                            <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
                             <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
                             <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                             <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
@@ -164,7 +160,7 @@ const MapComp = (props) => {
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img className="loader" src='/images/loader.svg' />}
+                loadingElement={<img alt="" className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
@@ -247,7 +243,7 @@ const SearchBoxGenerator = (props) => {
                 type="text"
                 placeholder="חיפוש"
             />
-            <img id="search-icon" src="/icons/search.svg" />
+            <img id="search-icon" alt="" src="/icons/search.svg" />
         </div>
     );
 }

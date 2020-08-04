@@ -3,17 +3,13 @@ import React, { useEffect, useState, useContext } from 'react';
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import _ from "lodash";
-
 import { SBMapComponent } from './sb_map_renderer'
 
 import { dateWTimeFormatChange } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
-const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
-const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
@@ -46,17 +42,17 @@ const ShofarBlowerMap = (props) => {
 
 
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
-        {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
+        {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container">{meetingData.address}</div> : null}
-        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
+        <div className="pub-start-time-container"><img alt=""src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
         {meetingData && meetingData.comments ? <div className="pub-address-container" >{meetingData.comments}</div> : null}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
         <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
-        {meetingData && meetingData.address ? <div className="pub-address-container"><img src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt=""src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
         {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
-        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
+        <div className="pub-start-time-container"><img alt=""src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
         {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
@@ -118,19 +114,12 @@ const ShofarBlowerMap = (props) => {
         let meetReq;
         for (let i in reqsArr) {
             meetReq = reqsArr[i]
-            // Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-            // Geocode.setLanguage("he");
-            // let [error, response] = await to(Geocode.fromAddress(meetReq.address + ` ${meetReq.comments || ""}`))
-            // if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address) for address ${meetReq.address}: ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של הבקשה ב: ${meetReq.address}` }); continue; }
-            // try {
-            // const { lat, lng } = response.results[0].geometry.location;
             const newLocObj = {
                 type: meetReq.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                 location: { lat: meetReq.lat, lng: meetReq.lng },
                 info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
             }
             newReqsLocs.push(newLocObj)
-            // } catch (e) { console.log("err setSBMapContent, ", e); }
             if (i == reqsArr.length - 1) {
                 setReqsLocs(newReqsLocs);
             }
@@ -142,11 +131,8 @@ const ShofarBlowerMap = (props) => {
         let myMeeting;
         for (let i in meetings) {
             myMeeting = meetings[i]
-            // let [error, response] = await to(Geocode.fromAddress(myMeeting.address + ` ${myMeeting.comments || ""}`))
-            // if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(meetReq.isPublicMeeting.address): ${error}`); openGenAlert({ text: `קרתה שגיאה עם המיקום של התקיעה שלך שב: ${myMeeting.address}` }); return; }
             let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
             try {
-                // const { lat, lng } = response.results[0].geometry.location;
                 const newLocObj = {
                     type: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
@@ -167,16 +153,14 @@ const ShofarBlowerMap = (props) => {
 
 
     const handleAssign = (meetingInfo) => {
-        console.log('meetingInfo: ', meetingInfo);
         setAssignMeetingInfo(meetingInfo)
     }
 
 
 
-    console.log('allMapData: ', allMapData);
     return (
         <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
-
+\
             <SBMapComponent
                 changeCenter={setCenter}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
@@ -186,7 +170,7 @@ const ShofarBlowerMap = (props) => {
                 history={props.history}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img className="loader" src='/images/loader.svg' />}
+                loadingElement={<img alt=""className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />

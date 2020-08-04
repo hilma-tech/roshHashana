@@ -69,8 +69,7 @@ module.exports = function (CustomUser) {
                 cb(err1, null);
             }
             if (!resKey) {
-                console.log(resKey)
-                console.log("err key")
+                console.log("err key", resKey)
                 cb(null, { ok: "err key" })
             } else {
                 const newTime = moment(new Date())
@@ -104,7 +103,6 @@ module.exports = function (CustomUser) {
                         }
                     })
                 } else {
-                    console.log("time out")
                     cb(null, { ok: "time out" })
                 }
             }
@@ -112,7 +110,6 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.cookieAndAccessToken = (userId, meetingId, roleId, options, res, cb) => {
-        console.log("Login secess")
         CustomUser.directLoginAs(userId, roleId, (err, result) => {
             let expires = new Date(Date.now() + 5184000000);
             res.cookie('access_token', result.__data.id, { signed: true, expires });
@@ -274,7 +271,6 @@ module.exports = function (CustomUser) {
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
-                    console.log("userInfo", userInfo)
                     return userInfo;
                 }
                 else if (role === 2) {
@@ -286,7 +282,6 @@ module.exports = function (CustomUser) {
 
                     let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
                     userInfo.publicMeetings = publicMeetings;
-                    console.log("publicMeetings", publicMeetings)
                     return userInfo;
                 }
                 else {
@@ -385,7 +380,6 @@ module.exports = function (CustomUser) {
                             blowerId: userId
                         }
                     })
-                    console.log("publicMeetingsArr", publicMeetingsArr)
                     const [resCreatePublicMeetings, errCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
                     if (errDeletePublicMeetings) {
                         console.log("errCreatePublicMeetings", errCreatePublicMeetings)
@@ -550,7 +544,6 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-            console.log('userData: ', userData);
             if (!userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
@@ -591,9 +584,6 @@ module.exports = function (CustomUser) {
             if (priRouteErr || !priRouteRes) { console.log('private route error : ', priRouteErr); }
             const [pubsErr, pubsRes] = await executeMySqlQuery(CustomUser, allPubsQ)
             if (pubsErr || !pubsRes) { console.log('public route and request error : ', pubsErr); }
-            console.log('++ priReqRes: ', priReqRes);
-            console.log('++ priRouteRes: ', priRouteRes);
-            console.log('++ pubsRes: ', pubsRes);
 
             const myPubRoutes = []
             const pubReqs = []
@@ -621,7 +611,6 @@ module.exports = function (CustomUser) {
         //check if user is confirmed by admin 
         (async () => {
 
-            console.log('!assignSB!: meetingObjs:', meetingObjs);
             if (!meetingObjs || !Array.isArray(meetingObjs)) return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
             const { userId } = options.accessToken;
@@ -641,12 +630,10 @@ module.exports = function (CustomUser) {
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
                     `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
-                console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
                 if (err || !res) console.log('err: ', err);
                 allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
             }
-            console.log('allRes: ', allRes);
             return cb(null, allRes)
         })();
     }

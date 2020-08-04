@@ -18,7 +18,7 @@ const Settings = (props) => {
 
     return (
         <div id="settings-container" className="fade-in">
-            <img id="close" className="clickAble" src="/icons/close.svg" onClick={handleClose} />
+            <img id="close" alt="" className="clickAble" src="/icons/close.svg" onClick={handleClose} />
             <div id="content-container">
                 <div id="title">הגדרות</div>
                 <div id="settigns-content">{props.children}</div>

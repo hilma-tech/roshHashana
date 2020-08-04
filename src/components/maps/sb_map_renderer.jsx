@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { withScriptjs, withGoogleMap, GoogleMap, Polyline} from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-maps";
 
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
@@ -30,11 +30,6 @@ const israelCoords = [
     { lat: 29.486869, lng: 34.881321 },
     { lat: 29.551662, lng: 34.984779 },
 ];
-
-const SHOFAR_BLOWER = 'shofar_blower';
-const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
-const PRIVATE_MEETING = 'private meeting';
-
 
 const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
     if (!stops || !stops.length) { console.log("no_stops_or_destination", origin, stops); cb(true) }
@@ -94,7 +89,7 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { err, data } = props
     if (err) return null;
-    if (!data) return <img className="loader" src='/images/loader.svg' />
+    if (!data) return <img alt="" className="loader" src='/images/loader.svg' />
 
     const { openGenAlert } = useContext(MainContext)
     const {
@@ -248,7 +243,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
 
             <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
-                {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>}
+                {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
                 <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >{genMap ? "מפה אישית" : "מפה כללית"}</div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
                     :

@@ -19,14 +19,14 @@ const SBSideInfo = (props) => {
                 routeDis
                     ?
                     <div id="sb-route-list-top" >
-                        <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img src="/icons/settings.svg" /></div>
+                        <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src=" /icons/settings.svg" /></div>
                         <div className="list-switch-container clickAble" onClick={() => switchBool(setRouteDis)} >
                             <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
                             <div className="list-switch-text">הצג מחפשים ברשימה</div>
                         </div>
                     </div>
                     :
-                    <div onClick={() => switchBool(setRouteDis)} className="clickAble" id="sb-meetings-list-top" ><img src="/icons/close.svg" /></div>
+                    <div onClick={() => switchBool(setRouteDis)} className="clickAble" id="sb-meetings-list-top" ><img alt="" src=" /icons/close.svg" /></div>
             }
             <div className="sb-side-list-content">
                 {

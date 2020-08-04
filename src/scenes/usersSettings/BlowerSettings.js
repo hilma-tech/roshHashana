@@ -83,7 +83,6 @@ const IsolatedSettings = (props) => {
         if (publicMeetings.length < 4) {
             let publicPlaces = publicMeetings;
             publicPlaces.push({});
-            console.log(publicPlaces)
             setPublicMeetings([...publicPlaces]);
             setMsgErr('');
 
@@ -120,7 +119,6 @@ const IsolatedSettings = (props) => {
     }
     const handleAddressChange = (placeName) => {
         setAddress(placeName)
-        console.log('setState to address: ', placeName);
     }
     const updateIsolatedInfo = async () => {
         // /^[a-z\u0590-\u05fe]+$/i

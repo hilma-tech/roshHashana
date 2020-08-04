@@ -4,7 +4,6 @@ module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
-        console.log('data: ', data);
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });

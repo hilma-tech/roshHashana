@@ -40,10 +40,7 @@ export const SBProvider = ({ children }) => {
 
 
     useEffect(() => {
-        console.log('ctx useEffect for assigns and for startTimes');
         if (assigns && Array.isArray(assigns) && assigns.length && startTimes && typeof startTimes === "object") {
-            console.log('assigns: ', assigns);
-            console.log('startTimes: ', startTimes);
 
             const toAssign = []
 
