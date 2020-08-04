@@ -1,10 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 
 import { SBContext } from '../ctx/shofar_blower_context';
 
-import Auth from '../modules/auth/Auth';
-
-import { assignSB } from '../fetch_and_utils'
 import { MainContext } from '../ctx/MainContext';
 
 const SBAssignMeeting = (props) => {

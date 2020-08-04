@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Fragment, useContext } from 'react';
+import React, { useEffect, useState, Fragment, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from "@material-ui/styles";
@@ -46,16 +46,6 @@ const IsolatedSettings = (props) => {
     const [vals, setVals] = useState({});
     console.log('vals: ', vals);
     const [errs, setErrs] = useState({});
-    // const [publicMeetings, setPublicMeetings] = useState([])
-    // const [blowingTimes, setBlowingTimes] = useState('');
-    // const [address, setAddress] = useState('');
-    // const [startTime, setStartTime] = useState('');
-    // const [username, setUsername] = useState('');
-    // const [maxTime, setMaxTime] = useState('');
-    // const [msgErr, setMsgErr] = useState('');
-    // const [name, setName] = useState('');
-    // const [locationMsgErr, setLocationMsgErr] = useState('');
-    // const [blowingTimesMsgErr, setBlowingTimesMsgErr] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -75,8 +65,8 @@ const IsolatedSettings = (props) => {
     const setValues = (val, valName) => {
         setVals(vals => ({ ...vals, [valName]: val }));
     }
-    const setMsgErr = (msg) => {
-        setErrs(errs => ({ ...errs, general: msg }))
+    const setMsgErr = (msg, valName = "general") => {
+        setErrs(errs => ({ ...errs, [valName]: msg }))
     }
 
     const addPublicPlace = () => {
@@ -148,7 +138,7 @@ const IsolatedSettings = (props) => {
             setErrs(errs => ({ ...errs, can_blow_x_times: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' }));
             return;
         }
-        if (username && username[0] != 0) { setErrs(errs => ({ ...errs, general: 'מספר הפלאפון שהזנת אינו תקין' })); return; }
+        if (username && username[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
 
         if (address) {
             if (!Array.isArray(address) || !address.length) {
@@ -184,13 +174,10 @@ const IsolatedSettings = (props) => {
             }
         }
 
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין'); return; }
+        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
-        // if (!volunteering_max_time) volunteering_max_time = originalVals.volunteering_max_time;
-        // if (!can_blow_x_times) can_blow_x_times = originalVals.can_blow_x_times;
-        // if (!volunteering_start_time) volunteering_start_time = originalVals.volunteering_start_time;
+        setErrs({}); //all
 
-        setMsgErr('');
         //update isolated details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -222,8 +209,13 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} />
-                    <div className="header">טלפון</div>
+                    <div className="err-msg">{errs.name || ""}</div>
+
+
+                    <div style={{ marginTop: "5%" }} className="header">טלפון</div>
                     <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username | ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <div className="err-msg">{errs.username || ""}</div>
+
                 </div>
 
                 <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>

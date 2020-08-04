@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import { dateWTimeFormatChange } from '../../fetch_and_utils';
 import _ from "lodash";
 import './map.scss';
 import moment from 'moment'
@@ -55,8 +54,6 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
-
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     let newCenter = { lat: position.coords.latitude, lng: position.coords.longitude };
@@ -67,16 +64,17 @@ const MapComp = (props) => {
                 }, await findLocationCoords('ירושלים'));
             }
             else {
-                let address = props.meetAddress || "ירושלים";
+                if (!props.meetAddress && !Object.keys(mapInfo).length) return;
+                let address = props.meetAddress || "";
                 if (mapInfo.userAddress && mapInfo.userAddress[0].address) {
-                    const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
-                    address = mapInfo.userAddress[0].address + ' ' + comments;
+                    const position = { lat: parseFloat(mapInfo.userAddress[0].lat), lng: parseFloat(mapInfo.userAddress[0].lng) };
+                    setCenter(position);
+                    setSelfLocation(position);
                 }
-
-                await findLocationCoords(address, true);
+                address && await findLocationCoords(address, true);
             }
+            await setPublicMapContent();
             setIsMarkerShown(true);
-
         })();
     }, [mapInfo])
 
@@ -86,22 +84,21 @@ const MapComp = (props) => {
         try {
             const newCenter = res.results[0].geometry.location;
             if (newCenter !== center) setCenter(newCenter);
-            if (isSelfLoc) setSelfLocation(newCenter);
+            if (isSelfLoc) {
+                setSelfLocation(newCenter);
+            }
         } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
     }
 
     const setPublicMapContent = async () => {
-
         //private meetings
         mapInfo && mapInfo.privateMeetings && mapInfo.privateMeetings.forEach(async privateMeet => { // isolated location (private meetings)
             const comments = privateMeet.commennts ? privateMeet.commennts : ' '
             if (!privateMeet.address) return
             const address = privateMeet.address + ' ' + comments;
-            let [error, response] = await to(Geocode.fromAddress(address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
-            try {
-                const { lat, lng } = response.results[0].geometry.location;
-                if (props.publicMap || { lat, lng } !== selfLocation) {
+            const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
+            setSelfLocation(selfLocation => {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     const newLocObj = {
                         type: PRIVATE_MEETING,
                         location: { lat, lng },
@@ -111,19 +108,18 @@ const MapComp = (props) => {
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
-            } catch (e) { console.log("err setPublicMapContent, ", e); }
+                return selfLocation;
+            });
         });
 
         mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const [error, response] = await to(Geocode.fromAddress(address));
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
-            try {
-                const date = moment(pub.start_time).format("HH:mm");
-                const { lat, lng } = response.results[0].geometry.location;
-                if (props.publicMap || { lat, lng } !== selfLocation) {
+            const date = moment(pub.start_time).format("HH:mm");
+            const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
+            setSelfLocation(selfLocation => {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     let newLocObj = {
                         type: SHOFAR_BLOWING_PUBLIC,
                         location: { lat, lng },
@@ -144,7 +140,8 @@ const MapComp = (props) => {
                     };
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
-            } catch (e) { return; }
+                return selfLocation
+            })
         });
     }
 

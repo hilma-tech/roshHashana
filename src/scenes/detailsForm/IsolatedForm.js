@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { BrowserView, isBrowser } from "react-device-detect";
 import Popup from '../../components/modals/general_popup';
-import Auth from '../../modules/auth/Auth';
-import Geocode from "react-geocode";
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateIsolatedDetails } from '../../fetch_and_utils';
@@ -18,6 +15,13 @@ export default class IsolatedForm extends Component {
             address: [],
             chosenCity: '',
             approval: true,
+        }
+    }
+
+    componentDidMount() {
+        if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
+            this.props.history.push('/');
+            return;
         }
     }
 

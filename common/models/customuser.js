@@ -61,7 +61,8 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.authenticationKey = (key, meetingId, options, res, cb) => {
+    CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
+        const { RoleMapping } = CustomUser.app.models;
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {
                 console.log("err", err1)
@@ -81,27 +82,22 @@ module.exports = function (CustomUser) {
                             cb(err2, null)
                         }
                         if (resdelet) {
-                            CustomUser.findOne({ where: { keyId: resKey.id } }, (err, resUser) => {
-                                if (err) return cb(err, null);
+                            CustomUser.findOne({ where: { keyId: resKey.id } }, (err3, resUser) => {
+                                if (err3) return cb(err3, null);
                                 if (resUser) {
-                                    CustomUser.app.models.RoleMapping.findOne({ where: { principalId: resUser.id } }, (err, resRole) => {
-                                        if (err) console.log("Err", err);
+                                    RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
+                                        if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            console.log("Login secess")
-                                            CustomUser.directLoginAs(resUser.id, resRole.roleId, (err, result) => {
-                                                let expires = new Date(Date.now() + 5184000000);
-                                                res.cookie('access_token', result.__data.id, { signed: true, expires });
-                                                res.cookie('klo', result.__data.klo, { signed: false, expires });
-                                                res.cookie('kl', result.__data.kl, { signed: false, expires });
-                                                // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
-                                                res.cookie('kloo', randomstring.generate(), { signed: true, expires });
-                                                res.cookie('klk', randomstring.generate(), { signed: true, expires });
-                                                res.cookie('olk', randomstring.generate(), { signed: true, expires });
-                                                CustomUser.checkStatus(result.userId, meetingId, resRole, cb)
-                                                // cb(null, { ok: true })
-                                            },
-                                                options, 5184000)
+                                            if (resRole.roleId != role && !resUser.address) {
+                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                                    if (err5) console.log("Err5", err5);
+                                                    if (resNewRole) {
+                                                        CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
+                                                    }
+                                                })
+                                            } else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
                                         }
+
                                     })
                                 }
                             })
@@ -114,13 +110,29 @@ module.exports = function (CustomUser) {
             }
         })
     }
-    CustomUser.checkStatus = (userId, meetingId, resRole, cb) => {
+
+    CustomUser.cookieAndAccessToken = (userId, meetingId, roleId, options, res, cb) => {
+        console.log("Login secess")
+        CustomUser.directLoginAs(userId, roleId, (err, result) => {
+            let expires = new Date(Date.now() + 5184000000);
+            res.cookie('access_token', result.__data.id, { signed: true, expires });
+            res.cookie('klo', result.__data.klo, { signed: false, expires });
+            res.cookie('kl', result.__data.kl, { signed: false, expires });
+            // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
+            res.cookie('kloo', randomstring.generate(), { signed: true, expires });
+            res.cookie('klk', randomstring.generate(), { signed: true, expires });
+            res.cookie('olk', randomstring.generate(), { signed: true, expires });
+            CustomUser.checkStatus(userId, meetingId, roleId, cb)
+            // cb(null, { ok: true })
+        },
+            options, 5184000)
+    }
+    CustomUser.checkStatus = (userId, meetingId, roleId, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
-        let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
             if (err || !res) { console.log("Err", err); } //todo: return cb(true?)
             if (res) {
-                switch (status) {
+                switch (roleId) {
                     case 1:
                         if (res.address == null) {
                             cb(null, { ok: "isolator new", data: { name: res.name } })
@@ -161,12 +173,6 @@ module.exports = function (CustomUser) {
                                                     data:
                                                     {
                                                         name: res.name,
-                                                        // meetingInfo: {
-                                                        //     address: resPublicMeeting.address,
-                                                        //     comments: resPublicMeeting.comments,
-                                                        //     start_time: resPublicMeeting.start_time,
-                                                        //     blowerName: resPublicMeeting.blowerPublic().name
-                                                        // }
                                                         meetingInfo: {
                                                             address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
@@ -207,6 +213,8 @@ module.exports = function (CustomUser) {
             `select 
             isolatedUser.name AS "isolatedName", 
             isolatedUser.address,
+            isolatedUser.lat,
+            isolatedUser.lng,
             isolatedUser.comments,
             blowerUser.name AS "blowerName"
             FROM 
@@ -223,6 +231,8 @@ module.exports = function (CustomUser) {
                 blowerUser.name AS "blowerName",
                 shofar_blower_pub.id,
                 shofar_blower_pub.address,
+                shofar_blower_pub.lat,
+                shofar_blower_pub.lng,
                 shofar_blower_pub.comments ,
                 shofar_blower_pub.start_time
                 from
@@ -237,7 +247,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `SELECT CustomUser.address FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
@@ -339,11 +349,21 @@ module.exports = function (CustomUser) {
                     console.log('create done: ', resCustomUser);
                 }
                 if (role === 1) {
+                    let pubMeetId = null;
+                    if (data.public_meeting) {
+                        let meetData = [{
+                            "address": data.address,
+                            "comments": data.comments ? data.comments : null,
+                            "start_time": null
+                        }];
+                        pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                    }
                     //isolated
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
-                        public_meeting: data.public_meeting
+                        public_meeting: data.public_meeting,
+                        "blowerMeetingId": pubMeetId
                     }
                     let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
@@ -487,6 +507,7 @@ module.exports = function (CustomUser) {
         accepts: [
             { arg: 'key', type: 'string' },
             { arg: 'meetingId', type: 'any' },
+            { arg: 'role', type: 'number' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
             { arg: 'res', type: 'object', http: { source: 'res' } }
 

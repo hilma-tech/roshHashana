@@ -1,5 +1,4 @@
-import React, { Fragment, Component, useEffect, useState } from "react";
-import AutoComplete from '../autocomplete/AutoComplete';
+import React, { Fragment, useEffect, useState } from "react";
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';

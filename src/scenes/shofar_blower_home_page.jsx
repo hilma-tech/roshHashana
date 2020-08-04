@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 
 import { MainContext } from '../ctx/MainContext';
 import { SBContext } from '../ctx/shofar_blower_context';

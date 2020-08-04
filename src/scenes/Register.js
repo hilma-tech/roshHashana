@@ -2,7 +2,7 @@
 import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
-import { BrowserView, isBrowser } from "react-device-detect";
+import { isBrowser } from "react-device-detect";
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
@@ -62,7 +62,7 @@ class Register extends React.Component {
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
       let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}`, {
+      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
       });
@@ -84,10 +84,12 @@ class Register extends React.Component {
 
             break;
           case "blower with data":
+            console.log("להציג הרשמה לתוקע");
             this.props.history.push('/');
 
             break;
           case "isolator new":
+            console.log("להציג הרשמה למבודד");
             this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
             break;
           case "isolator with data":

@@ -16,9 +16,11 @@ const IsolatedSettings = (props) => {
     const [comments, setComments] = useState('');
     const [username, setUsername] = useState('');
     const [msgErr, setMsgErr] = useState('');
+    const [locationMsgErr, setLocationMsgErr] = useState('');
+    const [phoneMsgErr, setPhoneMsgErr] = useState('');
+    const [nameMsgErr, setNameMsgErr] = useState('');
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
-    const [locationMsgErr, setLocationMsgErr] = useState('');
 
 
     useEffect(() => {
@@ -65,8 +67,18 @@ const IsolatedSettings = (props) => {
 
         if (!nameVal) nameVal = isolatedInfo.name;
         if (!usernameVal) usernameVal = isolatedInfo.username;
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
-        if (usernameVal[0] !== "0") { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+
+        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal) || usernameVal.length !== 10) {
+            openGenAlert({ text: 'השם שהזנת אינו תקין' })
+            setNameMsgErr('השם שהזנת אינו תקין');
+            return;
+        } console.log("usernameVal", usernameVal)
+
+        if (usernameVal[0] != 0) {
+            openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
+            setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
+            return;
+        }
         if (address === "NOT_A_VALID_ADDRESS") {
             openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
             setLocationMsgErr('הכתובת שהזנת אינה תקינה'); return;
@@ -114,8 +126,12 @@ const IsolatedSettings = (props) => {
                 <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
-                    <div className="header">טלפון</div>
+                    <div className="err-msg">{nameMsgErr}</div>
+
+                    <div style={{ marginTop: "5%" }} className="header">טלפון</div>
                     <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <div className="err-msg">{phoneMsgErr}</div>
+
                 </div>
 
                 <div id="blowing-set-btn" className="clickAble" onClick={() => setOpenBlowingSet(!openBlowingSet)}>
