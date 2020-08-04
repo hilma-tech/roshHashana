@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
-import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
-import Auth from '../../modules/auth/Auth';
-import './Settings.scss';
 import { MainContext } from '../../ctx/MainContext';
+
+import Auth from '../../modules/auth/Auth';
+
+import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+
 import GeneralAlert from '../../components/modals/general_alert';
+import { CONSTS } from '../../const_messages'
+
+import './Settings.scss';
 
 const IsolatedSettings = (props) => {
     const { userInfo, setUserInfo, openGenAlert, showAlert } = useContext(MainContext)
-    const [isolatedInfo, setIsolatedInfo] = useState({});
+    const [originalIsolatedInfo, setOriginalIsolatedInfo] = useState({});
     const [msgErr, setMsgErr] = useState('');
     const [phoneMsgErr, setPhoneMsgErr] = useState('');
     const [nameMsgErr, setNameMsgErr] = useState('');
@@ -17,23 +22,22 @@ const IsolatedSettings = (props) => {
 
     useEffect(() => {
         (async () => {
-            if (!Object.keys(isolatedInfo).length) {
+            if (!Object.keys(originalIsolatedInfo).length) {
                 if (!userInfo) {
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
                     if (res) {
                         setUserInfo(res)
-                        setValues(res, setIsolatedInfo);
+                        setValues(res, setOriginalIsolatedInfo);
                         setValues(res.name, setName);
                         setValues(res.username, setUsername);
                     }
                 }
                 else {
-                    setValues(userInfo, setIsolatedInfo);
+                    setValues(userInfo, setOriginalIsolatedInfo);
                     setValues(userInfo.name, setName);
                     setValues(userInfo.username, setUsername);
-
                 }
             }
         })();
@@ -52,29 +56,30 @@ const IsolatedSettings = (props) => {
 
     const updateIsolatedInfo = async () => {
 
-        let nameVal = name;
-        let usernameVal = username;
+        //2 lines: checking if info has changed, otherwise is null
+        let nameVal = name === originalIsolatedInfo.name ? null : name;
+        let usernameVal = name === originalIsolatedInfo.username ? null : username;
 
-        if (!nameVal) nameVal = isolatedInfo.name;
-        if (!usernameVal) usernameVal = isolatedInfo.username;
+        //will continue to update only if both are not null
+        if (nameVal === null && usernameVal === null) {
+            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG })
+            return;
+        }
 
-
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) {
+        if (nameVal && !/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) {
             openGenAlert({ text: 'השם שהזנת אינו תקין' })
             setNameMsgErr('השם שהזנת אינו תקין');
             return;
         }
 
-        if (usernameVal[0] != 0 || usernameVal.length !== 10) {
+        if (usernameVal && usernameVal[0] != 0 || usernameVal.length !== 10) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
             setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
             return;
         }
-        let newData = {
-            "name": nameVal,
-            "username": usernameVal,
-        }
-
+        let newData = {}
+        if (nameVal) newData.name = nameVal
+        if (usernameVal) newData.username = usernameVal
         setMsgErr('');
         //update isolated details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
@@ -83,9 +88,9 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": newData })
         }, true);
         if (res) {
-            userInfo.name = nameVal
-            userInfo.username = usernameVal
-            setUserInfo(userInfo)
+            if (nameVal) userInfo.name = nameVal
+            if (usernameVal) userInfo.username = usernameVal
+            if (nameVal && usernameVal) setUserInfo(userInfo)
             props.history.push('/', { name: nameVal });
         }
     }

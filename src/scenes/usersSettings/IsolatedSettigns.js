@@ -62,12 +62,10 @@ const IsolatedSettings = (props) => {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
         }
-        console.log('updateData: ', updateData);
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
             openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
             return;
         }
-        console.log('!updateData info: ', updateData);
 
         let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
         // validate values
