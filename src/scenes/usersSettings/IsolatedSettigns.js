@@ -25,6 +25,7 @@ const IsolatedSettings = (props) => {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 setVals(res);
+                setOriginalVals(res);
             }
         })();
     }, []);
@@ -61,6 +62,7 @@ const IsolatedSettings = (props) => {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
         }
+        console.log('updateData: ', updateData);
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
             openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
             return;
@@ -152,7 +154,6 @@ const IsolatedSettings = (props) => {
                         <div className="header">בפתח הבית</div>
                         <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
                     </div>
-                    {console.log("vals", vals)}
                     <div className="checkbox-container ">
                         <div className="header">בחלון או במרפסת הפונה לרחוב</div>
                         <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" />
@@ -163,7 +164,7 @@ const IsolatedSettings = (props) => {
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} value={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" defaultChecked={vals.public_phone ? true : false} ></input>
+                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" ></input>
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
