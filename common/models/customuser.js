@@ -349,7 +349,28 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let pubMeetId = null;
-                    if (data.public_meeting) {
+                    let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId } });
+
+                    //if the user changed his address and he has a public meeting
+                    if (data.public_meeting && data.address && isolatedInfo.public_meeting) {
+                        let meetingId = isolatedInfo.blowerMeetingId;
+                        let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                        //we can update the meeting so update the address of the meeting
+                        if (canEditPubMeeting) shofarBlowerPub.upsertWithWhere({ id: meetingId, address: data.address });
+                        //we can not update the meeting so create a new meeting with the new address
+                        else {
+                            let meetData = {}
+                            if (data.address) meetData.address = data.address
+                            if (data.comments) meetData.comments = data.comments
+                            if (data.start_time) meetData.start_time = data.start_time
+
+                            if (Object.keys(meetData).length) {
+                                pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                            }
+                        }
+                    }
+
+                    else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
                         let meetData = {}
 
                         if (data.address) meetData.address = data.address
@@ -361,7 +382,6 @@ module.exports = function (CustomUser) {
                         }
                     }
                     else {
-                        let isolatedInfo = await Isolated.findOne({ where: { and: [{ userIsolatedId: userId }, { public_meeting: 1 }] } });
                         //the user is changing from public to private
                         console.log('isolatedInfo', isolatedInfo)
                         if (isolatedInfo) {
@@ -381,6 +401,8 @@ module.exports = function (CustomUser) {
                     if (Object.values(newIsoData).find(d => d)) {
                         let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                     }
+
+
                 }
                 else if (role === 2) {
                     //shofar blower
