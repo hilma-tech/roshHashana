@@ -152,27 +152,30 @@ const IsolatedSettings = (props) => {
                 return;
             }
         }
-        for (let i = 0; i < publicMeetings.length; i++) {
-            if (!publicMeetings[i].time) {
-                openGenAlert({ text: "נא לציין את שעת התקיעה" })
-                setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
-                return;
-            }
-            if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
-                if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
-                    let pms = [...publicMeetings];
-                    pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
+        if (publicMeetings && publicMeetings.isArray() && publicMeetings.length > 0) {
+            for (let i = 0; i < publicMeetings.length; i++) {
+                if (!publicMeetings[i].time) {
+                    openGenAlert({ text: "נא לציין את שעת התקיעה" })
+                    setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
+                    return;
+                }
+                if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
+                    if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
+                        let pms = [...publicMeetings];
+                        pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
+                        setValues(pms, "publicMeetings")
+                        openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
+                        return
+                    }
+                    let pms = publicMeetings;
+                    pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
                     setValues(pms, "publicMeetings")
-                    openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
+                    openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
                     return
                 }
-                let pms = publicMeetings;
-                pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
-                setValues(pms, "publicMeetings")
-                openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
-                return
             }
         }
+
 
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
@@ -185,7 +188,13 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ data: updateData })
         }, true);
         if (res) {
-            // props.history.goBack();
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    props.history.goBack();
+                })
         }
     }
 
@@ -198,7 +207,6 @@ const IsolatedSettings = (props) => {
     return (
         <>
             <SettingsLayout handleClose={() => { props.history.goBack(); }}>
-                <button onClick={updateIsolatedInfo} >שמור</button>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -280,6 +288,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general}</div>
+                <button className="save-button" onClick={updateIsolatedInfo} >שמור</button>
             </SettingsLayout >
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
