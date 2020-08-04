@@ -176,7 +176,7 @@ class Register extends React.Component {
         {this.state.status === "start" ?
           <div className="allInputInRegisterPage" >
             <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
-            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="string" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
             <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
             <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
               שלח לי קוד
@@ -185,7 +185,7 @@ class Register extends React.Component {
           </div>
           : <>
             <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
+              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="string" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
               <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
               <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
               <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
