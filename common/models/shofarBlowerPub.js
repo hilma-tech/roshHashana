@@ -38,7 +38,7 @@ module.exports = function (shofarBlowerPub) {
         }
     }
 
-    checkIfCanDeleteMeeting = async (meetingId) => {
+    shofarBlowerPub.checkIfCanDeleteMeeting = async (meetingId) => {
         //count all the users that are registered to this meeting
         let numOfRegistered = await shofarBlowerPub.app.models.Isolated.count({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
         console.log('numOfRegistered', numOfRegistered)
