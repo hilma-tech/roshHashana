@@ -51,6 +51,8 @@ const IsolatedSettings = (props) => {
     const [name, setName] = useState('');
     const [locationMsgErr, setLocationMsgErr] = useState('');
     const [blowingTimesMsgErr, setBlowingTimesMsgErr] = useState('');
+    const [phoneMsgErr, setPhoneMsgErr] = useState('');
+    const [nameMsgErr, setNameMsgErr] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -136,7 +138,11 @@ const IsolatedSettings = (props) => {
             setBlowingTimesMsgErr('לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים'); return;
         }
         if (!nameVal) nameVal = blowerInfo.name;
-        if (usernameVal[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין'); return; }
+        if (usernameVal[0] != 0) {
+            openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
+            setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
+            return;
+        }
         if (!usernameVal) usernameVal = blowerInfo.username;
         if (address === "NOT_A_VALID_ADDRESS") {
             openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
@@ -152,7 +158,11 @@ const IsolatedSettings = (props) => {
             }
         }
 
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal)) { setMsgErr('השם שהזנת אינו תקין'); return; }
+        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(nameVal) || usernameVal.length !== 10) {
+            openGenAlert({ text: 'השם שהזנת אינו תקין' })
+            setNameMsgErr('השם שהזנת אינו תקין');
+            return;
+        }
 
         if (!maxTimeVal) maxTimeVal = blowerInfo.volunteering_max_time;
         if (!blowingTimesVal) blowingTimesVal = blowerInfo.can_blow_x_times;
@@ -207,8 +217,10 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
-                    <div className="header">טלפון</div>
+                    <div className="err-msg">{nameMsgErr}</div>
+                    <div style={{ marginTop: "5%" }} className="header">טלפון</div>
                     <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <div className="err-msg">{phoneMsgErr}</div>
                 </div>
 
                 <div id="blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
