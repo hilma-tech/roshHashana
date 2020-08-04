@@ -147,23 +147,8 @@ const MapComp = (props) => {
         if (props.publicMap) {
             props.history.push('/register', { type: 'generalUser', meetingInfo });
         }
-        // else {
-        //     //join the isolator to the meeting
-        //     let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
-        //         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        //         method: 'post',
-        //         body: JSON.stringify({ meetingInfo })
-        //     }, true);
-        //     if (res) {
-        //         // if(res.status==='OK')
-        //         //TODO: add msg of success 
-        //         // else 
-        //         //TODO: add msg of fail
-        //         console.log(res, 'res')
-        //     }
-        // }
-
     }
+    
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent

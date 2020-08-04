@@ -56,8 +56,8 @@ const AddPublicPlace = (props) => {
         props.updatePublicPlace(props.index, 'address', address);
     }, [address]);
 
-    //update chosenCity state and the publicPlaces array according to user choice
-    const updateCity = (address) => {
+    //update chosenAddress state and the publicPlaces array according to user choice
+    const updateAddress = (address) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
     }
@@ -65,7 +65,7 @@ const AddPublicPlace = (props) => {
         <div id="public-place-container">
             {props.removePubPlace && !props.inSettings && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
-            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateCity} defaultValue={address} className="address" />
+            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={address} className="address" />
             {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}
             <input
                 autoComplete={'off'}

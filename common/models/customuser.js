@@ -125,16 +125,7 @@ module.exports = function (CustomUser) {
                         if (res.address == null) {
                             cb(null, { ok: "isolator new", data: { name: res.name } })
                         } else {
-                            // CustomUser.app.models.city.findOne({ where: { id: res.cityId } }, (errCity, city) => {
-                            //     if (errCity) console.log('errCity', errCity);
-                            //     if (city) {
-                            //         let street = res.street ? res.street : '';
-                            //         let appartment = res.appartment ? res.appartment : '';
-                            //         let comments = res.comments ? res.comments : '';
-                            //         let address = street + ' ' + appartment + ' ' + comments + ', ' + city.name;
                             cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
-                            //     }
-                            // });
                         }
                         break;
 
@@ -171,10 +162,9 @@ module.exports = function (CustomUser) {
                                                     {
                                                         name: res.name,
                                                         // meetingInfo: {
-                                                        //     street: resPublicMeeting.street,
+                                                        //     address: resPublicMeeting.address,
                                                         //     comments: resPublicMeeting.comments,
                                                         //     start_time: resPublicMeeting.start_time,
-                                                        //     city: resPublicMeeting.meetingCity().name,
                                                         //     blowerName: resPublicMeeting.blowerPublic().name
                                                         // }
                                                         meetingInfo: {

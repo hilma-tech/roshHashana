@@ -55,41 +55,10 @@ module.exports = function (Isolated) {
     }
 
 
-    Isolated.joinPublicMeeting = async (meetingInfo, options) => {
-        if (!options.accessToken || !options.accessToken.userId) {
-            return
-        }
-        console.log('options.accessToken', options.accessToken)
-        console.log(meetingInfo, 'meetingInfo')
-        let meetInfo = {
-            "public_meeting": 1,
-            "meeting_time": meetingInfo.start_time,
-            "blowerMeetingId": meetingInfo.id
-        }
-        console.log(meetInfo, 'meetInfo')
-        try {
-            let res = await Isolated.upsertWithWhere({ userIsolatedId: options.accessToken.userId }, meetInfo);
-            return { status: 'OK' };
-        } catch (error) {
-            console.log(error, 'er')
-            return { status: 'FAILED' };
-        }
-    }
-
-
     Isolated.remoteMethod('InsertDataIsolated', {
         http: { verb: 'post' },
         accepts: [
             { arg: 'data', type: 'object' },
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
-        ],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
-
-    Isolated.remoteMethod('joinPublicMeeting', {
-        http: { verb: 'post' },
-        accepts: [
-            { arg: 'meetingInfo', type: 'object' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         ],
         returns: { arg: 'res', type: 'object', root: true }

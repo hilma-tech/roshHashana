@@ -138,8 +138,7 @@
             "principalId": "$authenticated",
             "permission": "ALLOW",
             "property": [
-                "InsertDataIsolated",
-                "joinPublicMeeting"
+                "InsertDataIsolated"
             ]
         }
     ]
