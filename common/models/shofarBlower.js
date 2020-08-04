@@ -28,7 +28,9 @@ module.exports = function (ShofarBlower) {
                         "volunteering_max_time": data.volunteering_max_time
                     },
                         objToCU = {
-                            "address": data.address,
+                            "address": data.address[0],
+                            "lng": data.address[1].lng,
+                            "lat": data.address[1].lat,
                             "comments": null
                         };
 

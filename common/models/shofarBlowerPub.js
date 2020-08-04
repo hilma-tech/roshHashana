@@ -19,7 +19,9 @@ module.exports = function (shofarBlowerPub) {
                 let meetingData = data[i];
 
                 let newPubMeeting = {
-                    "address": meetingData.address,
+                    "address": meetingData.address[0],
+                    "lng": meetingData.address[1].lng,
+                    "lat": meetingData.address[1].lat,
                     "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId

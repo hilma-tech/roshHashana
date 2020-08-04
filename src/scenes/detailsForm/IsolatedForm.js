@@ -15,8 +15,9 @@ export default class IsolatedForm extends Component {
         this.state = {
             errorMsg: '',
             openModal: false,
-            address: '',
-            approval: true
+            address: [],
+            chosenCity: '',
+            approval: true,
         }
     }
 
@@ -33,15 +34,14 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
-        console.log('formChilds: ', formChilds);
         const { address } = this.state
 
         //cheked address
-        if (!address || address === '') {
+        if (!Array.isArray(address) || !address.length) {
             this.setState({ errorMsg: 'אנא הכנס מיקום' });
             return;
         }
-        if (address === CONSTS.NOT_A_VALID_ADDRESS || (typeof address === "boolean" && address === true)) {
+        if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
             this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
@@ -80,7 +80,7 @@ export default class IsolatedForm extends Component {
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const { address } = this.state
-        this.props.history.push('/', { name, address });
+        this.props.history.push('/', { name, address: address[0] });
     }
 
     render() {

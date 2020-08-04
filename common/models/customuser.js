@@ -513,7 +513,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.mapInfoSB = function (options, cb) { //! changed to use address and not street, city and appartment
+    CustomUser.mapInfoSB = function (options, cb) { // might make sense to move this to ShofarBlower.js BUT..
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
