@@ -52,7 +52,6 @@ const SBHomePage = (props) => {
         }
         if (mapContent === "NO_ADDRESS") {
             Auth.logout()
-            // return;
         }
         else if (mapContent && typeof mapContent === "object" && mapContent.userData && mapContent.userData[0]) {
             if (!meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length)) setMeetingsReqs(mapContent.openReqs)
