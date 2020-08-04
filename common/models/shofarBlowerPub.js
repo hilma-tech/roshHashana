@@ -37,5 +37,19 @@ module.exports = function (shofarBlowerPub) {
             }
         }
     }
+
+    checkIfCanDeleteMeeting = async (meetingId) => {
+        //count all the users that are registered to this meeting
+        let numOfRegistered = await shofarBlowerPub.app.models.Isolated.count({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
+        console.log('numOfRegistered', numOfRegistered)
+        if (numOfRegistered > 1) {
+            let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: null }] } });
+            //if the meeting has no shofar blower assigned already
+            console.log('pubMeet', pubMeet)
+            if (pubMeet) return true;
+            else return false;
+        }
+        else return false;
+    }
 }
 
