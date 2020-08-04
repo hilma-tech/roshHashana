@@ -42,7 +42,6 @@ export default class IsolatedForm extends Component {
         super(props);
         this.state = {
             errorMsg: '',
-            cities: [], // alist of all the cities
             address: '', //the address of the shofar blower
             chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
@@ -53,16 +52,7 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            if (this.props.location && this.props.location.state && this.props.location.state.noDetails) {
-                //get all cities for autocomplete
-                let [res, err] = await Auth.superAuthFetch(`/api/cities/getAllCities`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" }
-                }, true);
-                if (res) {
-                    this.setState({ cities: res });
-                }
-            }
-            else {
+            if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
                 this.props.history.push('/');
                 return;
             }
