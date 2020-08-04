@@ -41,6 +41,8 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
+        console.log('formChilds: ', formChilds);
+        console.log('formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true: ', formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true);
         const { address } = this.state
 
         //cheked address
@@ -53,13 +55,14 @@ export default class IsolatedForm extends Component {
             return;
         }
 
-        const comments = formChilds[4].value ? formChilds[4].value : ' ';
+        const comments = formChilds[1].value ? formChilds[1].value : ' ';
+        this.comments = comments;
 
         let isolatedDetails = {
-            "public_phone": formChilds[5].children[1].checked,
+            "public_phone": this.state.approval ? true : false,
             "address": address,
             "comments": comments,
-            "public_meeting": formChilds[2] && formChilds[2].children[1] && formChilds[2].children[1].checked ? false : true
+            "public_meeting": formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true
         }
 
         //update isolated details
@@ -87,7 +90,8 @@ export default class IsolatedForm extends Component {
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const { address } = this.state
-        this.props.history.push('/', { name, address: address[0] });
+        console.log('this.comments: ', this.comments);
+        this.props.history.push('/', { name, address: address[0], comments: this.comments });
     }
 
     render() {
