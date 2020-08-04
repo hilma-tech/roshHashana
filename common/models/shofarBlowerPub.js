@@ -17,7 +17,7 @@ module.exports = function (shofarBlowerPub) {
             for (let i = 0; i < data.length; i++) {
 
                 let meetingData = data[i];
-
+                meetingData.address[0] = meetingData.address[0].substring(0, 398)
                 let newPubMeeting = {
                     "address": meetingData.address[0],
                     "lng": meetingData.address[1].lng,

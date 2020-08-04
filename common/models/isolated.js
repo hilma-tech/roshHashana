@@ -11,8 +11,8 @@ module.exports = function (Isolated) {
                 if (!isolatedInfo) {
                     let pubMeetId = null;
                     if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
-                    if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
-                    data.address = data.address.substring(0, 398) // shouldn't be more than 400 
+                    if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+                    data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
 
                     //create public meeting
                     if (data.public_meeting) {
