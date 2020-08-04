@@ -360,7 +360,7 @@ module.exports = function (CustomUser) {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
                         public_meeting: data.public_meeting,
-                        "blowerMeetingId": pubMeetId
+                        blowerMeetingId: pubMeetId
                     }
                     let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
