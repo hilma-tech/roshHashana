@@ -104,7 +104,9 @@
                 "dataScale": null,
                 "nullable": "Y"
             }
-        }
+        },
+        "lng": "string",
+        "lat": "string"
     },
     "acls": [
         {
@@ -112,6 +114,6 @@
             "principalId": "$everyone",
             "permission": "DENY",
             "accessType": "*"
-        }  
+        }
     ]
 }
