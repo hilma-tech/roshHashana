@@ -8,7 +8,6 @@ import { TimePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
-import Geocode from "react-geocode";
 import './Settings.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 

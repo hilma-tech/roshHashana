@@ -85,7 +85,7 @@ const GeneralUserPage = (props) => {
         if (res && res.res === 'SUCCESS') {
             Auth.logout(window.location.href = window.location.origin);
         }
-        // else  TODO: לשים הודעה שזה נכשל
+        else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
     }
 
     return (
