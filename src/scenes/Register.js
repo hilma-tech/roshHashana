@@ -2,7 +2,7 @@
 import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
-import { BrowserView, isBrowser } from "react-device-detect";
+import { isBrowser } from "react-device-detect";
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
@@ -34,13 +34,13 @@ class Register extends React.Component {
   handleChange(event) {
     this.setState({ alart: null })
     if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
-    event.target.id === "name" && event.target.value.length < 20 ||
-    event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") { 
+      event.target.id === "name" && event.target.value.length < 20 ||
+      event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
       this.setState({ [event.target.id]: event.target.value })
     }
-    
+
   }
-  
+
   async handleSubmit() {
     if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {

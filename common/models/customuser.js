@@ -61,7 +61,7 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.authenticationKey = (key, meetingId,role, options, res, cb) => {
+    CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
         const { RoleMapping } = CustomUser.app.models;
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {
@@ -95,7 +95,7 @@ module.exports = function (CustomUser) {
                                                         CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
                                                     }
                                                 })
-                                            }else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
+                                            } else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
                                         }
 
                                     })
@@ -111,22 +111,22 @@ module.exports = function (CustomUser) {
         })
     }
 
-CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =>{
-    console.log("Login secess")
-    CustomUser.directLoginAs(userId, roleId, (err, result) => {
-        let expires = new Date(Date.now() + 5184000000);
-        res.cookie('access_token', result.__data.id, { signed: true, expires });
-        res.cookie('klo', result.__data.klo, { signed: false, expires });
-        res.cookie('kl', result.__data.kl, { signed: false, expires });
-        // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
-        res.cookie('kloo', randomstring.generate(), { signed: true, expires });
-        res.cookie('klk', randomstring.generate(), { signed: true, expires });
-        res.cookie('olk', randomstring.generate(), { signed: true, expires });
-        CustomUser.checkStatus(userId, meetingId, roleId, cb)
-        // cb(null, { ok: true })
-    },
-        options, 5184000)
-}
+    CustomUser.cookieAndAccessToken = (userId, meetingId, roleId, options, res, cb) => {
+        console.log("Login secess")
+        CustomUser.directLoginAs(userId, roleId, (err, result) => {
+            let expires = new Date(Date.now() + 5184000000);
+            res.cookie('access_token', result.__data.id, { signed: true, expires });
+            res.cookie('klo', result.__data.klo, { signed: false, expires });
+            res.cookie('kl', result.__data.kl, { signed: false, expires });
+            // //These are all 'trash' cookies in order to confuse the hacker who tries to penetrate kl,klo cookies
+            res.cookie('kloo', randomstring.generate(), { signed: true, expires });
+            res.cookie('klk', randomstring.generate(), { signed: true, expires });
+            res.cookie('olk', randomstring.generate(), { signed: true, expires });
+            CustomUser.checkStatus(userId, meetingId, roleId, cb)
+            // cb(null, { ok: true })
+        },
+            options, 5184000)
+    }
     CustomUser.checkStatus = (userId, meetingId, roleId, cb) => {
         const { shofarBlowerPub } = CustomUser.app.models;
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
@@ -213,6 +213,8 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
             `select 
             isolatedUser.name AS "isolatedName", 
             isolatedUser.address,
+            isolatedUser.lat,
+            isolatedUser.lng,
             isolatedUser.comments,
             blowerUser.name AS "blowerName"
             FROM 
@@ -229,6 +231,8 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                 blowerUser.name AS "blowerName",
                 shofar_blower_pub.id,
                 shofar_blower_pub.address,
+                shofar_blower_pub.lat,
+                shofar_blower_pub.lng,
                 shofar_blower_pub.comments ,
                 shofar_blower_pub.start_time
                 from
@@ -243,7 +247,7 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `SELECT CustomUser.address FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
@@ -335,11 +339,21 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
+                    let pubMeetId = null;
+                    if (data.public_meeting) {
+                        let meetData = [{
+                            "address": data.address,
+                            "comments": data.comments ? data.comments : null,
+                            "start_time": null
+                        }];
+                        pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                    }
                     //isolated
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
-                        public_meeting: data.public_meeting
+                        public_meeting: data.public_meeting,
+                        "blowerMeetingId": pubMeetId
                     }
                     let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }

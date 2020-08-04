@@ -6,7 +6,6 @@ import Auth from '../../modules/auth/Auth';
 
 import Map from '../../components/maps/map';
 
-import { CONSTS } from '../../const_messages';
 import GeneralAlert from '../../components/modals/general_alert';
 
 import './MainPage.scss';

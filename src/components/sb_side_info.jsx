@@ -1,7 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
-
-import { SBContext } from '../ctx/shofar_blower_context';
-import { MainContext } from '../ctx/MainContext'
+import React, { useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
