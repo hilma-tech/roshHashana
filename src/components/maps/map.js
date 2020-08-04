@@ -67,15 +67,14 @@ const MapComp = (props) => {
                 if (!props.meetAddress && !Object.keys(mapInfo).length) return;
                 let address = props.meetAddress || "";
                 if (mapInfo.userAddress && mapInfo.userAddress[0].address) {
-                    const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
-                    address = mapInfo.userAddress[0].address + ' ' + comments;
+                    const position = { lat: parseFloat(mapInfo.userAddress[0].lat), lng: parseFloat(mapInfo.userAddress[0].lng) };
+                    setCenter(position);
+                    setSelfLocation(position);
                 }
-                await findLocationCoords(address, true);
+                address && await findLocationCoords(address, true);
             }
             await setPublicMapContent();
             setIsMarkerShown(true);
-            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
-
         })();
     }, [mapInfo])
 
@@ -97,60 +96,50 @@ const MapComp = (props) => {
             const comments = privateMeet.commennts ? privateMeet.commennts : ' '
             if (!privateMeet.address) return
             const address = privateMeet.address + ' ' + comments;
-            let [error, response] = await to(Geocode.fromAddress(address))
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
-            try {
-                const { lat, lng } = response.results[0].geometry.location;
-                setSelfLocation(selfLocation => {
-                    if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
-                        const newLocObj = {
-                            type: PRIVATE_MEETING,
-                            location: { lat, lng },
-                            info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                                <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                                <div>לא ניתן להצטרף לתקיעה זו</div></div>
-                        }
-                        setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+            setSelfLocation(selfLocation => {
+                if (props.publicMap || (privateMeet.lat !== selfLocation.lat && privateMeet.lng !== selfLocation.lng)) {
+                    const newLocObj = {
+                        type: PRIVATE_MEETING,
+                        location: { lat: privateMeet.lat, lng: privateMeet.lng },
+                        info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
                     }
-                    return selfLocation;
-                });
-            } catch (e) { console.log("err setPublicMapContent, ", e); }
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                }
+                return selfLocation;
+            });
         });
 
         mapInfo && mapInfo.publicMeetings && mapInfo.publicMeetings.forEach(async pub => { //public meetings location
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const [error, response] = await to(Geocode.fromAddress(address));
-            if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(isolated.address): ${error}`); return; }
-            try {
-                const date = moment(pub.start_time).format("HH:mm");
-                const { lat, lng } = response.results[0].geometry.location;
-                setSelfLocation(selfLocation => {
-                    if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
-                        let newLocObj = {
-                            type: SHOFAR_BLOWING_PUBLIC,
-                            location: { lat, lng },
-                            info: <div id="info-window-container">
-                                <div className="info-window-header">תקיעה ציבורית</div>
-                                <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
-                                <div className="pub-address-container">
-                                    <img src={'/icons/address.svg'} />
-                                    <div style={{ textAlign: "right" }}>
-                                        {address}
-                                    </div>
+            const date = moment(pub.start_time).format("HH:mm");
+            setSelfLocation(selfLocation => {
+                if (props.publicMap || (pub.lat !== selfLocation.lat && pub.lng !== selfLocation.lng)) {
+                    let newLocObj = {
+                        type: SHOFAR_BLOWING_PUBLIC,
+                        location: { lat: pub.lat, lng: pub.lng },
+                        info: <div id="info-window-container">
+                            <div className="info-window-header">תקיעה ציבורית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                            <div className="pub-address-container">
+                                <img src={'/icons/address.svg'} />
+                                <div style={{ textAlign: "right" }}>
+                                    {address}
                                 </div>
-                                <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
-                                <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                                <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                                <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                             </div>
-                        };
-                        setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
-                    }
-                    return selfLocation
-                })
-            } catch (e) { return; }
+                            <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
+                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                        </div>
+                    };
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                }
+                return selfLocation
+            })
         });
     }
 
