@@ -1,16 +1,12 @@
 import React, { Fragment, Component } from 'react';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
-import AutoComplete from '../../components/autocomplete/AutoComplete';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { BrowserView, isBrowser } from "react-device-detect";
-import Popup from '../../components/modals/general_popup';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
-import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
-import Geocode from "react-geocode";
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateSBDetails } from '../../fetch_and_utils';

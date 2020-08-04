@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, Polyline, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Polyline} from "react-google-maps";
 
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';

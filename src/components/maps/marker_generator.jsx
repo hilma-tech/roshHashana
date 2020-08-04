@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView, InfoWindow, DirectionsRenderer } from "react-google-maps";
+import { Marker, InfoWindow } from "react-google-maps";
 
 const SHOFAR_BLOWER = 'shofar_blower';
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
@@ -35,7 +35,7 @@ const MarkerGenerator = (props) => {
             icon={icon}
             label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
-            position={props.position ? props.position : { lat: location.lat, lng: location.lng }}>
+            position={Object.keys(props.position).length ? props.position : location ? { lat: location.lat, lng: location.lng } : null}>
             {!props.isolated && !props.blower && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>
     );

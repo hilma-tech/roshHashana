@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Fragment, useContext } from 'react';
+import React, { useEffect, useState, Fragment, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { ThemeProvider } from "@material-ui/styles";

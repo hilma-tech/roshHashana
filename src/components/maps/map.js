@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import { dateWTimeFormatChange } from '../../fetch_and_utils';
 import _ from "lodash";
 import './map.scss';
 import moment from 'moment'
