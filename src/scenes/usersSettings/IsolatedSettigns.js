@@ -127,7 +127,7 @@ const IsolatedSettings = (props) => {
                     <div className="header">כתובת</div>
                     {console.log("address", address)}
                     <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={address} />
-                    <div className="err-msg">{locationMsgErr}</div>
+                    <div className="err-msg">{locationMsgErr || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">

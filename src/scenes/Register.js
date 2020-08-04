@@ -34,13 +34,13 @@ class Register extends React.Component {
   handleChange(event) {
     this.setState({ alart: null })
     if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
-    event.target.id === "name" && event.target.value.length < 20 ||
-    event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") { 
+      event.target.id === "name" && event.target.value.length < 20 ||
+      event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".") {
       this.setState({ [event.target.id]: event.target.value })
     }
-    
+
   }
-  
+
   async handleSubmit() {
     if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
@@ -92,7 +92,7 @@ class Register extends React.Component {
             break;
           case "isolator with data":
             console.log("להציג למבודד שנירשם כבר את הסטטוס שלו");
-            this.props.history.push('/', { name: res.data.name, address: res.data.address });
+            this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
 
             break;
           case "isolated with new public meeting":

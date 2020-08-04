@@ -61,7 +61,8 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
 
     const handlePlaceChange = (autocomplete) => {
         let placeInfo = autocomplete.getPlace();
-        let place = placeInfo.geometry && placeInfo.geometry.location && placeInfo.formatted_address ? [placeInfo.formatted_address, { lng: placeInfo.geometry.location.lng(), lat: placeInfo.geometry.location.lat() }] : ["NOT_A_VALID_ADDRESS", null]
+        console.log('placeInfo: ', placeInfo);
+        let place = placeInfo.geometry && placeInfo.geometry.location && typeof placeInfo.geometry.location.lng === "function" && typeof placeInfo.geometry.location.lat === "function" && placeInfo.formatted_address ? [placeInfo.formatted_address, { lng: placeInfo.geometry.location.lng(), lat: placeInfo.geometry.location.lat() }] : ["NOT_A_VALID_ADDRESS", null]
         onAddressChange(place)
     }
 
