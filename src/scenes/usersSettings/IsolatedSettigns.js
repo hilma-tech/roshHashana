@@ -107,14 +107,20 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": updateData })
         }, true);
         if (res) {
-            props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+                })
         }
     }
 
     return (
         <>
             <SettingsLayout handleClose={() => { props.history.push('/'); }}>
-                <button onClick={updateIsolatedInfo} >שמור</button>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -144,7 +150,7 @@ const IsolatedSettings = (props) => {
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית</div>
-                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance"/>
+                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
                     </div>
                     {console.log("vals", vals)}
                     <div className="checkbox-container ">
@@ -161,6 +167,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
+                <button className="save-button" onClick={updateIsolatedInfo} >שמור</button>
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
