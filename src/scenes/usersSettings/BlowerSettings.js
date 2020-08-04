@@ -36,7 +36,7 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
-
+let publicMeetingsChanged = false;
 const IsolatedSettings = (props) => {
 
     const { openGenAlert, showAlert } = useContext(MainContext);
@@ -70,6 +70,7 @@ const IsolatedSettings = (props) => {
     }
 
     const addPublicPlace = () => {
+        publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
             publicMeetings.push({});
@@ -78,6 +79,7 @@ const IsolatedSettings = (props) => {
         }
         else setMsgErr('לא ניתן להוסיף עוד תקיעות ציבוריות ');
     }
+
     const changeSettingsType = (e) => {
         if (e.target.id === settingsType) {
             setSettingsType('');
@@ -97,6 +99,7 @@ const IsolatedSettings = (props) => {
 
 
     const removePubPlace = (i) => {
+        publicMeetingsChanged = true
         let publicPlaces = [...vals.publicMeetings];
         publicPlaces.splice(i, 1);
         setValues(publicPlaces, 'publicMeetings')
@@ -110,13 +113,13 @@ const IsolatedSettings = (props) => {
         setValues(placeName, 'address')
         console.log('setState to address: ', placeName);
     }
-    const updateIsolatedInfo = async () => {
-        // /^[a-z\u0590-\u05fe]+$/i
 
+
+    const updateIsolatedInfo = async () => {
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
-            if ((field === "publicMeetings" && Array.isArray(vals[field]) && vals[field].length) || vals[field] !== originalVals[field]) {
+            if ((field === "publicMeetings" && publicMeetingsChanged) || vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
         }
@@ -190,6 +193,7 @@ const IsolatedSettings = (props) => {
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        publicMeetingsChanged = true
         let publicPlaces = vals.publicMeetings;
         publicPlaces[index][keyName] = publicPlaceVal;
         setValues(publicPlaces, "publicMeetings")
