@@ -114,7 +114,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         url: '/icons/sb_origin.svg',
         scaledSize: new window.google.maps.Size(100, 100),
         // origin: new window.google.maps.Point(0, 0),
-        // anchor: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
 

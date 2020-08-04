@@ -101,14 +101,16 @@ const MapComp = (props) => {
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
-                const newLocObj = {
-                    type: PRIVATE_MEETING,
-                    location: { lat, lng },
-                    info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                        <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                if (props.publicMap || { lat, lng } !== selfLocation) {
+                    const newLocObj = {
+                        type: PRIVATE_MEETING,
+                        location: { lat, lng },
+                        info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                    }
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
-                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
             } catch (e) { console.log("err setPublicMapContent, ", e); }
         });
 
@@ -121,25 +123,27 @@ const MapComp = (props) => {
             try {
                 const date = moment(pub.start_time).format("HH:mm");
                 const { lat, lng } = response.results[0].geometry.location;
-                let newLocObj = {
-                    type: SHOFAR_BLOWING_PUBLIC,
-                    location: { lat, lng },
-                    info: <div id="info-window-container">
-                        <div className="info-window-header">תקיעה ציבורית</div>
-                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
-                        <div className="pub-address-container">
-                            <img src={'/icons/address.svg'} />
-                            <div style={{ textAlign: "right" }}>
-                                {address}
+                if (props.publicMap || { lat, lng } !== selfLocation) {
+                    let newLocObj = {
+                        type: SHOFAR_BLOWING_PUBLIC,
+                        location: { lat, lng },
+                        info: <div id="info-window-container">
+                            <div className="info-window-header">תקיעה ציבורית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                            <div className="pub-address-container">
+                                <img src={'/icons/address.svg'} />
+                                <div style={{ textAlign: "right" }}>
+                                    {address}
+                                </div>
                             </div>
+                            <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
+                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                         </div>
-                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
-                        <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                        <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                        <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
-                    </div>
-                };
-                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                    };
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                }
             } catch (e) { return; }
         });
     }
@@ -204,7 +208,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
-        // anchor: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(45, 45),
     }
 
 
