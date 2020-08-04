@@ -96,11 +96,12 @@ const MapComp = (props) => {
             const comments = privateMeet.commennts ? privateMeet.commennts : ' '
             if (!privateMeet.address) return
             const address = privateMeet.address + ' ' + comments;
+            const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || (privateMeet.lat !== selfLocation.lat && privateMeet.lng !== selfLocation.lng)) {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     const newLocObj = {
                         type: PRIVATE_MEETING,
-                        location: { lat: privateMeet.lat, lng: privateMeet.lng },
+                        location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
                             <div>לא ניתן להצטרף לתקיעה זו</div></div>
@@ -116,11 +117,12 @@ const MapComp = (props) => {
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
             const date = moment(pub.start_time).format("HH:mm");
+            const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || (pub.lat !== selfLocation.lat && pub.lng !== selfLocation.lng)) {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     let newLocObj = {
                         type: SHOFAR_BLOWING_PUBLIC,
-                        location: { lat: pub.lat, lng: pub.lng },
+                        location: { lat, lng },
                         info: <div id="info-window-container">
                             <div className="info-window-header">תקיעה ציבורית</div>
                             <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
