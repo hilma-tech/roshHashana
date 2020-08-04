@@ -67,12 +67,12 @@ const MapComp = (props) => {
                 }, await findLocationCoords('ירושלים'));
             }
             else {
-                let address = props.meetAddress || "ירושלים";
+                if (!props.meetAddress && !Object.keys(mapInfo).length) return;
+                let address = props.meetAddress || "";
                 if (mapInfo.userAddress && mapInfo.userAddress[0].address) {
                     const comments = mapInfo.userAddress[0].commennts ? mapInfo.userAddress[0].commennts : ' '
                     address = mapInfo.userAddress[0].address + ' ' + comments;
                 }
-
                 await findLocationCoords(address, true);
             }
             setIsMarkerShown(true);
