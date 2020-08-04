@@ -100,15 +100,15 @@ const GeneralUserPage = (props) => {
                     <div className="content"  >{`שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
                         {shofarBlowerName && <div className="meetingDetail">
-                            <img className="icon" src="/icons/blueShofar.svg" />
+                            <img alt="" className="icon" src="/icons/blueShofar.svg" />
                             <div  >{`בעל תוקע: ${shofarBlowerName}`}</div>
                         </div>}
                         <div className="meetingDetail">
-                            <img className="icon" src="/icons/location.svg" />
+                            <img alt="" className="icon" src="/icons/location.svg" />
                             <div  >{`${address}`}</div>
                         </div>
                         <div className="meetingDetail">
-                            <img className="icon clock" src="/icons/blueClock.svg" />
+                            <img alt="" className="icon clock" src="/icons/blueClock.svg" />
                             <div>
                                 <div  >{`בשעה: ${time}`}</div>
                                 <div className="timeNote"> אם יתבצע שינוי בזמן התקיעה נעדכן אותך בהודעה</div>
@@ -119,7 +119,7 @@ const GeneralUserPage = (props) => {
                     </div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
-                        <img src='/images/map.svg' />
+                        <img alt="" src='/images/map.svg' />
                     </div>
 
                 </div>

@@ -124,7 +124,7 @@ export default class IsolatedForm extends Component {
                     return false;
                 }
             }
-        }       
+        }
         updateArrInState && this.setState({ publicPlaces });
         return true;
     }
@@ -152,7 +152,7 @@ export default class IsolatedForm extends Component {
             return;
         }
 
-        if(formChilds[1].value < 1){
+        if (formChilds[1].value < 1) {
             this.setState({ errorMsg: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
             return;
         }
@@ -205,7 +205,7 @@ export default class IsolatedForm extends Component {
             <div id="isolated-form-container">
 
                 <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
-                    <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
+                    <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                     <div className="msg-txt header"> {`שלום ${name}, `}</div>
                     <div className="msg-txt header">ותודה על הנכונות לעזור!</div>
                     <div className="msg-txt header">כמה שאלות, ונמשיך לקביעת המפגש</div>
@@ -279,7 +279,7 @@ export default class IsolatedForm extends Component {
                 </div>
 
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
-                    <img id="shofar-img" src="/icons/shofar.png" />
+                    <img id="shofar-img" alt="" src="/icons/shofar.png" />
                 </BrowserView>
             </div>
         );

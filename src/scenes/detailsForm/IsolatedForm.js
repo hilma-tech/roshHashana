@@ -38,8 +38,6 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
-        console.log('formChilds: ', formChilds);
-        console.log('formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true: ', formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true);
         const { address } = this.state
 
         //cheked address
@@ -87,7 +85,6 @@ export default class IsolatedForm extends Component {
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const { address } = this.state
-        console.log('this.comments: ', this.comments);
         this.props.history.push('/', { name, address: address[0], comments: this.comments });
     }
 
@@ -98,7 +95,7 @@ export default class IsolatedForm extends Component {
             <>
                 <div id="isolated-form-container" style={{ opacity: this.state.openModal ? '0' : '1' }} >
                     <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
-                        <img id="go-back" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
+                        <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                         <div className="msg-txt header">{`שלום ${name},`}</div>
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
@@ -130,7 +127,7 @@ export default class IsolatedForm extends Component {
                         </form>
                     </div>
                     <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
-                        <img id="shofar-img" src="/icons/shofar.png" />
+                        <img id="shofar-img" alt="" src="/icons/shofar.png" />
                     </BrowserView>
                 </div>
                 {this.state.openModal ?

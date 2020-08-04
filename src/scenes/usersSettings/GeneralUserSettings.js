@@ -19,7 +19,6 @@ const IsolatedSettings = (props) => {
         (async () => {
             if (!Object.keys(isolatedInfo).length) {
                 if (!userInfo) {
-                    console.log("from server")
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
@@ -31,7 +30,6 @@ const IsolatedSettings = (props) => {
                     }
                 }
                 else {
-                    console.log("from context", userInfo)
                     setValues(userInfo, setIsolatedInfo);
                     setValues(userInfo.name, setName);
                     setValues(userInfo.username, setUsername);

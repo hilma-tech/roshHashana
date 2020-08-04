@@ -69,8 +69,7 @@ module.exports = function (CustomUser) {
                 cb(err1, null);
             }
             if (!resKey) {
-                console.log(resKey)
-                console.log("err key")
+                console.log("err key", resKey)
                 cb(null, { ok: "err key" })
             } else {
                 const newTime = moment(new Date())
@@ -104,7 +103,6 @@ module.exports = function (CustomUser) {
                         }
                     })
                 } else {
-                    console.log("time out")
                     cb(null, { ok: "time out" })
                 }
             }
@@ -112,7 +110,6 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.cookieAndAccessToken = (userId, meetingId, roleId, options, res, cb) => {
-        console.log("Login secess")
         CustomUser.directLoginAs(userId, roleId, (err, result) => {
             let expires = new Date(Date.now() + 5184000000);
             res.cookie('access_token', result.__data.id, { signed: true, expires });
@@ -272,6 +269,7 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
+                    if (!isolated) return { errmMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
                     return userInfo;
@@ -279,6 +277,7 @@ module.exports = function (CustomUser) {
                 else if (role === 2) {
                     //shofar blower 
                     let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
+                    if (!blower) return { errmMsg: 'LOG_OUT' };
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
                     userInfo.volunteering_max_time = blower.volunteering_max_time;
@@ -344,11 +343,10 @@ module.exports = function (CustomUser) {
                 if (data.comments) userData.comments = data.comments
 
                 if (Object.keys(userData).length) {
-                    console.log('userData: ', userData);
                     let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
-                    console.log('create done: ', resCustomUser);
                 }
                 if (role === 1) {
+                    //isolated
                     let pubMeetId = null;
                     if (data.public_meeting) {
                         let meetData = [{
@@ -358,7 +356,6 @@ module.exports = function (CustomUser) {
                         }];
                         pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
                     }
-                    //isolated
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
@@ -565,7 +562,6 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-            console.log('userData: ', userData);
             if (!userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
@@ -606,9 +602,6 @@ module.exports = function (CustomUser) {
             if (priRouteErr || !priRouteRes) { console.log('private route error : ', priRouteErr); }
             const [pubsErr, pubsRes] = await executeMySqlQuery(CustomUser, allPubsQ)
             if (pubsErr || !pubsRes) { console.log('public route and request error : ', pubsErr); }
-            console.log('++ priReqRes: ', priReqRes);
-            console.log('++ priRouteRes: ', priRouteRes);
-            console.log('++ pubsRes: ', pubsRes);
 
             const myPubRoutes = []
             const pubReqs = []
@@ -636,7 +629,6 @@ module.exports = function (CustomUser) {
         //check if user is confirmed by admin 
         (async () => {
 
-            console.log('!assignSB!: meetingObjs:', meetingObjs);
             if (!meetingObjs || !Array.isArray(meetingObjs)) return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
             const { userId } = options.accessToken;
@@ -656,12 +648,10 @@ module.exports = function (CustomUser) {
                 const blowerUpdateQ = meetingObj.isPublicMeeting ?
                     `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerId IS NULL`
                     : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${meetingObj.meetingId} AND blowerMeetingId IS NULL`
-                console.log('blowerUpdateQ: ', blowerUpdateQ);
                 let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
                 if (err || !res) console.log('err: ', err);
                 allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
             }
-            console.log('allRes: ', allRes);
             return cb(null, allRes)
         })();
     }
