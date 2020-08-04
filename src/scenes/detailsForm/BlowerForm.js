@@ -128,7 +128,7 @@ export default class IsolatedForm extends Component {
                     return false;
                 }
             }
-        }
+        }       
         updateArrInState && this.setState({ publicPlaces });
         return true;
     }
@@ -155,6 +155,12 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
+
+        if(formChilds[1].value < 1){
+            this.setState({ errorMsg: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
+            return;
+        }
+
         // check address
         const { address } = this.state
         if (!Array.isArray(address) || !address.length) {

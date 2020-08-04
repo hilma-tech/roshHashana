@@ -21,6 +21,13 @@ export default class IsolatedForm extends Component {
         }
     }
 
+    componentDidMount() {
+        if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
+            this.props.history.push('/');
+            return;
+        }
+    }
+
     goBack = () => {
         this.props.history.goBack();
     }
