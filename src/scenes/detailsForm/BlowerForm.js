@@ -118,9 +118,15 @@ export default class IsolatedForm extends Component {
                 updateArrInState = true;
                 publicPlaces.splice(i, 1);
             }
-            else if (!publicPlaces[i].address || !publicPlaces[i].time) {
-                this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
-                return false;
+            else {
+                if (!publicPlaces[i].address || !publicPlaces[i].time) {
+                    this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
+                    return false;
+                }
+                if (publicPlaces[i].address === CONSTS.NOT_A_VALID_ADDRESS) {
+                    this.setState({ errorMsg: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
+                    return false;
+                }
             }
         }
         updateArrInState && this.setState({ publicPlaces });
