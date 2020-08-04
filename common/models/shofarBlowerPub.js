@@ -58,14 +58,5 @@ module.exports = function (shofarBlowerPub) {
             }
         }
     }
-
-    shofarBlowerPub.remoteMethod('createNewPubMeeting', {
-        http: { verb: 'post' },
-        accepts: [
-            { arg: 'data', type: 'object' },
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
-        ],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
 }
 

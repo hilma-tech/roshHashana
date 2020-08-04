@@ -8,7 +8,8 @@ import { assignSB } from '../fetch_and_utils'
 import { MainContext } from '../ctx/MainContext';
 
 const SBAssignMeeting = (props) => {
-    const { assignMeetingInfo, openGenAlert, setAssignMeetingInfo,
+    const { openGenAlert } = useContext(MainContext)
+    const { assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
         meetingsReqs, setMeetingsReqs,
         assigns, setAssigns,

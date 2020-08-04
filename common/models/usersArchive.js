@@ -13,12 +13,4 @@ module.exports = function (usersArchive) {
             throw error;
         }
     }
-
-    usersArchive.remoteMethod('addUserToArchive', {
-        http: { verb: 'post' },
-        accepts: [
-            { arg: 'userData', type: 'object' },
-        ],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
 }

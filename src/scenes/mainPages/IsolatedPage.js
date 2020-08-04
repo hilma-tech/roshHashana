@@ -51,7 +51,7 @@ const IsolatedPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = () => {
-        openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
+        openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
             if (!continuE) return
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },

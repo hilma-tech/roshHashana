@@ -34,6 +34,7 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         const formChilds = e.target.children;
+        console.log('formChilds: ', formChilds);
         const { address } = this.state
 
         //cheked address
@@ -52,7 +53,7 @@ export default class IsolatedForm extends Component {
             "public_phone": formChilds[5].children[1].checked,
             "address": address,
             "comments": comments,
-            "public_meeting": formChilds[2].children[1].checked ? false : true
+            "public_meeting": formChilds[2] && formChilds[2].children[1] && formChilds[2].children[1].checked ? false : true
         }
 
         //update isolated details
@@ -94,10 +95,11 @@ export default class IsolatedForm extends Component {
                         <div className="msg-txt header">{`שלום ${name},`}</div>
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
-                        <div className="msg-txt">הפרטים שלך הם:</div>
-                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress}>
+                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "2.5rem" }} >
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
+                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" />
+
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">
@@ -109,8 +111,6 @@ export default class IsolatedForm extends Component {
                                 <div>בחלון או במרפסת הפונה לרחוב</div>
                                 <input className="clickAble" type="radio" name="preferance" />
                             </div>
-
-                            <input autoComplete={'off'} id="comments" type="text" placeholder="הערות ותיאור הכתובת" />
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>

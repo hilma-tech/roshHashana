@@ -130,7 +130,7 @@
         },
         {
             "principalType": "ROLE",
-            "principalId": "$everyone",
+            "principalId": "SHOFARBLOWER",
             "permission": "ALLOW",
             "property": "InsertDataShofarBlower"
         }

@@ -90,9 +90,9 @@ label {
         }
     }
 }
+
 #name,
 #phone-number,
-#address,
 #comments,
 #place-description,
 .autocompleteInput,
@@ -109,7 +109,38 @@ input[type="number"] {
         -webkit-appearance: none;
     }
 }
-.autocompleteInput {
+#address,.address
+    {
+        @include input();
+        font-size: 1.3rem;
+        margin-bottom: 0 !important;
+        &::placeholder {
+            font-size: 1.3rem;
+            padding-right: 2%;
+            color: black;
+            opacity: 0.9;
+        }
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+    }
+    #public-blowing-set{
+        #place-description{
+            @include input();
+            font-size: 1.3rem;
+            margin-top: 5% !important;
+            &::placeholder {
+                font-size: 1.3rem;
+                padding-right: 2%;
+                color: black;
+                opacity: 0.9;
+            }
+            &::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+            }
+        }
+    }
+    .autocompleteInput {
 }
 .header,
 .header2 {

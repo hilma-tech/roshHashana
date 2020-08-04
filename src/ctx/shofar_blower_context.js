@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { assignSB } from '../fetch_and_utils';
+import GeneralAlert from '../components/modals/general_alert';
 
 export const SBContext = React.createContext()
 
@@ -23,9 +24,9 @@ export const SBProvider = ({ children }) => {
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
         const startTimeRoute = new Date(myMeetings[0].startTime).getTime()
-        if(!startTimeRoute) return null
+        if (!startTimeRoute) return null
         const endTimeRoute = new Date(myMeetings[myMeetings.length - 1].startTime).getTime()
-        if(!endTimeRoute) return null
+        if (!endTimeRoute) return null
         return endTimeRoute - startTimeRoute
     }
     const getTotalLength = () => {
@@ -88,13 +89,11 @@ export const SBProvider = ({ children }) => {
         if (obj.isPopup) alertObj.isPopup = { ...obj.isPopup, popupCb, closeSelf: () => { setShowAlert(false) } }
         setShowAlert(alertObj)
         if (!obj.isPopup && !obj.noTimeout) alertTO = setTimeout(closeAlert, 5000)
-
     }
 
 
 
     const ctxValue = window.sbctx = {
-        openGenAlert, showAlert,
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
@@ -104,6 +103,9 @@ export const SBProvider = ({ children }) => {
     }
 
     return <SBContext.Provider value={ctxValue} >
-        {children}
+        <>
+            {children}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+        </>
     </SBContext.Provider>
 }

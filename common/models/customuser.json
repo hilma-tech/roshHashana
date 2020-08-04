@@ -69,14 +69,14 @@
       "precision": null,
       "scale": null,
       "mysql": {
-          "columnName": "address",
-          "dataType": "varchar",
-          "dataLength": 400,
-          "dataPrecision": null,
-          "dataScale": null,
-          "nullable": "Y"
+        "columnName": "address",
+        "dataType": "varchar",
+        "dataLength": 400,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
       }
-  },
+    },
     "comments": {
       "type": "String",
       "required": false,
@@ -134,32 +134,20 @@
     {
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "extendedLogin"
+      "permission": "DENY",
+      "property": "*"
     },
     {
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "authenticate"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "createUser"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "authenticationKey"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "getMapData"
+      "property": [
+        "extendedLogin",
+        "createUser",
+        "authenticationKey",
+        "authenticate",
+        "getMapData"
+      ]
     },
     {
       "principalType": "ROLE",
@@ -174,19 +162,11 @@
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "getUserInfo"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "updateUserInfo"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "deleteUser"
+      "property": [
+        "getUserInfo",
+        "updateUserInfo",
+        "deleteUser"
+      ]
     }
   ],
   "methods": {}

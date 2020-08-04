@@ -91,10 +91,12 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
-    const { data } = props
-    if (!data) return <div>loading</div>
+    const { err, data } = props
+    if (err) return null;
+    if (!data) return <img className="loader" src='/images/loader.svg' />
 
-    const { openGenAlert,
+    const { openGenAlert } = useContext(MainContext)
+    const {
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)

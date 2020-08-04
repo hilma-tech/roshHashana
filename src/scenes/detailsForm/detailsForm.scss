@@ -97,7 +97,11 @@
         }
         .preferance {
             font-size: 1.3rem;
-            color: #1e2e31;
+            // color: #1e2e31;
+            color: $turquoise;
+            text-align: right;
+            margin: 2rem auto 1rem auto;
+            width: 80%;
         }
         .checkbox-container {
             font-size: 1rem;
@@ -157,6 +161,8 @@
             }
             &.approval {
                 padding-left: 5%;
+                margin-bottom: 2rem ;
+                margin-top: 2rem ;
                 #approval {
                     color: $turquoise;
                     text-align: right;
@@ -183,6 +189,10 @@
                     }
                 }
             }
+        }
+        #isolated-comments{
+            margin-bottom: 3rem;
+            margin-top: 2rem;
         }
         .err-msg {
             font-size: 1.2rem;

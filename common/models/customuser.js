@@ -118,7 +118,7 @@ module.exports = function (CustomUser) {
         const { shofarBlowerPub } = CustomUser.app.models;
         let status = resRole.roleId
         CustomUser.findOne({ where: { id: userId } }, (err, res) => {
-            if (err || !res) { console.log("Err", err);} //todo: return cb(true?)
+            if (err || !res) { console.log("Err", err); } //todo: return cb(true?)
             if (res) {
                 switch (status) {
                     case 1:
@@ -210,8 +210,9 @@ module.exports = function (CustomUser) {
 
 
     CustomUser.getMapData = async (isPubMap = false, options) => {
+        // map data for all maps (except for shofar blower map)
 
-        //get all private meetings
+        //get all private meetings  
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `select 
             isolatedUser.name AS "isolatedName", 
@@ -246,11 +247,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `select
-                         CustomUser.address
-                         from
-                         CustomUser
-                         where CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
@@ -277,6 +274,7 @@ module.exports = function (CustomUser) {
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
+                    console.log("userInfo", userInfo)
                     return userInfo;
                 }
                 else if (role === 2) {
@@ -288,6 +286,7 @@ module.exports = function (CustomUser) {
 
                     let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
                     userInfo.publicMeetings = publicMeetings;
+                    console.log("publicMeetings", publicMeetings)
                     return userInfo;
                 }
                 else {
@@ -332,7 +331,6 @@ module.exports = function (CustomUser) {
                 const userId = options.accessToken.userId;
                 let role = await getUserRole(userId);
                 if (!role) return;
-                let city;
                 let userData = {
                     name: data.name,
                     username: data.username,
@@ -363,7 +361,7 @@ module.exports = function (CustomUser) {
                         console.log("errDeletePublicMeetings", errDeletePublicMeetings)
                     }
                     let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => {
-                        if (publicMeeting.cityId && publicMeeting.street && (publicMeeting.time || publicMeeting.start_time) && userId) {
+                        if (publicMeeting.address && (publicMeeting.time || publicMeeting.start_time) && userId) {
                             return true; // skip
                         }
                         return false;
@@ -371,13 +369,13 @@ module.exports = function (CustomUser) {
 
                     publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
                         return {
-                            cityId: publicMeeting.cityId,
-                            street: publicMeeting.street,
+                            address: publicMeeting.address,
                             comments: publicMeeting.placeDescription || publicMeeting.comments,
                             start_time: publicMeeting.time || publicMeeting.start_time,
                             blowerId: userId
                         }
                     })
+                    console.log("publicMeetingsArr", publicMeetingsArr)
                     const [resCreatePublicMeetings, errCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
                     if (errDeletePublicMeetings) {
                         console.log("errCreatePublicMeetings", errCreatePublicMeetings)
@@ -551,7 +549,7 @@ module.exports = function (CustomUser) {
             FROM isolated 
                 JOIN CustomUser ON userIsolatedId  = CustomUser.id 
             WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
-            
+
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
             SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", shofar_blower_pub.address, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
             CASE

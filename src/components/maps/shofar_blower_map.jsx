@@ -22,7 +22,10 @@ const PRIVATE_MEETING = 'private meeting';
 
 
 const ShofarBlowerMap = (props) => {
-    const { openGenAlert,
+
+    const { openGenAlert } = useContext(MainContext)
+
+    const {
         myMeetings, meetingsReqs,
         setAssignMeetingInfo,
         startTimes } = useContext(SBContext)
@@ -36,9 +39,9 @@ const ShofarBlowerMap = (props) => {
     const [userOriginLoc, setUserOriginLoc] = useState(null)
 
     const [allMapData, setAllMapData] = useState(null)
+    const [err, setErr] = useState(false)
 
     const [center, setCenter] = useState({});
-    const [isMarkerShown, setIsMarkerShown] = useState(false);
 
     const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
@@ -65,9 +68,9 @@ const ShofarBlowerMap = (props) => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
                 Geocode.setLanguage("he");
-                const centerAdr = `${userData.city || ""} ${userData.street || ""} ${userData.appartment || ""}`
+                const centerAdr = userData.address + (userData.comments ? userData.comments : "")
                 let [error, res] = await to(Geocode.fromAddress(centerAdr))
-                if (error || !res) { openGenAlert({ text: "אירעה שגיאה בטעינת המפה, נא נסו שנית מאוחר יותר" }); console.log("error getting geoCode of ירושלים: ", error); return; }
+                if (error || !res) { setErr(true); openGenAlert({ text: "אירעה שגיאה בטעינת המפה, נא נסו שנית מאוחר יותר" }); console.log("error getting geoCode of ירושלים: ", error); return; }
                 try {
                     const newCenter = res.results[0].geometry.location;
                     if (newCenter !== center) setCenter(newCenter)
@@ -98,7 +101,6 @@ const ShofarBlowerMap = (props) => {
     useEffect(() => {
         if (Array.isArray(myMLocs) && Array.isArray(reqsLocs) && userOriginLoc && typeof userOriginLoc === "object" && userData && typeof userData === "object") {
             setAllMapData({ userData, userOriginLoc, reqsLocs, myMLocs })
-            // console.log('<< myMLocs: ', myMLocs);
         }
     }, [myMLocs])
 
@@ -185,6 +187,7 @@ const ShofarBlowerMap = (props) => {
 
 
 
+    console.log('allMapData: ', allMapData);
     return (
         <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
 
@@ -192,11 +195,12 @@ const ShofarBlowerMap = (props) => {
                 changeCenter={setCenter}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
+                err={err}
                 data={allMapData}
                 history={props.history}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img src='/icons/loader.svg' />}
+                loadingElement={<img className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />

@@ -6,7 +6,6 @@ import './general_alert.scss'
 
 
 const GeneralAlert = ({ text, warning, isPopup, noTimeout = false }) => {
-
     if (isPopup) return <GeneralPopup text={text} {...isPopup} />
 
     return (

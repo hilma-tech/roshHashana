@@ -36,10 +36,8 @@ const AddPublicPlace = (props) => {
     useEffect(() => {
         if (props.info && Object.keys(props.info).length !== 0) {
             console.log("props.info", props.info)
-            let city
             props.info.start_time && setChosenTime(props.info.start_time)
-            if (props.info.cityId) city = props.cities.find(city => city.id === props.info.cityId)
-            city && setAddress(city.name)
+            props.info.address && setAddress(props.info.address)
             props.info.comments && setComments(props.info.comments)
         }
         props.updatePublicPlace(props.index, 'time', chosenTime);
@@ -67,7 +65,8 @@ const AddPublicPlace = (props) => {
         <div id="public-place-container">
             {props.removePubPlace && !props.inSettings && <img className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
-            <FormSearchBoxGenerator uId={'form-search-input-2'} second onAddressChange={updateCity} />
+            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateCity} defaultValue={address} className="address" />
+            {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}
             <input
                 autoComplete={'off'}
                 id="place-description"

@@ -18,7 +18,8 @@ import './sb.scss'
 let fetching = false
 const SBHomePage = (props) => {
 
-    const { showAlert, openGenAlert,
+    const { showAlert, openGenAlert } = useContext(MainContext)
+    const {
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
         assignMeetingInfo } = useContext(SBContext)
@@ -67,7 +68,7 @@ const SBHomePage = (props) => {
     return (
         <div className="sb-homepage-container">
             {
-                !userData && !meetingsReqs && !myMeetings ? <div>loading!</div> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
+                !userData && !meetingsReqs && !myMeetings ? <img className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
@@ -80,7 +81,6 @@ const SBHomePage = (props) => {
                     <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
                 )
             }
-
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </div>
     );
