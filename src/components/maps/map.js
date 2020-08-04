@@ -55,7 +55,6 @@ const MapComp = (props) => {
         (async () => {
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
             Geocode.setLanguage("he");
-
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     let newCenter = { lat: position.coords.latitude, lng: position.coords.longitude };
@@ -76,6 +75,7 @@ const MapComp = (props) => {
             }
             await setPublicMapContent();
             setIsMarkerShown(true);
+            if (props.publicMap || props.isolated || props.blower) await setPublicMapContent();
 
         })();
     }, [mapInfo])

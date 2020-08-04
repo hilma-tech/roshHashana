@@ -335,11 +335,21 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
+                    let pubMeetId = null;
+                    if (data.public_meeting) {
+                        let meetData = [{
+                            "address": data.address,
+                            "comments": data.comments ? data.comments : null,
+                            "start_time": null
+                        }];
+                        pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                    }
                     //isolated
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
-                        public_meeting: data.public_meeting
+                        public_meeting: data.public_meeting,
+                        "blowerMeetingId": pubMeetId
                     }
                     let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
