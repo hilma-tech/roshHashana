@@ -36,7 +36,7 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
-
+let publicMeetingsChanged = false;
 const IsolatedSettings = (props) => {
 
     const { openGenAlert, showAlert } = useContext(MainContext);
@@ -70,6 +70,7 @@ const IsolatedSettings = (props) => {
     }
 
     const addPublicPlace = () => {
+        publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
             publicMeetings.push({});
@@ -78,6 +79,7 @@ const IsolatedSettings = (props) => {
         }
         else setMsgErr('לא ניתן להוסיף עוד תקיעות ציבוריות ');
     }
+
     const changeSettingsType = (e) => {
         if (e.target.id === settingsType) {
             setSettingsType('');
@@ -97,6 +99,7 @@ const IsolatedSettings = (props) => {
 
 
     const removePubPlace = (i) => {
+        publicMeetingsChanged = true
         let publicPlaces = [...vals.publicMeetings];
         publicPlaces.splice(i, 1);
         setValues(publicPlaces, 'publicMeetings')
@@ -109,13 +112,13 @@ const IsolatedSettings = (props) => {
     const handleAddressChange = (placeName) => {
         setValues(placeName, 'address')
     }
-    const updateIsolatedInfo = async () => {
-        // /^[a-z\u0590-\u05fe]+$/i
 
+
+    const updateIsolatedInfo = async () => {
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
-            if ((field === "publicMeetings" && Array.isArray(vals[field]) && vals[field].length) || vals[field] !== originalVals[field]) {
+            if ((field === "publicMeetings" && publicMeetingsChanged) || vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
         }
@@ -151,27 +154,30 @@ const IsolatedSettings = (props) => {
                 return;
             }
         }
-        for (let i = 0; i < publicMeetings.length; i++) {
-            if (!publicMeetings[i].time) {
-                openGenAlert({ text: "נא לציין את שעת התקיעה" })
-                setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
-                return;
-            }
-            if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
-                if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
-                    let pms = [...publicMeetings];
-                    pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
+        if (publicMeetings && publicMeetings.isArray() && publicMeetings.length > 0) {
+            for (let i = 0; i < publicMeetings.length; i++) {
+                if (!publicMeetings[i].time) {
+                    openGenAlert({ text: "נא לציין את שעת התקיעה" })
+                    setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
+                    return;
+                }
+                if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
+                    if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
+                        let pms = [...publicMeetings];
+                        pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
+                        setValues(pms, "publicMeetings")
+                        openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
+                        return
+                    }
+                    let pms = publicMeetings;
+                    pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
                     setValues(pms, "publicMeetings")
-                    openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
+                    openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
                     return
                 }
-                let pms = publicMeetings;
-                pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
-                setValues(pms, "publicMeetings")
-                openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
-                return
             }
         }
+
 
         if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
@@ -184,11 +190,18 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ data: updateData })
         }, true);
         if (res) {
-            // props.history.goBack();
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    props.history.goBack();
+                })
         }
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        publicMeetingsChanged = true
         let publicPlaces = vals.publicMeetings;
         publicPlaces[index][keyName] = publicPlaceVal;
         setValues(publicPlaces, "publicMeetings")
@@ -197,7 +210,6 @@ const IsolatedSettings = (props) => {
     return (
         <>
             <SettingsLayout handleClose={() => { props.history.goBack(); }}>
-                <button onClick={updateIsolatedInfo} >שמור</button>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -279,6 +291,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general}</div>
+                <button className="save-button" onClick={updateIsolatedInfo} >שמור</button>
             </SettingsLayout >
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
