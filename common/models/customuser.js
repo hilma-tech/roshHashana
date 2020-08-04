@@ -328,7 +328,7 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.updateUserInfo = async (data, options) => {
-        const { shofarBlowerPub } = CustomUser.app.models;
+        const { shofarBlowerPub, Isolated , ShofarBlower} = CustomUser.app.models;
         if (options.accessToken && options.accessToken.userId) {
             try {
                 const userId = options.accessToken.userId;
@@ -354,7 +354,21 @@ module.exports = function (CustomUser) {
                             "comments": data.comments ? data.comments : null,
                             "start_time": null
                         }];
-                        pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                        pubMeetId = await shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                    }
+                    else {
+                        let isolatedInfo = await Isolated.findOne({ where: { and: [{ userIsolatedId: userId }, { public_meeting: 1 }] } });
+                        //the user is changing from public to private
+                        if (isolatedInfo) {
+                            let meetingId = isolatedInfo.blowerMeetingId;
+                            //count all the users that are registered to this meeting
+                            let numOfRegistered = await Isolated.count({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
+                            if (numOfRegistered > 1) {
+                                let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: null }] } });
+                                //if the meeting has no shofar blower assigned already
+                                if (pubMeet) await shofarBlowerPub.destroyById(meetingId);
+                            }
+                        }
                     }
                     let newIsoData = {
                         userIsolatedId: userId,
@@ -362,7 +376,7 @@ module.exports = function (CustomUser) {
                         public_meeting: data.public_meeting,
                         blowerMeetingId: pubMeetId
                     }
-                    let resIsolated = await CustomUser.app.models.Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
+                    let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
                 else if (role === 2) {
                     //shofar blower
@@ -373,7 +387,7 @@ module.exports = function (CustomUser) {
                     if (data.volunteering_start_time) newBloData.volunteering_start_time = data.volunteering_start_time
                     if (Object.values(newBloData).length) {
                         console.log('newBloData: ', newBloData);
-                        let resBlower = await CustomUser.app.models.ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
+                        let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
                         console.log('updated sb info: ', resBlower);
                     }
                     if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
