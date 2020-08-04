@@ -16,6 +16,7 @@ const IsolatedPage = (props) => {
     const [openMap, setOpenMap] = useState(false);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
+    const [comment, setComment] = useState('');
 
     if (!props.location || !props.location.state || !props.location.state.name || !props.location.state.address)
         Auth.logout(window.location.href = window.location.origin);
@@ -25,6 +26,7 @@ const IsolatedPage = (props) => {
             if (props.location && props.location.state && props.location.state.name && props.location.state.address) {
                 setName(props.location.state.name);
                 setAddress(props.location.state.address);
+                props.location.state.comments && setComment(props.location.state.comments)
             }
             else {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
@@ -33,9 +35,9 @@ const IsolatedPage = (props) => {
                 console.log(res, 'res')
 
                 if (res) {
-
-                    setAddress(res.address);
                     setName(res.name)
+                    setAddress(res.address);
+                    setComment(res.comments);
                 }
             }
         })();
@@ -73,7 +75,8 @@ const IsolatedPage = (props) => {
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
-                    <div id="address-info" style={{ marginBottom: isBrowser ? '2%' : '50%' }}>{address}</div>
+                    <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
+                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '30%' }}>{comment}</div> : null}
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
