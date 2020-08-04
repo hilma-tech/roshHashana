@@ -144,6 +144,7 @@ const IsolatedSettings = (props) => {
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית</div>
+                        {console.log(isolatedInfo.public_meeting, 'pub')}
                         <input className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? false : true} />
                     </div>
 

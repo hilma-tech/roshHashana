@@ -17,9 +17,6 @@ const IsolatedPage = (props) => {
     const [address, setAddress] = useState('');
     const [comment, setComment] = useState('');
 
-    if (!props.location || !props.location.state || !props.location.state.name || !props.location.state.address)
-        Auth.logout(window.location.href = window.location.origin);
-
     useEffect(() => {
         (async () => {
             if (props.location && props.location.state && props.location.state.name && props.location.state.address) {
@@ -31,8 +28,11 @@ const IsolatedPage = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
-
                 if (res) {
+                    if (res.errmMsg && res.errmMsg === 'LOG_OUT') {
+                        Auth.logout(window.location.href = window.location.origin);
+                        return;
+                    }
                     setName(res.name)
                     setAddress(res.address);
                     setComment(res.comments);

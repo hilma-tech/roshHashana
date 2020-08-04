@@ -31,6 +31,12 @@ class Register extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+    if (Auth.isAuthenticated()) {
+      return this.props.history.push('/');
+    }
+  }
+
   handleChange(event) {
     this.setState({ alart: null })
     if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||

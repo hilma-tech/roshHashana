@@ -269,6 +269,7 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
+                    if (!isolated) return { errmMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
                     return userInfo;
@@ -276,6 +277,7 @@ module.exports = function (CustomUser) {
                 else if (role === 2) {
                     //shofar blower 
                     let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
+                    if (!blower) return { errmMsg: 'LOG_OUT' };
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
                     userInfo.volunteering_max_time = blower.volunteering_max_time;
@@ -334,6 +336,7 @@ module.exports = function (CustomUser) {
                 }
                 let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 if (role === 1) {
+                    //isolated
                     let pubMeetId = null;
                     if (data.public_meeting) {
                         let meetData = [{
@@ -343,7 +346,6 @@ module.exports = function (CustomUser) {
                         }];
                         pubMeetId = await CustomUser.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
                     }
-                    //isolated
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
