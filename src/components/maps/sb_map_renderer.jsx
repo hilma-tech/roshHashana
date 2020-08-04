@@ -19,7 +19,8 @@ const mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    componentRestrictions: { country: "il" }
+    componentRestrictions: { country: "il" },
+    clickableIcons: false
 };
 const israelCoords = [
     { lat: 32.863532, lng: 35.889902 },

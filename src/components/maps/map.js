@@ -23,7 +23,8 @@ var mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    disableDefaultUI: true
+    disableDefaultUI: true,
+    clickableIcons: false
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -148,7 +149,7 @@ const MapComp = (props) => {
             props.history.push('/register', { type: 'generalUser', meetingInfo });
         }
     }
-    
+
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
