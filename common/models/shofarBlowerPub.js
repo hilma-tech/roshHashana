@@ -11,16 +11,31 @@ module.exports = function (shofarBlowerPub) {
 
     //this function excepts to get data as an array!!!!
     shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options) => {
+        console.log('createNewPubMeeting data: ', data);
         if (!Array.isArray(data)) { console.log("cannot get data in createNewPubMeeting cos not an array. data:", data); return; }
         let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {
             for (let i = 0; i < data.length; i++) {
                 let meetingData = data[i];
+
+                let city;
+                let addressArr = meetingData.address && meetingData.address[0]
+                console.log('meetingData.address && meetingData.address[0]: ', meetingData.address && meetingData.address[0]);
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    console.log('addressArr: ', addressArr);
+                    city = shofarBlowerPub.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1) || addressArr[addressArr.length - 1];
+                    console.log('city: ', city);
+                }
+
+
                 meetingData.address[0] = meetingData.address[0].substring(0, 398)
+
                 let newPubMeeting = {
                     "address": meetingData.address[0],
                     "lng": meetingData.address[1].lng,
                     "lat": meetingData.address[1].lat,
+                    city,
                     "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId

@@ -43,7 +43,6 @@ const IsolatedSettings = (props) => {
 
     const [originalVals, setOriginalVals] = useState({});
     const [vals, setVals] = useState({});
-    console.log('vals: ', vals);
     const [errs, setErrs] = useState({});
 
     useEffect(() => {
@@ -179,7 +178,7 @@ const IsolatedSettings = (props) => {
                 return;
             }
         }
-        if (publicMeetings && publicMeetings.isArray() && publicMeetings.length > 0) {
+        if (publicMeetings && Array.isArray(publicMeetings) && publicMeetings.length > 0) {
             for (let i = 0; i < publicMeetings.length; i++) {
                 if (!publicMeetings[i].time) {
                     openGenAlert({ text: "נא לציין את שעת התקיעה" })

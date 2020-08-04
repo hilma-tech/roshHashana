@@ -328,6 +328,20 @@ module.exports = function (CustomUser) {
         }
     }
 
+
+    CustomUser.getLastItemThatIsNotIsrael = (arr, pos) => {
+        //gets an array of strings and the last position of that array (arr.length - 1)
+        // returns the first item (from the end) that is not ירושלים
+        //? check if pos is bigger than 1000000 ? (to prevent an infinite loop cos goes from pos to pos===0 (on pos===0 returns))
+        if (arr[pos] !== "ישראל") {
+            return arr[pos]
+        }
+        if (!pos || pos == 300) {
+            return arr[arr.length - 1]
+        }
+        return CustomUser.getLastItemThatIsNotIsrael(arr, pos - 1)
+    }
+
     CustomUser.updateUserInfo = async (data, options) => {
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
         if (options.accessToken && options.accessToken.userId) {
@@ -338,10 +352,18 @@ module.exports = function (CustomUser) {
                 let userData = {}
                 if (data.name) userData.name = data.name
                 if (data.username) userData.username = data.username
-                if (data.address && data.address[0]) userData.address = data.address[0]
                 if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
                 if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
                 if (data.comments) userData.comments = data.comments
+                if (data.address && data.address[0]) {
+                    userData.address = data.address[0]
+                    let addressArr = data.address[0]
+                    if (typeof addressArr === "string" && addressArr.length) {
+                        addressArr = addressArr.split(", ")
+                        let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                        userData.city = city || addressArr[addressArr.length - 1];
+                    }
+                }
 
                 if (Object.keys(userData).length) {
                     let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
@@ -424,11 +446,20 @@ module.exports = function (CustomUser) {
 
                         let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
 
+                        let city;
                         publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
+                            if (publicMeeting.address && publicMeeting.address[0]) {
+                                let addressArr = publicMeeting.address[0]
+                                if (typeof addressArr === "string" && addressArr.length) {
+                                    addressArr = addressArr.split(", ")
+                                    city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                                }
+                            }
                             return {
-                                address: publicMeeting.address[0],
-                                lng: publicMeeting.address[1].lng,
-                                lat: publicMeeting.address[1].lat,
+                                address: publicMeeting.address && publicMeeting.address[0],
+                                lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
+                                lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
+                                city,
                                 comments: publicMeeting.placeDescription || publicMeeting.comments,
                                 start_time: publicMeeting.time || publicMeeting.start_time,
                                 blowerId: userId
