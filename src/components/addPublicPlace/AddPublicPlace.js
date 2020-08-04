@@ -43,6 +43,7 @@ const AddPublicPlace = (props) => {
 
     //update chosenTime state and the publicPlaces array according to user choise
     const changeChosenTime = (time) => {
+        console.log('time._d: ', time._d);
         setChosenTime(time._d);
     }
 
@@ -58,12 +59,13 @@ const AddPublicPlace = (props) => {
     const updateAddress = (address) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
+        console.log('address to update: ', address);
     }
     return (
         <div id="public-place-container">
             {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
-            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={address} className="address" />
+            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={Array.isArray(address) && address[0] ? address[0] : address} className="address" />
             {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}
             <input
                 autoComplete={'off'}

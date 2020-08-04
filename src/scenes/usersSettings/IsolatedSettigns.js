@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import Auth from '../../modules/auth/Auth';
-import Geocode from "react-geocode";
 import './Settings.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { MainContext } from '../../ctx/MainContext';
@@ -53,6 +52,7 @@ const IsolatedSettings = (props) => {
         }
     }
     const handleAddressChange = (placeName) => {
+        console.log(placeName, 'place')
         setAddress(placeName)
     }
     const updateIsolatedInfo = async () => {
@@ -81,35 +81,24 @@ const IsolatedSettings = (props) => {
             setLocationMsgErr('הכתובת שהזנת אינה תקינה'); return;
         }
 
-
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
-        Geocode.setLanguage("he");
-        await Geocode.fromAddress(address).then(
-            async response => {
-                let newData = {
-                    "name": nameVal,
-                    "username": usernameVal,
-                    "public_phone": public_phone.checked,
-                    "address": address,
-                    "comments": comments,
-                    "public_meeting": public_meeting.checked ? 1 : 0
-                }
-                setMsgErr('');
-                //update isolated details
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
-                    headers: { Accept: "application/json", "Content-Type": "application/json" },
-                    method: "PUT",
-                    body: JSON.stringify({ "data": newData })
-                }, true);
-                if (res) {
-                    props.history.push('/', { name: nameVal, address });
-                }
-            },
-            error => {
-                setMsgErr('הכתובת אינה תקינה, אנא בדוק אותה');
-                return;
-            }
-        );
+        let newData = {
+            "name": nameVal,
+            "username": usernameVal,
+            "public_phone": public_phone.checked,
+            "address": address,
+            "comments": comments,
+            "public_meeting": public_meeting.checked ? 1 : 0
+        }
+        setMsgErr('');
+        //update isolated details
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "PUT",
+            body: JSON.stringify({ "data": newData })
+        }, true);
+        if (res) {
+            props.history.push('/', { name: nameVal, address });
+        }
     }
 
     return (
@@ -139,12 +128,11 @@ const IsolatedSettings = (props) => {
                 <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
                     <div className="header">כתובת</div>
                     <FormSearchBoxGenerator value={address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={address} />
-                    <div className="err-msg">{locationMsgErr}</div>
+                    <div className="err-msg">{locationMsgErr || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית</div>
-                        {console.log(isolatedInfo.public_meeting, 'pub')}
                         <input className="clickAble" type="radio" name="preferance" defaultChecked={isolatedInfo.public_meeting ? false : true} />
                     </div>
 

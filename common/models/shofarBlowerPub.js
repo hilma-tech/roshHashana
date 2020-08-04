@@ -15,7 +15,6 @@ module.exports = function (shofarBlowerPub) {
         let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {
             for (let i = 0; i < data.length; i++) {
-
                 let meetingData = data[i];
                 meetingData.address[0] = meetingData.address[0].substring(0, 398)
                 let newPubMeeting = {

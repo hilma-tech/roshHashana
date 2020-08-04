@@ -115,11 +115,11 @@ export default class IsolatedForm extends Component {
                 publicPlaces.splice(i, 1);
             }
             else {
-                if (!publicPlaces[i].address || !publicPlaces[i].time) {
+                if (!publicPlaces[i].address || !Array.isArray(publicPlaces[i].address) || !publicPlaces[i].time) {
                     this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
                     return false;
                 }
-                if (publicPlaces[i].address === CONSTS.NOT_A_VALID_ADDRESS) {
+                if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
                     this.setState({ errorMsg: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
                     return false;
                 }

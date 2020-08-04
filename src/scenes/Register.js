@@ -96,7 +96,7 @@ class Register extends React.Component {
             this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
             break;
           case "isolator with data":
-            this.props.history.push('/', { name: res.data.name, address: res.data.address });
+            this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
 
             break;
           case "isolated with new public meeting":
