@@ -50,7 +50,7 @@ const IsolatedSettings = (props) => {
         setValues(placeName[1] ? placeName[1].lng : null, "lng")
         setValues(placeName[1] ? placeName[1].lat : null, "lat")
     }
-    const updateIsolatedInfo = async () => {
+    const updateIsolatedInfo = async (fromX) => {
         // let nameVal = name;
         // let usernameVal = username;
         // let public_meeting = document.getElementById('public-meeting');
@@ -63,6 +63,28 @@ const IsolatedSettings = (props) => {
             }
         }
         console.log('updateData: ', updateData);
+        if (fromX) {
+            console.log("updateData", updateData)
+            if (updateData && Object.keys(updateData).length !== 0) {
+                openGenAlert({
+                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
+                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
+                },
+                    (res) => {
+                        if (res) {
+                            props.history.goBack();
+                            return
+                        } else {
+                            return
+                        }
+                    })
+                return
+            } else {
+                props.history.goBack();
+                return
+
+            }
+        }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
             openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
             return;
@@ -122,7 +144,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { props.history.push('/'); }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
