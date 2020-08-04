@@ -28,10 +28,9 @@ module.exports = function (shofarBlowerPub) {
                 meetingDataArray.push(newPubMeeting)
             }
             try {
-
                 //create new public meeting
                 let res = await shofarBlowerPub.create(meetingDataArray);
-                if (res) return res.id;
+                if (res) return Array.isArray(res) && res.length ? res[0].id : res.id;
 
             } catch (error) {
                 throw error;
