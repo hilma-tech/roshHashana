@@ -117,10 +117,6 @@
     "public": true,
     "dataSource": "msql"
   },
-  "city": {
-    "public": true,
-    "dataSource": "msql"
-  },
   "usersArchive": {
     "public": true,
     "dataSource": "msql"
