@@ -4,19 +4,22 @@ module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
+        console.log('data: ', data);
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
                 if (!isolatedInfo) {
                     let pubMeetId = null;
-                    if (!data.address || !data.address.length) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
-                    if (data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
-                    data.address = data.address.substring(0, 398) // shouldn't be more than 400 
+                    if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
+                    if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+                    data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
 
                     //create public meeting
                     if (data.public_meeting) {
                         let meetData = [{
-                            "address": data.address,
+                            "address": data.address[0],
+                            "lng": data.address[1].lng,
+                            "lat": data.address[1].lat,
                             "comments": data.comments,
                             "start_time": null
                         }]
@@ -30,7 +33,9 @@ module.exports = function (Isolated) {
                         "blowerMeetingId": pubMeetId
                     },
                         objToCU = {
-                            "address": data.address,
+                            "address": data.address[0],
+                            "lng": data.address[1].lng,
+                            "lat": data.address[1].lat,
                             "comments": data.comments
                         };
 
@@ -55,41 +60,10 @@ module.exports = function (Isolated) {
     }
 
 
-    Isolated.joinPublicMeeting = async (meetingInfo, options) => {
-        if (!options.accessToken || !options.accessToken.userId) {
-            return
-        }
-        console.log('options.accessToken', options.accessToken)
-        console.log(meetingInfo, 'meetingInfo')
-        let meetInfo = {
-            "public_meeting": 1,
-            "meeting_time": meetingInfo.start_time,
-            "blowerMeetingId": meetingInfo.id
-        }
-        console.log(meetInfo, 'meetInfo')
-        try {
-            let res = await Isolated.upsertWithWhere({ userIsolatedId: options.accessToken.userId }, meetInfo);
-            return { status: 'OK' };
-        } catch (error) {
-            console.log(error, 'er')
-            return { status: 'FAILED' };
-        }
-    }
-
-
     Isolated.remoteMethod('InsertDataIsolated', {
         http: { verb: 'post' },
         accepts: [
             { arg: 'data', type: 'object' },
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
-        ],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
-
-    Isolated.remoteMethod('joinPublicMeeting', {
-        http: { verb: 'post' },
-        accepts: [
-            { arg: 'meetingInfo', type: 'object' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         ],
         returns: { arg: 'res', type: 'object', root: true }

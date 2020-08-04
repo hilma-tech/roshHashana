@@ -23,7 +23,8 @@ var mapOptions = {
     zoomControl: false,
     streetViewControl: false,
     mapTypeControl: false,
-    disableDefaultUI: true
+    disableDefaultUI: true,
+    clickableIcons: false
 };
 
 const SHOFAR_BLOWER = 'shofar_blower';
@@ -100,14 +101,16 @@ const MapComp = (props) => {
             if (error || !response || !Array.isArray(response.results) || response.status !== "OK") { console.log(`error geoCode.fromAddress(privateMeet.address): ${error}`); return; }
             try {
                 const { lat, lng } = response.results[0].geometry.location;
-                const newLocObj = {
-                    type: PRIVATE_MEETING,
-                    location: { lat, lng },
-                    info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
-                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                        <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                if (props.publicMap || { lat, lng } !== selfLocation) {
+                    const newLocObj = {
+                        type: PRIVATE_MEETING,
+                        location: { lat, lng },
+                        info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                    }
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
-                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
             } catch (e) { console.log("err setPublicMapContent, ", e); }
         });
 
@@ -120,25 +123,27 @@ const MapComp = (props) => {
             try {
                 const date = moment(pub.start_time).format("HH:mm");
                 const { lat, lng } = response.results[0].geometry.location;
-                let newLocObj = {
-                    type: SHOFAR_BLOWING_PUBLIC,
-                    location: { lat, lng },
-                    info: <div id="info-window-container">
-                        <div className="info-window-header">תקיעה ציבורית</div>
-                        <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
-                        <div className="pub-address-container">
-                            <img src={'/icons/address.svg'} />
-                            <div style={{ textAlign: "right" }}>
-                                {address}
+                if (props.publicMap || { lat, lng } !== selfLocation) {
+                    let newLocObj = {
+                        type: SHOFAR_BLOWING_PUBLIC,
+                        location: { lat, lng },
+                        info: <div id="info-window-container">
+                            <div className="info-window-header">תקיעה ציבורית</div>
+                            <div className="pub-shofar-blower-name-container"><img src={'/icons/shofar.svg'} /><div>{pub.blowerName}</div></div>
+                            <div className="pub-address-container">
+                                <img src={'/icons/address.svg'} />
+                                <div style={{ textAlign: "right" }}>
+                                    {address}
+                                </div>
                             </div>
+                            <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
+                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                         </div>
-                        <div className="pub-start-time-container"><img src={'/icons/clock.svg'} /><div>{date}</div></div>
-                        <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                        <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                        <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
-                    </div>
-                };
-                setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                    };
+                    setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
+                }
             } catch (e) { return; }
         });
     }
@@ -147,23 +152,8 @@ const MapComp = (props) => {
         if (props.publicMap) {
             props.history.push('/register', { type: 'generalUser', meetingInfo });
         }
-        // else {
-        //     //join the isolator to the meeting
-        //     let [res, err] = await Auth.superAuthFetch(`/api/Isolateds/joinPublicMeeting`, {
-        //         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        //         method: 'post',
-        //         body: JSON.stringify({ meetingInfo })
-        //     }, true);
-        //     if (res) {
-        //         // if(res.status==='OK')
-        //         //TODO: add msg of success 
-        //         // else 
-        //         //TODO: add msg of fail
-        //         console.log(res, 'res')
-        //     }
-        // }
-
     }
+
     return (
         <div className={'map-container slide-in-bottom'}>
             <MyMapComponent
@@ -218,7 +208,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
-        // anchor: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(45, 45),
     }
 
 

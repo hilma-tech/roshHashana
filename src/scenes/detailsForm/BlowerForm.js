@@ -118,9 +118,15 @@ export default class IsolatedForm extends Component {
                 updateArrInState = true;
                 publicPlaces.splice(i, 1);
             }
-            else if (!publicPlaces[i].address || !publicPlaces[i].time) {
-                this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
-                return false;
+            else {
+                if (!publicPlaces[i].address || !publicPlaces[i].time) {
+                    this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
+                    return false;
+                }
+                if (publicPlaces[i].address === CONSTS.NOT_A_VALID_ADDRESS) {
+                    this.setState({ errorMsg: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
+                    return false;
+                }
             }
         }
         updateArrInState && this.setState({ publicPlaces });
@@ -151,12 +157,16 @@ export default class IsolatedForm extends Component {
         }
         // check address
         const { address } = this.state
-        if (address === CONSTS.NOT_A_VALID_ADDRESS || (typeof address === "boolean" && address === true)) {
-            //if true, is not one from google (see handlePlaceChange:func in search_box_generator)
+        if (!Array.isArray(address) || !address.length) {
+            this.setState({ errorMsg: 'אנא הכנס מיקום' });
+            return;
+        }
+        if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
             this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
 
+        //startTime
         let startTime = new Date(this.state.chosenTime);
         startTime.setFullYear(2020, 8, 20);
 
@@ -168,11 +178,10 @@ export default class IsolatedForm extends Component {
             "can_blow_x_times": formChilds[1].value,
             "volunteering_start_time": startTime,
             "volunteering_max_time": this.state.walkTime,//endTime,
-            "address": this.state.address, //!
+            "address": this.state.address,
             "publicPlaces": this.state.publicPlaces
         }
         this.setState({ errorMsg: '' });
-        console.log("valid");
         //update shofar blower details
         updateSBDetails(blowerDetails, (error) => {
             if (!error) {

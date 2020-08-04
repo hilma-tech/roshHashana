@@ -8,9 +8,7 @@ module.exports = function (ShofarBlower) {
     //         "can_blow_x_times":1,
     //         "volunteering_start_time":1594563291554,
     //         "volunteering_max_time":1594563291554,
-    //         "city" : "חיפה",
-    //         "street": "פרויד",
-    //         "appartment": "23",
+    //         "address",
     //         "comments": null
     //     }
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
@@ -19,9 +17,9 @@ module.exports = function (ShofarBlower) {
                 console.log('data: ', data);
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
                 if (!blowerInfo) {
-                    if (!data.address || !data.address.length) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
-                    if (data.address === "NOT_A_VALID_ADDRESS" || (typeof address === "boolean" && address === true)) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
-                    data.address = data.address.substring(0, 398) // shouldn't be more than 400 
+                    if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
+                    if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+                    data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
 
                     let objToBlower = {
                         "userBlowerId": options.accessToken.userId,
@@ -30,7 +28,9 @@ module.exports = function (ShofarBlower) {
                         "volunteering_max_time": data.volunteering_max_time
                     },
                         objToCU = {
-                            "address": data.address,
+                            "address": data.address[0],
+                            "lng": data.address[1].lng,
+                            "lat": data.address[1].lat,
                             "comments": null
                         };
 

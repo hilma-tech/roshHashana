@@ -137,9 +137,7 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                         if (res.address == null) {
                             cb(null, { ok: "isolator new", data: { name: res.name } })
                         } else {
-
                             cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address } })
-
                         }
                         break;
 
@@ -175,7 +173,6 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
                                                     data:
                                                     {
                                                         name: res.name,
-
                                                         meetingInfo: {
                                                             address: resPublicMeeting.address,
                                                             comments: resPublicMeeting.comments,
@@ -523,7 +520,7 @@ CustomUser.cookieAndAccessToken =(userId, meetingId, roleId, options, res, cb) =
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.mapInfoSB = function (options, cb) { //! changed to use address and not street, city and appartment
+    CustomUser.mapInfoSB = function (options, cb) { // might make sense to move this to ShofarBlower.js BUT..
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {

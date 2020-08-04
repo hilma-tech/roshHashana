@@ -27,7 +27,7 @@ const MarkerGenerator = (props) => {
         url: url,
         scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
-        // anchor: new window.google.maps.Point(0, 0), // changes position of icon
+        anchor: new window.google.maps.Point(25, 25), // changes position of icon
     }
 
     return (
