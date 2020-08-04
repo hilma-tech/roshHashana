@@ -213,6 +213,8 @@ module.exports = function (CustomUser) {
             `select 
             isolatedUser.name AS "isolatedName", 
             isolatedUser.address,
+            isolatedUser.lat,
+            isolatedUser.lng,
             isolatedUser.comments,
             blowerUser.name AS "blowerName"
             FROM 
@@ -229,6 +231,8 @@ module.exports = function (CustomUser) {
                 blowerUser.name AS "blowerName",
                 shofar_blower_pub.id,
                 shofar_blower_pub.address,
+                shofar_blower_pub.lat,
+                shofar_blower_pub.lng,
                 shofar_blower_pub.comments ,
                 shofar_blower_pub.start_time
                 from
