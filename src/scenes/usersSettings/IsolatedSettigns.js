@@ -50,16 +50,33 @@ const IsolatedSettings = (props) => {
         setValues(placeName[1] ? placeName[1].lng : null, "lng")
         setValues(placeName[1] ? placeName[1].lat : null, "lat")
     }
-    const updateIsolatedInfo = async () => {
-        // let nameVal = name;
-        // let usernameVal = username;
-        // let public_meeting = document.getElementById('public-meeting');
-        // let public_phone = document.getElementById('public-phone');
+    const updateIsolatedInfo = async (fromX = false) => {
         const updateData = {};
 
         for (let field in { ...vals }) { // remove values that are as origin
             if (vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
+            }
+        }
+        if (fromX) {
+            if (updateData && Object.keys(updateData).length !== 0) {
+                openGenAlert({
+                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
+                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
+                },
+                    (res) => {
+                        if (res) {
+                            props.history.goBack();
+                            return
+                        } else {
+                            return
+                        }
+                    })
+                return
+            } else {
+                props.history.goBack();
+                return
+
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
@@ -90,14 +107,6 @@ const IsolatedSettings = (props) => {
             updateData.address = [address, { lng, lat }]
         }
 
-        // let newData = {
-        //     "name": nameVal,
-        //     "username": usernameVal,
-        //     "public_phone": public_phone.checked,
-        //     "address": address,
-        //     "comments": comments,
-        //     "public_meeting": public_meeting.checked ? 1 : 0
-        // }
         setErrs({});
         //address to be Array
         //update isolated details
@@ -107,14 +116,20 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": updateData })
         }, true);
         if (res) {
-            props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+                })
         }
     }
 
     return (
         <>
-            <SettingsLayout handleClose={() => { props.history.push('/'); }}>
-                <button onClick={updateIsolatedInfo} >שמור</button>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -144,7 +159,7 @@ const IsolatedSettings = (props) => {
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית</div>
-                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance"/>
+                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
                     </div>
                     <div className="checkbox-container ">
                         <div className="header">בחלון או במרפסת הפונה לרחוב</div>
@@ -160,6 +175,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
+                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
