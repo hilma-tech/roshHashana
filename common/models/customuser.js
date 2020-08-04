@@ -5,6 +5,7 @@ const moment = require('moment');
 const randomstring = require("randomstring");
 const to = require('../../server/common/to');
 const { options } = require('superagent');
+const { wait } = require('event-stream');
 let msgText = `שלום`
 let msgText2 = `הקוד שלך הוא:`
 
@@ -362,25 +363,22 @@ module.exports = function (CustomUser) {
                     else {
                         let isolatedInfo = await Isolated.findOne({ where: { and: [{ userIsolatedId: userId }, { public_meeting: 1 }] } });
                         //the user is changing from public to private
+                        console.log('isolatedInfo', isolatedInfo)
                         if (isolatedInfo) {
                             let meetingId = isolatedInfo.blowerMeetingId;
-                            //count all the users that are registered to this meeting
-                            let numOfRegistered = await Isolated.count({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
-                            if (numOfRegistered > 1) {
-                                let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: null }] } });
-                                //if the meeting has no shofar blower assigned already
-                                if (pubMeet) await shofarBlowerPub.destroyById(meetingId);
-                            }
+                            let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                            console.log(canDeleteMeeting, 'canDeleteMeeting')
+                            if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         }
                     }
-                    
+
                     let newIsoData = {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
                         public_meeting: data.public_meeting,
                         blowerMeetingId: pubMeetId
                     }
-                    if (Object.values(newIsoData).find(d => d)){
+                    if (Object.values(newIsoData).find(d => d)) {
                         let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                     }
                 }
