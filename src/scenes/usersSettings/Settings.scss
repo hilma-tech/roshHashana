@@ -19,10 +19,13 @@
 .personal-info,
 #blowing-set,
 #public-blowing-set {
-    margin-right: 5%;
+    margin-right: 7% !important;
+    margin-left: 7% !important;
     .MuiFormControl-root {
-        width: 100%;
+        width: 100% !important;
+
         .MuiInputBase-input {
+            width: 100% !important;
             @include input();
             margin: 0 0 5% 0;
             box-sizing: border-box;
@@ -96,6 +99,7 @@ label {
 #place-description,
 .autocompleteInput,
 input[type="number"] {
+    width: 100% !important;
     @include input();
     font-size: 1.3rem;
     &::placeholder {
@@ -112,6 +116,7 @@ input[type="number"] {
     {
         @include input();
         font-size: 1.3rem;
+        width:100%;
         margin-bottom: 0 !important;
         &::placeholder {
             font-size: 1.3rem;
