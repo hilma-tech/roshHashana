@@ -22,7 +22,7 @@
         flex-direction: column;
     }
     .browserinputTextAndPhone {
-        font-size: 180%;
+        font-size: 260%;
         margin-top: 0%;
         color: #ffffff;
     }
@@ -55,7 +55,7 @@
     .browserkey {
         outline: none;
         border: 1.2px solid #ffffff;
-        margin: 2% 36% 0% 36%;
+        margin: 5.3% 36% 0% 36%;
         background-color: #f2f2f2ba;
         padding: 1%;
         font-size: 1rem;
@@ -81,7 +81,7 @@
     .browserbutton1 {
         border: none;
         padding: 1% 0%;
-        margin: 1% 44% 0% 44%;
+        margin: 1.2% 44% 0% 44%;
         color: #ffffff;
         background-color: #489fb5;
         font-size: 2.5vh;
@@ -114,14 +114,32 @@
         top: 2.5%;
         right: 4%;
     }
+    .allDataRegisterPage{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 90%;
+    }
 
     .allInputInRegisterPage {
         display: flex;
         flex-direction: column;
     }
+    .mobileinputTextAndPhoneisolator{
+        white-space: pre-line;
+        line-height: 1.2;
+        font-size: 180%;
+        margin: 9% 0% 2% 0%;
+        color: #ffffff;
+        max-width: 80vw;
+        margin-left: auto;
+        margin-right: auto;
+    }
     .mobileinputTextAndPhone {
-        font-size: 150%;
-        margin: 2% 0% 2% 0%;
+        white-space: pre-line;
+        line-height: 1.2;
+        font-size: 180%;
+        margin: 11% 0% 2% 0%;
         color: #ffffff;
         max-width: 80vw;
         margin-left: auto;
@@ -143,7 +161,7 @@
         outline: none;
         background-color: #f2f2f252;
         border: 1.2px solid #ffffff;
-        margin: 1% 10% 1% 10%;
+        margin: 3% 10% 0% 10%;
         padding: 3%;
         font-size: 1rem;
         font-weight: bold;
@@ -154,7 +172,7 @@
     .mobilekey {
         outline: none;
         border: 1.2px solid #ffffff;
-        margin: 22% 10% 3% 10%;
+        margin: 24% 10% 0% 10%;
         background-color: #f2f2f252;
         padding: 3%;
         font-size: 1rem;

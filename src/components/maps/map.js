@@ -94,14 +94,13 @@ const MapComp = (props) => {
             if (!privateMeet.address) return
             const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || props.blower || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     const newLocObj = {
                         type: PRIVATE_MEETING,
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            {!props.blower && <div>לא ניתן להצטרף לתקיעה זו</div>}
-                        </div>
+                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
@@ -113,10 +112,10 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה ';
+            const date = moment(pub.start_time).format("HH:mm");
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || props.blower || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
+                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     let newLocObj = {
                         type: SHOFAR_BLOWING_PUBLIC,
                         location: { lat, lng },
@@ -130,13 +129,9 @@ const MapComp = (props) => {
                                 </div>
                             </div>
                             <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
-                            {!props.blower &&
-                                <>
-                                    <div >ייתכנו שינויי בזמני התקיעות</div>
-                                    <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                                    <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
-                                </>
-                            }
+                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                         </div>
                     };
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
@@ -203,7 +198,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/youHere.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(45, 45),
@@ -211,11 +206,11 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
 
     return <GoogleMap
-        defaultZoom={16}
+        defaultZoom={20}
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator bounds={bounds} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
+        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -227,13 +222,9 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 const SearchBoxGenerator = (props) => {
 
     useEffect(() => {
-        const options = {
-            bounds: props.bounds,
-            strictBounds: true
-        }
         const input = document.getElementById('search-input');
-        let autocomplete = new window.google.maps.places.Autocomplete(input, options);
-        // autocomplete.setComponentRestrictions({ "country": "il" });
+        let autocomplete = new window.google.maps.places.Autocomplete(input);
+        autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => {
             let place = autocomplete.getPlace();
             if (place.geometry) props.changeCenter(place.geometry.location);
