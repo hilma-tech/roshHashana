@@ -165,11 +165,11 @@ const IsolatedSettings = (props) => {
 
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
-                        <div className="header">בפתח הבית</div>
+                        <div className="header">בפתח הבית - תקיעה פרטית</div>
                         <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
                     </div>
                     <div className="checkbox-container ">
-                        <div className="header">בחלון או במרפסת הפונה לרחוב</div>
+                        <div className="header">בחלון או במרפסת הפונה לרחוב - תקיעה ציבורית</div>
                         <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" />
                     </div>
 

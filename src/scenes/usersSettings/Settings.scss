@@ -226,12 +226,18 @@ input[type="number"] {
             }
             &:checked::after {
                 content: "L";
-                transform: rotate(45deg) translate(-20%, -15%) scaleX(-1);
+                transform: rotate(45deg) translate(-40%, 0%) scaleX(-1);
                 font-size: 80%;
                 font-weight: bold;
                 border-radius: 0;
                 background-color: transparent;
                 border: 2px solid transparent;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                align-content: center;
+                justify-content: end;
+                line-height: 100%;
             }
         }
     }

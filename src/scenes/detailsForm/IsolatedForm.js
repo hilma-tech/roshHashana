@@ -99,7 +99,9 @@ export default class IsolatedForm extends Component {
                         <div className="msg-txt header">{`שלום ${name},`}</div>
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
-                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "2.5rem" }} >
+                        <div className="msg-txt h1"> הפרטים שלך הם: </div>
+
+                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "1.8rem" }} >
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" />
@@ -131,7 +133,7 @@ export default class IsolatedForm extends Component {
                     </BrowserView>
                 </div>
                 {this.state.openModal ?
-                    <div id="override-popup-container" ><Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} /></div>
+                    <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} /></div>
                     : null}
             </>
         );

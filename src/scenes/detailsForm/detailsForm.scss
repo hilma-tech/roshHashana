@@ -44,6 +44,9 @@
         font-size: 1.2rem;
         margin-bottom: 6%;
     }
+    .h1 {
+        font-size: 1.3rem;
+    }
     form {
         input {
             background-color: $grey-bg;
@@ -104,7 +107,7 @@
             // color: #1e2e31;
             color: $turquoise;
             text-align: right;
-            margin: 2rem auto 1rem auto;
+            margin: 0 auto 1rem auto;
             width: 80%;
         }
         .checkbox-container {
@@ -137,6 +140,7 @@
                 -webkit-appearance: none;
                 -moz-appearance: none;
                 appearance: none;
+                margin-top: 2%;
 
                 &::before {
                     border-radius: 50%;
@@ -185,19 +189,24 @@
                     }
                     &:checked::after {
                         content: "L";
-                        transform: rotate(45deg) translate(-20%, -15%) scaleX(-1);
+                        transform: rotate(45deg) translate(-40%, 0%) scaleX(-1);
                         font-size: 80%;
                         font-weight: bold;
                         border-radius: 0;
                         background-color: transparent;
                         border: 2px solid transparent;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        align-content: center;
+                        justify-content: end;
+                        line-height: 100%;
                     }
                 }
             }
         }
         #isolated-comments {
-            margin-bottom: 3rem;
-            margin-top: 2rem;
+            margin-bottom: 2rem;
         }
         .err-msg {
             font-size: 1rem;
@@ -209,9 +218,10 @@
                 width: 75%;
                 height: 2rem;
                 color: black;
+                font-family: 'Assistant',sans-serif !important;
                 &::-webkit-input-placeholder {
                     color: black;
-                    opacity: 0.8;
+                    opacity: 1;
                     font-size: 1rem;
                 }
             }
