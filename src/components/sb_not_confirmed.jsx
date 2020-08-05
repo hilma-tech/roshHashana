@@ -40,7 +40,7 @@ const SBNotConfirmed = (props) => {
                     <div id="thank-you-msg">תודה על הרשמתך.</div>
                     <div>בזמן הקרוב נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
                     <div>בברכה,<br></br>צוות יום תרועה.</div>
-                    <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשתך</div>
+                    <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול הרשמתך</div>
                     <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                                 <img alt="" src='/images/map.svg' />
