@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { MainContext } from '../../ctx/MainContext';
-
-import Auth from '../../modules/auth/Auth';
-
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
-
 import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages'
-
+import { MainContext } from '../../ctx/MainContext';
+import { CONSTS } from '../../const_messages';
+import Map from '../../components/maps/map';
+import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
+
+
+
+
 
 const IsolatedSettings = (props) => {
     const { userInfo, setUserInfo, openGenAlert, showAlert } = useContext(MainContext)
@@ -16,14 +17,14 @@ const IsolatedSettings = (props) => {
     const [msgErr, setMsgErr] = useState('');
     const [phoneMsgErr, setPhoneMsgErr] = useState('');
     const [nameMsgErr, setNameMsgErr] = useState('');
-
+    const [meetAddres, setMeetAddress] = useState('');
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
 
     useEffect(() => {
         (async () => {
             if (!Object.keys(originalIsolatedInfo).length) {
-                if (!userInfo) {
+                if (!userInfo || !props.history.location || !props.history.location.state || !props.history.location.state.meetAddress) {
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
@@ -32,12 +33,14 @@ const IsolatedSettings = (props) => {
                         setValues(res, setOriginalIsolatedInfo);
                         setValues(res.name, setName);
                         setValues(res.username, setUsername);
+                        setValues(`${res.meetingInfo.address}, ${res.meetingInfo.comments}`, setMeetAddress);
                     }
                 }
                 else {
                     setValues(userInfo, setOriginalIsolatedInfo);
                     setValues(userInfo.name, setName);
                     setValues(userInfo.username, setUsername);
+                    setValues(props.history.location.state.meetAddress, setMeetAddress)
                 }
             }
         })();
@@ -135,7 +138,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated />}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />

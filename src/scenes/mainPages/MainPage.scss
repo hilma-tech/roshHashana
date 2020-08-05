@@ -29,7 +29,7 @@
     .content-container {
         position: absolute;
         width: 100%;
-        padding: 0 10%;
+        padding: 20% 10%;
         #thank-you-msg {
             margin-bottom: 15%;
         }
@@ -41,6 +41,7 @@
             text-decoration: underline;
             margin-bottom: 40%;
             font-size: 1.3rem;
+            margin-top: 5%;
         }
         #see-map {
             font-weight: bold;
@@ -73,7 +74,7 @@
             color: black;
             font-size: 1.3rem;
             line-height: normal;
-
+            margin-bottom: 5%;
             .clock {
                 margin-bottom: 2rem;
             }
@@ -94,6 +95,9 @@
     .containerContent {
         position: absolute;
         top: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     .header {
         position: absolute;

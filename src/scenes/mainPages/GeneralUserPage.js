@@ -28,7 +28,7 @@ const GeneralUserPage = (props) => {
                 if (props.location.state.meetingInfo) {
                     setShofarBlowerName(props.location.state.meetingInfo.blowerName);
                     setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments}`);
-                    setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
+                    setTime(`${props.location.state.meetingInfo.start_time ? moment(props.location.state.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                 }
             } else {
                 if (!userInfo) {
@@ -73,7 +73,7 @@ const GeneralUserPage = (props) => {
     }
 
     const openSettings = () => {
-        props.history.push('/settings');
+        props.history.push('/settings', { meetAddress: address });
     }
 
     //cancel the request and delete the user
@@ -90,7 +90,7 @@ const GeneralUserPage = (props) => {
 
     return (
         <>
-            <div id="isolated-page-container"  >
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }} >
                 <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" }}>
                     <div className="clickAble" onClick={openSettings}><img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
@@ -116,14 +116,14 @@ const GeneralUserPage = (props) => {
                         </div>
                         <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div>
                     </div>
-                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                    {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
-                    </div>
+                    </div>}
 
                 </div>
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
+            {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
         </>
