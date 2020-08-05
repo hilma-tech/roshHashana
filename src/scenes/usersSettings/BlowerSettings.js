@@ -117,7 +117,7 @@ const IsolatedSettings = (props) => {
 
 
     const updateIsolatedInfo = async (fromX) => {
-        console.log('updateIsolatedInfo: ', fromX);
+        console.log("hiii")
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -228,7 +228,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -310,7 +310,6 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general}</div>
-                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
             </SettingsLayout >
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
