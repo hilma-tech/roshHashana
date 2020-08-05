@@ -189,7 +189,7 @@ export default class IsolatedForm extends Component {
             "address": this.state.address,
             "publicPlaces": this.state.publicPlaces
         }
-        this.setState({ errorMsg: '', publicMeetErr: '', addressErr: '' });
+        this.setState({ errorMsg: '', publicMeetErr: '', addressErr: '', numOfBlowErr: '' });
         //update shofar blower details
         updateSBDetails(blowerDetails, (error) => {
             if (!error) {
