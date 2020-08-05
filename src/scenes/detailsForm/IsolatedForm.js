@@ -112,7 +112,7 @@ export default class IsolatedForm extends Component {
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="err-msg">{this.state.addressErr}</div>
-                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" />
+                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" maxLength={254}/>
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 

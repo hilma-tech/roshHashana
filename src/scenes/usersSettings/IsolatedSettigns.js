@@ -146,7 +146,7 @@ const IsolatedSettings = (props) => {
 
                 <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
                     <div className="err-msg">{errs.name || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
@@ -176,7 +176,7 @@ const IsolatedSettings = (props) => {
                     </div>
 
                     <div className="header">הערות ותיאור הכתובת</div>
-                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} />
+                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254}/>
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>

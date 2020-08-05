@@ -353,7 +353,9 @@ module.exports = function (CustomUser) {
                 if (data.username) userData.username = data.username
                 if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
                 if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-                userData.comments = data.comments
+                if (data.comments && data.comments.length < 255) userData.comments = data.comments
+                else userData.comments = '';
+                
                 if (data.address && data.address[0]) {
                     userData.address = data.address[0]
                     let addressArr = data.address[0]
@@ -382,7 +384,8 @@ module.exports = function (CustomUser) {
                         else {
                             let meetData = {}
                             if (data.address) meetData.address = data.address
-                            if (data.comments) meetData.comments = data.comments
+                            if (data.comments && data.comments.length < 255) meetData.comments = data.comments
+                            else meetData.comments = '';
                             if (data.start_time) meetData.start_time = data.start_time
 
                             if (Object.keys(meetData).length) {
@@ -398,7 +401,7 @@ module.exports = function (CustomUser) {
                             const address = [isolatedInfo.UserToIsolated().address, { lat: isolatedInfo.UserToIsolated().lat, lng: isolatedInfo.UserToIsolated().lng }];
                             meetData.address = address;
                         }
-                        if (data.comments) meetData.comments = data.comments;
+                        if (data.comments && data.comments.length < 255) meetData.comments = data.comments;
                         else meetData.comments = isolatedInfo.UserToIsolated().comments;
                         if (data.start_time) meetData.start_time = data.start_time;
 

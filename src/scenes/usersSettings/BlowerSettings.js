@@ -246,7 +246,7 @@ const IsolatedSettings = (props) => {
                 <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
 
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
                     <div className="err-msg">{errs.name || ""}</div>
 
 
