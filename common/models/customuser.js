@@ -353,7 +353,7 @@ module.exports = function (CustomUser) {
                 if (data.username) userData.username = data.username
                 if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
                 if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-                if (data.comments) userData.comments = data.comments
+                userData.comments = data.comments
                 if (data.address && data.address[0]) {
                     userData.address = data.address[0]
                     let addressArr = data.address[0]

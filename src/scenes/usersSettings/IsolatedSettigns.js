@@ -91,6 +91,7 @@ const IsolatedSettings = (props) => {
                 })
             return;
         }
+        console.log("updateData", updateData)
 
         let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
         // validate values
