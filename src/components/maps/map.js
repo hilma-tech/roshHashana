@@ -210,7 +210,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
+        <SearchBoxGenerator bounds={bounds} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -222,9 +222,13 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 const SearchBoxGenerator = (props) => {
 
     useEffect(() => {
+        const options = {
+            bounds: props.bounds,
+            strictBounds: true
+        }
         const input = document.getElementById('search-input');
-        let autocomplete = new window.google.maps.places.Autocomplete(input);
-        autocomplete.setComponentRestrictions({ "country": "il" });
+        let autocomplete = new window.google.maps.places.Autocomplete(input, options);
+        // autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => {
             let place = autocomplete.getPlace();
             if (place.geometry) props.changeCenter(place.geometry.location);
