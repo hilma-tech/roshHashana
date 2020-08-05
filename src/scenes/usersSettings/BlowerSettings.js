@@ -186,18 +186,11 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
-                    if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
-                        let pms = [...publicMeetings];
-                        pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
-                        setValues(pms, "publicMeetings")
-                        openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
-                        return
-                    }
-                    let pms = publicMeetings;
-                    pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
+                if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
+                    let pms = [...publicMeetings];
+                    pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
                     setValues(pms, "publicMeetings")
-                    openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
+                    openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
                     return
                 }
             }
