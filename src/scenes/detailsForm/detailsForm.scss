@@ -218,9 +218,10 @@
                 width: 75%;
                 height: 2rem;
                 color: black;
+                font-family: 'Assistant',sans-serif !important;
                 &::-webkit-input-placeholder {
                     color: black;
-                    opacity: 0.8;
+                    opacity: 1;
                     font-size: 1rem;
                 }
             }
