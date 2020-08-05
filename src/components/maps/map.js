@@ -29,7 +29,6 @@ const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
 const MapComp = (props) => {
-
     const [allLocations, setAllLocations] = useState([]);
     const [center, setCenter] = useState({});
     const [selfLocation, setSelfLocation] = useState({});
