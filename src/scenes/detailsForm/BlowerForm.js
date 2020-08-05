@@ -38,11 +38,14 @@ export default class IsolatedForm extends Component {
         super(props);
         this.state = {
             errorMsg: '',
+            publicMeetErr: '',
+            addressErr: '',
+            numOfBlowErr: '',
             address: '', //the address of the shofar blower
-            chosenTime: Date.now(), //the start time the shofar blower wants to start his volunteering
+            chosenTime: null, //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
             publicPlaces: [{}], //a list of all the public places that the shofar blower added,
-            walkTime: 15 //the total time the shofar blower wants to walk
+            walkTime: -15 //the total time the shofar blower wants to walk
         }
     }
 
@@ -87,7 +90,7 @@ export default class IsolatedForm extends Component {
             publicPlaces.push({});
             this.setState({ publicPlaces });
         }
-        else this.setState({ errorMsg: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
+        else this.setState({ publicMeetErr: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
     }
 
     //remove the public meeting
@@ -95,6 +98,9 @@ export default class IsolatedForm extends Component {
         let publicPlaces = this.state.publicPlaces;
         publicPlaces.splice(index, 1);
         this.setState({ publicPlaces });
+        if (publicPlaces.length < 4) {
+            this.setState({ publicMeetErr: '' });
+        }
     }
 
     //update walk time
@@ -103,7 +109,7 @@ export default class IsolatedForm extends Component {
     }
 
     handleAddressChange = (address) => {
-        this.setState({ address })
+        this.setState({ address });
     }
 
     checkForMissingDataInPublicPlaces = async () => {
@@ -116,11 +122,11 @@ export default class IsolatedForm extends Component {
             }
             else {
                 if (!publicPlaces[i].address || !Array.isArray(publicPlaces[i].address) || !publicPlaces[i].time) {
-                    this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
+                    this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים' });
                     return false;
                 }
                 if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
-                    this.setState({ errorMsg: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
+                    this.setState({ publicMeetErr: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
                     return false;
                 }
             }
@@ -148,23 +154,23 @@ export default class IsolatedForm extends Component {
         }
 
         if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
-            this.setState({ errorMsg: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
+            this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
 
         if (formChilds[1].value < 1) {
-            this.setState({ errorMsg: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
+            this.setState({ numOfBlowErr: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
             return;
         }
 
         // check address
         const { address } = this.state
         if (!Array.isArray(address) || !address.length) {
-            this.setState({ errorMsg: 'אנא הכנס מיקום' });
+            this.setState({ addressErr: 'אנא הכנס מיקום' });
             return;
         }
         if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
-            this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
+            this.setState({ addressErr: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
 
@@ -179,11 +185,11 @@ export default class IsolatedForm extends Component {
         let blowerDetails = {
             "can_blow_x_times": formChilds[1].value,
             "volunteering_start_time": startTime,
-            "volunteering_max_time": this.state.walkTime,//endTime,
+            "volunteering_max_time": Math.abs(this.state.walkTime),//endTime,
             "address": this.state.address,
             "publicPlaces": this.state.publicPlaces
         }
-        this.setState({ errorMsg: '' });
+        this.setState({ errorMsg: '', publicMeetErr: '', addressErr: '' });
         //update shofar blower details
         updateSBDetails(blowerDetails, (error) => {
             if (!error) {
@@ -207,8 +213,8 @@ export default class IsolatedForm extends Component {
                 <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                     <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={this.goBack} />
                     <div className="msg-txt header"> {`שלום ${name}, `}</div>
-                    <div className="msg-txt header">ותודה על הנכונות לעזור!</div>
-                    <div className="msg-txt header">כמה שאלות, ונמשיך לקביעת המפגש</div>
+                    <div className="msg-txt header">תודה על הנכונות לעזור!</div>
+                    <div className="msg-txt header h2">כמה שאלות, ונמשיך לקביעת המפגש</div>
 
 
                     <form onSubmit={this.saveShofarBlowerDetails} onKeyPress={this.handleKeyPress}>
@@ -216,14 +222,16 @@ export default class IsolatedForm extends Component {
                         {/* shofar blowing times input */}
                         <div className="title">כמה פעמים תהיה מוכן לקיים תקיעת שופר באזורך?</div>
                         <input type="number" />
+                        <div className="err-msg ">{this.state.numOfBlowErr}</div>
 
                         {/* start time input */}
-                        <div className="title">אני מתכנן לצאת למסלול תקיעות שופר בשעה:</div>
+                        <div className="title">באיזה שעה אתה מתכנן לצאת למסלול תקיעות שופר?</div>
                         <div id="comment">ניתן לערוך את שעת התקיעה עד ליום רביעי, כ"ז באלול 16.9 בשעה 24:00</div>
                         <ThemeProvider theme={materialTheme}>
                             <MuiPickersUtilsProvider utils={MomentUtils}>
                                 <Fragment>
                                     <TimePicker
+                                        placeholder="שעה"
                                         ampm={false}
                                         value={this.state.chosenTime}
                                         onChange={this.changeChosenTime}
@@ -237,11 +245,12 @@ export default class IsolatedForm extends Component {
                         <div className="title">מה הכתובת ממנה אתה יוצא?</div>
                         <div id="comment">נא לרשום את הכתובת המלאה</div>
                         <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1' />
+                        <div className="err-msg ">{this.state.addressErr}</div>
 
                         {/* walk time slider */}
                         <div className="walk-time title">סמן את זמן ההליכה</div>
-                        <Slider value={this.state.walkTime} min={15} max={180} onChange={this.handleWalkTImeChange} aria-labelledby="continuous-slider" />
-                        <div>{`עד ${this.state.walkTime} דקות`}</div>
+                        <Slider track="inverted" value={this.state.walkTime} min={-180} max={-15} onChange={this.handleWalkTImeChange} aria-labelledby="continuous-slider" />
+                        <div id="max-time-div">{`עד ${Math.abs(this.state.walkTime)} דקות`}</div>
 
                         {/* public meeting or not */}
                         <div className="title">האם ישנו מקום ציבורי בו אתה תוקע ואנשים נוספים יכולים להצטרף לתקיעה?</div>
@@ -264,8 +273,9 @@ export default class IsolatedForm extends Component {
                                 })}
                                 <div id="add-public-place" className="clickAble" onClick={this.addPublicPlace}>
                                     <div id="plus">+</div>
-                                    <div>הוסף מקום ציבורי</div>
+                                    <div id="add-public-place-button">הוסף מקום ציבורי</div>
                                 </div>
+                                <div className="err-msg ">{this.state.publicMeetErr}</div>
                             </div>}
 
                         <div className="checkbox-container">

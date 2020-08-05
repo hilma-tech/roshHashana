@@ -40,8 +40,9 @@
       align-items: center;
       justify-content: space-evenly;
       button {
+        
         border-radius: 10px;
-        width: 15vw;
+        width: fit-content;
         max-width: 210px;
         padding: 10px 10px;
         h4 {

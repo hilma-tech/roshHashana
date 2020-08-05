@@ -43,7 +43,6 @@ const AddPublicPlace = (props) => {
 
     //update chosenTime state and the publicPlaces array according to user choise
     const changeChosenTime = (time) => {
-        console.log('time._d: ', time._d);
         setChosenTime(time._d);
     }
 
@@ -55,11 +54,10 @@ const AddPublicPlace = (props) => {
         props.updatePublicPlace(props.index, 'address', address);
     }, [address]);
 
-    //update chosenAddress state and the publicPlaces array according to user choice
+    // update chosenAddress state and the publicPlaces array according to user choice
     const updateAddress = (address) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
-        console.log('address to update: ', address);
     }
     return (
         <div id="public-place-container">

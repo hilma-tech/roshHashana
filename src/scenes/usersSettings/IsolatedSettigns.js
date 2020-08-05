@@ -80,7 +80,14 @@ const IsolatedSettings = (props) => {
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.push('/');
+                })
             return;
         }
 
@@ -129,7 +136,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -141,7 +148,7 @@ const IsolatedSettings = (props) => {
                     <div className="err-msg">{errs.name || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="string" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
@@ -167,7 +174,7 @@ const IsolatedSettings = (props) => {
                     </div>
 
                     <div className="header">הערות ותיאור הכתובת</div>
-                    <input autoComplete={'off'} id="comments" type="text" defaultValue={vals.comments || ""} value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} />
+                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} />
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
@@ -175,7 +182,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
-                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
+
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

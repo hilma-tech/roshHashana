@@ -107,12 +107,12 @@ export default class IsolatedForm extends Component {
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">
-                                <div>בפתח הבית</div>
+                                <div>בפתח הבית- תקיעה פרטית</div>
                                 <input className="clickAble" type="radio" name="preferance" defaultChecked />
                             </div>
 
                             <div className="checkbox-container ">
-                                <div>בחלון או במרפסת הפונה לרחוב</div>
+                                <div>בחלון או מרפסת הפונה לרחוב- תקיעה ציבורית</div>
                                 <input className="clickAble" type="radio" name="preferance" />
                             </div>
 

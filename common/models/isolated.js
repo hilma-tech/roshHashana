@@ -11,14 +11,24 @@ module.exports = function (Isolated) {
                     let pubMeetId = null;
                     if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
                     if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+
                     data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
+
+                    let city;
+                    let addressArr = data.address && data.address[0]
+                    if (typeof addressArr === "string" && addressArr.length) {
+                        addressArr = addressArr.split(", ")
+                        city = Isolated.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1) || addressArr[addressArr.length - 1];
+                    }
+
 
                     //create public meeting
                     if (data.public_meeting) {
                         let meetData = [{
                             "address": data.address,
                             "comments": data.comments,
-                            "start_time": null
+                            "start_time": null,
+                            city
                         }]
                         pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
                     }
@@ -33,7 +43,8 @@ module.exports = function (Isolated) {
                             "address": data.address[0],
                             "lng": data.address[1].lng,
                             "lat": data.address[1].lat,
-                            "comments": data.comments
+                            "comments": data.comments,
+                            city
                         };
 
 

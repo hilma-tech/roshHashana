@@ -54,15 +54,44 @@ const IsolatedSettings = (props) => {
         }
     }
 
-    const updateIsolatedInfo = async () => {
+    const updateIsolatedInfo = async (fromX) => {
+
 
         //2 lines: checking if info has changed, otherwise is null
         let nameVal = name === originalIsolatedInfo.name ? null : name;
-        let usernameVal = name === originalIsolatedInfo.username ? null : username;
-
+        let usernameVal = username === originalIsolatedInfo.username ? null : username;
+        if (fromX) {
+            if (nameVal === null && usernameVal === null) {
+                props.history.goBack();
+                return
+            } else {
+                openGenAlert({
+                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
+                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
+                },
+                    (res) => {
+                        if (res) {
+                            props.history.goBack();
+                            return
+                        } else {
+                            return
+                        }
+                    })
+                return
+            }
+        }
         //will continue to update only if both are not null
+
         if (nameVal === null && usernameVal === null) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG })
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res) {
+                        props.history.push('/', { name: nameVal });
+                    }
+                })
             return;
         }
 
@@ -72,7 +101,7 @@ const IsolatedSettings = (props) => {
             return;
         }
 
-        if (usernameVal && usernameVal[0] != 0 || usernameVal.length !== 10) {
+        if (usernameVal && (usernameVal[0] != 0 || usernameVal.length !== 10)) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
             setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
             return;
@@ -88,22 +117,31 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": newData })
         }, true);
         if (res) {
-            if (nameVal) userInfo.name = nameVal
-            if (usernameVal) userInfo.username = usernameVal
-            if (nameVal && usernameVal) setUserInfo(userInfo)
-            props.history.push('/', { name: nameVal });
+
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res) {
+                        if (nameVal) userInfo.name = nameVal
+                        if (usernameVal) userInfo.username = usernameVal
+                        if (nameVal && usernameVal) setUserInfo(userInfo)
+                        props.history.push('/', { name: nameVal });
+                    }
+                })
         }
     }
 
     return (
         <>
-            <SettingsLayout handleClose={updateIsolatedInfo}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
                     <div className="err-msg">{nameMsgErr}</div>
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="string" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{phoneMsgErr}</div>
                 </div>
                 <div className="err-msg">{msgErr}</div>

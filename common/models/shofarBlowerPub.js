@@ -16,11 +16,22 @@ module.exports = function (shofarBlowerPub) {
         if (options.accessToken && options.accessToken.userId) {
             for (let i = 0; i < data.length; i++) {
                 let meetingData = data[i];
+
+                let city;
+                let addressArr = meetingData.address && meetingData.address[0]
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    city = shofarBlowerPub.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1) || addressArr[addressArr.length - 1];
+                }
+
+
                 meetingData.address[0] = meetingData.address[0].substring(0, 398)
+
                 let newPubMeeting = {
                     "address": meetingData.address[0],
                     "lng": meetingData.address[1].lng,
                     "lat": meetingData.address[1].lat,
+                    city,
                     "comments": meetingData.placeDescription || meetingData.comments,
                     "start_time": meetingData.time,
                     "blowerId": blowerId
@@ -40,12 +51,11 @@ module.exports = function (shofarBlowerPub) {
 
     shofarBlowerPub.checkIfCanDeleteMeeting = async (meetingId) => {
         //count all the users that are registered to this meeting
-        let numOfRegistered = await shofarBlowerPub.app.models.Isolated.count({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
-        console.log('numOfRegistered', numOfRegistered)
-        if (numOfRegistered > 1) {
+        let numOfRegistered = await shofarBlowerPub.app.models.Isolated.find({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
+
+        if (numOfRegistered.length <= 1) {
             let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: null }] } });
             //if the meeting has no shofar blower assigned already
-            console.log('pubMeet', pubMeet)
             if (pubMeet) return true;
             else return false;
         }
