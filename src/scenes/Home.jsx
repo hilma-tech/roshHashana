@@ -4,6 +4,8 @@ import Map from '../components/maps/map';
 import './Home.scss'
 
 const Home = (props) => {
+    const allMeeting ="לכל מפגשי \n תקיעות שופר בארץ"
+    const stuckHouse ="תקועים בבית? \n אנחנו נדאג לכם לתקיעת שופר"
     const [openMap, setOpenMap] = useState(false);
     //detects the number of the images that were loaded
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
@@ -23,9 +25,9 @@ const Home = (props) => {
             <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }} >
                 <div className="content-container" >
 
-                    <img alt="" style={{ width: isBrowser ? '26vw' : '50vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
+                    <img alt="" style={{ width: isBrowser ? '26vw' : '67vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
-                        <div >תקועים בבית? <br></br> אנחנו נדאג לכם לתקיעת שופר</div>
+                        <div className="stuckHouse">{stuckHouse}</div>
                     </div>
                     <div className="buttonAll justify-content-center align-items-center">
                         <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} ` + ' row justify-content-center '} style={{ width: isBrowser && '56vw', marginTop: isBrowser && "3%", margin: !isBrowser && "10% auto 0% auto", }}>
@@ -40,7 +42,7 @@ const Home = (props) => {
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
                     </>
                         : <>
-                            <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", fontWeight: 'bold', marginTop: "12%" }}>לכל מפגשי <br></br>תקיעות שופר בארץ</div>
+                            <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "12%", whiteSpace: "pre-line", lineHeight: "1.2"}}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
                 </div>

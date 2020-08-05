@@ -64,11 +64,11 @@
         left: 50%;
         transform: translate(-50%, -50%);
         #search-input {
-            margin-top: 0;
+            margin-top: 6%;
             box-sizing: border-box;
             border: 1px solid transparent;
-            width: 15rem;
-            height: 2rem;
+            width: 20rem;
+            height: 2.5rem;
             padding: 0 12px;
             border-radius: 3px;
             box-shadow: 4px 4px 25px rgba(0, 0, 0, 0.3);
@@ -79,7 +79,7 @@
         #search-icon {
             position: absolute;
             left: 7%;
-            top: 50%;
+            top: 67%;
             width: 1rem;
             transform: translate(-50%, -50%);
         }

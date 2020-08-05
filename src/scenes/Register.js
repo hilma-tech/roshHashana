@@ -24,8 +24,7 @@ class Register extends React.Component {
       imgLoadedNum: 0
     };
     this.generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
-    this.isolator1 = "אני רוצה לשמוע";
-    this.isolator2 = "תקיעת שופר";
+    this.isolator = "אני רוצה לשמוע \n תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -159,42 +158,43 @@ class Register extends React.Component {
         {this.state.status === "start" ?
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
           :
-          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
+          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart : null , phone : "" , name : "" , key : "" }) }} />
         }
-
-        <div className=""><img alt="" style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location.state.type === 'blower' ?
-          <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
-          :
-          this.props.location.state.type === 'isolator' ?
-            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.isolator1}<br></br>{this.isolator2}</div>
+        {/* <div className="allDataRegisterPage"> */}
+          <div className=""><img alt="" style={{ width: isBrowser ? '26vw' : '70vw', marginTop: isBrowser ? "5%" : "22%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+          {this.props.location.state.type === 'blower' ?
+            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
             :
-            <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
+            this.props.location.state.type === 'isolator' ?
+              <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhoneisolator"}`} >{this.isolator}</div>
+              :
+              <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
 
-        }
+          }
 
-        {this.state.status === "start" ?
-          <div className="allInputInRegisterPage" >
-            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
-            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
-            <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-            <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
-              שלח לי קוד
+          {this.state.status === "start" ?
+            <div className="allInputInRegisterPage" >
+              <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
+              <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
+              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
+                שלח לי קוד
                  </button>
 
-          </div>
-          : <>
-            <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
-              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
-              <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
-                שלח לי קוד מחדש
+            </div>
+            : <>
+              <div className="allInputInRegisterPage" >
+                <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
+                <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
+                <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
+                <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
+                  שלח לי קוד מחדש
                 </button>
 
-              <div>
-              </div>
-            </div></>}
+                <div>
+                </div>
+              </div></>}
+        {/* </div> */}
       </div>
     );
   }

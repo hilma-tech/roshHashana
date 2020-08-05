@@ -198,7 +198,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/youHere.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(45, 45),
