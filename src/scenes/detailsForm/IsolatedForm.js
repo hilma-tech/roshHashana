@@ -19,13 +19,15 @@ export default class IsolatedForm extends Component {
     }
 
     componentDidMount() {
-        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-        }, true);
-        if (res && res.address) {
-            this.props.history.push('/');
-            return;
-        }
+        (async()=>{
+            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+            }, true);
+            if (res && res.address) {
+                this.props.history.push('/');
+                return;
+            }
+        })();
     }
 
     goBack = () => {
