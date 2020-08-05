@@ -4,6 +4,7 @@ import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
 import { MainContext } from '../../ctx/MainContext';
 import { CONSTS } from '../../const_messages';
+import { isIOS } from "react-device-detect";
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
@@ -168,19 +169,19 @@ const IsolatedSettings = (props) => {
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית - תקיעה פרטית</div>
-                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
+                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                     </div>
                     <div className="checkbox-container ">
                         <div className="header">בחלון או במרפסת הפונה לרחוב - תקיעה ציבורית</div>
-                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" />
+                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                     </div>
 
                     <div className="header">הערות ותיאור הכתובת</div>
-                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254}/>
+                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} />
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" ></input>
+                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>

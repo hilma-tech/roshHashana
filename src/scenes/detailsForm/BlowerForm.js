@@ -63,7 +63,8 @@ export default class IsolatedForm extends Component {
     }
 
     goBack = () => {
-        this.props.history.goBack();
+        // this.props.history.goBack();
+        Auth.logout(window.location.href = window.location.origin);
     }
 
     //update the start time the shofar blower wants to start his volunteering

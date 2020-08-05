@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserView, isBrowser } from "react-device-detect";
+import { BrowserView, isBrowser, isIOS } from "react-device-detect";
 import Popup from '../../components/modals/general_popup';
 import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
@@ -33,7 +33,8 @@ export default class IsolatedForm extends Component {
     }
 
     goBack = () => {
-        this.props.history.goBack();
+        // this.props.history.goBack();
+        Auth.logout(window.location.href = window.location.origin);
     }
 
     //update the chosen address
@@ -112,23 +113,23 @@ export default class IsolatedForm extends Component {
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="err-msg">{this.state.addressErr}</div>
-                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" maxLength={254}/>
+                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" maxLength={254} />
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">
                                 <div>בפתח הבית- תקיעה פרטית</div>
-                                <input className="clickAble" type="radio" name="preferance" defaultChecked />
+                                <input className="clickAble" type="radio" name="preferance" defaultChecked style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container ">
                                 <div>בחלון או מרפסת הפונה לרחוב- תקיעה ציבורית</div>
-                                <input className="clickAble" type="radio" name="preferance" />
+                                <input className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" ></input>
+                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
                             </div>
 
                             <div className="err-msg">{this.state.errorMsg}</div>

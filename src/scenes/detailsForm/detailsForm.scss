@@ -140,7 +140,7 @@
                 -webkit-appearance: none;
                 -moz-appearance: none;
                 appearance: none;
-                margin-top: 2%;
+                // margin-top: 2%;
 
                 &::before {
                     border-radius: 50%;
@@ -215,8 +215,8 @@
         .MuiFormControl-root {
             width: 100%;
             .MuiInputBase-input {
-                width: 75%;
-                height: 2rem;
+                width: 80%;
+                height: 3rem;
                 color: black;
                 font-family: "Assistant", sans-serif !important;
                 &::-webkit-input-placeholder {
