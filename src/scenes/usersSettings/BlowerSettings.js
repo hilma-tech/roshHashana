@@ -251,7 +251,7 @@ const IsolatedSettings = (props) => {
 
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="string" value={vals.username | ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
