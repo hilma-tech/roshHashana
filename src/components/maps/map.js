@@ -94,13 +94,14 @@ const MapComp = (props) => {
             if (!privateMeet.address) return
             const lat = parseFloat(privateMeet.lat), lng = parseFloat(privateMeet.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
+                if (props.publicMap || props.blower || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     const newLocObj = {
                         type: PRIVATE_MEETING,
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                            {!props.blower && <div>לא ניתן להצטרף לתקיעה זו</div>}
+                        </div>
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
@@ -112,10 +113,10 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = moment(pub.start_time).format("HH:mm");
+            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה ';
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
-                if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
+                if (props.publicMap || props.blower || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
                     let newLocObj = {
                         type: SHOFAR_BLOWING_PUBLIC,
                         location: { lat, lng },
@@ -129,9 +130,13 @@ const MapComp = (props) => {
                                 </div>
                             </div>
                             <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
-                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                            {!props.blower &&
+                                <>
+                                    <div >ייתכנו שינויי בזמני התקיעות</div>
+                                    <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                                    <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                                </>
+                            }
                         </div>
                     };
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
@@ -206,7 +211,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
 
     return <GoogleMap
-        defaultZoom={20}
+        defaultZoom={16}
         defaultOptions={options}
         center={props.center}
     >
