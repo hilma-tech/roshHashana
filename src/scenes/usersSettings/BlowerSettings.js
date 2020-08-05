@@ -117,6 +117,7 @@ const IsolatedSettings = (props) => {
 
 
     const updateIsolatedInfo = async (fromX) => {
+        console.log('updateIsolatedInfo: ', fromX);
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
