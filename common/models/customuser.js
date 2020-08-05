@@ -208,24 +208,23 @@ module.exports = function (CustomUser) {
 
         //get all private meetings  
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
-            `select 
+            `SELECT 
             isolatedUser.name AS "isolatedName", 
             isolatedUser.address,
             isolatedUser.lat,
             isolatedUser.lng,
             isolatedUser.comments,
             blowerUser.name AS "blowerName"
-            FROM 
-            isolated 
-            left join CustomUser isolatedUser on isolatedUser.id = isolated.userIsolatedId 
-            left join CustomUser blowerUser on blowerUser.id =isolated.blowerMeetingId
-            where 
-            isolated.public_meeting = 0 and isolated.blowerMeetingId is not null `);
+            FROM isolated 
+                LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+            WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
-                `select
+                `SELECT
                 blowerUser.name AS "blowerName",
                 shofar_blower_pub.id,
                 shofar_blower_pub.address,
@@ -233,10 +232,10 @@ module.exports = function (CustomUser) {
                 shofar_blower_pub.lng,
                 shofar_blower_pub.comments ,
                 shofar_blower_pub.start_time
-                from
-                shofar_blower_pub
-                LEFT JOIN CustomUser blowerUser on blowerUser.id = shofar_blower_pub.blowerId 
-                where blowerId is not null;`);
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
             if (errPublic) throw errPublic;
 
             if (resPublic) {
