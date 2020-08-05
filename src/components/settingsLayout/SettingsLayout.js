@@ -19,7 +19,7 @@ const Settings = (props) => {
 
     return (
         <div>
-            <div style={{ width: isBrowser ? "36%" : "100%", right: isBrowser ? "0" : "none", left: isBrowser ? "none" : "0" }} id="settings-container" className="fade-in">
+            <div style={{ width: isBrowser ? "40%" : "100%", right: isBrowser ? "0" : "none", left: isBrowser ? "none" : "0" }} id="settings-container" className="fade-in">
                 <img id="close" alt="" className="clickAble" src="/icons/close.svg" onClick={handleClose} />
                 <div className="save-button" onClick={props.handleUpdate} > עדכן</div>
                 <div id="content-container">
@@ -29,7 +29,7 @@ const Settings = (props) => {
 
                 </div>
             </div>
-            {<img className="shofarBackground" src="images/shoparForStartCrop.png" />}
+            {isBrowser && props.map}
         </div >
     );
 }

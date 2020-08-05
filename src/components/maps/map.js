@@ -148,7 +148,7 @@ const MapComp = (props) => {
     }
 
     return (
-        <div className={'map-container slide-in-bottom'}>
+        <div className={`map-container ${props.settings ? 'fade-in' : (!props.publicMap && isBrowser) ? 'slide-in-top' : 'slide-in-bottom'}`} style={{ width: (!props.publicMap && isBrowser) ? '60%' : '100%' }}>
             <MyMapComponent
                 selfLocation={selfLocation}
                 meetAddress={props.meetAddress ? props.meetAddress : null}
@@ -164,7 +164,7 @@ const MapComp = (props) => {
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
+            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>}
         </div>
     );
 }
@@ -237,7 +237,7 @@ const SearchBoxGenerator = (props) => {
     }, []);
 
     return (
-        <div id="search-input-container">
+        <div id="search-input-container" style={{ left: (!props.publicMap && isBrowser) ? '30%' : '50%' }}>
             <input
                 id="search-input"
                 type="text"
