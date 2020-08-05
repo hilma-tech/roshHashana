@@ -148,7 +148,14 @@ const IsolatedSettings = (props) => {
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.goBack();
+                })
             return;
         }
         console.log('!updateData info: ', updateData);

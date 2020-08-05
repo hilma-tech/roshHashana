@@ -83,7 +83,15 @@ const IsolatedSettings = (props) => {
         //will continue to update only if both are not null
 
         if (nameVal === null && usernameVal === null) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG })
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res) {
+                        props.history.push('/', { name: nameVal });
+                    }
+                })
             return;
         }
 
