@@ -377,7 +377,7 @@ module.exports = function (CustomUser) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         //we can update the meeting so update the address of the meeting
-                        if (canEditPubMeeting) pubMeetI = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
+                        if (canEditPubMeeting) pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
                         //we can not update the meeting so create a new meeting with the new address
                         else {
                             let meetData = {}

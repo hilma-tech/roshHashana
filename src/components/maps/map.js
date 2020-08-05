@@ -150,6 +150,8 @@ const MapComp = (props) => {
     return (
         <div className={`map-container ${props.settings ? 'fade-in' : (!props.publicMap && isBrowser) ? 'slide-in-top' : 'slide-in-bottom'}`} style={{ width: (!props.publicMap && isBrowser) ? '60%' : '100%' }}>
             <MyMapComponent
+                publicMap={props.publicMap}
+                settings={props.settings}
                 selfLocation={selfLocation}
                 meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
@@ -210,7 +212,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
+        <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -237,7 +239,7 @@ const SearchBoxGenerator = (props) => {
     }, []);
 
     return (
-        <div id="search-input-container" style={{ left: (!props.publicMap && isBrowser) ? '30%' : '50%' }}>
+        <div id="search-input-container" >
             <input
                 id="search-input"
                 type="text"
