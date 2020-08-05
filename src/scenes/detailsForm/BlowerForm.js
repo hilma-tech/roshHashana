@@ -127,11 +127,11 @@ export default class IsolatedForm extends Component {
                 if (!publicPlaces[i].address || !Array.isArray(publicPlaces[i].address) || !publicPlaces[i].time) {
                     this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים' });
                     return false;
-                }
-                if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
+                } else if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
                     this.setState({ publicMeetErr: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
                     return false;
                 }
+                else this.setState({ publicMeetErr: '' });
             }
         }
         updateArrInState && this.setState({ publicPlaces });
@@ -155,16 +155,16 @@ export default class IsolatedForm extends Component {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
+        else this.setState({ errorMsg: '' });
 
         if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
             this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
-
-        if (formChilds[1].value < 1) {
+        else if (formChilds[1].value < 1) {
             this.setState({ numOfBlowErr: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
             return;
-        }
+        } else this.setState({ numOfBlowErr: '' });
 
         // check address
         const { address } = this.state
@@ -172,10 +172,10 @@ export default class IsolatedForm extends Component {
             this.setState({ addressErr: 'אנא הכנס מיקום' });
             return;
         }
-        if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
+        else if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
             this.setState({ addressErr: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
-        }
+        } else this.setState({ addressErr: '' });
 
         //startTime
         let startTime = new Date(this.state.chosenTime);

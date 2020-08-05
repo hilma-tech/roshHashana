@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserView, isBrowser } from "react-device-detect";
 import Popup from '../../components/modals/general_popup';
+import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateIsolatedDetails } from '../../fetch_and_utils';
@@ -11,6 +12,7 @@ export default class IsolatedForm extends Component {
         super(props);
         this.state = {
             errorMsg: '',
+            addressErr: "",
             openModal: false,
             address: [],
             chosenCity: '',
@@ -19,7 +21,7 @@ export default class IsolatedForm extends Component {
     }
 
     componentDidMount() {
-        (async()=>{
+        (async () => {
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
@@ -47,13 +49,13 @@ export default class IsolatedForm extends Component {
 
         //cheked address
         if (!Array.isArray(address) || !address.length) {
-            this.setState({ errorMsg: 'אנא הכנס מיקום' });
+            this.setState({ addressErr: 'אנא הכנס מיקום' });
+            return;
+        } else if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
+            this.setState({ addressErr: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
-        if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
-            this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
-            return;
-        }
+        else this.setState({ addressErr: '' });
 
         const comments = formChilds[1].value ? formChilds[1].value : ' ';
         this.comments = comments;
@@ -109,6 +111,7 @@ export default class IsolatedForm extends Component {
                         <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "1.8rem" }} >
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
+                            <div className="err-msg">{this.state.addressErr}</div>
                             <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" />
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
