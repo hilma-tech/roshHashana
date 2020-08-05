@@ -27,7 +27,7 @@ const GeneralUserPage = (props) => {
                 }
                 if (props.location.state.meetingInfo) {
                     setShofarBlowerName(props.location.state.meetingInfo.blowerName);
-                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments}`);
+                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments ? props.location.state.meetingInfo.comments : ''}`);
                     setTime(`${props.location.state.meetingInfo.start_time ? moment(props.location.state.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                 }
             } else {
@@ -40,7 +40,7 @@ const GeneralUserPage = (props) => {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
-                        setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments}`);
+                        setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`);
                         setTime(`${moment(res.meetingInfo.start_time).format("HH:mm")}`);
                     }
                 } else {
@@ -48,7 +48,7 @@ const GeneralUserPage = (props) => {
                     setName(userInfo.name);
                     if (userInfo.meetingInfo) {
                         setShofarBlowerName(userInfo.meetingInfo.blowerName);
-                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments}`);
+                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
                         setTime(`${moment(userInfo.meetingInfo.start_time).format("HH:mm")}`);
                     }
                 }
@@ -91,7 +91,7 @@ const GeneralUserPage = (props) => {
     return (
         <>
             <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }} >
-                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" , width: "100%" }}>
+                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0", width: "100%" }}>
                     <div className="clickAble" onClick={openSettings}>
                         <img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
