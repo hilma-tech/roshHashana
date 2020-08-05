@@ -250,8 +250,9 @@ cursor: pointer;
 background-color:#1F717E;}
 #add-public-place {
     display: flex;
+    font-weight: bold;
     flex-direction: row;
-    width: 50%;
+    width: 100%;
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 2%;

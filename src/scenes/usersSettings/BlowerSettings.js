@@ -288,7 +288,7 @@ const IsolatedSettings = (props) => {
                     <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
                 </div>
 
-                <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
+                <div id="public-blowing-set" className="fade-in" style={{ display: (settingsType === 'public-blowing-set-btn' ? 'block' : 'none'), marginRight: "0" }}>
                     {vals.publicMeetings && vals.publicMeetings.map((place, index) => {
                         return (
                             <div key={index}>
