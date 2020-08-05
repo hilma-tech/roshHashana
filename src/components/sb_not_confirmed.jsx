@@ -29,9 +29,6 @@ const SBNotConfirmed = (props) => {
     }
 
 
-
-
-
     return (
         <>
             <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '60%' }} >
@@ -47,7 +44,7 @@ const SBNotConfirmed = (props) => {
                     </div>}
                 </div>
             </div>
-            {openMap || isBrowser && <Map closeMap={closeOrOpenMap} blower />}{/*general map with no option to assign yourself to the meetings */}
+            {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} blower />}{/*general map with no option to assign yourself to the meetings */}
         </>
     );
 }

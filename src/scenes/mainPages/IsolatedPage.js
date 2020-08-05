@@ -63,7 +63,6 @@ const IsolatedPage = (props) => {
             else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
         })
     }
-    console.log(openMap, isBrowser)
 
     return (
         <>
