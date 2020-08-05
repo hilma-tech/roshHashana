@@ -91,6 +91,7 @@ const IsolatedSettings = (props) => {
                 })
             return;
         }
+        console.log("updateData", updateData)
 
         let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
         // validate values
@@ -137,7 +138,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings/>}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings />}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -149,14 +150,14 @@ const IsolatedSettings = (props) => {
                     <div className="err-msg">{errs.name || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="string" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
 
                 <div id="blowing-set-btn" className="clickAble" onClick={() => setOpenBlowingSet(!openBlowingSet)}>
                     <div >הגדרות לתקיעה בשופר</div>
-                    <div>{openPersInfo ? '-' : '+'}</div>
+                    <div>{openBlowingSet ? '-' : '+'}</div>
                 </div>
 
                 <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
