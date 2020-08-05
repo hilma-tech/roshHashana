@@ -63,27 +63,28 @@ const IsolatedPage = (props) => {
             else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
         })
     }
+    console.log(openMap, isBrowser)
 
     return (
         <>
-            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }}>
                 <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div>{`שלום ${name}`}</div>
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
-                    <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
+                    <div id="address-info" style={{ marginBottom: isBrowser ? '15%' : '0%' }}>{address}</div>
                     {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '30%' }}>{comment}</div> : null}
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
-                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                    {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
-                    </div>
+                    </div>}
                 </div>
 
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} isolated />}
+            {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} isolated />}
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

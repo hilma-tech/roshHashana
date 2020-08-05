@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import GeneralAlert from '../../components/modals/general_alert';
+import { MainContext } from '../../ctx/MainContext';
+import { CONSTS } from '../../const_messages';
+import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
-import { MainContext } from '../../ctx/MainContext';
-import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages';
 
 const IsolatedSettings = (props) => {
     const { openGenAlert, showAlert } = useContext(MainContext);
@@ -136,7 +137,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings/>}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
