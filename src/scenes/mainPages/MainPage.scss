@@ -28,6 +28,9 @@
         top: 3%;
     }
     .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
         height: 100%;
         width: 100%;
         padding: 0 10%;
