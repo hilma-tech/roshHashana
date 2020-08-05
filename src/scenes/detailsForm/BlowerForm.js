@@ -185,7 +185,7 @@ export default class IsolatedForm extends Component {
         let blowerDetails = {
             "can_blow_x_times": formChilds[1].value,
             "volunteering_start_time": startTime,
-            "volunteering_max_time": this.state.walkTime,//endTime,
+            "volunteering_max_time": Math.abs(this.state.walkTime),//endTime,
             "address": this.state.address,
             "publicPlaces": this.state.publicPlaces
         }
