@@ -80,7 +80,14 @@ const IsolatedSettings = (props) => {
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.push('/');
+                })
             return;
         }
 
@@ -129,7 +136,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -175,7 +182,7 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
-                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
+
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

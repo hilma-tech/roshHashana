@@ -19,10 +19,12 @@ const Settings = (props) => {
     return (
         <div id="settings-container" className="fade-in">
             <img id="close" alt="" className="clickAble" src="/icons/close.svg" onClick={handleClose} />
+            <div className="save-button" onClick={props.handleUpdate} > עדכן</div>
             <div id="content-container">
                 <div id="title">הגדרות</div>
                 <div id="settigns-content">{props.children}</div>
                 <div id="log-out" className="clickAble" onClick={() => Auth.logout(logOut)} >התנתק</div>
+
             </div>
         </div>
     );

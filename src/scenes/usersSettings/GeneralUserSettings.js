@@ -83,7 +83,15 @@ const IsolatedSettings = (props) => {
         //will continue to update only if both are not null
 
         if (nameVal === null && usernameVal === null) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG })
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res) {
+                        props.history.push('/', { name: nameVal });
+                    }
+                })
             return;
         }
 
@@ -127,7 +135,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
@@ -137,7 +145,6 @@ const IsolatedSettings = (props) => {
                     <div className="err-msg">{phoneMsgErr}</div>
                 </div>
                 <div className="err-msg">{msgErr}</div>
-                <button style={{ marginTop: "5%" }} className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

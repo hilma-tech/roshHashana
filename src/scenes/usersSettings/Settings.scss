@@ -236,21 +236,28 @@ input[type="number"] {
     color: darkred;
 }
 .save-button{margin: 0 2vw;
-padding: 1% 5%;
+padding: 0% 6%;
+position:absolute;
+top:4%;
+left:6%;
 color: white;
 border: none;
-font-size: 3vh;
+font-size: 1rem;
 font-weight: bold;
-background-color: #489fb5;}
+width:fit-content;
+text-align: center;
+cursor: pointer;
+background-color:#1F717E;}
 #add-public-place {
     display: flex;
+    font-weight: bold;
     flex-direction: row;
-    width: 50%;
+    width: 100%;
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 2%;
     font-size: 1rem;
-    color: black;
+    color :#1F717E;
     #plus {
         display: flex;
         justify-content: center;
@@ -261,7 +268,7 @@ background-color: #489fb5;}
         border-radius: 50%;
         width: 1em;
         height: 1em;
-        background-color: black;
+        background-color: #1F717E;
         color: white;
     }
 }
