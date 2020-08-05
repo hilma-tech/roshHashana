@@ -138,7 +138,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated />}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated settings/>}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
                     <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
