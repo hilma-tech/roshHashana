@@ -29,7 +29,7 @@ const IsolatedPage = (props) => {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (res) {
-                    if (res.errmMsg && res.errmMsg === 'LOG_OUT') {
+                    if (res.errMsg && res.errMsg === 'LOG_OUT') {
                         Auth.logout(window.location.href = window.location.origin);
                         return;
                     }
