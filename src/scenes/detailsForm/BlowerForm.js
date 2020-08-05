@@ -7,6 +7,7 @@ import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
 import MomentUtils from '@date-io/moment';
+import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateSBDetails } from '../../fetch_and_utils';
@@ -51,11 +52,13 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
+            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+            }, true);
+            if (res && res.address) {
                 this.props.history.push('/');
                 return;
             }
-
         })();
     }
 

@@ -19,7 +19,10 @@ export default class IsolatedForm extends Component {
     }
 
     componentDidMount() {
-        if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+        }, true);
+        if (res && res.address) {
             this.props.history.push('/');
             return;
         }

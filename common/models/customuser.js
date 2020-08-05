@@ -269,7 +269,7 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
-                    if (!isolated) return { errmMsg: 'LOG_OUT' };
+                    if (!isolated) return { errMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
                     return userInfo;
@@ -277,7 +277,7 @@ module.exports = function (CustomUser) {
                 else if (role === 2) {
                     //shofar blower 
                     let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
-                    if (!blower) return { errmMsg: 'LOG_OUT' };
+                    if (!blower) return { errMsg: 'LOG_OUT' };
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
                     userInfo.volunteering_max_time = blower.volunteering_max_time;
