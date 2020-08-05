@@ -90,13 +90,14 @@ const GeneralUserPage = (props) => {
 
     return (
         <>
-            <div id="isolated-page-container"  >
-                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" }}>
-                    <div className="clickAble" onClick={openSettings}><img alt="settings" src="/icons/settings.svg" /></div>
+            <div id="isolated-page-container" style={{ width: isBrowser ? "36%" : "100%", right: isBrowser ? "0" : "none", left: isBrowser ? "none" : "0" }}>
+                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0", width: "100%" }}>
+                    <div className="clickAble" onClick={openSettings}>
+                        <img style={{ position: "absolute", left: "0" }} alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
+                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
-                    <div className="content"  >{`שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:`}</div>
+                    <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:` : `שלום ${name},\n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
                         {shofarBlowerName && <div className="meetingDetail">
                             <img alt="" className="icon" src="/icons/blueShofar.svg" />
@@ -116,13 +117,15 @@ const GeneralUserPage = (props) => {
                         </div>
                         <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div>
                     </div>
-                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                    {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
-                    </div>
+                    </div>}
 
                 </div>
             </div>
+            {isBrowser && <img className="shofarBackground" src="images/shoparForStartCrop.png" />}
+
             {openMap && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
