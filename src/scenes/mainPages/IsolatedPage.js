@@ -46,7 +46,6 @@ const IsolatedPage = (props) => {
     }
 
     const openSettings = () => {
-        console.log("openSettings")
         props.history.push('/settings');
     }
 
