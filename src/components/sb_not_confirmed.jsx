@@ -31,7 +31,7 @@ const SBNotConfirmed = (props) => {
 
     return (
         <>
-            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '60%' }} >
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }} >
                 <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div id="thank-you-msg">תודה על הרשמתך.</div>
