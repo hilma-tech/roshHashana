@@ -75,8 +75,8 @@ const IsolatedPage = (props) => {
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
                     <div id="address-info" style={{ marginBottom: isBrowser ? '15%' : '0%' }}>{address}</div>
-                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '30%' }}>{comment}</div> : null}
-                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
+                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
+                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
