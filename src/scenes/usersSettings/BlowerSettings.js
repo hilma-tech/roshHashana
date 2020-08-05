@@ -1,19 +1,20 @@
 import React, { useRef, useEffect, useState, Fragment, useContext } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
+import GeneralAlert from '../../components/modals/general_alert';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
+import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import { CONSTS } from '../../const_messages';
 import Slider from '@material-ui/core/Slider';
+import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import './Settings.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 
-import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
-import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages';
 const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
@@ -235,7 +236,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
