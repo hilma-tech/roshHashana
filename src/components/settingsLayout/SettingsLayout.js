@@ -29,7 +29,7 @@ const Settings = (props) => {
 
                 </div>
             </div>
-            {<img className="shofarBackground" src="images/shoparForStartCrop.png" />}
+            {isBrowser && <img className="shofarBackground" src="images/shoparForStartCrop.png" />}
         </div >
     );
 }
