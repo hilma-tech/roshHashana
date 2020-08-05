@@ -92,7 +92,6 @@ const GeneralUserPage = (props) => {
         <>
             <div id="isolated-page-container"  >
                 <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" }}>
-                    <div ><img alt="backIcon" onClick={() => { props.history.goBack() }} className="icon" src="/icons/go-back.svg" /></div>
                     <div className="clickAble" onClick={openSettings}><img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
                 <div className="content-container containerContent" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
