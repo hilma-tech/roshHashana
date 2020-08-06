@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
@@ -34,17 +34,22 @@ const MapComp = (props) => {
     const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
+    let unmounted = useRef(false).current
 
     useEffect(() => {
         (async () => {
-
+            unmounted = true
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
-            if (mapContent) {
+            if (!unmounted && mapContent) {
                 setMapInfo(mapContent);
             }
         })();
+        return () => {
+            //cleanup
+            unmounted = true
+        }
     }, []);
 
     useEffect(() => {
