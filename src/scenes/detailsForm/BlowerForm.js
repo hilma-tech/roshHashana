@@ -83,7 +83,7 @@ export default class IsolatedForm extends Component {
     //update the public meeting that the shofar blower added
     updatePublicPlace = (index, keyName, publicPlaceVal) => {
         let publicPlaces = this.state.publicPlaces;
-        if (keyName === 'comments' && !/^[A-Zא-תa-z '"-]{2,}$/.test(publicPlaceVal)) {
+        if (keyName === 'comments' && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaceVal)) {
             this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
             return;
         }
@@ -124,7 +124,7 @@ export default class IsolatedForm extends Component {
         let publicPlaces = this.state.publicPlaces;
         let updateArrInState = false;
         for (let i in publicPlaces) {
-            if (!/^[A-Zא-תa-z '"-]{2,}$/.test(publicPlaces[i].comments)) {
+            if (!/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaces[i].comments)) {
                 this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
                 return false;
             }
@@ -141,6 +141,13 @@ export default class IsolatedForm extends Component {
                     return false;
                 } else this.setState({ publicMeetErr: '' });
             }
+<<<<<<< HEAD
+=======
+            if (!/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicPlaces[i].comments)) {
+                this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
+                return false;
+            }
+>>>>>>> 8c2925922287ba707f0dff6685a8faad59582026
         }
         updateArrInState && this.setState({ publicPlaces });
         return true;

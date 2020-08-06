@@ -193,7 +193,7 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (!/^[A-Zא-תa-z '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                if (!/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
                     let pms = [...publicMeetings];
                     pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
                     setValues(pms, "publicMeetings")
@@ -211,7 +211,7 @@ const IsolatedSettings = (props) => {
         }
 
 
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
+        if (!/^[A-Zא-תa-z 0-9 '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
         setErrs({}); //all
 
