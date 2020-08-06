@@ -423,7 +423,7 @@ module.exports = function (CustomUser) {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
                         public_meeting: data.public_meeting,
-                        blowerMeetingId: typeof pubMeetId === 'object' ? pubMeetId.id : pubMeetId
+                        blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
                     }
                     if (Object.values(newIsoData).find(d => d)) {
                         let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
