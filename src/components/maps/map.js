@@ -34,22 +34,17 @@ const MapComp = (props) => {
     const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
-    let unmounted = useRef(false).current
 
     useEffect(() => {
         (async () => {
-            unmounted = true
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
-            if (!unmounted && mapContent) {
+            if (mapContent) {
                 setMapInfo(mapContent);
             }
         })();
-        return () => {
-            //cleanup
-            unmounted = true
-        }
+
     }, []);
 
     useEffect(() => {
