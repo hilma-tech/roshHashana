@@ -202,8 +202,12 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillColor: '#FF0000',
         fillOpacity: 0.35
     });
-
+    
+    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
+    
+    if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function")
+    return null
     for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
         for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));

@@ -244,7 +244,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng, CustomUser.comments FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
