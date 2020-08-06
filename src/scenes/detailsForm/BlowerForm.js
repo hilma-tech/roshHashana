@@ -91,7 +91,7 @@ export default class IsolatedForm extends Component {
     addPublicPlace = () => {
         if (this.state.publicPlaces.length < 4) {
             let publicPlaces = this.state.publicPlaces;
-            publicPlaces.push({});
+            publicPlaces.push({ id: this.state.publicPlaces.length });
             this.setState({ publicPlaces });
         }
         else this.setState({ publicMeetErr: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
@@ -270,7 +270,7 @@ export default class IsolatedForm extends Component {
                             <div className="public-meeting-options">
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
-                                        key={index}
+                                        key={place.id}
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
