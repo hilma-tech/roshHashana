@@ -17,7 +17,6 @@ import "./consts/generalStyles.scss"
 
 
 // import SimpleUserHome from "./scenes/Home";
-const Map = loadable(() => import('./components/maps/map'));
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
