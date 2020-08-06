@@ -75,7 +75,7 @@ const IsolatedSettings = (props) => {
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
-            publicMeetings.push({});
+            publicMeetings.push({ id: vals.publicMeetings.length });
             setValues(publicMeetings, "publicMeetings");
             if (errs.general && errs.general.length) setMsgErr(' ')
         }
@@ -302,7 +302,7 @@ const IsolatedSettings = (props) => {
                 <div id="public-blowing-set" className="fade-in" style={{ display: (settingsType === 'public-blowing-set-btn' ? 'block' : 'none'), marginRight: "0" }}>
                     {vals.publicMeetings && vals.publicMeetings.map((place, index) => {
                         return (
-                            <div key={index}>
+                            <div key={place.id}>
                                 <AddPublicPlace
                                     removePubPlace={removePubPlace}
                                     index={index}
