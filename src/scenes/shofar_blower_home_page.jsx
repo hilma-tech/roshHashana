@@ -20,11 +20,11 @@ const SBHomePage = (props) => {
 
     const { showAlert, openGenAlert } = useContext(MainContext)
     const {
+        userData, setUserData, 
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
         assignMeetingInfo } = useContext(SBContext)
 
-    const { userInfo: userData, setUserInfo: setUserData } = useContext(MainContext)
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
 

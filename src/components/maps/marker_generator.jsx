@@ -33,9 +33,47 @@ const MarkerGenerator = (props) => {
             icon={icon}
             label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
-            position={(props.position && Object.keys(props.position).length) ? props.position : location ? { lat: location.lat, lng: location.lng } : null}>
+            position={(props.position && typeof props.position === "object" && Object.keys(props.position).length) ? props.position : location ? { lat: location.lat, lng: location.lng } : null}>
             {!props.isolated && !props.blower && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>
     );
 }
 export default MarkerGenerator;
+
+
+
+export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
+    /**
+     * icon: overrides props.type
+     * location
+     * info: info window on click
+     * iconType: type of meeting, so we know the right icon
+     **/
+
+    const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
+
+    const closeOrOpenInfoWindow = () => setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen)
+
+    if (!location || !location.lng || !location.lat) return null;
+    let latNum = Number(location.lat)
+    let lngNum = Number(location.lng)
+    if (isNaN(latNum) || isNaN(lngNum)) return null
+
+    let iconUrl = (iconType === PRIVATE_MEETING) ? '/icons/single-blue.svg' : '/icons/group-orange.svg';
+
+    const icon = markerIcon || {
+        url: iconUrl,
+        scaledSize: (iconType === PRIVATE_MEETING) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
+        origin: new window.google.maps.Point(0, 0),
+        anchor: new window.google.maps.Point(25, 25), // changes position of icon
+    }
+
+    return (
+        <Marker
+            icon={icon}
+            onClick={closeOrOpenInfoWindow}
+            position={{ lat: latNum, lng: lngNum }}>
+            {info && isInfoWindowOpen ? <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow> : null}
+        </Marker>
+    );
+}

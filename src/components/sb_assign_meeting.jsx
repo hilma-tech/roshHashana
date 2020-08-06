@@ -1,46 +1,91 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { SBContext } from '../ctx/shofar_blower_context';
 
 import { MainContext } from '../ctx/MainContext';
+import { isBrowser } from 'react-device-detect';
 
 const SBAssignMeeting = (props) => {
     const { openGenAlert } = useContext(MainContext)
-    const { assignMeetingInfo, setAssignMeetingInfo,
+    const { userData,
+        assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
         meetingsReqs, setMeetingsReqs,
         assigns, setAssigns,
     } = useContext(SBContext)
-    const { userInfo: userData } = useContext(MainContext)
+
+    const [openAssign, setOpenRouteList] = useState(true)
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
-        props.history.push('/sh-map')
+        props.history.push('/')
         return;
+    }
+
+    const closeAssign = () => {
+        if (isBrowser) {
+            setAssignMeetingInfo(null)
+            return
+        }
+        setOpenRouteList(false)
+        setTimeout(() => { setAssignMeetingInfo(null) }, 400)
     }
 
 
     const handleAssignment = async (close) => {
         if (close === "close") {
-            setAssignMeetingInfo(null)
+            closeAssign()
             return;
         }
+        console.log('handleAssignment: ');
         //set new route and remove meetingId from reqs array
         if (myMeetings.length == userData.can_blow_x_times) {
             openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבץ`, isPopup: { okayText: "הבנתי" } })
             return;
         }
+        openGenAlert({ text: "..." })
         setAssigns(a => Array.isArray(a) ? [...a, assignMeetingInfo] : [assignMeetingInfo])
         if (!myMeetings.includes(assignMeetingInfo)) setMyMeetings(mym => Array.isArray(mym) ? [...mym, assignMeetingInfo] : [assignMeetingInfo])
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != assignMeetingInfo.meetingId))
-        setAssignMeetingInfo(null)
+        closeAssign()
     }
 
+    let iconSrc;
+    let iconText;
+    if (assignMeetingInfo.isPublicMeeting) {
+        iconSrc = "/icons/group-orange.svg"
+        iconText = "תקיעה ציבורית"
+    }
+    else {
+        iconSrc = "/icons/single-blue.svg"
+        iconText = "תקיעה פרטית"
+    }
+
+    const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
 
     return (
-        <div>
-            {JSON.stringify(assignMeetingInfo)}
-            <button onClick={handleAssignment} >assign</button>
-            <button onClick={() => { handleAssignment("close") }} >x</button>
+        <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
+
+            <div id="assign-x-btn-cont" >
+                <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
+            </div>
+
+            <div>
+                <div id="assign-title" className="width100" >שיבוץ תקיעה בשופר</div>
+
+                <div id="assign-icon-and-text-cont" className="width100" >
+                    <img id="assign-icon" src={iconSrc} />
+                    <div id="assign-text" >{iconText}</div>
+                </div>
+            </div>
+
+            <div className="sb-assign-content-container">
+                <div className="input-div" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
+                {assignMeetingInfo.isPublicMeeting ? null : < div className="input-div" id="meeting-phone" >{assignMeetingInfo.phone}</div>}
+                <div className="input-div" id="meeting-address" >{assignMeetingInfo.address}</div>
+                <div className={`input-div ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
+            </div>
+
+            <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>
         </div>
     );
 }

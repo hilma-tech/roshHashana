@@ -91,7 +91,6 @@ label {
     }
 }
 
-
 #comments,
 #place-description,
 .autocompleteInput,
@@ -108,11 +107,29 @@ input[type="number"] {
         -webkit-appearance: none;
     }
 }
-#address,.address, #blowingTimes,#phone-number,#name
-    {
+#address,
+.address,
+#blowingTimes,
+#phone-number,
+#name {
+    @include input();
+    font-size: 1.3rem;
+    margin-bottom: 0 !important;
+    &::placeholder {
+        font-size: 1.3rem;
+        padding-right: 2%;
+        color: black;
+        opacity: 0.9;
+    }
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+}
+#public-blowing-set {
+    #place-description {
         @include input();
         font-size: 1.3rem;
-        margin-bottom: 0 !important;
+        margin-top: 5% !important;
         &::placeholder {
             font-size: 1.3rem;
             padding-right: 2%;
@@ -123,23 +140,8 @@ input[type="number"] {
             -webkit-appearance: none;
         }
     }
-    #public-blowing-set{
-        #place-description{
-            @include input();
-            font-size: 1.3rem;
-            margin-top: 5% !important;
-            &::placeholder {
-                font-size: 1.3rem;
-                padding-right: 2%;
-                color: black;
-                opacity: 0.9;
-            }
-            &::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-            }
-        }
-    }
-    .autocompleteInput {
+}
+.autocompleteInput {
 }
 .header,
 .header2 {
@@ -235,13 +237,15 @@ input[type="number"] {
     font-size: 1.2rem;
     color: darkred;
 }
-.save-button{margin: 0 2vw;
-padding: 1% 5%;
-color: white;
-border: none;
-font-size: 3vh;
-font-weight: bold;
-background-color: #489fb5;}
+.save-button {
+    margin: 0 2vw;
+    padding: 1% 5%;
+    color: white;
+    border: none;
+    font-size: 3vh;
+    font-weight: bold;
+    background-color: #489fb5;
+}
 #add-public-place {
     display: flex;
     flex-direction: row;

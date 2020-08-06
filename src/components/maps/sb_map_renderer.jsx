@@ -4,7 +4,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-m
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import MarkerGenerator from './marker_generator';
+import { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
 import { CONSTS } from '../../const_messages';
@@ -93,11 +93,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const { openGenAlert } = useContext(MainContext)
     const {
+        userData,
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)
-
-    const { userInfo: userData } = useContext(MainContext)
 
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
@@ -193,6 +192,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setGenMap(v => !v)
     }
 
+    //MAP RESTRICTIONS - ISRAEL --START
     var israelPolygon = new window.google.maps.Polygon({
         paths: israelCoords,
         strokeColor: '#FF0000',
@@ -212,14 +212,17 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         latLngBounds: bounds,
         strictBounds: false
     }
+    //MAP RESTRICTIONS - ISRAEL --END
 
-    props.data && console.log('props.data: ', props.data);
+
     let sideListTO = null;
     const closeSideMeetingsList = () => {
         sideListTO && clearTimeout(sideListTO)
         if (showMeetingsList) sideListTO = setTimeout(() => { setShowMeetingsList(false) }, 400)
         setShowMeetingsListAni(false)
     }
+
+    props.data && console.log('props.data: ', props.data);
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
@@ -240,7 +243,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     />
             }
             {/* user location */}
-            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
+            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} />
 
             <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                 {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
@@ -264,44 +267,41 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     );
 }));
 
-const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => {
+const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
+    <>
+        {/* reqsLocs */
+            Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
+                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.type} location={m.location} info={m.info} />)
+                : null}
+        {/* myMLocs */
+            Array.isArray(data.myMLocs) && data.myMLocs.length ?
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.iconType} location={m.location} info={m.info} />)
+                : null}
 
+        {Array.isArray(routePath) ?
+            <Polyline
+                path={routePath}
+                geodesic={false}
+                options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
+            />
+            : null
+        }
 
-    return (
-        <>
-            {/* reqsLocs */
-                Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
-                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-                }) : null}
-            {/* myMLocs */
-                Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
-                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-                }) : null}
+        {/* before and after route stops */
+            Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
+                b4OrAfterRoutePath.map((routePath, i) => (
+                    <Polyline
+                        key={"k" + i}
+                        path={routePath}
+                        geodesic={false}
+                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }} 
+                        //todo: check change of opacity (i * 10?)
+                    />
+                ))
+                : null}
 
-            {Array.isArray(routePath) ?
-                <Polyline
-                    path={routePath}
-                    geodesic={false}
-                    options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
-                />
-                : null
-            }
-
-            {/* before and after route stops */
-                Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
-                    b4OrAfterRoutePath.map((routePath, i) => (
-                        <Polyline
-                            key={"k" + i}
-                            path={routePath}
-                            geodesic={false}
-                            options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 2 + Number(i * 2) }}
-                        />
-                    ))
-                    : null}
-
-        </>
-    );
-}
+    </>
+);
 
 const BringAllGenMapInfo = () => {
     /*

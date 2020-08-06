@@ -622,34 +622,64 @@ module.exports = function (CustomUser) {
             }
             const { userId } = options.accessToken
 
-            const userDataQ = `SELECT shofar_blower.confirm, shofar_blower.can_blow_x_times, volunteering_start_time AS "startTime", volunteering_max_time*60000 AS "maxRouteDuration", 
-            CustomUser.name, CustomUser.address  
+            const userDataQ = `SELECT 
+            shofar_blower.confirm, 
+            shofar_blower.can_blow_x_times, 
+            volunteering_start_time AS "startTime", 
+            volunteering_max_time*60000 AS "maxRouteDuration", 
+            CustomUser.name, 
+            CustomUser.address,  
+            CustomUser.lng,
+            CustomUser.lat 
+            
             FROM shofar_blower 
                 LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
+            
             WHERE CustomUser.id = ${userId}`
 
             let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-            if (!userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
+            if (!userData || !userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
+            
             //open PRIVATE meeting requests
-            const openPriReqsQ = /* request for private meetings */`SELECT isolated.id AS "meetingId", false AS "isPublicMeeting", IF(isolated.public_phone, CustomUser.username, null) AS "phone", CustomUser.name, 
-            CustomUser.address  
+            const openPriReqsQ = /* request for private meetings */`SELECT 
+            isolated.id AS "meetingId", 
+            false AS "isPublicMeeting", 
+            IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
+            CustomUser.name, 
+            CustomUser.address,
+            CustomUser.lng,
+            CustomUser.lat 
+            
             FROM isolated 
                 JOIN CustomUser ON userIsolatedId  = CustomUser.id 
+            
             WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
 
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
-            SELECT shofar_blower_pub.id AS "meetingId", shofar_blower_pub.constMeeting, start_time AS "startTime", shofar_blower_pub.address, shofar_blower_pub.comments, true AS "isPublicRoute", COUNT(isolated.id) AS "signedCount",  
+            SELECT 
+            shofar_blower_pub.id AS "meetingId", 
+            shofar_blower_pub.constMeeting, 
+            start_time AS "startTime", 
+            shofar_blower_pub.address, 
+            shofar_blower_pub.comments, 
+            shofar_blower_pub.lng, 
+            shofar_blower_pub.lat,
+            true AS "isPublicRoute", 
+            COUNT(isolated.id) AS "signedCount",  
             CASE
                 WHEN blowerId IS NULL THEN "req"
                 WHEN blowerId = ${userId} THEN "route"
             END blowerStatus,
             true AS isPublicMeeting 
+            
             FROM isolated 
                 RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
+            
             WHERE (blowerId IS NULL OR blowerId = ${userId}) 
+            
             GROUP BY shofar_blower_pub.id ORDER BY start_time`
 
             //my PRIVATE routes
@@ -658,7 +688,10 @@ module.exports = function (CustomUser) {
                 isolated.id AS "meetingId", 
                 isolated.meeting_time AS "startTime", 
                 CustomUser.address,
+                CustomUser.lng,
+                CustomUser.lat,
                 CustomUser.comments, 
+                CustomUser.name, 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 
                 LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
@@ -694,6 +727,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.assignSB = function (options, meetingObjs, cb) {
+        console.log('assignSB: ');
         //check if user is confirmed by admin 
         (async () => {
 
@@ -720,6 +754,7 @@ module.exports = function (CustomUser) {
                 if (err || !res) console.log('err: ', err);
                 allRes.push({ meetingId: meetingObj.meetingId, success: !err && !!res })
             }
+            console.log('allRes: ', allRes);
             return cb(null, allRes)
         })();
     }
