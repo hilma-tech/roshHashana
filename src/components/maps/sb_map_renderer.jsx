@@ -4,7 +4,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-m
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import { SBMarkerGenerator } from './marker_generator';
+import MarkerGenerator, { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
 import { CONSTS } from '../../const_messages';
@@ -31,8 +31,8 @@ const israelCoords = [
     { lat: 29.551662, lng: 34.984779 },
 ];
 
-const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
-    if (!stops || !stops.length) { console.log("no_stops_or_destination", origin, stops); cb(true) }
+const getOverViewPath = async (google, origin, stops, extraData, cb = () => { }) => {
+    if (!stops || !stops.length) { console.log("no_stops_or_destination", origin, stops); return cb(true); Promise.resolve([true]) }
     const travelMode = google.maps.TravelMode.WALKING
     const waypoints = stops
         .map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
@@ -55,9 +55,11 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
         destination: destination,
         optimizeWaypoints: false
     }, (result, status) => {
-        console.log('result: ', result);
+        // console.log('result: ', result);
         if (status !== google.maps.DirectionsStatus.OK) {
-            return cb("אירעה שגיאה בטעינת המפה, עמכם הסליחה")
+            cb("אירעה שגיאה בטעינת המפה, עמכם הסליחה")
+            return;
+            Promise.resolve(["אירעה שגיאה בטעינת המפה, עמכם הסליחה"])
         }
         let res = {}
         if (extraData && extraData.getTimes) {
@@ -81,6 +83,7 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 
         cb(null, res)
         return;
+        Promise.resolve([null, res])
 
     })
 }
@@ -119,23 +122,21 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         const userEndTime = userStartTime + userData.maxRouteDuration;
         const routeStops = [];
         const constStopsB4 = [];
-        const constStopsAfer = [];
+        const constStopsAfter = [];
         let meetingStartTime;
+
+        //fill routeStops, constStopsb4 and constStopsAfter
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
             if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) { // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
-                    // console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
-                    // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
-                    constStopsAfer.push(data.myMLocs[i])
+                    constStopsAfter.push(data.myMLocs[i])
                 }
             }
             else routeStops.push(data.myMLocs[i])
         }
-        // console.log('constStopsB4: ', constStopsB4);
-        // console.log('constStopsAfer: ', constStopsAfer);
 
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
             //get times only if there is a stop (a meeting) that doesn't have a start time
@@ -163,9 +164,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             let overviewPaths = [];
             b4Res && overviewPaths.push(b4Res.overviewPath)
 
-            if (Array.isArray(constStopsAfer) && constStopsAfer.length) { //const meeting after get overview
+            if (Array.isArray(constStopsAfter) && constStopsAfter.length) { //const meeting after get overview
                 let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
-                getOverViewPath(window.google, origin.location, constStopsAfer, null, (e, r) => afterStopsCb(e, r, overviewPaths))
+                getOverViewPath(window.google, origin.location, constStopsAfter, null, (e, r) => afterStopsCb(e, r, overviewPaths))
             } else afterStopsCb(null, null, overviewPaths)
 
         }
@@ -180,7 +181,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         }
 
         // console.log('constStopsB4: ', constStopsB4);
-        if ((Array.isArray(constStopsB4) && constStopsB4.length) || (Array.isArray(constStopsAfer) && constStopsAfer.length)) {
+        if ((Array.isArray(constStopsB4) && constStopsB4.length) || (Array.isArray(constStopsAfter) && constStopsAfter.length)) {
             if ((Array.isArray(constStopsB4) && constStopsB4.length)) getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null, b4StopsCb)
             else b4StopsCb(null, null)
         }
@@ -201,8 +202,12 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillColor: '#FF0000',
         fillOpacity: 0.35
     });
-
+    
+    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
+    
+    if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function")
+    return null
     for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
         for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
@@ -260,7 +265,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     </div>
                     : null
                 }
-
             </div>
 
         </GoogleMap>
@@ -294,8 +298,8 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }} 
-                        //todo: check change of opacity (i * 10?)
+                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }}
+                    //todo: check change of opacity (i * 10?)
                     />
                 ))
                 : null}
@@ -303,11 +307,10 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
     </>
 );
 
-const BringAllGenMapInfo = () => {
-    /*
-        todo: רעות אני צריכה אותך פה בשביל להביא את המידע מהמפה הכללית, אי אפשר להביא את כל ה
-        todo: Map component
-        todo: כי יש צורך *רק* בנקודות ציון יעני, אני צריכה לשמור על *כל* שאר הדברים שלי, נגיד הכפתור לעבור בין המפות
-    */
-    return <></>
+const BringAllGenMapInfo = ({ allLocations }) => {
+    if (!Array.isArray(allLocations)) return null;
+
+    return <>{allLocations.map((locationInfo, index) => {
+        return <MarkerGenerator key={index} blower locationInfo={locationInfo} /> /* all blowing meetings locations */
+    })}</>
 }

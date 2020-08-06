@@ -73,8 +73,10 @@ const IsolatedPage = (props) => {
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
-                    <div id="address-info" style={{ marginBottom: isBrowser ? '15%' : '0%' }}>{address}</div>
-                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
+                    <div style={{ marginBottom: isBrowser ? '15%' : '0%' }} >
+                        <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
+                        {comment && comment.length ? <div style={{ marginTop: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
+                    </div>
                     <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה

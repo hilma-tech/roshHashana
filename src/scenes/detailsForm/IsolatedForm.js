@@ -15,7 +15,8 @@ export default class IsolatedForm extends Component {
             addressErr: "",
             openModal: false,
             address: [],
-            chosenCity: '',
+            comments: '',
+            publicMeeting: false,
             approval: true,
         }
     }
@@ -45,8 +46,7 @@ export default class IsolatedForm extends Component {
     //save the isolated details
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
-        const formChilds = e.target.children;
-        const { address } = this.state
+        const { address, comments, approval, publicMeeting } = this.state
 
         //cheked address
         if (!Array.isArray(address) || !address.length) {
@@ -58,14 +58,11 @@ export default class IsolatedForm extends Component {
         }
         else this.setState({ addressErr: '' });
 
-        const comments = formChilds[1].value ? formChilds[1].value : ' ';
-        this.comments = comments;
-
         let isolatedDetails = {
-            "public_phone": this.state.approval ? true : false,
+            "public_phone": approval ? true : false,
             "address": address,
             "comments": comments,
-            "public_meeting": formChilds[3] && formChilds[3].children[1] && formChilds[3].children[1].checked ? false : true
+            "public_meeting": publicMeeting ? true : false
         }
 
         //update isolated details
@@ -87,13 +84,19 @@ export default class IsolatedForm extends Component {
             return;
         }
     }
-    checkboxChange = (e) => {
+    handleCommentsChange = (e) => {
+        this.setState({ comments: e.target.value });
+    }
+    publicMeetingChange = (bool) => {
+        this.setState({ publicMeeting: bool });
+    }
+    approvedChange = (e) => {
         this.setState({ approval: e.target.checked });
     }
     goToMainPage = () => {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
-        const { address } = this.state
-        this.props.history.push('/', { name, address: address[0], comments: this.comments });
+        const { address, comments } = this.state
+        this.props.history.push('/', { name, address: address[0], comments });
     }
 
     render() {
@@ -113,23 +116,23 @@ export default class IsolatedForm extends Component {
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="err-msg">{this.state.addressErr}</div>
-                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות נוספות למציאת המיקום" maxLength={254} />
+                            <input value={this.state.comments} onChange={this.handleCommentsChange} autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות נוספות למציאת המיקום" maxLength={254} />
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">
                                 <div>בפתח הבית- תקיעה פרטית</div>
-                                <input className="clickAble" type="radio" name="preferance" defaultChecked style={{ marginTop: isIOS ? '0' : '2%' }} />
+                                <input checked={this.state.publicMeeting ? false : true} onChange={e => { this.publicMeetingChange(e.target.checked ? false : true) }} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container ">
                                 <div>בחלון או מרפסת הפונה לרחוב- תקיעה ציבורית</div>
-                                <input className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
+                                <input checked={this.state.publicMeeting ? true : false} onChange={e => { this.publicMeetingChange(e.target.checked ? true : false) }} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
+                                <input onChange={this.approvedChange} checked={this.state.approval} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
                             </div>
 
                             <div className="err-msg">{this.state.errorMsg}</div>
