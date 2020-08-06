@@ -111,7 +111,7 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = moment(pub.start_time).format("HH:mm");
+            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
@@ -128,10 +128,12 @@ const MapComp = (props) => {
                                 </div>
                             </div>
                             <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
-                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
-                        </div>
+                            {!props.blower && <>
+                                < div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                                <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                                <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                            </>}
+                        </div >
                     };
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }

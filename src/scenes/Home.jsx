@@ -25,7 +25,7 @@ const Home = (props) => {
             <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }} >
                 <div className="content-container" >
 
-                    <img alt="" style={{ width: isBrowser ? '26vw' : '67vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
+                    <img alt="" style={{ width: isBrowser ? '21vw' : '67vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
                         <div className="stuckHouse">{stuckHouse}</div>
                     </div>

@@ -41,7 +41,7 @@ const GeneralUserPage = (props) => {
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
                         setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`);
-                        setTime(`${moment(res.meetingInfo.start_time).format("HH:mm")}`);
+                        setTime(`${res.meetingInfo.start_time ? moment(res.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
                 } else {
                     console.log("from context", userInfo)
@@ -49,7 +49,7 @@ const GeneralUserPage = (props) => {
                     if (userInfo.meetingInfo) {
                         setShofarBlowerName(userInfo.meetingInfo.blowerName);
                         setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
-                        setTime(`${moment(userInfo.meetingInfo.start_time).format("HH:mm")}`);
+                        setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
                 }
             }
@@ -78,7 +78,7 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+        let [res, err] = await Auth.superAuthFetch(`/ api / CustomUsers / deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });
@@ -97,7 +97,7 @@ const GeneralUserPage = (props) => {
                 </div>
                 <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
-                    <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:` : `שלום ${name},\n הצטרפת לתקיעה ציבורית`}</div>
+                    <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה: ` : `שלום ${name}, \n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
                         {shofarBlowerName && <div className="meetingDetail">
                             <img alt="" className="icon" src="/icons/blueShofar.svg" />
