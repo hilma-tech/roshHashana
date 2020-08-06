@@ -37,7 +37,6 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            unmounted = true
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
