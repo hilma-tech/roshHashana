@@ -74,7 +74,7 @@ const AddPublicPlace = (props) => {
                 value={comments}
                 onChange={
                     (e) => {
-                        if (!/^[A-Zא-תa-z '"-]{0,}$/.test(e.target.value)) {
+                        if (!/^[A-Zא-תa-z0-9 '"-]{0,}$/.test(e.target.value)) {
                             return;
                         }
                         setComments(e.target.value)
