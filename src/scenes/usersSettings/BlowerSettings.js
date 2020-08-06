@@ -225,6 +225,9 @@ const IsolatedSettings = (props) => {
                         props.history.goBack();
                 })
         }
+        if (err) {
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר." })
+        }
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
@@ -236,7 +239,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings/>}>
+            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
