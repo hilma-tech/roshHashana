@@ -133,12 +133,8 @@ input[type="number"] {
     #place-description {
         @include input();
         font-size: 1.3rem;
-<<<<<<< HEAD
-        margin-top: 5% !important;
-=======
         width:100%;
         margin-bottom: 0 !important;
->>>>>>> f203e7306d5523359e7f2eb600301ab528d2ebe0
         &::placeholder {
             font-size: 1.3rem;
             padding-right: 2%;
