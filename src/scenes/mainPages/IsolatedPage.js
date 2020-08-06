@@ -68,7 +68,7 @@ const IsolatedPage = (props) => {
         <>
             <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }}>
                 <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
-                <div className="content-container">
+                <div className="content-container" style={{ overflowY: isBrowser ? "none" : "scroll" }}>
                     <div>{`שלום ${name}`}</div>
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
