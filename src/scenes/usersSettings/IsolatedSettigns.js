@@ -96,7 +96,7 @@ const IsolatedSettings = (props) => {
 
         let { name, username, address, lng, lat, public_meeting, public_phone, comments } = updateData;
         // validate values
-        if (comments && !/^[A-Zא-תa-z '"-]{2,}$/.test(comments)) {
+        if (comments && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(comments)) {
             openGenAlert({ text: 'לא ניתן להכניס תווים מיוחדים בתיאור' })
             setAnErr('לא ניתן להכניס תווים מיוחדים בתיאור', 'comments');
             return;
