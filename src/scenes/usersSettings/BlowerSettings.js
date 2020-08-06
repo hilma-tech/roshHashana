@@ -173,7 +173,7 @@ const IsolatedSettings = (props) => {
             setErrs(errs => ({ ...errs, can_blow_x_times: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' }));
             return;
         }
-        if (username && username[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
+        if (username && (username[0] != 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
 
         if (address) {
             if (!Array.isArray(address) || !address.length) {
