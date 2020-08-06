@@ -113,7 +113,7 @@ export default class IsolatedForm extends Component {
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="err-msg">{this.state.addressErr}</div>
-                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" maxLength={254} />
+                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות נוספות למציאת המיקום" maxLength={254} />
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
@@ -142,7 +142,7 @@ export default class IsolatedForm extends Component {
                     </BrowserView>
                 </div>
                 {this.state.openModal ?
-                    <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} /></div>
+                    <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי, תודה" closeSelf={this.goToMainPage} /></div>
                     : null}
             </>
         );

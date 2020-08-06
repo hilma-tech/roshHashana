@@ -23,7 +23,7 @@ class Register extends React.Component {
       sendKey: false,
       imgLoadedNum: 0
     };
-    this.generalUser = `אני רוצה להשתתף במפגש תקיעת שופר ציבורי`;
+    this.generalUser = `אני רוצה לשמוע תקיעת שופר קרוב לבית`;
     this.isolator = "אני רוצה לשמוע \n תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
     this.handleChange = this.handleChange.bind(this);
@@ -174,21 +174,21 @@ class Register extends React.Component {
 
         {this.state.status === "start" ?
           <div className="allInputInRegisterPage" >
-            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
-            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"טלפון"} value={this.state.phone} onChange={this.handleChange} />
+            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"נא להזין שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
+            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"נא להזין מספר טלפון נייד"} value={this.state.phone} onChange={this.handleChange} />
             <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
             <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
-              שלח לי קוד
+              שלחו לי קוד כניסה
                  </button>
 
           </div>
           : <>
             <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
+              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"מה הקוד שקיבלת מאיתנו (בהודעת SMS)?"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
               <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
+              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> הכניסו אותי </button>
               <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
-                שלח לי קוד מחדש
+                שלחו לי קוד חדש
                 </button>
 
               <div>
