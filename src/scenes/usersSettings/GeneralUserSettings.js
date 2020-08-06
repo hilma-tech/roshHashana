@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { MainContext } from '../../ctx/MainContext';
-
-import Auth from '../../modules/auth/Auth';
-
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
-
 import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages'
-
+import { MainContext } from '../../ctx/MainContext';
+import { CONSTS } from '../../const_messages';
+import Map from '../../components/maps/map';
+import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
+
+
+
+
 
 const IsolatedSettings = (props) => {
     const { userInfo, setUserInfo, openGenAlert, showAlert } = useContext(MainContext)
@@ -16,14 +17,14 @@ const IsolatedSettings = (props) => {
     const [msgErr, setMsgErr] = useState('');
     const [phoneMsgErr, setPhoneMsgErr] = useState('');
     const [nameMsgErr, setNameMsgErr] = useState('');
-
+    const [meetAddres, setMeetAddress] = useState('');
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
 
     useEffect(() => {
         (async () => {
             if (!Object.keys(originalIsolatedInfo).length) {
-                if (!userInfo) {
+                if (!userInfo || !props.history.location || !props.history.location.state || !props.history.location.state.meetAddress) {
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
@@ -32,12 +33,14 @@ const IsolatedSettings = (props) => {
                         setValues(res, setOriginalIsolatedInfo);
                         setValues(res.name, setName);
                         setValues(res.username, setUsername);
+                        setValues(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`, setMeetAddress);
                     }
                 }
                 else {
                     setValues(userInfo, setOriginalIsolatedInfo);
                     setValues(userInfo.name, setName);
                     setValues(userInfo.username, setUsername);
+                    setValues(props.history.location.state.meetAddress, setMeetAddress)
                 }
             }
         })();
@@ -83,7 +86,15 @@ const IsolatedSettings = (props) => {
         //will continue to update only if both are not null
 
         if (nameVal === null && usernameVal === null) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG })
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res) {
+                        props.history.push('/', { name: nameVal });
+                    }
+                })
             return;
         }
 
@@ -127,17 +138,16 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated settings />}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} />
+                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} minLength={2}/>
                     <div className="err-msg">{nameMsgErr}</div>
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="string" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{phoneMsgErr}</div>
                 </div>
                 <div className="err-msg">{msgErr}</div>
-                <button style={{ marginTop: "5%" }} className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

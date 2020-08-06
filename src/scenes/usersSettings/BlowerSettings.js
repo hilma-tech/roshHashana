@@ -1,19 +1,20 @@
 import React, { useRef, useEffect, useState, Fragment, useContext } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
+import GeneralAlert from '../../components/modals/general_alert';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { ThemeProvider } from "@material-ui/styles";
 import { MainContext } from '../../ctx/MainContext';
+import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
+import { CONSTS } from '../../const_messages';
 import Slider from '@material-ui/core/Slider';
+import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import './Settings.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 
-import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
-import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages';
 const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
@@ -117,7 +118,7 @@ const IsolatedSettings = (props) => {
 
 
     const updateIsolatedInfo = async (fromX) => {
-        console.log('updateIsolatedInfo: ', fromX);
+        console.log("hiii")
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -148,7 +149,14 @@ const IsolatedSettings = (props) => {
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.goBack();
+                })
             return;
         }
         console.log('!updateData info: ', updateData);
@@ -186,18 +194,11 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (!publicMeetings[i].address || !Array.isArray(publicMeetings[i].address)) {
-                    if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
-                        let pms = [...publicMeetings];
-                        pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
-                        setValues(pms, "publicMeetings")
-                        openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
-                        return
-                    }
-                    let pms = publicMeetings;
-                    pms[i].errMsg = CONSTS.ADDRESS_MSG_ERROR;
+                if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
+                    let pms = [...publicMeetings];
+                    pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
                     setValues(pms, "publicMeetings")
-                    openGenAlert({ text: CONSTS.ADDRESS_MSG_ERROR })
+                    openGenAlert({ text: CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR })
                     return
                 }
             }
@@ -235,7 +236,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings/>}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -245,12 +246,12 @@ const IsolatedSettings = (props) => {
                 <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
 
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
                     <div className="err-msg">{errs.name || ""}</div>
 
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="string" value={vals.username | ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
@@ -295,7 +296,7 @@ const IsolatedSettings = (props) => {
                     <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
                 </div>
 
-                <div id="public-blowing-set" className="fade-in" style={{ display: settingsType === 'public-blowing-set-btn' ? 'block' : 'none' }}>
+                <div id="public-blowing-set" className="fade-in" style={{ display: (settingsType === 'public-blowing-set-btn' ? 'block' : 'none'), marginRight: "0" }}>
                     {vals.publicMeetings && vals.publicMeetings.map((place, index) => {
                         return (
                             <div key={index}>
@@ -317,7 +318,6 @@ const IsolatedSettings = (props) => {
                     </div>
                 </div>
                 <div className="err-msg">{errs.general}</div>
-                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
             </SettingsLayout >
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}

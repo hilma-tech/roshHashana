@@ -26,7 +26,7 @@ module.exports = function (Isolated) {
                     if (data.public_meeting) {
                         let meetData = [{
                             "address": data.address,
-                            "comments": data.comments,
+                            "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
                             "start_time": null,
                             city
                         }]
@@ -43,7 +43,7 @@ module.exports = function (Isolated) {
                             "address": data.address[0],
                             "lng": data.address[1].lng,
                             "lat": data.address[1].lat,
-                            "comments": data.comments,
+                            "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
                             city
                         };
 

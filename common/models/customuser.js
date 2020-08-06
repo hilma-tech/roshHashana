@@ -269,7 +269,7 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
-                    if (!isolated) return { errmMsg: 'LOG_OUT' };
+                    if (!isolated) return { errMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
                     return userInfo;
@@ -277,7 +277,7 @@ module.exports = function (CustomUser) {
                 else if (role === 2) {
                     //shofar blower 
                     let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
-                    if (!blower) return { errmMsg: 'LOG_OUT' };
+                    if (!blower) return { errMsg: 'LOG_OUT' };
                     userInfo.can_blow_x_times = blower.can_blow_x_times;
                     userInfo.volunteering_start_time = blower.volunteering_start_time;
                     userInfo.volunteering_max_time = blower.volunteering_max_time;
@@ -353,7 +353,9 @@ module.exports = function (CustomUser) {
                 if (data.username) userData.username = data.username
                 if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
                 if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-                if (data.comments) userData.comments = data.comments
+                if (data.comments && data.comments.length < 255) userData.comments = data.comments
+                else userData.comments = '';
+                
                 if (data.address && data.address[0]) {
                     userData.address = data.address[0]
                     let addressArr = data.address[0]
@@ -370,19 +372,20 @@ module.exports = function (CustomUser) {
                 if (role === 1) {
                     //isolated
                     let pubMeetId = null;
-                    let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId } });
+                    let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
 
                     //if the user changed his address and he has a public meeting
-                    if (data.public_meeting && data.address && isolatedInfo.public_meeting) {
+                    if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         //we can update the meeting so update the address of the meeting
-                        if (canEditPubMeeting) shofarBlowerPub.upsertWithWhere({ id: meetingId, address: data.address });
+                        if (canEditPubMeeting) pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
                         //we can not update the meeting so create a new meeting with the new address
                         else {
                             let meetData = {}
                             if (data.address) meetData.address = data.address
-                            if (data.comments) meetData.comments = data.comments
+                            if (data.comments && data.comments.length < 255) meetData.comments = data.comments
+                            else meetData.comments = '';
                             if (data.start_time) meetData.start_time = data.start_time
 
                             if (Object.keys(meetData).length) {
@@ -393,22 +396,25 @@ module.exports = function (CustomUser) {
 
                     else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
                         let meetData = {}
-
-                        if (data.address) meetData.address = data.address
-                        if (data.comments) meetData.comments = data.comments
-                        if (data.start_time) meetData.start_time = data.start_time
+                        if (data.address) meetData.address = data.address;
+                        else {
+                            const address = [isolatedInfo.UserToIsolated().address, { lat: isolatedInfo.UserToIsolated().lat, lng: isolatedInfo.UserToIsolated().lng }];
+                            meetData.address = address;
+                        }
+                        if (data.comments && data.comments.length < 255) meetData.comments = data.comments;
+                        else meetData.comments = isolatedInfo.UserToIsolated().comments;
+                        if (data.start_time) meetData.start_time = data.start_time;
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
                         }
                     }
                     else {
+
                         //the user is changing from public to private
-                        console.log('isolatedInfo', isolatedInfo)
                         if (isolatedInfo) {
                             let meetingId = isolatedInfo.blowerMeetingId;
                             let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
-                            console.log(canDeleteMeeting, 'canDeleteMeeting')
                             if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         }
                     }

@@ -34,7 +34,7 @@ const MarkerGenerator = (props) => {
             label={props.label ? props.label : ''}
             onClick={closeOrOpenInfoWindow}
             position={(props.position && typeof props.position === "object" && Object.keys(props.position).length) ? props.position : location ? { lat: location.lat, lng: location.lng } : null}>
-            {!props.isolated && !props.blower && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
+            {!props.isolated && info && isInfoWindowOpen && <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow>}
         </Marker>
     );
 }

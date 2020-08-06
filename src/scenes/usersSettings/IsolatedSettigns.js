@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
+import GeneralAlert from '../../components/modals/general_alert';
+import { MainContext } from '../../ctx/MainContext';
+import { CONSTS } from '../../const_messages';
+import { isIOS } from "react-device-detect";
+import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
-import { MainContext } from '../../ctx/MainContext';
-import GeneralAlert from '../../components/modals/general_alert';
-import { CONSTS } from '../../const_messages';
 
 const IsolatedSettings = (props) => {
     const { openGenAlert, showAlert } = useContext(MainContext);
@@ -80,9 +82,17 @@ const IsolatedSettings = (props) => {
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({ text: CONSTS.NO_SETTINGS_CHANGE_MSG });
+            openGenAlert({
+                text: "נשמר בהצלחה",
+                isPopup: { okayText: "אישור" }
+            },
+                (res) => {
+                    if (res)
+                        props.history.push('/');
+                })
             return;
         }
+        console.log("updateData", updateData)
 
         let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
         // validate values
@@ -129,7 +139,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }}>
+            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings />}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -137,18 +147,18 @@ const IsolatedSettings = (props) => {
 
                 <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
                     <div className="err-msg">{errs.name || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="string" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
 
                 <div id="blowing-set-btn" className="clickAble" onClick={() => setOpenBlowingSet(!openBlowingSet)}>
                     <div >הגדרות לתקיעה בשופר</div>
-                    <div>{openPersInfo ? '-' : '+'}</div>
+                    <div>{openBlowingSet ? '-' : '+'}</div>
                 </div>
 
                 <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
@@ -158,24 +168,24 @@ const IsolatedSettings = (props) => {
 
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
-                        <div className="header">בפתח הבית</div>
-                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" />
+                        <div className="header">בפתח הבית - תקיעה פרטית</div>
+                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                     </div>
                     <div className="checkbox-container ">
-                        <div className="header">בחלון או במרפסת הפונה לרחוב</div>
-                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" />
+                        <div className="header">בחלון או במרפסת הפונה לרחוב - תקיעה ציבורית</div>
+                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                     </div>
 
                     <div className="header">הערות ותיאור הכתובת</div>
-                    <input autoComplete={'off'} id="comments" type="text" defaultValue={vals.comments || ""} value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} />
+                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} />
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" ></input>
+                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>
-                <button className="save-button" onClick={() => { updateIsolatedInfo(false) }} >שמור</button>
+
             </SettingsLayout>
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

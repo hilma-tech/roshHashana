@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { BrowserView, isBrowser } from "react-device-detect";
+import { BrowserView, isBrowser, isIOS } from "react-device-detect";
 import Popup from '../../components/modals/general_popup';
+import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateIsolatedDetails } from '../../fetch_and_utils';
@@ -11,6 +12,7 @@ export default class IsolatedForm extends Component {
         super(props);
         this.state = {
             errorMsg: '',
+            addressErr: "",
             openModal: false,
             address: [],
             chosenCity: '',
@@ -19,14 +21,20 @@ export default class IsolatedForm extends Component {
     }
 
     componentDidMount() {
-        if (!this.props.location || !this.props.location.state || !this.props.location.state.noDetails) {
-            this.props.history.push('/');
-            return;
-        }
+        (async () => {
+            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+            }, true);
+            if (res && res.address) {
+                this.props.history.push('/');
+                return;
+            }
+        })();
     }
 
     goBack = () => {
-        this.props.history.goBack();
+        // this.props.history.goBack();
+        Auth.logout(window.location.href = window.location.origin);
     }
 
     //update the chosen address
@@ -42,13 +50,13 @@ export default class IsolatedForm extends Component {
 
         //cheked address
         if (!Array.isArray(address) || !address.length) {
-            this.setState({ errorMsg: 'אנא הכנס מיקום' });
+            this.setState({ addressErr: 'אנא הכנס מיקום' });
+            return;
+        } else if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
+            this.setState({ addressErr: 'נא לבחור מיקום מהרשימה הנפתחת' })
             return;
         }
-        if (!address[0] || address[0] === CONSTS.NOT_A_VALID_ADDRESS || typeof address[1] !== "object" || !address[1].lng || !address[1].lat) {
-            this.setState({ errorMsg: 'נא לבחור מיקום מהרשימה הנפתחת' })
-            return;
-        }
+        else this.setState({ addressErr: '' });
 
         const comments = formChilds[1].value ? formChilds[1].value : ' ';
         this.comments = comments;
@@ -99,26 +107,29 @@ export default class IsolatedForm extends Component {
                         <div className="msg-txt header">{`שלום ${name},`}</div>
                         <div className="msg-txt header"> נשמח לעזור לך למצוא בעל תוקע שיגיע עד אליך.</div>
                         <br></br>
-                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "2.5rem" }} >
+                        <div className="msg-txt h1"> הפרטים שלך הם: </div>
+
+                        <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "1.8rem" }} >
 
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
-                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות ותיאור הכתובת" />
+                            <div className="err-msg">{this.state.addressErr}</div>
+                            <input autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות נוספות למציאת המיקום" maxLength={254} />
 
                             <div className="preferance">מהם העדפותיך לשמיעת תקיעת השופר?</div>
 
                             <div className="checkbox-container ">
-                                <div>בפתח הבית</div>
-                                <input className="clickAble" type="radio" name="preferance" defaultChecked />
+                                <div>בפתח הבית- תקיעה פרטית</div>
+                                <input className="clickAble" type="radio" name="preferance" defaultChecked style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container ">
-                                <div>בחלון או במרפסת הפונה לרחוב</div>
-                                <input className="clickAble" type="radio" name="preferance" />
+                                <div>בחלון או מרפסת הפונה לרחוב- תקיעה ציבורית</div>
+                                <input className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
                             </div>
 
                             <div className="checkbox-container approval ">
                                 <div id="approval">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" ></input>
+                                <input onChange={this.checkboxChange} checked={this.state.approval} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
                             </div>
 
                             <div className="err-msg">{this.state.errorMsg}</div>
@@ -131,7 +142,7 @@ export default class IsolatedForm extends Component {
                     </BrowserView>
                 </div>
                 {this.state.openModal ?
-                    <div id="override-popup-container" ><Popup text={`תודה!\nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי תודה" closeSelf={this.goToMainPage} /></div>
+                    <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי, תודה" closeSelf={this.goToMainPage} /></div>
                     : null}
             </>
         );

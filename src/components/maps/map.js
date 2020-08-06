@@ -29,7 +29,6 @@ const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
 const MapComp = (props) => {
-
     const [allLocations, setAllLocations] = useState([]);
     const [center, setCenter] = useState({});
     const [selfLocation, setSelfLocation] = useState({});
@@ -112,7 +111,7 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = moment(pub.start_time).format("HH:mm");
+            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
@@ -129,10 +128,12 @@ const MapComp = (props) => {
                                 </div>
                             </div>
                             <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
-                            <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
-                            <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
-                            <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
-                        </div>
+                            {!props.blower && <>
+                                < div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                                <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
+                                <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
+                            </>}
+                        </div >
                     };
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
@@ -148,8 +149,10 @@ const MapComp = (props) => {
     }
 
     return (
-        <div className={'map-container slide-in-bottom'}>
+        <div className={`map-container ${props.settings ? 'fade-in' : (!props.publicMap && isBrowser) ? 'slide-in-top' : 'slide-in-bottom'}`} style={{ width: (!props.publicMap && isBrowser) ? '60%' : '100%' }}>
             <MyMapComponent
+                publicMap={props.publicMap}
+                settings={props.settings}
                 selfLocation={selfLocation}
                 meetAddress={props.meetAddress ? props.meetAddress : null}
                 isolated={props.isolated}
@@ -164,7 +167,7 @@ const MapComp = (props) => {
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>
+            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>}
         </div>
     );
 }
@@ -198,7 +201,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationIcon = {
-        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/selfLocation.svg',
+        url: props.meetAddress ? '/icons/meetAddress.svg' : props.blower ? '/icons/startRoute.svg' : '/icons/youHere.svg',
         scaledSize: new window.google.maps.Size(90, 90),
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(45, 45),
@@ -210,7 +213,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         defaultOptions={options}
         center={props.center}
     >
-        <SearchBoxGenerator changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
+        <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
             return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
@@ -237,7 +240,7 @@ const SearchBoxGenerator = (props) => {
     }, []);
 
     return (
-        <div id="search-input-container">
+        <div id="search-input-container" >
             <input
                 id="search-input"
                 type="text"
