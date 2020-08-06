@@ -135,6 +135,9 @@ const IsolatedSettings = (props) => {
                         props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
                 })
         }
+        if (err) {
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר." })
+        }
     }
 
     return (
