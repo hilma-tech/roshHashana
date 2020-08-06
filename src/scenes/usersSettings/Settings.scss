@@ -119,6 +119,7 @@ input[type="number"] {
     @include input();
     font-size: 1.3rem;
     margin-bottom: 0 !important;
+    width: 100% !important;
     &::placeholder {
         font-size: 1.3rem;
         padding-right: 2%;
