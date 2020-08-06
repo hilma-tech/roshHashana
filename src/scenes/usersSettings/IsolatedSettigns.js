@@ -94,9 +94,13 @@ const IsolatedSettings = (props) => {
         }
         console.log("updateData", updateData)
 
-        let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
+        let { name, username, address, lng, lat, public_meeting, public_phone, comments } = updateData;
         // validate values
-
+        if (comments && !/^[A-Zא-תa-z '"-]{2,}$/.test(comments)) {
+            openGenAlert({ text: 'לא ניתן להכניס תווים מיוחדים בתיאור' })
+            setAnErr('לא ניתן להכניס תווים מיוחדים בתיאור', 'comments');
+            return;
+        }
         if (name && !/^[A-Zא-תa-z '"-]{2,}$/.test(name)) {
             openGenAlert({ text: 'השם שהזנת אינו תקין' })
             setAnErr('השם שהזנת אינו תקין', 'name');
@@ -181,6 +185,7 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">הערות ותיאור הכתובת</div>
                     <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} />
+                    <div className="err-msg">{errs.comments || ""}</div>
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>

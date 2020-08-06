@@ -174,7 +174,6 @@ const IsolatedSettings = (props) => {
             return;
         }
         if (username && (username[0] != 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
-
         if (address) {
             if (!Array.isArray(address) || !address.length) {
                 openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
@@ -193,6 +192,13 @@ const IsolatedSettings = (props) => {
                     openGenAlert({ text: "נא לציין את שעת התקיעה" })
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
+                }
+                if (!/^[A-Zא-תa-z '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                    let pms = [...publicMeetings];
+                    pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
+                    setValues(pms, "publicMeetings")
+                    openGenAlert({ text: 'לא ניתן להכניס תווים מיוחדים בתיאור' })
+                    return
                 }
                 if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
                     let pms = [...publicMeetings];

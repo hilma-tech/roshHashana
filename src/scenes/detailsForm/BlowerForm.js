@@ -131,8 +131,10 @@ export default class IsolatedForm extends Component {
                 } else if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
                     this.setState({ publicMeetErr: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
                     return false;
-                }
-                else this.setState({ publicMeetErr: '' });
+                } else if (!/^[A-Zא-תa-z '"-]{2,}$/.test(publicPlaces[i].comments)) {
+                    this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
+                    return false;
+                } else this.setState({ publicMeetErr: '' });
             }
         }
         updateArrInState && this.setState({ publicPlaces });
