@@ -193,7 +193,7 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (!/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                if (publicMeetings[i].comments && publicMeetings[i].comments.length && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
                     let pms = [...publicMeetings];
                     pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
                     setValues(pms, "publicMeetings")
@@ -237,9 +237,14 @@ const IsolatedSettings = (props) => {
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        let value;
+        if (keyName === 'time') {
+            value = new Date(publicPlaceVal);
+            value.setFullYear(2020, 8, 20);
+        } else value = publicPlaceVal;
         publicMeetingsChanged = true
         let publicPlaces = vals.publicMeetings;
-        publicPlaces[index][keyName] = publicPlaceVal;
+        publicPlaces[index][keyName] = value;
         setValues(publicPlaces, "publicMeetings")
     }
 
