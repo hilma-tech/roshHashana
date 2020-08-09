@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Geocode from "react-geocode";
 
+import moment from 'moment'
+import Auth from '../../modules/auth/Auth'
+
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
@@ -23,19 +26,20 @@ const ShofarBlowerMap = (props) => {
     const { openGenAlert } = useContext(MainContext)
 
     const {
-        userData, 
+        userData,
         myMeetings, meetingsReqs,
         setAssignMeetingInfo,
         startTimes } = useContext(SBContext)
 
 
+    const [center, setCenter] = useState({});
 
     const [userOriginLoc, setUserOriginLoc] = useState(null)
+    const [allGenLocations, setAllGenLocations] = useState(null)
 
     const [allMapData, setAllMapData] = useState(null)
     const [err, setErr] = useState(false)
 
-    const [center, setCenter] = useState({});
 
     // const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
@@ -96,6 +100,21 @@ const ShofarBlowerMap = (props) => {
     }, [myMeetings, meetingsReqs])
 
 
+    const fetchAllGenLocations = async () => {
+        let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${true}`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" }
+        }, true);
+
+        if (err) {
+            openGenAlert({ text: "קרתה בעיה בהבאת המידע, נא נסו שנית מאוחר יותר" })
+            return;
+        }
+        if (mapContent) {
+            handleSetAllGenMapData(mapContent)
+        }
+    }
+
+
     const handleSetAllMapData = () => {
         // layout for map renderer
         let meetingsReqsLocs = !Array.isArray(meetingsReqs) ? []
@@ -122,8 +141,53 @@ const ShofarBlowerMap = (props) => {
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
     }
 
+    const handleSetAllGenMapData = (mapContent) => {
+        if (!mapContent || !mapContent.privateMeetings) return;
+        const priMeetLocs = []
+        let privateMeet;
+        for (let i in mapContent.privateMeetings) { // isolated location (private meetings)
+            privateMeet = mapContent.privateMeetings[i]
+            const lat = Number(privateMeet.lat), lng = Number(privateMeet.lng);
+            priMeetLocs.push({
+                type: PRIVATE_MEETING,
+                location: { lat, lng },
+                info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                    <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                    <div>לא ניתן להצטרף לתקיעה זו</div></div>
+            })
+        }
+
+        if (!mapContent || !mapContent.publicMeetings) return;
+        const pubMeetLocs = []
+        let pubMeet;
+        let lat, lng, date
+        for (let i in mapContent.publicMeetings) { // isolated location (private meetings)
+            pubMeet = mapContent.publicMeetings[i]
+            lat = Number(pubMeet.lat)
+            lng = Number(pubMeet.lng);
+            date = pubMeet.start_time ? moment(pubMeet.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
+            pubMeetLocs.push({
+                type: SHOFAR_BLOWING_PUBLIC,
+                location: { lat, lng },
+                info: <div id="info-window-container">
+                    <div className="info-window-header">תקיעה ציבורית</div>
+                    <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{pubMeet.blowerName}</div></div>
+                    <div className="pub-address-container">
+                        <img alt="" src={'/icons/address.svg'} />
+                        <div style={{ textAlign: "right" }}>
+                            {`${pubMeet.address} ${pubMeet.comments || pubMeet.commennts || ""}`}
+                        </div>
+                    </div>
+                    <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
+                </div>
+            })
+        }
+        setAllGenLocations({ priMeetLocs, pubMeetLocs })
+    }
+
+
     const getLngLatOfLocation = async (address) => {
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log(`error getting geoCode of ${address}: `, error); return; }
@@ -137,6 +201,11 @@ const ShofarBlowerMap = (props) => {
         setAssignMeetingInfo(meetingInfo)
     }
 
+    const handleMapChanged = (needGenInfo) => {
+        if (needGenInfo && !allGenLocations) {
+            fetchAllGenLocations()
+        }
+    }
 
 
     return (
@@ -148,6 +217,8 @@ const ShofarBlowerMap = (props) => {
                 err={err}
                 data={allMapData}
                 history={props.history}
+                allGenLocations={allGenLocations}
+                handleMapChanged={handleMapChanged}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}

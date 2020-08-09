@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
+import moment from 'moment'
 
 import { SBContext } from '../ctx/shofar_blower_context';
-import { MainContext } from '../ctx/MainContext'
 
 const SBRouteList = (props) => {
     const sbCtxVal = useContext(SBContext)
@@ -52,9 +52,15 @@ const SBRouteList = (props) => {
                                 </div>
                             </div>
                             <div className="meeting-in-route-info-container">
-                                <div className="meeting-in-route-title" >{i == 0 ? "נקודת יציאה" : (m.isPublicMeeting ? "קריאה ציבורית" : m.name)}</div>
-                                <div className="meeting-in-route-location" >{m.address || ""}</div>
-                                <div className="meeting-in-route-comments" >{m.comments || ""}</div>
+                                <div className="meeting-in-route-info-1">
+                                    <div className="meeting-in-route-title" >{i == 0 ? "נקודת יציאה" : (m.isPublicMeeting ? "קריאה ציבורית" : m.name)}</div>
+                                    <div className="meeting-in-route-location" >{typeof m.address === "string" ? m.address.split(", ישראל").join('') : ""}</div>
+                                    <div className="meeting-in-route-comments" >{m.comments || ""}</div>
+                                </div>
+                                <div className="meeting-in-route-info-2">
+                                    <img src={m.isPublicMeeting ? "/icons/group-orange.svg" : "/icons/single-blue.svg"} alt={m.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
+                                    <div className="meeting-in-route-time">{moment(m.startTime).format("HH:mm")}</div>
+                                </div>
                             </div>
                         </div>
                     );

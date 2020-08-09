@@ -331,7 +331,6 @@ module.exports = function (CustomUser) {
     CustomUser.getLastItemThatIsNotIsrael = (arr, pos) => {
         //gets an array of strings and the last position of that array (arr.length - 1)
         // returns the first item (from the end) that is not ירושלים
-        //? check if pos is bigger than 1000000 ? (to prevent an infinite loop cos goes from pos to pos===0 (on pos===0 returns))
         if (arr[pos] !== "ישראל") {
             return arr[pos]
         }
