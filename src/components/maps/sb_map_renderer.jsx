@@ -135,7 +135,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         const userEndTime = userStartTime + userData.maxRouteDuration;
         const routeStops = [];
         const constStopsB4 = [];
-        const constStopsAfer = [];
+        const constStopsAfter = [];
         let meetingStartTime;
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
@@ -146,7 +146,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     constStopsB4.push(data.myMLocs[i])
                 } else {
                     // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
-                    constStopsAfer.push(data.myMLocs[i])
+                    constStopsAfter.push(data.myMLocs[i])
                 }
             }
             else routeStops.push(data.myMLocs[i])
@@ -168,37 +168,37 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
             console.log('1 res.overviewPath: ', res.overviewPath);
             setRoutePath(res.overviewPath)
-
-            //get const meetings overview
-            let constOverviewPaths = [];
-            if (Array.isArray(constStopsB4) && constStopsB4.length) {
-                //const meeting b4 -- get path
-                let [constB4Err, constB4Res] = await getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
-                if (constB4Err) {
-                    console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
-                    if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
-                }
-                if (constB4Res) {
-                    console.log('2 constB4Res.overviewPath: ', constB4Res.overviewPath);
-                    constOverviewPaths.push(constB4Res.overviewPath)
-                }
-            }
-            if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
-                let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
-                //const meeting after -- get path
-                let [constAfterErr, constAfterRes] = await getOverViewPath(window.google, origin.location, constStopsAfter, null)
-                if (constAfterErr) {
-                    // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
-                    if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
-                }
-                if (constAfterRes) {
-                    console.log('3 constAfterRes.overviewPath: ', constAfterRes.overviewPath);
-                    constOverviewPaths.push(constAfterRes.overviewPath)
-                }
-            }
-            // console.log('final constOverviewPaths: ', constOverviewPaths);
-            Array.isArray(constOverviewPaths) && setB4OrAfterRoutePath(constOverviewPaths)
         }
+
+        //get const meetings overview
+        let constOverviewPaths = [];
+        if (Array.isArray(constStopsB4) && constStopsB4.length) {
+            //const meeting b4 -- get path
+            let [constB4Err, constB4Res] = await getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
+            if (constB4Err) {
+                console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
+                if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
+            }
+            if (constB4Res) {
+                console.log('2 constB4Res.overviewPath: ', constB4Res.overviewPath);
+                constOverviewPaths.push(constB4Res.overviewPath)
+            }
+        }
+        if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
+            let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
+            //const meeting after -- get path
+            let [constAfterErr, constAfterRes] = await getOverViewPath(window.google, origin.location, constStopsAfter, null)
+            if (constAfterErr) {
+                // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
+                if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
+            }
+            if (constAfterRes) {
+                console.log('3 constAfterRes.overviewPath: ', constAfterRes.overviewPath);
+                constOverviewPaths.push(constAfterRes.overviewPath)
+            }
+        }
+        // console.log('final constOverviewPaths: ', constOverviewPaths);
+        Array.isArray(constOverviewPaths) && setB4OrAfterRoutePath(constOverviewPaths)
     }
 
 
@@ -308,8 +308,8 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }} 
-                        //todo: check change of opacity (i * 10?)
+                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }}
+                    //todo: check change of opacity (i * 10?)
                     />
                 ))
                 : null}
