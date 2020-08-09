@@ -244,7 +244,7 @@ module.exports = function (CustomUser) {
                 if (!isPubMap) {
 
                     let [err, address] = await executeMySqlQuery(CustomUser,
-                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
+                        `SELECT CustomUser.address, CustomUser.lat, CustomUser.lng, CustomUser.comments FROM CustomUser WHERE CustomUser.id = ${options.accessToken.userId};`)
                     if (err) throw err;
                     if (address) {
                         userAddress = address;
@@ -354,7 +354,7 @@ module.exports = function (CustomUser) {
                 if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
                 if (data.comments && data.comments.length < 255) userData.comments = data.comments
                 else userData.comments = '';
-                
+
                 if (data.address && data.address[0]) {
                     userData.address = data.address[0]
                     let addressArr = data.address[0]
@@ -422,7 +422,7 @@ module.exports = function (CustomUser) {
                         userIsolatedId: userId,
                         public_phone: data.public_phone,
                         public_meeting: data.public_meeting,
-                        blowerMeetingId: pubMeetId
+                        blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
                     }
                     if (Object.values(newIsoData).find(d => d)) {
                         let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
@@ -647,7 +647,7 @@ module.exports = function (CustomUser) {
             if (!userData || !userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
             allRes.userData = userDataErr || !userData ? true : userData
             if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
-            
+
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT 
             isolated.id AS "meetingId", 

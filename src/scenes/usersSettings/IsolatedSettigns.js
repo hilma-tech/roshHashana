@@ -3,7 +3,7 @@ import { FormSearchBoxGenerator } from '../../components/maps/search_box_generat
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
 import { MainContext } from '../../ctx/MainContext';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import { isIOS } from "react-device-detect";
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
@@ -94,9 +94,13 @@ const IsolatedSettings = (props) => {
         }
         console.log("updateData", updateData)
 
-        let { name, username, address, lng, lat, public_meeting, public_phone } = updateData;
+        let { name, username, address, lng, lat, public_meeting, public_phone, comments } = updateData;
         // validate values
-
+        if (comments && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(comments)) {
+            openGenAlert({ text: 'לא ניתן להכניס תווים מיוחדים בתיאור' })
+            setAnErr('לא ניתן להכניס תווים מיוחדים בתיאור', 'comments');
+            return;
+        }
         if (name && !/^[A-Zא-תa-z '"-]{2,}$/.test(name)) {
             openGenAlert({ text: 'השם שהזנת אינו תקין' })
             setAnErr('השם שהזנת אינו תקין', 'name');
@@ -134,6 +138,9 @@ const IsolatedSettings = (props) => {
                     if (res)
                         props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
                 })
+        }
+        if (err) {
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר." })
         }
     }
 
@@ -178,6 +185,7 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">הערות ותיאור הכתובת</div>
                     <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} />
+                    <div className="err-msg">{errs.comments || ""}</div>
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>

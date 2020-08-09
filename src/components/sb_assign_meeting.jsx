@@ -5,7 +5,7 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
 import { assignSB } from '../fetch_and_utils';
-import { CONSTS } from '../const_messages';
+import { CONSTS } from '../consts/const_messages';
 import { useEffect } from 'react';
 import { getOverviewPath } from './maps/get_overview_path';
 

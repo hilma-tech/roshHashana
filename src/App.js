@@ -26,6 +26,9 @@ const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedS
 const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));
 const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSettings'));
 
+const AdminHome = loadable(() => import('./scenes/admin/AdminHome'))
+const AdminLogin = loadable(() => import('./scenes/admin/AdminLogin'))
+
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/Home'));
 const Register = loadable(() => import('./scenes/Register'));
@@ -75,6 +78,8 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
+                            <Route exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
+                            <Route path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i/login" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                         </Switch>
@@ -85,5 +90,5 @@ const App = (props) => {
     );
 }
 
-//export default inject('ExampleStore')(observer(App));
+//export default inject('ExampleStore')(observer(App)); 
 export default App;

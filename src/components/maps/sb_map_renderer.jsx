@@ -4,32 +4,17 @@ import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-m
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import { SBMarkerGenerator } from './marker_generator';
+import MarkerGenerator, { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
 import { getOverviewPath } from './get_overview_path';
+import { CONSTS } from '../../consts/const_messages';
 
 import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
 
-const mapOptions = {
-    fullscreenControl: false,
-    zoomControl: false,
-    streetViewControl: false,
-    mapTypeControl: false,
-    componentRestrictions: { country: "il" },
-    clickableIcons: false
-};
-const israelCoords = [
-    { lat: 32.863532, lng: 35.889902 },
-    { lat: 33.458826, lng: 35.881345 },
-    { lat: 33.107715, lng: 35.144508 },
-    { lat: 31.296718, lng: 34.180102 },
-    { lat: 29.486869, lng: 34.881321 },
-    { lat: 29.551662, lng: 34.984779 },
-];
 
 
 
@@ -59,7 +44,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
-        console.log('data changed: ', data);
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
     }, [])
 
@@ -72,15 +56,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         const constStopsB4 = [];
         const constStopsAfter = [];
         let meetingStartTime;
-        console.log('userStartTime: ', new Date(userData.startTime));
+
+        //fill routeStops, constStopsb4 and constStopsAfter
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
-            console.log('meetingStartTime: ', new Date(data.myMLocs[i].startTime));
-            console.log('data.myMLocs[i]: ', data.myMLocs[i]);
             if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
                 // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
-                    // console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
                     // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
@@ -104,7 +86,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 return false
             }
             getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
-            console.log('1 res.overviewPath: ', res.overviewPath);
             setRoutePath(res.overviewPath)
         }
 
@@ -118,7 +99,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
             }
             if (constB4Res) {
-                console.log('2 constB4Res.overviewPath: ', constB4Res.overviewPath);
                 constOverviewPaths.push(constB4Res.overviewPath)
             }
         }
@@ -131,7 +111,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
             }
             if (constAfterRes) {
-                console.log('3 constAfterRes.overviewPath: ', constAfterRes.overviewPath);
                 constOverviewPaths.push(constAfterRes.overviewPath)
             }
         }
@@ -142,7 +121,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     //MAP RESTRICTIONS - ISRAEL --START
     var israelPolygon = new window.google.maps.Polygon({
-        paths: israelCoords,
+        paths: CONSTS.ISRAEL_COORDS,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -150,6 +129,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillOpacity: 0.35
     });
 
+    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null
@@ -158,6 +138,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
         }
     }
+    let mapOptions = CONSTS.MAP_OPTIONS;
     mapOptions.restriction = {
         latLngBounds: bounds,
         strictBounds: false
@@ -212,7 +193,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     </div>
                     : null
                 }
-
             </div>
 
         </GoogleMap>
@@ -255,11 +235,10 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
     </>
 );
 
-const BringAllGenMapInfo = () => {
-    /*
-        todo: רעות אני צריכה אותך פה בשביל להביא את המידע מהמפה הכללית, אי אפשר להביא את כל ה
-        todo: Map component
-        todo: כי יש צורך *רק* בנקודות ציון יעני, אני צריכה לשמור על *כל* שאר הדברים שלי, נגיד הכפתור לעבור בין המפות
-    */
-    return <></>
+const BringAllGenMapInfo = ({ allLocations }) => {
+    if (!Array.isArray(allLocations)) return null;
+
+    return <>{allLocations.map((locationInfo, index) => {
+        return <MarkerGenerator key={index} blower locationInfo={locationInfo} /> /* all blowing meetings locations */
+    })}</>
 }

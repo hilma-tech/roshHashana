@@ -8,7 +8,7 @@ import { MainContext } from '../../ctx/MainContext';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
@@ -75,7 +75,7 @@ const IsolatedSettings = (props) => {
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
-            publicMeetings.push({});
+            publicMeetings.push({ id: vals.publicMeetings.length });
             setValues(publicMeetings, "publicMeetings");
             if (errs.general && errs.general.length) setMsgErr(' ')
         }
@@ -173,8 +173,7 @@ const IsolatedSettings = (props) => {
             setErrs(errs => ({ ...errs, can_blow_x_times: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' }));
             return;
         }
-        if (username && username[0] != 0) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
-
+        if (username && (username[0] != 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
         if (address) {
             if (!Array.isArray(address) || !address.length) {
                 openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
@@ -194,6 +193,13 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
+                if (!/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                    let pms = [...publicMeetings];
+                    pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
+                    setValues(pms, "publicMeetings")
+                    openGenAlert({ text: 'לא ניתן להכניס תווים מיוחדים בתיאור' })
+                    return
+                }
                 if (publicMeetings[i].address.length !== 2 || publicMeetings[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicMeetings[i].address[1] || !publicMeetings[i].address[1].lng || !publicMeetings[i].address[1].lat) {
                     let pms = [...publicMeetings];
                     pms[i].errMsg = CONSTS.PICK_FROM_LIST_ADDRESS_MSG_ERROR;
@@ -205,7 +211,7 @@ const IsolatedSettings = (props) => {
         }
 
 
-        if (!/^[A-Zא-תa-z '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
+        if (!/^[A-Zא-תa-z 0-9 '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
         setErrs({}); //all
 
@@ -225,6 +231,9 @@ const IsolatedSettings = (props) => {
                         props.history.goBack();
                 })
         }
+        if (err) {
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר." })
+        }
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
@@ -236,7 +245,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings/>}>
+            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -299,7 +308,7 @@ const IsolatedSettings = (props) => {
                 <div id="public-blowing-set" className="fade-in" style={{ display: (settingsType === 'public-blowing-set-btn' ? 'block' : 'none'), marginRight: "0" }}>
                     {vals.publicMeetings && vals.publicMeetings.map((place, index) => {
                         return (
-                            <div key={index}>
+                            <div key={place.id}>
                                 <AddPublicPlace
                                     removePubPlace={removePubPlace}
                                     index={index}

@@ -1,29 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
+import {CONSTS} from '../../consts/const_messages';
 import './map.scss';
 import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
-const israelCoords = [
-    { lat: 32.863532, lng: 35.889902 },
-    { lat: 33.458826, lng: 35.881345 },
-    { lat: 33.107715, lng: 35.144508 },
-    { lat: 31.296718, lng: 34.180102 },
-    { lat: 29.486869, lng: 34.881321 },
-    { lat: 29.551662, lng: 34.984779 },
-];
 
-var mapOptions = {
-    fullscreenControl: false,
-    zoomControl: false,
-    streetViewControl: false,
-    mapTypeControl: false,
-    disableDefaultUI: true,
-    clickableIcons: false
-};
 
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
@@ -37,7 +22,6 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
@@ -45,6 +29,7 @@ const MapComp = (props) => {
                 setMapInfo(mapContent);
             }
         })();
+
     }, []);
 
     useEffect(() => {
@@ -179,9 +164,9 @@ export default MapComp;
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
-    let options = mapOptions;
+    let options = CONSTS.MAP_OPTIONS;
     var israelPolygon = new window.google.maps.Polygon({
-        paths: israelCoords,
+        paths: CONSTS.ISRAEL_COORDS,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -190,6 +175,8 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     });
 
     var bounds = new window.google.maps.LatLngBounds();
+    if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function")
+        return null
     for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
         for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));

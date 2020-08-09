@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
 import { MainContext } from '../../ctx/MainContext';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
@@ -134,6 +134,9 @@ const IsolatedSettings = (props) => {
                     }
                 })
         }
+        if (err) {
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר" })
+        }
     }
 
     return (
@@ -141,7 +144,7 @@ const IsolatedSettings = (props) => {
             <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated settings />}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} minLength={2}/>
+                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} minLength={2} />
                     <div className="err-msg">{nameMsgErr}</div>
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
                     <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
