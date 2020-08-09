@@ -562,6 +562,13 @@ module.exports = function (CustomUser) {
     }
 
 
+    CustomUser.deleteUser = async (role, options) => {
+
+        if(role===)
+
+    }
+
+
     CustomUser.remoteMethod('createUser', {
         http: { verb: 'post' },
         accepts: [
