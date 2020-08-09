@@ -237,9 +237,14 @@ const IsolatedSettings = (props) => {
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        let value;
+        if (keyName === 'time') {
+            value = new Date(publicPlaceVal);
+            value.setFullYear(2020, 8, 20);
+        } else value = publicPlaceVal;
         publicMeetingsChanged = true
         let publicPlaces = vals.publicMeetings;
-        publicPlaces[index][keyName] = publicPlaceVal;
+        publicPlaces[index][keyName] = value;
         setValues(publicPlaces, "publicMeetings")
     }
 

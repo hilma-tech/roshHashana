@@ -87,7 +87,14 @@ export default class IsolatedForm extends Component {
             this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
             return;
         }
-        publicPlaces[index][keyName] = publicPlaceVal;
+
+        let value;
+        if (keyName === 'time') {
+            value = new Date(publicPlaceVal);
+            value.setFullYear(2020, 8, 20);
+        } else value = publicPlaceVal;
+
+        publicPlaces[index][keyName] = value;
         this.setState({ publicPlaces });
     }
 
