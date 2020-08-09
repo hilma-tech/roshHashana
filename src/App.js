@@ -9,7 +9,6 @@ import { PrivateRoute, MultipleRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
-import SBHomePage from './scenes/shofar_blower_home_page';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
 
@@ -21,6 +20,7 @@ const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'))
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
 const GeneralUserPage = loadable(() => import('./scenes/mainPages/GeneralUserPage'));
+const SBHomePage = loadable(() => import('./scenes/shofar_blower_home_page'));
 
 const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedSettigns'));
 const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));

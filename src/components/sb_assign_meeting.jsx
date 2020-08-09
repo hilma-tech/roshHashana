@@ -1,9 +1,15 @@
 import React, { useContext, useState } from 'react';
+import { isBrowser } from 'react-device-detect';
 
 import { SBContext } from '../ctx/shofar_blower_context';
-
 import { MainContext } from '../ctx/MainContext';
-import { isBrowser } from 'react-device-detect';
+
+import { assignSB } from '../fetch_and_utils';
+import { CONSTS } from '../const_messages';
+import { useEffect } from 'react';
+import { getOverviewPath } from './maps/get_overview_path';
+
+const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
 
 const SBAssignMeeting = (props) => {
     const { openGenAlert } = useContext(MainContext)
@@ -11,10 +17,24 @@ const SBAssignMeeting = (props) => {
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
         meetingsReqs, setMeetingsReqs,
-        assigns, setAssigns,
+        startTimes, totalTime
     } = useContext(SBContext)
 
     const [openAssign, setOpenRouteList] = useState(true)
+
+    useEffect(() => {
+        const script = document.createElement('script')
+        script.async = true;
+        script.defer = true;
+        script.id = "mapScriptHi";
+        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`
+        document.head.appendChild(script);
+        return () => {
+            let script = document.getElementById('mapScriptHi')
+            document.head.removeChild(script);
+        }
+    }, [])
+
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
         props.history.push('/')
@@ -30,6 +50,12 @@ const SBAssignMeeting = (props) => {
         setTimeout(() => { setAssignMeetingInfo(null) }, 400)
     }
 
+    const calcTotalNewTime = (obj) => {
+        if (!obj.startTimes || !Array.isArray(obj.startTimes)) return null
+        const totalTime = obj.startTimes.reduce((accumulator, st) => st.duration && st.duration.value ? (accumulator + Number(st.duration.value)) : null, 0) * 1000
+        return totalTime;
+    }
+
 
     const handleAssignment = async (close) => {
         if (close === "close") {
@@ -38,14 +64,69 @@ const SBAssignMeeting = (props) => {
         }
         //set new route and remove meetingId from reqs array
         if (myMeetings.length == userData.can_blow_x_times) {
-            openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבץ`, isPopup: { okayText: "הבנתי" } })
+            openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
             return;
         }
         openGenAlert({ text: "..." })
-        setAssigns(a => Array.isArray(a) ? [...a, assignMeetingInfo] : [assignMeetingInfo])
+
+
+        if (!window.google || !window.google.maps) {
+            openGenAlert({ text: assign_error });
+            console.log('no window.google || no window.google.maps');
+            return;
+        }
+        const newStops = (Array.isArray(myMeetings) && myMeetings.length) ? [...myMeetings, assignMeetingInfo] : assignMeetingInfo
+        debugger
+        let [errOP, resOP] = await getOverviewPath(window.google, { lat: Number(userData.lat), lng: Number(userData.lng) }, newStops, { getTimes: true, userData })
+        debugger
+        if (errOP) {
+            console.log('errOP: ', errOP);
+            openGenAlert({ text: assign_error })
+            return;
+        }
+        const newTotalTime = calcTotalNewTime(resOP)
+        debugger
+
+        if (!newTotalTime) {
+            console.log('no newTotalTime : ', newTotalTime);
+            openGenAlert({ text: assign_error })
+            return
+        }
+
+        // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --START
+        if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
+            openGenAlert({ text: `זמן המסלול לאחר השיבוץ שלך יהיה ${newTotalTime / 60000} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${userData.maxRouteDuration / 60000} דקות, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
+            return;
+        }
+        // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --END
+
+        //LOCAL STATE UPDATE WITH NEW MEETING --START
         if (!myMeetings.includes(assignMeetingInfo)) setMyMeetings(mym => Array.isArray(mym) ? [...mym, assignMeetingInfo] : [assignMeetingInfo])
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != assignMeetingInfo.meetingId))
-        closeAssign()
+        //LOCAL STATE UPDATE WITH NEW MEETING --END
+
+        //ASSIGN --START
+        const newAssignMeetingObj = { meetingId: assignMeetingInfo.meetingId, isPublicMeeting: assignMeetingInfo.isPublicMeeting, startTime: resOP.startTimes[resOP.startTimes.length - 1].startTime }
+        assignSB([newAssignMeetingObj], (error, res) => {
+            if (error || !res) openGenAlert({ text: typeof error === "string" ? error : "קרתה תקלה, נא השתבצו מאוחר יותר, תודה" })
+            else if (Array.isArray(res)) {
+                let success = true
+                for (let i in res) {
+                    if (!res[i] || !res[i].success) {
+                        openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
+                        success = false
+                        break;
+                    }
+                }
+                if (success) {
+                    openGenAlert({ text: "שובצת בהצלחה" })
+                }
+            }
+            else openGenAlert({ text: "שובצת בהצלחה" })
+            closeAssign()
+        })
+        //ASSIGN --END
+
     }
 
     let iconSrc;
@@ -78,10 +159,10 @@ const SBAssignMeeting = (props) => {
             </div>
 
             <div className="sb-assign-content-container">
-                <div className="input-div" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
-                {assignMeetingInfo.isPublicMeeting ? null : < div className="input-div" id="meeting-phone" >{assignMeetingInfo.phone}</div>}
-                <div className="input-div" id="meeting-address" >{assignMeetingInfo.address}</div>
-                <div className={`input-div ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
+                <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
+                {assignMeetingInfo.isPublicMeeting ? null : < div className="inputDiv" id="meeting-phone" >{assignMeetingInfo.phone}</div>}
+                <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
+                <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 
             <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>

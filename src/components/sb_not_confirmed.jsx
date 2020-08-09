@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import loadable from '@loadable/component';
+
 import { deleteUser } from '../fetch_and_utils';
 
 import { isBrowser } from "react-device-detect";
 
-import Map from './maps/map';
 import '../components/maps/map.scss';
 import { useContext } from 'react';
 import { MainContext } from '../ctx/MainContext';
 
+const Map = loadable(() => import('./maps/map'));
 
 
 const SBNotConfirmed = (props) => {

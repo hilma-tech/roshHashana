@@ -7,7 +7,7 @@ import { MainContext } from '../../ctx/MainContext';
 import { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
-import { CONSTS } from '../../const_messages';
+import { getOverviewPath } from './get_overview_path';
 
 import { isBrowser } from "react-device-detect";
 
@@ -31,71 +31,6 @@ const israelCoords = [
     { lat: 29.551662, lng: 34.984779 },
 ];
 
-const getOverViewPath = async (google, origin, stops, extraData) => {
-    if (!stops || !stops.length) {
-        console.log("no_stops_or_destination", origin, stops);
-        return [true];
-    }
-    const travelMode = google.maps && google.maps.TravelMode && google.maps.TravelMode.WALKING || 'WALKING'
-    let waypoints;
-    try {
-        waypoints = stops.map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
-    } catch (e) {
-        waypoints = []
-    }
-    let destination;
-    try {
-        destination = waypoints.pop().location
-    } catch (e) {
-        destination = {}
-    }
-
-    // console.log('> origin: ', { ...origin });
-    // console.log('> waypoints: ', [...waypoints]);
-    // console.log('> destination: ', { ...destination });
-
-    const directionsService = new google.maps.DirectionsService();
-    if (!directionsService || !directionsService.route || typeof directionsService.route !== "function") {
-        return ["אירעה שגיאה בטעינת המפה, עמכם הסליחה"]
-    }
-    return await new Promise((resolve, reject) => {
-        directionsService.route({
-            origin,
-            travelMode,
-            waypoints,
-            destination: destination,
-            optimizeWaypoints: false
-        }, (result, status) => {
-            console.log('result: ', result);
-            if (status !== google.maps.DirectionsStatus.OK) {
-                resolve(["אירעה שגיאה בטעינת המפה, עמכם הסליחה"])
-                return;
-            }
-            let res = {}
-            if (extraData && extraData.getTimes) {
-                res.startTimes = []
-                let leg;
-                let prevStartTimeVal
-                let legDuration
-                for (let i in stops) {
-                    leg = result.routes[0].legs[i]
-                    legDuration = Number(leg.duration.value) * 1000
-                    if (!res.startTimes[i - 1]) {
-                        if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
-                        prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
-                    } else {
-                        prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
-                    }
-                    res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
-                }
-            }
-            res.overviewPath = result.routes[0].overview_path
-
-            // console.log('Promise.resolve([null, res]): ', [null, res]);
-            resolve([null, res])
-        })
-    })
-}
 
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
@@ -137,8 +72,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         const constStopsB4 = [];
         const constStopsAfter = [];
         let meetingStartTime;
+        console.log('userStartTime: ', new Date(userData.startTime));
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
+            console.log('meetingStartTime: ', new Date(data.myMLocs[i].startTime));
+            console.log('data.myMLocs[i]: ', data.myMLocs[i]);
             if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
                 // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
@@ -156,7 +94,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
             // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
             let getTimes = true
-            let [err, res] = await getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData })
+            let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData })
             if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
@@ -174,7 +112,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let constOverviewPaths = [];
         if (Array.isArray(constStopsB4) && constStopsB4.length) {
             //const meeting b4 -- get path
-            let [constB4Err, constB4Res] = await getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
+            let [constB4Err, constB4Res] = await getOverviewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
             if (constB4Err) {
                 console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
                 if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
@@ -187,7 +125,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
             let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
             //const meeting after -- get path
-            let [constAfterErr, constAfterRes] = await getOverViewPath(window.google, origin.location, constStopsAfter, null)
+            let [constAfterErr, constAfterRes] = await getOverviewPath(window.google, origin.location, constStopsAfter, null)
             if (constAfterErr) {
                 // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
                 if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }

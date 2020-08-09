@@ -49,7 +49,7 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -162,7 +162,7 @@ const MapComp = (props) => {
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}

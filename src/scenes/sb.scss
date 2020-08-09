@@ -83,6 +83,11 @@
 #sb-side-list-container {
     background-color: white;
     padding: 20px 40px;
+
+    height: 100%;
+    overflow-y: auto;
+    
+
     #sb-route-list-top {
         height: 80px;
         width: 100%;
@@ -123,7 +128,7 @@
     }
     .sb-side-list-content {
         width: 100%;
-        height: unset;
+
         .sb-side-list-title {
             color: $turquoise;
             font-size: 1.7rem;
@@ -411,7 +416,7 @@
     .sb-assign-content-container {
         overflow-wrap: break-word;
         width: 100%;
-        .input-div {
+        .inputDiv {
             text-align: right;
             cursor: default;
             @include input();
