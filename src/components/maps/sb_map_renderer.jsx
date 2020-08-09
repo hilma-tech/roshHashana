@@ -4,7 +4,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-m
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
-import MarkerGenerator from './marker_generator';
+import { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
 import { CONSTS } from '../../const_messages';
@@ -31,11 +31,18 @@ const israelCoords = [
     { lat: 29.551662, lng: 34.984779 },
 ];
 
-const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
-    if (!stops || !stops.length) { console.log("no_stops_or_destination", origin, stops); cb(true) }
-    const travelMode = google.maps.TravelMode.WALKING
-    const waypoints = stops
-        .map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
+const getOverViewPath = async (google, origin, stops, extraData) => {
+    if (!stops || !stops.length) {
+        console.log("no_stops_or_destination", origin, stops);
+        return [true];
+    }
+    const travelMode = google.maps && google.maps.TravelMode && google.maps.TravelMode.WALKING || 'WALKING'
+    let waypoints;
+    try {
+        waypoints = stops.map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
+    } catch (e) {
+        waypoints = []
+    }
     let destination;
     try {
         destination = waypoints.pop().location
@@ -43,45 +50,50 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
         destination = {}
     }
 
-    console.log('> origin: ', { ...origin });
-    console.log('> waypoints: ', [...waypoints]);
-    console.log('> destination: ', { ...destination });
+    // console.log('> origin: ', { ...origin });
+    // console.log('> waypoints: ', [...waypoints]);
+    // console.log('> destination: ', { ...destination });
 
     const directionsService = new google.maps.DirectionsService();
-    directionsService.route({
-        origin,
-        travelMode,
-        waypoints,
-        destination: destination,
-        optimizeWaypoints: false
-    }, (result, status) => {
-        console.log('result: ', result);
-        if (status !== google.maps.DirectionsStatus.OK) {
-            return cb("אירעה שגיאה בטעינת המפה, עמכם הסליחה")
-        }
-        let res = {}
-        if (extraData && extraData.getTimes) {
-            res.startTimes = []
-            let leg;
-            let prevStartTimeVal
-            let legDuration
-            for (let i in stops) {
-                leg = result.routes[0].legs[i]
-                legDuration = Number(leg.duration.value) * 1000
-                if (!res.startTimes[i - 1]) {
-                    if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
-                    prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
-                } else {
-                    prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
-                }
-                res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
+    if (!directionsService || !directionsService.route || typeof directionsService.route !== "function") {
+        return ["אירעה שגיאה בטעינת המפה, עמכם הסליחה"]
+    }
+    return await new Promise((resolve, reject) => {
+        directionsService.route({
+            origin,
+            travelMode,
+            waypoints,
+            destination: destination,
+            optimizeWaypoints: false
+        }, (result, status) => {
+            console.log('result: ', result);
+            if (status !== google.maps.DirectionsStatus.OK) {
+                resolve(["אירעה שגיאה בטעינת המפה, עמכם הסליחה"])
+                return;
             }
-        }
-        res.overviewPath = result.routes[0].overview_path
+            let res = {}
+            if (extraData && extraData.getTimes) {
+                res.startTimes = []
+                let leg;
+                let prevStartTimeVal
+                let legDuration
+                for (let i in stops) {
+                    leg = result.routes[0].legs[i]
+                    legDuration = Number(leg.duration.value) * 1000
+                    if (!res.startTimes[i - 1]) {
+                        if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
+                        prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
+                    } else {
+                        prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
+                    }
+                    res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
+                }
+            }
+            res.overviewPath = result.routes[0].overview_path
 
-        cb(null, res)
-        return;
-
+            // console.log('Promise.resolve([null, res]): ', [null, res]);
+            resolve([null, res])
+        })
     })
 }
 
@@ -89,15 +101,13 @@ const getOverViewPath = (google, origin, stops, extraData, cb = () => { }) => {
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { err, data } = props
     if (err) return null;
-    if (!data) return <img alt="" className="loader" src='/images/loader.svg' />
-
+    if (!data) return <img alt="נטען..." className="loader" src='/images/loader.svg' />
     const { openGenAlert } = useContext(MainContext)
     const {
+        userData,
         setStartTimes, startTimes,
         setMyMeetings
     } = useContext(SBContext)
-
-    const { userInfo: userData } = useContext(MainContext)
 
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
@@ -114,85 +124,85 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
+        console.log('data changed: ', data);
+        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
+    }, [])
+
+    const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
-        const userOrigin = { location: data.userOriginLoc, /* icon: userLocationIcon, */ origin: true } //! check if need userLocationIcon here
+        const userOrigin = { location: data.userOriginLoc, origin: true }
         const userStartTime = new Date(userData.startTime).getTime()
         const userEndTime = userStartTime + userData.maxRouteDuration;
         const routeStops = [];
         const constStopsB4 = [];
-        const constStopsAfer = [];
+        const constStopsAfter = [];
         let meetingStartTime;
         for (let i in data.myMLocs) {
             meetingStartTime = new Date(data.myMLocs[i].startTime).getTime()
-            if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) { // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
+            if (data.myMLocs[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
+                // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
                 if (meetingStartTime < userStartTime) {
                     // console.log('pushing as a b4 const stop: ', data.myMLocs[i]);
                     constStopsB4.push(data.myMLocs[i])
                 } else {
                     // console.log('pushing as a AFTER const stop: ', data.myMLocs[i]);
-                    constStopsAfer.push(data.myMLocs[i])
+                    constStopsAfter.push(data.myMLocs[i])
                 }
             }
             else routeStops.push(data.myMLocs[i])
         }
-        // console.log('constStopsB4: ', constStopsB4);
-        // console.log('constStopsAfer: ', constStopsAfer);
-
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
             //get times only if there is a stop (a meeting) that doesn't have a start time
             //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
-            let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
-            getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData },
-                (err, res) => {
-                    if (err) { console.log("err getoverviewpath ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
-                    let newStartTimes = res.startTimes;
-                    if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-                    const getMyST = (mId) => {
-                        let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
-                        if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
-                        return false
-                    }
-                    getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
-                    setRoutePath(res.overviewPath)
-                })
-        }
-        const b4StopsCb = (b4Err, b4Res) => {
-            // console.log('b4Res: ', b4Res);s
-            if (b4Err) {
-                console.log("err getoverviewpath for constStopsB4: ", constStopsB4, " err: ", b4Err); if (typeof b4Err === "string") { openGenAlert({ text: b4Err }); } return;
+            // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
+            let getTimes = true
+            let [err, res] = await getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData })
+            if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+            let newStartTimes = res.startTimes;
+            if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
+            const getMyST = (mId) => {
+                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
+                if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
+                return false
             }
-            let overviewPaths = [];
-            b4Res && overviewPaths.push(b4Res.overviewPath)
-
-            if (Array.isArray(constStopsAfer) && constStopsAfer.length) { //const meeting after get overview
-                let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
-                getOverViewPath(window.google, origin.location, constStopsAfer, null, (e, r) => afterStopsCb(e, r, overviewPaths))
-            } else afterStopsCb(null, null, overviewPaths)
-
+            getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
+            console.log('1 res.overviewPath: ', res.overviewPath);
+            setRoutePath(res.overviewPath)
         }
-        const afterStopsCb = (afterErr, afterRes, overviewPaths) => {
-            // console.log('afterRes: ', afterRes);
-            if (afterErr) {
-                console.log("err getoverviewpath for constStopsAfter: ", constStopsB4, " err: ", afterErr); if (typeof afterErr === "string") { openGenAlert({ text: afterErr }); } return;
+
+        //get const meetings overview
+        let constOverviewPaths = [];
+        if (Array.isArray(constStopsB4) && constStopsB4.length) {
+            //const meeting b4 -- get path
+            let [constB4Err, constB4Res] = await getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
+            if (constB4Err) {
+                console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
+                if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
             }
-            afterRes && overviewPaths.push(afterRes.overviewPath)
-            Array.isArray(overviewPaths) && setB4OrAfterRoutePath(overviewPaths)
-            // console.log('setB4OrAfterRoutePath(to:): ', overviewPaths);
+            if (constB4Res) {
+                console.log('2 constB4Res.overviewPath: ', constB4Res.overviewPath);
+                constOverviewPaths.push(constB4Res.overviewPath)
+            }
         }
-
-        // console.log('constStopsB4: ', constStopsB4);
-        if ((Array.isArray(constStopsB4) && constStopsB4.length) || (Array.isArray(constStopsAfer) && constStopsAfer.length)) {
-            if ((Array.isArray(constStopsB4) && constStopsB4.length)) getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null, b4StopsCb)
-            else b4StopsCb(null, null)
+        if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
+            let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
+            //const meeting after -- get path
+            let [constAfterErr, constAfterRes] = await getOverViewPath(window.google, origin.location, constStopsAfter, null)
+            if (constAfterErr) {
+                // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
+                if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
+            }
+            if (constAfterRes) {
+                console.log('3 constAfterRes.overviewPath: ', constAfterRes.overviewPath);
+                constOverviewPaths.push(constAfterRes.overviewPath)
+            }
         }
-
-    }, [props.data])
-
-
-    const changeMap = (e) => {
-        setGenMap(v => !v)
+        // console.log('final constOverviewPaths: ', constOverviewPaths);
+        Array.isArray(constOverviewPaths) && setB4OrAfterRoutePath(constOverviewPaths)
     }
 
+
+    //MAP RESTRICTIONS - ISRAEL --START
     var israelPolygon = new window.google.maps.Polygon({
         paths: israelCoords,
         strokeColor: '#FF0000',
@@ -203,6 +213,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     });
 
     var bounds = new window.google.maps.LatLngBounds();
+
+    if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null
     for (var i = 0; i < israelPolygon.getPaths().getLength(); i++) {
         for (var j = 0; j < israelPolygon.getPaths().getAt(i).getLength(); j++) {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
@@ -212,14 +224,18 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         latLngBounds: bounds,
         strictBounds: false
     }
+    //MAP RESTRICTIONS - ISRAEL --END
 
-    props.data && console.log('props.data: ', props.data);
+
     let sideListTO = null;
     const closeSideMeetingsList = () => {
         sideListTO && clearTimeout(sideListTO)
         if (showMeetingsList) sideListTO = setTimeout(() => { setShowMeetingsList(false) }, 400)
         setShowMeetingsListAni(false)
     }
+
+    const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
+
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
@@ -231,6 +247,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             {
                 genMap ?
                     <BringAllGenMapInfo
+                        allLocations={props.allGenLocations}
                     />
                     :
                     <BringAllSBMapInfo
@@ -240,7 +257,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     />
             }
             {/* user location */}
-            <MarkerGenerator position={data.userOriginLoc} icon={userLocationIcon} />
+            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} /> {/* might need to disable when genMap is on */}
 
             <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                 {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
@@ -264,44 +281,41 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     );
 }));
 
-const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => {
+const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
+    <>
+        {/* reqsLocs */
+            Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
+                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.type} location={m.location} info={m.info} />)
+                : null}
+        {/* myMLocs */
+            Array.isArray(data.myMLocs) && data.myMLocs.length ?
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.iconType} location={m.location} info={m.info} />)
+                : null}
 
+        {Array.isArray(routePath) ?
+            <Polyline
+                path={routePath}
+                geodesic={false}
+                options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
+            />
+            : null
+        }
 
-    return (
-        <>
-            {/* reqsLocs */
-                Array.isArray(data.reqsLocs) && data.reqsLocs.length ? data.reqsLocs.map((locationInfo, index) => {
-                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-                }) : null}
-            {/* myMLocs */
-                Array.isArray(data.myMLocs) && data.myMLocs.length ? data.myMLocs.map((locationInfo, index) => {
-                    return <MarkerGenerator key={index} locationInfo={locationInfo} /> /* meetings locations */
-                }) : null}
+        {/* before and after route stops */
+            Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
+                b4OrAfterRoutePath.map((routePath, i) => (
+                    <Polyline
+                        key={"k" + i}
+                        path={routePath}
+                        geodesic={false}
+                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }}
+                    //todo: check change of opacity (i * 10?)
+                    />
+                ))
+                : null}
 
-            {Array.isArray(routePath) ?
-                <Polyline
-                    path={routePath}
-                    geodesic={false}
-                    options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
-                />
-                : null
-            }
-
-            {/* before and after route stops */
-                Array.isArray(b4OrAfterRoutePath) && b4OrAfterRoutePath.length ?
-                    b4OrAfterRoutePath.map((routePath, i) => (
-                        <Polyline
-                            key={"k" + i}
-                            path={routePath}
-                            geodesic={false}
-                            options={{ strokeColor: "purple", strokeOpacity: "62%", strokeWeight: 2 + Number(i * 2) }}
-                        />
-                    ))
-                    : null}
-
-        </>
-    );
-}
+    </>
+);
 
 const BringAllGenMapInfo = () => {
     /*

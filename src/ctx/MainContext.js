@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 export const MainContext = React.createContext()
 
 export const MainProvider = ({ children }) => {
-    //alerts
+    //alerts START
     let alertTO = null;
     const [showAlert, setShowAlert] = useState(false)
-    const [cities, setCities] = useState([]);
+    //alerts END
+    
     const [userInfo, setUserInfo] = useState(null);
 
     const closeAlert = () => { setShowAlert(false) }
@@ -22,7 +23,6 @@ export const MainProvider = ({ children }) => {
 
     const ctxValue = {
         openGenAlert, showAlert,
-        cities, setCities,
         userInfo, setUserInfo
     }
 

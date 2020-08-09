@@ -8,13 +8,13 @@ import { isBrowser } from 'react-device-detect';
 
 const SBSideInfo = (props) => {
     const [routeDis, setRouteDis] = useState(true)
-    const [openRouteList, setOpenRouteList] = useState(false)
+    const [openRouteList, setOpenRouteList] = useState(null)
 
     const switchBool = (state) => state(prev => !prev)
 
 
     return (
-        <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList ? "open-animation" : "close-animation"}`} id="sb-side-list-container" >
+        <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList === null ? "" : (openRouteList ? "open-animation" : "close-animation")}`} id="sb-side-list-container" >
             {!isBrowser ? <div className="blue-line-container" onClick={() => /* the on click could be on click of WHOLE route side list, (when on mobile) */switchBool(setOpenRouteList)}><div className="blue-line" ></div></div> :
                 routeDis
                     ?

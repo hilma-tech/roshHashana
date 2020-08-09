@@ -1,4 +1,5 @@
 @import "../consts/consts.scss";
+
 .sb-map-container-mobile {
     width: 100%;
     height: 80%;
@@ -28,7 +29,7 @@
             background-color: white;
             height: 2rem;
             line-height: 2rem;
-            padding: 0 12px;
+            padding: 0px 12px 0 40px;
             border-radius: 30px;
             box-shadow: 0px 3px 6px #00000029;
             font-size: 1rem;
@@ -68,7 +69,7 @@
             height: 100%;
             margin-top: 0;
             box-sizing: border-box;
-            padding: 0 12px;
+            padding: 0px 12px 0 40px;
             border: 0;
             font-size: 1rem;
             outline: none;
@@ -95,7 +96,8 @@
             min-width: 50%;
             width: fit-content;
             padding: 10px;
-            height: 40%;
+            min-height: 40%;
+            height: fit-content;
             line-height: 100%;
             border-radius: 30px;
             box-shadow: 0px -3px 6px #00000029;
@@ -152,8 +154,10 @@
             .open-meeting-in-list-info {
                 .open-meeting-in-list-title {
                     font-weight: bolder;
+                    text-align: right;
                 }
                 .open-meeting-in-list-location {
+                    text-align: right;
                 }
                 .open-meeting-in-list-commets {
                 }
@@ -162,6 +166,7 @@
                 background-color: $orange;
                 padding: 0 1rem;
                 cursor: pointer;
+                margin-right: 5px;
                 &:active {
                     color: grey;
                     -moz-user-select: none;
@@ -182,7 +187,9 @@
                 .meeting-in-route-img {
                     width: 100%;
                     height: 100%;
-                    line-height: 35px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     border-radius: 50%;
                     background-color: $light-blue;
                     color: white;
@@ -191,23 +198,39 @@
             }
             .meeting-in-route-info-container {
                 display: flex;
-                flex-direction: column;
-                align-self: baseline;
-                justify-content: center;
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: space-between;
                 width: 80%;
                 background-color: white;
                 padding: 5px 15px;
                 box-shadow: 0px 3px 6px #00000029;
-                .meeting-in-route-title {
-                    width: fit-content;
-                    font-weight: bolder;
+                .meeting-in-route-info-1 {
+                    display: flex;
+                    flex-direction: column;
+                    align-self: baseline;
+                    justify-content: center;
+                    .meeting-in-route-title {
+                        width: fit-content;
+                        font-weight: bolder;
+                    }
+                    .meeting-in-route-location {
+                        width: fit-content;
+                        text-align: right;
+                    }
+                    .meeting-in-route-comments {
+                        width: fit-content;
+                        font-size: 0.9rem;
+                    }
                 }
-                .meeting-in-route-location {
-                    width: fit-content;
-                }
-                .meeting-in-route-comments {
-                    width: fit-content;
-                    font-size: 0.9rem;
+                .meeting-in-route-info-2 {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    img {
+                        width: 2rem;
+                    }
                 }
             }
         }
@@ -334,6 +357,76 @@
             background-color: $light-blue;
             height: 2px;
         }
+    }
+}
+
+.sb-assign-container {
+    width: 30%;
+    float: right;
+}
+.sb-assign-mobile-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 80%;
+
+    width: 100%;
+    z-index: 2;
+}
+#sb-assign-container {
+    //mobile and desktop
+    height: 100%;
+    background-color: white;
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-evenly;
+    #assign-x-btn-cont {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        #assign-x-btn {
+            cursor: pointer;
+            width: 1.5rem;
+        }
+    }
+    #assign-title {
+        justify-content: flex-start;
+        text-align: right;
+        color: $turquoise;
+        font-size: 1.7rem;
+        margin-bottom: 5px;
+    }
+    #assign-icon-and-text-cont {
+        color: $turquoise;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .sb-assign-content-container {
+        overflow-wrap: break-word;
+        width: 100%;
+        .input-div {
+            text-align: right;
+            cursor: default;
+            @include input();
+            width: 100%;
+        }
+        .no-value-text {
+            color: grey;
+        }
+    }
+    #assign-btn {
+        align-self: flex-end;
+        padding: 3% 15%;
+        color: black;
+        border: none;
+        background-color: $orange;
     }
 }
 

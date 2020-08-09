@@ -43,7 +43,6 @@ const AddPublicPlace = (props) => {
 
     //update chosenTime state and the publicPlaces array according to user choise
     const changeChosenTime = (time) => {
-        console.log('time._d: ', time._d);
         setChosenTime(time._d);
     }
 
@@ -55,11 +54,10 @@ const AddPublicPlace = (props) => {
         props.updatePublicPlace(props.index, 'address', address);
     }, [address]);
 
-    //update chosenAddress state and the publicPlaces array according to user choice
+    // update chosenAddress state and the publicPlaces array according to user choice
     const updateAddress = (address) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
-        console.log('address to update: ', address);
     }
     return (
         <div id="public-place-container">
@@ -68,6 +66,7 @@ const AddPublicPlace = (props) => {
             <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={Array.isArray(address) && address[0] ? address[0] : address} className="address" />
             {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}
             <input
+                maxLength={254}
                 autoComplete={'off'}
                 id="place-description"
                 type="text"

@@ -19,10 +19,13 @@
 .personal-info,
 #blowing-set,
 #public-blowing-set {
-    margin-right: 5%;
+    margin-right: 7% !important;
+    margin-left: 7% !important;
     .MuiFormControl-root {
-        width: 100%;
+        width: 100% !important;
+
         .MuiInputBase-input {
+            width: 100% !important;
             @include input();
             margin: 0 0 5% 0;
             box-sizing: border-box;
@@ -91,11 +94,11 @@ label {
     }
 }
 
-
 #comments,
 #place-description,
 .autocompleteInput,
 input[type="number"] {
+    width: 100% !important;
     @include input();
     font-size: 1.3rem;
     &::placeholder {
@@ -108,11 +111,33 @@ input[type="number"] {
         -webkit-appearance: none;
     }
 }
-#address,.address, #blowingTimes,#phone-number,#name
-    {
+#address,
+.address,
+#blowingTimes,
+#phone-number,
+#name {
+    @include input();
+    font-size: 1.3rem;
+    width:100%;
+    margin-bottom: 0 !important;
+    &::placeholder {
+        font-size: 1.3rem;
+        padding-right: 2%;
+        color: black;
+        opacity: 0.9;
+    }
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+}
+#public-blowing-set {
+    #place-description {
         @include input();
         font-size: 1.3rem;
-        margin-bottom: 0 !important;
+        width:100%;
+        margin-bottom: 5% !important;
+        margin-top: 5% !important;
+
         &::placeholder {
             font-size: 1.3rem;
             padding-right: 2%;
@@ -123,23 +148,8 @@ input[type="number"] {
             -webkit-appearance: none;
         }
     }
-    #public-blowing-set{
-        #place-description{
-            @include input();
-            font-size: 1.3rem;
-            margin-top: 5% !important;
-            &::placeholder {
-                font-size: 1.3rem;
-                padding-right: 2%;
-                color: black;
-                opacity: 0.9;
-            }
-            &::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-            }
-        }
-    }
-    .autocompleteInput {
+}
+.autocompleteInput {
 }
 .header,
 .header2 {
@@ -159,7 +169,7 @@ input[type="number"] {
     justify-content: flex-end;
     width: fit-content;
     margin: auto;
-    margin-right: 12%;
+    margin-right: 5%;
     div {
         margin-right: 1rem;
         margin-bottom: 0.5rem;
@@ -221,12 +231,18 @@ input[type="number"] {
             }
             &:checked::after {
                 content: "L";
-                transform: rotate(45deg) translate(-20%, -15%) scaleX(-1);
+                transform: rotate(45deg) translate(-40%, 0%) scaleX(-1);
                 font-size: 80%;
                 font-weight: bold;
                 border-radius: 0;
                 background-color: transparent;
                 border: 2px solid transparent;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                align-content: center;
+                justify-content: end;
+                line-height: 100%;
             }
         }
     }
@@ -235,22 +251,29 @@ input[type="number"] {
     font-size: 1.2rem;
     color: darkred;
 }
-.save-button{margin: 0 2vw;
-padding: 1% 5%;
+.save-button{
+padding: 0.5% 6%;
+position:absolute;
+top:4%;
+left:6%;
 color: white;
 border: none;
-font-size: 3vh;
+font-size: 1rem;
 font-weight: bold;
-background-color: #489fb5;}
+text-align: center;
+cursor: pointer;
+background-color:#1F717E;
+}
 #add-public-place {
     display: flex;
+    font-weight: bold;
     flex-direction: row;
-    width: 50%;
+    width: 100%;
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 2%;
     font-size: 1rem;
-    color: black;
+    color :#1F717E;
     #plus {
         display: flex;
         justify-content: center;
@@ -261,7 +284,7 @@ background-color: #489fb5;}
         border-radius: 50%;
         width: 1em;
         height: 1em;
-        background-color: black;
+        background-color: #1F717E;
         color: white;
     }
 }

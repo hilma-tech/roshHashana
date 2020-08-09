@@ -27,8 +27,8 @@ const GeneralUserPage = (props) => {
                 }
                 if (props.location.state.meetingInfo) {
                     setShofarBlowerName(props.location.state.meetingInfo.blowerName);
-                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments}`);
-                    setTime(`${moment(props.location.state.meetingInfo.start_time).format("HH:mm")}`);
+                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments ? props.location.state.meetingInfo.comments : ''}`);
+                    setTime(`${props.location.state.meetingInfo.start_time ? moment(props.location.state.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                 }
             } else {
                 if (!userInfo) {
@@ -40,16 +40,16 @@ const GeneralUserPage = (props) => {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
-                        setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments}`);
-                        setTime(`${moment(res.meetingInfo.start_time).format("HH:mm")}`);
+                        setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`);
+                        setTime(`${res.meetingInfo.start_time ? moment(res.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
                 } else {
                     console.log("from context", userInfo)
                     setName(userInfo.name);
                     if (userInfo.meetingInfo) {
                         setShofarBlowerName(userInfo.meetingInfo.blowerName);
-                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments}`);
-                        setTime(`${moment(userInfo.meetingInfo.start_time).format("HH:mm")}`);
+                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
+                        setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
                 }
             }
@@ -73,31 +73,31 @@ const GeneralUserPage = (props) => {
     }
 
     const openSettings = () => {
-        props.history.push('/settings');
+        props.history.push('/settings', { meetAddress: address });
     }
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
+        let [res, err] = await Auth.superAuthFetch(`/ api / CustomUsers / deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });
         if (res && res.res === 'SUCCESS') {
             Auth.logout(window.location.href = window.location.origin);
         }
-        // else  TODO: לשים הודעה שזה נכשל
+        else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
     }
 
     return (
         <>
-            <div id="isolated-page-container"  >
-                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0" }}>
-                    <div ><img alt="backIcon" onClick={() => { props.history.goBack() }} className="icon" src="/icons/go-back.svg" /></div>
-                    <div className="clickAble" onClick={openSettings}><img alt="settings" src="/icons/settings.svg" /></div>
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }} >
+                <div className="header " style={{ margin: isBrowser ? "0.5rem 0 0 0" : "0.5rem 0 0.5rem 0", width: "100%" }}>
+                    <div className="clickAble" onClick={openSettings}>
+                        <img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
+                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
-                    <div className="content"  >{`שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה:`}</div>
+                    <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה: ` : `שלום ${name}, \n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
                         {shofarBlowerName && <div className="meetingDetail">
                             <img alt="" className="icon" src="/icons/blueShofar.svg" />
@@ -117,14 +117,14 @@ const GeneralUserPage = (props) => {
                         </div>
                         <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div>
                     </div>
-                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                    {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
-                    </div>
+                    </div>}
 
                 </div>
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
+            {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
         </>

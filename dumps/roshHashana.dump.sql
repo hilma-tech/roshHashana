@@ -72,6 +72,9 @@ CREATE TABLE `CustomUser` (
   `verificationToken` varchar(512) DEFAULT NULL,
   `mainImageId` int(11) DEFAULT NULL,
   `address` varchar(400) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `lng` varchar(255) DEFAULT NULL,
+  `lat` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -360,6 +363,9 @@ CREATE TABLE `shofar_blower_pub` (
   `blowerId` int(10) unsigned DEFAULT NULL,
   `constMeeting` tinyint(3) unsigned DEFAULT '0',
   `address` varchar(400) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `lng` varchar(255) DEFAULT NULL,
+  `lat` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

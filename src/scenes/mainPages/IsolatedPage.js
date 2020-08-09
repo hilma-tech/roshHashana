@@ -29,7 +29,7 @@ const IsolatedPage = (props) => {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (res) {
-                    if (res.errmMsg && res.errmMsg === 'LOG_OUT') {
+                    if (res.errMsg && res.errMsg === 'LOG_OUT') {
                         Auth.logout(window.location.href = window.location.origin);
                         return;
                     }
@@ -66,24 +66,24 @@ const IsolatedPage = (props) => {
 
     return (
         <>
-            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} >
+            <div id="isolated-page-container" className={`${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ width: isBrowser ? '40%' : '100%' }}>
                 <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
-                <div className="content-container">
+                <div className="content-container" style={{ overflowY: isBrowser ? "none" : "scroll" }}>
                     <div>{`שלום ${name}`}</div>
                     <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                     <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                     <div>לכתובת:</div>
-                    <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
-                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '30%' }}>{comment}</div> : null}
-                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '20%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
-                    <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
+                    <div id="address-info" style={{ marginBottom: isBrowser ? '15%' : '0%' }}>{address}</div>
+                    {comment && comment.length ? <div style={{ marginBottom: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
+                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
+                    {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />
-                    </div>
+                    </div>}
                 </div>
 
             </div>
-            {openMap && <Map closeMap={closeOrOpenMap} isolated />}
+            {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} isolated />}
 
             {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>

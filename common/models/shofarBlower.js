@@ -19,7 +19,14 @@ module.exports = function (ShofarBlower) {
                     if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
                     if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
                     data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
-
+                    if (data.address && data.address[0]) {
+                        let addressArr = data.address[0]
+                        if (typeof addressArr === "string" && addressArr.length) {
+                            addressArr = addressArr.split(", ")
+                            let city = ShofarBlower.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                            data.city = city || addressArr[addressArr.length - 1];
+                        }
+                    }
                     let objToBlower = {
                         "userBlowerId": options.accessToken.userId,
                         "can_blow_x_times": data.can_blow_x_times,
@@ -28,6 +35,7 @@ module.exports = function (ShofarBlower) {
                     },
                         objToCU = {
                             "address": data.address[0],
+                            "city": data.city,
                             "lng": data.address[1].lng,
                             "lat": data.address[1].lat,
                             "comments": null

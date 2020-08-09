@@ -15,6 +15,7 @@
     //white background (the popup container)
     background-color: white;
     width: 90vw;
+    max-width: 600px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -40,8 +41,9 @@
       align-items: center;
       justify-content: space-evenly;
       button {
+        
         border-radius: 10px;
-        width: 15vw;
+        width: fit-content;
         max-width: 210px;
         padding: 10px 10px;
         h4 {
