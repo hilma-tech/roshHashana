@@ -198,24 +198,39 @@
             }
             .meeting-in-route-info-container {
                 display: flex;
-                flex-direction: column;
-                align-self: baseline;
-                justify-content: center;
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: space-between;
                 width: 80%;
                 background-color: white;
                 padding: 5px 15px;
                 box-shadow: 0px 3px 6px #00000029;
-                .meeting-in-route-title {
-                    width: fit-content;
-                    font-weight: bolder;
+                .meeting-in-route-info-1 {
+                    display: flex;
+                    flex-direction: column;
+                    align-self: baseline;
+                    justify-content: center;
+                    .meeting-in-route-title {
+                        width: fit-content;
+                        font-weight: bolder;
+                    }
+                    .meeting-in-route-location {
+                        width: fit-content;
+                        text-align: right;
+                    }
+                    .meeting-in-route-comments {
+                        width: fit-content;
+                        font-size: 0.9rem;
+                    }
                 }
-                .meeting-in-route-location {
-                    width: fit-content;
-                    text-align: right;
-                }
-                .meeting-in-route-comments {
-                    width: fit-content;
-                    font-size: 0.9rem;
+                .meeting-in-route-info-2 {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    img {
+                        width: 2rem;
+                    }
                 }
             }
         }
@@ -398,6 +413,7 @@
         width: 100%;
         .input-div {
             text-align: right;
+            cursor: default;
             @include input();
             width: 100%;
         }

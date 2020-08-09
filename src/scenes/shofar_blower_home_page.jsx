@@ -20,7 +20,7 @@ const SBHomePage = (props) => {
 
     const { showAlert, openGenAlert } = useContext(MainContext)
     const {
-        userData, setUserData, 
+        userData, setUserData,
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
         assignMeetingInfo } = useContext(SBContext)
@@ -48,7 +48,7 @@ const SBHomePage = (props) => {
         if (err || !mapContent) {
             const error = err === "NO_INTERNET" ? "אין חיבור לאינטרנט, לא ניתן לטעון את המידע" : (err.error && err.error.status === "401" ? false : "אירעה שגיאה, נא נסו שנית מאוחר יותר")
             error && openGenAlert({ text: error })
-            console.log("error getting sb map content ", err);
+            // console.log("error getting sb map content ", err);
         }
         if (mapContent === "NO_ADDRESS") {
             Auth.logout()
@@ -58,7 +58,8 @@ const SBHomePage = (props) => {
             //sort my routes by startTime, where closest (lowest) is first
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)
             if (!userData || (Array.isArray(userData) && !userData.length)) setUserData(mapContent.userData[0])
-            //if got .length == limit, call again -- and on SET need to check if already is data and then add and not set
+            //if got .length == limit, call again -- and on SET need to check if already have some data and then add and not set
+            console.log('mapContent: ', mapContent);
         }
         fetching = false
     }
@@ -67,7 +68,7 @@ const SBHomePage = (props) => {
     return (
         <div className="sb-homepage-container">
             {
-                !userData && !meetingsReqs && !myMeetings ? <img alt="" className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
+                !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}

@@ -36,7 +36,6 @@ const SBAssignMeeting = (props) => {
             closeAssign()
             return;
         }
-        console.log('handleAssignment: ');
         //set new route and remove meetingId from reqs array
         if (myMeetings.length == userData.can_blow_x_times) {
             openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבץ`, isPopup: { okayText: "הבנתי" } })

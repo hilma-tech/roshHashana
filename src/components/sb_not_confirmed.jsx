@@ -20,7 +20,7 @@ const SBNotConfirmed = (props) => {
     }
     const cancelVolunteering = () => {
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, (continuE) => {
-            if (!continuE) return
+            if (!continuE) return;
             deleteUser((error) => {
                 if (error) props.openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
             })
