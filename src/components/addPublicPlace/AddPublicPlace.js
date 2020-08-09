@@ -64,7 +64,6 @@ const AddPublicPlace = (props) => {
             {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
             {/* address inputs  */}
             <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={Array.isArray(address) && address[0] ? address[0] : address} className="address" />
-            {props.info && props.info.errMsg && <div className="err-msg">{props.info.errMsg}</div>}
             <input
                 maxLength={254}
                 autoComplete={'off'}
@@ -72,6 +71,7 @@ const AddPublicPlace = (props) => {
                 type="text"
                 placeholder="תיאור המקום"
                 value={comments}
+                style={props.info && props.info.errMsg ? { marginBottom: 0 } : {}}
                 onChange={
                     (e) => {
                         if (!/^[A-Zא-תa-z0-9 '"-]{0,}$/.test(e.target.value)) {
@@ -81,6 +81,7 @@ const AddPublicPlace = (props) => {
                         props.updatePublicPlace(props.index, "placeDescription", e.target.value)
                     }
                 } />
+            {props.info && props.info.errMsg && <div style={{ marginBottom: "5%" }} className="err-msg">{props.info.errMsg}</div>}
 
             {/* time input */}
             <ThemeProvider theme={materialTheme}>
