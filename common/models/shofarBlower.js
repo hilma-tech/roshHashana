@@ -47,7 +47,7 @@ module.exports = function (ShofarBlower) {
                         let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
                         //if the shofar blower added publicPlaces,
                         if (data.publicPlaces) {
-                            let [resPublicMeetings, errPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options));
+                            let [resPublicMeetings, errPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options, true));
                             if (resPublicMeetings) console.log("resPublicMeetings", resPublicMeetings)
                             if (errPublicMeetings) console.log("errPublicMeetings", errPublicMeetings)
                         }

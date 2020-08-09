@@ -10,7 +10,7 @@ module.exports = function (shofarBlowerPub) {
     // },]
 
     //this function excepts to get data as an array!!!!
-    shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options) => {
+    shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options, areConstMeetings) => {
         if (!Array.isArray(data)) { console.log("cannot get data in createNewPubMeeting cos not an array. data:", data); return; }
         let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {
@@ -32,6 +32,7 @@ module.exports = function (shofarBlowerPub) {
                     "lng": meetingData.address[1].lng,
                     "lat": meetingData.address[1].lat,
                     city,
+                    "constMeetings": areConstMeetings,
                     "comments": (meetingData.placeDescription && meetingData.placeDescription.length < 255) ? meetingData.placeDescription : (meetingData.comments && meetingData.comments.length < 255) ? meetingData.comments : '',
                     "start_time": meetingData.time,
                     "blowerId": blowerId
