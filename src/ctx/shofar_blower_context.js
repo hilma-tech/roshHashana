@@ -90,7 +90,7 @@ export const SBProvider = ({ children }) => {
 
 
 
-    const ctxValue = window.sbctx = {
+    const ctxValue =  {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
