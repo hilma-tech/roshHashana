@@ -7,29 +7,13 @@ import { MainContext } from '../../ctx/MainContext';
 import MarkerGenerator, { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 
 import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
 
-const mapOptions = {
-    fullscreenControl: false,
-    zoomControl: false,
-    streetViewControl: false,
-    mapTypeControl: false,
-    componentRestrictions: { country: "il" },
-    clickableIcons: false
-};
-const israelCoords = [
-    { lat: 32.863532, lng: 35.889902 },
-    { lat: 33.458826, lng: 35.881345 },
-    { lat: 33.107715, lng: 35.144508 },
-    { lat: 31.296718, lng: 34.180102 },
-    { lat: 29.486869, lng: 34.881321 },
-    { lat: 29.551662, lng: 34.984779 },
-];
 
 const getOverViewPath = async (google, origin, stops, extraData) => {
     if (!stops || !stops.length) {
@@ -205,14 +189,14 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     //MAP RESTRICTIONS - ISRAEL --START
     var israelPolygon = new window.google.maps.Polygon({
-        paths: israelCoords,
+        paths: CONSTS.ISRAEL_COORDS,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: '#FF0000',
         fillOpacity: 0.35
     });
-    
+
     console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
 
@@ -222,6 +206,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             bounds.extend(israelPolygon.getPaths().getAt(i).getAt(j));
         }
     }
+    let mapOptions = CONSTS.MAP_OPTIONS;
     mapOptions.restriction = {
         latLngBounds: bounds,
         strictBounds: false

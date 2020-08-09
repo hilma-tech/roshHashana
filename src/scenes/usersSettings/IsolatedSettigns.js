@@ -3,7 +3,7 @@ import { FormSearchBoxGenerator } from '../../components/maps/search_box_generat
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
 import { MainContext } from '../../ctx/MainContext';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import { isIOS } from "react-device-detect";
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';

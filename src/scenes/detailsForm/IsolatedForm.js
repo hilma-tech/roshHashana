@@ -5,7 +5,7 @@ import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateIsolatedDetails } from '../../fetch_and_utils';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 
 export default class IsolatedForm extends Component {
     constructor(props) {

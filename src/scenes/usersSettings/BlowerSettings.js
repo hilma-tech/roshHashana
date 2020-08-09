@@ -8,7 +8,7 @@ import { MainContext } from '../../ctx/MainContext';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
-import { CONSTS } from '../../const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';

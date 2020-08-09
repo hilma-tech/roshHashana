@@ -4,26 +4,11 @@ import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
+import {CONSTS} from '../../consts/const_messages';
 import './map.scss';
 import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
-const israelCoords = [
-    { lat: 32.863532, lng: 35.889902 },
-    { lat: 33.458826, lng: 35.881345 },
-    { lat: 33.107715, lng: 35.144508 },
-    { lat: 31.296718, lng: 34.180102 },
-    { lat: 29.486869, lng: 34.881321 },
-    { lat: 29.551662, lng: 34.984779 },
-];
 
-var mapOptions = {
-    fullscreenControl: false,
-    zoomControl: false,
-    streetViewControl: false,
-    mapTypeControl: false,
-    disableDefaultUI: true,
-    clickableIcons: false
-};
 
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
@@ -49,7 +34,7 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -162,7 +147,7 @@ const MapComp = (props) => {
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
@@ -179,9 +164,9 @@ export default MapComp;
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
-    let options = mapOptions;
+    let options = CONSTS.MAP_OPTIONS;
     var israelPolygon = new window.google.maps.Polygon({
-        paths: israelCoords,
+        paths: CONSTS.ISRAEL_COORDS,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,

@@ -1,5 +1,5 @@
 import Auth from './modules/auth/Auth'
-import { CONSTS } from './const_messages'
+import { CONSTS } from './consts/const_messages'
 
 
 export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
