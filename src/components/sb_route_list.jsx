@@ -1,18 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-
+import SBAssignMeeting from './sb_assign_meeting';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { changePosition } from '../fetch_and_utils';
 
 const SBRouteList = (props) => {
-    const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute } = useContext(SBContext);
-    const [startPoint, setStartPoint] = useState({});
-    useEffect(() => {
-        if (!userData) return null;
-        setStartPoint(userData)
-
-    }, []);
+    const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
+    if (!userData) return null;
 
     const textStart = "משך הליכה כולל"
     const msTT = totalTime
@@ -49,8 +44,13 @@ const SBRouteList = (props) => {
         );
     });
 
+    const openMeetingInfo = (meetingInfo) => {
+        console.log('heree')
+        setAssignMeetingInfo(meetingInfo);
+    }
+
     const createItemContent = (value, index) => {
-        return (<div key={"sb-route-list-" + index} className="meeting-in-route" >
+        return (<div key={"sb-route-list-" + index} className="meeting-in-route clickAble" onClick={() => openMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 <div className="meeting-in-route-img">
                     {index === -1 ?
@@ -78,18 +78,20 @@ const SBRouteList = (props) => {
         );
     };
     return (
-        <div className="sb-route-list" >
-            <div className="sb-side-list-title" >
-                מפת התקיעות שלי
+        assignMeetingInfo && typeof assignMeetingInfo === 'object' && Object.keys(assignMeetingInfo).length ?
+            <SBAssignMeeting notAssign />
+            : <div className="sb-route-list" >
+                <div className="sb-side-list-title" >
+                    מפת התקיעות שלי
             </div>
-            <div className="under-title">
-                {`${textStart}: ${textValue}`}
+                <div className="under-title">
+                    {`${textStart}: ${textValue}`}
+                </div>
+                <div className="sb-list">
+                    {userData && createItemContent(userData, -1)}
+                    <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
+                </div>
             </div>
-            <div className="sb-list">
-                {startPoint && createItemContent(startPoint, -1)}
-                <SortableList lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
-            </div>
-        </div>
     );
 }
 

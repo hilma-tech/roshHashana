@@ -397,6 +397,10 @@
         border: none;
         background-color: $orange;
     }
+    .delete-meeting {
+        text-decoration: underline;
+        color: $turquoise;
+    }
 }
 
 .sb-homepage-container {
