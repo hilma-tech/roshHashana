@@ -465,6 +465,7 @@ module.exports = function (CustomUser) {
                                 lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
                                 lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
                                 city,
+                                constMeeting: true,
                                 comments: publicMeeting.placeDescription || publicMeeting.comments,
                                 start_time: publicMeeting.time || publicMeeting.start_time,
                                 blowerId: userId
