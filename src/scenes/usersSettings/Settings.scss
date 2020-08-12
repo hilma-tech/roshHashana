@@ -27,12 +27,15 @@
         .MuiInputBase-input {
             width: 100% !important;
             @include input();
+            font-family: "Assistant", sans-serif !important;
             margin: 0 0 5% 0;
             box-sizing: border-box;
+            font-size: 1.3rem;
             &::-webkit-input-placeholder {
                 color: black;
-                opacity: 1;
-                font-size: 1rem;
+                opacity: 0.7;
+                font-size: 1.3rem;
+                padding-right: 2%;
             }
         }
         .MuiInput-underline:before {
@@ -105,7 +108,9 @@ input[type="number"] {
         font-size: 1.3rem;
         padding-right: 2%;
         color: black;
-        opacity: 0.9;
+        opacity: 0.7;
+
+
     }
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -125,7 +130,9 @@ input[type="number"] {
         font-size: 1.3rem;
         padding-right: 2%;
         color: black;
-        opacity: 0.9;
+        opacity: 0.7;
+
+
     }
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -143,7 +150,8 @@ input[type="number"] {
             font-size: 1.3rem;
             padding-right: 2%;
             color: black;
-            opacity: 0.9;
+            opacity: 0.7;
+
         }
         &::-webkit-inner-spin-button {
             -webkit-appearance: none;
