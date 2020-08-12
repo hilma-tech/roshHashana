@@ -91,3 +91,7 @@ export const changePosition = (array, from, to) => {
     array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
     return array;
 }
+
+export const splitJoinAddressOnIsrael = (address) => {
+    return address.split(", ישראל").join('') // maybe add a split on ישראל only
+}

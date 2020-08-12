@@ -3,7 +3,7 @@ import moment from 'moment'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SBAssignMeeting from './sb_assign_meeting';
 import { SBContext } from '../ctx/shofar_blower_context';
-import { changePosition } from '../fetch_and_utils';
+import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
 
 const SBRouteList = (props) => {
     const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
@@ -61,7 +61,7 @@ const SBRouteList = (props) => {
             <div className="meeting-in-route-info-container">
                 <div className="meeting-in-route-info-1">
                     <div className="meeting-in-route-title" >{index === -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : value.name)}</div>
-                    <div className="meeting-in-route-location" >{typeof value.address === "string" ? value.address.split(", ישראל").join('') : ""}</div>
+                    <div className="meeting-in-route-location" >{typeof value.address === "string" ? splitJoinAddressOnIsrael(value.address) : ""}</div>
                     <div className="meeting-in-route-comments" >{value.comments || ""}</div>
                 </div>
                 <div className="meeting-in-route-info-2">

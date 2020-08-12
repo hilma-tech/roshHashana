@@ -16,8 +16,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
 
 
-
-
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { err, data } = props
     if (err) return null;
@@ -203,18 +201,18 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
     <>
         {/* reqsLocs */
             Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
-                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.type} location={m.location} info={m.info} />)
+                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
                 : null}
         {/* myMLocs */
             Array.isArray(data.myMLocs) && data.myMLocs.length ?
-                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.iconType} location={m.location} info={m.info} />)
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
                 : null}
 
         {Array.isArray(routePath) ?
             <Polyline
                 path={routePath}
                 geodesic={false}
-                options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
+                options={{ strokeColor: '#82C0CC', strokeOpacity: 0.62, strokeWeight: 7, }}
             />
             : null
         }
@@ -226,7 +224,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }}
+                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 2 + Number(i * 2) }}
                     //todo: check change of opacity (i * 10?)
                     />
                 ))
