@@ -75,17 +75,15 @@ const SBAssignMeeting = (props) => {
             console.log('no window.google || no window.google.maps');
             return;
         }
+        // newStops should be without const meetings!
         const newStops = (Array.isArray(myMeetings) && myMeetings.length) ? [...myMeetings, assignMeetingInfo] : assignMeetingInfo
-        debugger
         let [errOP, resOP] = await getOverviewPath(window.google, { lat: Number(userData.lat), lng: Number(userData.lng) }, newStops, { getTimes: true, userData })
-        debugger
         if (errOP) {
             console.log('errOP: ', errOP);
             openGenAlert({ text: assign_error })
             return;
         }
         const newTotalTime = calcTotalNewTime(resOP)
-        debugger
 
         if (!newTotalTime) {
             console.log('no newTotalTime : ', newTotalTime);
@@ -150,7 +148,7 @@ const SBAssignMeeting = (props) => {
             </div>
 
             <div>
-                <div id="assign-title" className="width100" >{!props.notAssign ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
+                <div id="assign-title" className="width100" >{props.inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
                     <img id="assign-icon" src={iconSrc} />
@@ -165,7 +163,7 @@ const SBAssignMeeting = (props) => {
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 
-            {!props.notAssign ? <div className="delete-meeting clickAble">הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
+            {props.inRoute ? <div className="delete-meeting clickAble">הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
         </div>
     );
 }

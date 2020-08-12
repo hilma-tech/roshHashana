@@ -79,7 +79,7 @@ const SBRouteList = (props) => {
     };
     return (
         assignMeetingInfo && typeof assignMeetingInfo === 'object' && Object.keys(assignMeetingInfo).length ?
-            <SBAssignMeeting notAssign />
+            <SBAssignMeeting inRoute />
             : <div className="sb-route-list" >
                 <div className="sb-side-list-title" >
                     מפת התקיעות שלי
