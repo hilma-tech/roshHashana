@@ -24,7 +24,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings
+        setMyMeetings, myMeetings
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -43,7 +43,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
-    }, [])
+    }, [myMeetings])
 
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
@@ -73,8 +73,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             //get times only if there is a stop (a meeting) that doesn't have a start time
             //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
             // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
-            let getTimes = true
-            let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData })
+            let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
@@ -83,7 +82,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                 return false
             }
-            getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
+            for (let m of myMeetings) {
+                // if(!m || !m.startTime || new Date(m.startTime) ==z)
+            }
+            setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
             setRoutePath(res.overviewPath)
         }
 
@@ -127,7 +129,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillOpacity: 0.35
     });
 
-    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null

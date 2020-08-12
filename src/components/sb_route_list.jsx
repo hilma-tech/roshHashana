@@ -4,7 +4,6 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SBAssignMeeting from './sb_assign_meeting';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
-import { type } from 'jquery';
 
 
 const SBRouteList = (props) => {
@@ -44,6 +43,7 @@ const SBRouteList = (props) => {
     }, []);
 
     if (!userData) return null;
+    
 
 
     const textStart = "משך הליכה כולל"
