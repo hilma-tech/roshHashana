@@ -72,7 +72,7 @@ export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
         <Marker
             icon={icon}
             onClick={closeOrOpenInfoWindow}
-            position={{ lat: latNum, lng: lngNum }}>
+            position={new window.google.maps.LatLng(latNum, lngNum)}>
             {info && isInfoWindowOpen ? <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow> : null}
         </Marker>
     );

@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
-import { SBContext } from '../ctx/shofar_blower_context';
 
 import moment from 'moment'
 
@@ -10,10 +9,44 @@ import SBAssignMeeting from './sb_assign_meeting';
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
 
 const SBRouteList = (props) => {
-    
-    const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
+    const [myRoute, setMyRoute] = useState([]);
+    const [constB4, setConstB4] = useState([]);
+    const [constAfter, setConstAfter] = useState([]);
+    const [meetingInfo, setMeetingInfo] = useState(false);
+    const { userData, totalTime, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, assignMeetingInfo, isInRoute, setIsInRoute } = useContext(SBContext);
+    const CONST_MEETING = 'CONST_MEETING';
+
+    useEffect(() => {
+        //sort all meetings and Separation between const meetings and the route
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const routeStops = [];
+        const constStopsB4 = [];
+        const constStopsAfter = [];
+        let meetingStartTime;
+
+        //fill routeStops, constStopsb4 and constStopsAfter
+        for (let i in myMeetings) {
+            meetingStartTime = new Date(myMeetings[i].startTime).getTime()
+            if (myMeetings[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
+                // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
+                if (meetingStartTime < userStartTime) {
+                    constStopsB4.push(myMeetings[i])
+                } else {
+                    // console.log('pushing as a AFTER const stop: ', myMeetings[i]);
+                    constStopsAfter.push(myMeetings[i])
+                }
+            }
+            else routeStops.push(myMeetings[i])
+        }
+        setConstAfter(constStopsAfter);
+        setConstB4(constStopsB4);
+        setMyRoute(routeStops);
+    }, []);
+
     if (!userData) return null;
     
+
 
     const textStart = "משך הליכה כולל"
     const msTT = totalTime
@@ -50,18 +83,18 @@ const SBRouteList = (props) => {
         );
     });
 
-    const openMeetingInfo = (meetingInfo) => {
-        console.log('heree')
-        setAssignMeetingInfo(meetingInfo);
+    const openOrCloseMeetingInfo = (val) => {
+        setIsInRoute(true);
+        setAssignMeetingInfo(val);
     }
 
     const createItemContent = (value, index) => {
-        return (<div key={"sb-route-list-" + index} className="meeting-in-route clickAble" onClick={() => openMeetingInfo(value)}>
+        return (<div key={"sb-route-list-" + index} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 <div className="meeting-in-route-img">
                     {index === -1 ?
                         <img src="/icons/white_shofar.svg" />
-                        : index + 1}
+                        : index === CONST_MEETING ? '' : index + 1}
                 </div>
             </div>
             <div className="meeting-in-route-info-container">
@@ -79,25 +112,30 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        setMyRoute(
-            changePosition(myRoute, oldIndex, newIndex),
-        );
+        let newRoute = changePosition(myRoute, oldIndex, newIndex);
+        //update myRoute and myMeetings according to the reordering
+        setMyRoute(newRoute,);
+        setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
     return (
-        assignMeetingInfo && typeof assignMeetingInfo === 'object' && Object.keys(assignMeetingInfo).length ?
-            <SBAssignMeeting inRoute />
-            : <div className="sb-route-list" >
-                <div className="sb-side-list-title" >
-                    מפת התקיעות שלי
+        <div className="sb-route-list" >
+            <div className="sb-side-list-title" >
+                מפת התקיעות שלי
             </div>
-                <div className="under-title">
-                    {`${textStart}: ${textValue}`}
-                </div>
-                <div className="sb-list">
-                    {userData && createItemContent(userData, -1)}
-                    <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
-                </div>
+            <div className="under-title">
+                {`${textStart}: ${textValue}`}
             </div>
+            <div className="sb-list">
+                {constB4 && Array.isArray(constB4) && constB4.map((item) => {
+                    return createItemContent(item, CONST_MEETING);
+                })}
+                {userData && createItemContent(userData, -1)}
+                <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
+                {constAfter && Array.isArray(constAfter) && constAfter.map((item) => {
+                    return createItemContent(item, CONST_MEETING);
+                })}
+            </div>
+        </div>
     );
 }
 

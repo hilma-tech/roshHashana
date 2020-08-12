@@ -74,6 +74,7 @@
             border: 0;
             font-size: 1rem;
             outline: none;
+            width: 80%;
             text-overflow: ellipsis;
         }
         #sb-search-icon {
@@ -87,7 +88,9 @@
 
     height: 100%;
     overflow-y: auto;
-    
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     #sb-route-list-top {
         height: 80px;

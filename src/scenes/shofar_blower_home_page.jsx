@@ -23,6 +23,7 @@ const SBHomePage = (props) => {
         userData, setUserData,
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
+        isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
 
 
@@ -70,7 +71,7 @@ const SBHomePage = (props) => {
                 !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute}/> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}

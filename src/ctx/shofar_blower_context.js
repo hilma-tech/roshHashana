@@ -20,6 +20,7 @@ export const SBProvider = ({ children }) => {
     const [startTimes, setStartTimes] = useState(null)
     const [totalTime, setTotalTime] = useState(null)
     const [totalLength, setTotalLength] = useState(null)
+    const [isInRoute, setIsInRoute] = useState(false)
 
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
@@ -37,7 +38,6 @@ export const SBProvider = ({ children }) => {
         if (startTimes) setTotalLength(getTotalLength())
         if (Array.isArray(myMeetings) && myMeetings.length) setTotalTime(getTotalTime())
     }, [startTimes, myMeetings])
-    
 
     const ctxValue = window.sbctx = {
         userData, myMeetings, meetingsReqs,
@@ -45,6 +45,7 @@ export const SBProvider = ({ children }) => {
         assignMeetingInfo, setAssignMeetingInfo,
         assigns, setAssigns,
         startTimes, setStartTimes,
+        isInRoute, setIsInRoute,
         totalTime, totalLength,
     }
 
