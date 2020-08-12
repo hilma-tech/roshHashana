@@ -129,7 +129,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillOpacity: 0.35
     });
 
-    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null

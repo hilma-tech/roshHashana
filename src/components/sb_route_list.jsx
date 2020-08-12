@@ -5,6 +5,8 @@ import SBAssignMeeting from './sb_assign_meeting';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
 
+import { SBContext } from '../ctx/shofar_blower_context';
+
 const SBRouteList = (props) => {
     
     const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
