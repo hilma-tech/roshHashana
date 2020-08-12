@@ -120,6 +120,21 @@
               "nullable": "Y"
             }
         },
+        "constMeeting": {
+            "type": "Number",
+            "required": true,
+            "length": null,
+            "precision": 10,
+            "scale": 0,
+            "mysql": {
+                "columnName": "constMeeting",
+                "dataType": "tinyint",
+                "dataLength": null,
+                "dataPrecision": 10,
+                "dataScale": 0,
+                "nullable": "Y"
+            }
+        },
         "lng": "string",
         "lat": "string"
     },
