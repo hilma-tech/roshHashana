@@ -29,12 +29,8 @@
       flex-direction: row-reverse;
       justify-content: space-between;
       align-items: center;
-      .coap-img {
-         height: 1.5rem;
+      img {
          filter: drop-shadow(8px 8px 10px rgba(0, 0, 0, 0.363));
-      }
-      .bigger-logo {
-         height: 1.8rem;
       }
    }
 
@@ -139,16 +135,6 @@
          height: fit-content;
          margin-left: auto;
          margin-right: auto;
-      }
-   }
-}
-
-@media only screen and (min-width: 1000px) {
-   .HomePage {
-      .coap-imgs-container {
-         .coap-img {
-            height: 2.5rem;
-         }
       }
    }
 }
