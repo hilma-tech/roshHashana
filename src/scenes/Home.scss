@@ -29,12 +29,8 @@
       flex-direction: row-reverse;
       justify-content: space-between;
       align-items: center;
-      .coap-img {
-         height: 1.5rem;
+      img {
          filter: drop-shadow(8px 8px 10px rgba(0, 0, 0, 0.363));
-      }
-      .bigger-logo {
-         height: 1.8rem;
       }
    }
 

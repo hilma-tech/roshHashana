@@ -161,7 +161,7 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
-        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "5%" : "22%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "12%" : "22%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
         {this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :

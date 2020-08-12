@@ -22,11 +22,11 @@ const Home = (props) => {
 
     return (
         <>
-            <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex' }} >
-                <div className="coap-imgs-container" style={{ width: isBrowser ? '20%' : '65%'}}>
-                    <img className="coap-img" src="/images/hilma.svg" />
-                    <img className="coap-img bigger-logo" src="/images/AMITlogo.png" />
-                    <img className="coap-img" src="/images/SynagogueOrg.png" />
+            <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: isBrowser ? '8%' : '5%' }} >
+                <div className="coap-imgs-container" style={{ width: isBrowser ? '35%' : '65%' }}>
+                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" />
+                    <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
+                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/SynagogueOrg.png" />
                 </div>
                 <div className="content-container" >
 
