@@ -39,7 +39,7 @@ export const SBProvider = ({ children }) => {
     }, [startTimes, myMeetings])
     
 
-    const ctxValue =  {
+    const ctxValue = window.sbctx = {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
