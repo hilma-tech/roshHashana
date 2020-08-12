@@ -4,8 +4,8 @@ import Map from '../components/maps/map';
 import './Home.scss'
 
 const Home = (props) => {
-    const allMeeting ="לכל מפגשי \n תקיעות שופר בארץ"
-    const stuckHouse ="תקועים בבית? \n אנחנו נדאג לכם לתקיעת שופר"
+    const allMeeting = "לכל מפגשי \n תקיעות שופר בארץ"
+    const stuckHouse = "תקועים בבית? \n אנחנו נדאג לכם לתקיעת שופר"
     const [openMap, setOpenMap] = useState(false);
     //detects the number of the images that were loaded
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
@@ -22,7 +22,12 @@ const Home = (props) => {
 
     return (
         <>
-            <div className={`HomePage d-flex justify-content-center align-items-center ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'block' }} >
+            <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex' }} >
+                <div className="coap-imgs-container" style={{ width: isBrowser ? '20%' : '65%'}}>
+                    <img className="coap-img" src="/images/hilma.svg" />
+                    <img className="coap-img bigger-logo" src="/images/AMITlogo.png" />
+                    <img className="coap-img" src="/images/SynagogueOrg.png" />
+                </div>
                 <div className="content-container" >
 
                     <img alt="" style={{ width: isBrowser ? '21vw' : '67vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
@@ -42,7 +47,7 @@ const Home = (props) => {
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
                     </>
                         : <>
-                            <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "12%", whiteSpace: "pre-line", lineHeight: "1.2"}}>{allMeeting}</div>
+                            <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "12%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
                 </div>
