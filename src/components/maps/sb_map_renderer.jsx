@@ -14,6 +14,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
+import { updateMyStartTime } from '../../fetch_and_utils';
 
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
@@ -77,15 +78,30 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-            const getMyST = (mId) => {
-                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
+            console.log('newStartTimes: ', newStartTimes);
+            const getMyNewST = (mId, isPub) => {
+                console.log('mId: ', mId);
+                console.log('isPub: ', isPub);
+                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                 return false
             }
-            for (let m of myMeetings) {
-                if(!m || !m.startTime || new Date(m.startTime) ==)
+            const meetingsToUpdateST = [];
+            for (let m of routeStops) {
+                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
+                // console.log('curr start time: ', new Date(m.startTime).toJSON());
+                // console.log('myNewStartTime: ', myNewStartTime);
+                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime)
+                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
-            setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
+            if (meetingsToUpdateST && meetingsToUpdateST.length) {
+                console.log("calling updateMyStartTime with ", meetingsToUpdateST);
+                updateMyStartTime(meetingsToUpdateST, (error => {
+                    console.log('updateMyStartTime error: ', error);
+                    if (error) { openGenAlert({ text: error }) }
+                }))
+            }
+            // setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId, m.isPublicMeeting) || new Date(m.startTime).toJSON() })))
             setRoutePath(res.overviewPath)
         }
 

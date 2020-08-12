@@ -38,7 +38,7 @@ const getConstMeetings = (MyMeetings, userData) => {
 }
 
 
-const SBAssignMeeting = (props) => {
+const SBAssignMeeting = ({ history, inRoute }) => {
 
     const { openGenAlert } = useContext(MainContext)
     const { userData,
@@ -65,7 +65,7 @@ const SBAssignMeeting = (props) => {
 
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
-        props.history.push('/')
+        history.push('/')
         return;
     }
 
@@ -184,7 +184,7 @@ const SBAssignMeeting = (props) => {
             </div>
 
             <div>
-                <div id="assign-title" className="width100" >{props.inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
+                <div id="assign-title" className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
                     <img id="assign-icon" src={iconSrc} />
@@ -199,7 +199,7 @@ const SBAssignMeeting = (props) => {
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 
-            {props.inRoute ? <div className="delete-meeting clickAble">הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
+            {inRoute ? <div className="delete-meeting clickAble">הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
         </div>
     );
 }

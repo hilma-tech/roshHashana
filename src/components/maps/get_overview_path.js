@@ -3,7 +3,7 @@ import { CONSTS } from '../../consts/const_messages'
 
 
 export const getOverviewPath = async (google, origin, stops, extraData) => {
-    console.log('stops: ', stops);
+    extraData && extraData.getTimes && console.log('stops: ', stops);
 
     /**
     * origin: { lng: double, lat: double }
@@ -33,9 +33,9 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
         destination = {}
     }
 
-    console.log('> origin: ', { ...origin });
-    console.log('> waypoints: ', [...waypoints]);
-    console.log('> destination: ', { ...destination });
+    // console.log('> origin: ', { ...origin });
+    // console.log('> waypoints: ', [...waypoints]);
+    // console.log('> destination: ', { ...destination });
 
     let directionsService = new google.maps.DirectionsService();
 
@@ -70,7 +70,7 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
                     } else {
                         prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
                     }
-                    res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
+                    res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, isPublicMeeting: stops[i].isPublicMeeting, startTime: Number(prevStartTimeVal) + legDuration })
                 }
             }
             res.overviewPath = result.routes[0].overview_path

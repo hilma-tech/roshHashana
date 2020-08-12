@@ -1,6 +1,7 @@
 import Auth from './modules/auth/Auth'
 import { CONSTS } from './consts/const_messages'
 
+//* UTILS are at bottom ...
 
 export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlower`, {
@@ -46,14 +47,25 @@ export const deleteUser = async (cb = () => { }) => {
     });
     if (res && res.res === 'SUCCESS') {
         Auth.logout(window.location.href = window.location.origin);
-        cb(false) //no error
+        typeof cb === "function" && cb(false) //no error
     }
     else
-        cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "סליחה, הפעולה נכשלה, נא נסו שנית מאוחר יותר") //yes error
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "סליחה, הפעולה נכשלה, נא נסו שנית מאוחר יותר") //yes error
 }
 
+export const updateMyStartTime = async (obj, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/updateMyStartTime`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ meetings: obj })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
+    }
+    else
+    typeof cb === "function" && cb(false) //no error
 
-
+}
 
 
 
