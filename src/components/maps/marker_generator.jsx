@@ -49,25 +49,25 @@ export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
      * info: info window on click
      * iconType: type of meeting, so we know the right icon
      **/
-
+    
     const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
-
+    
     const closeOrOpenInfoWindow = () => setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen)
-
+    
     if (!location || !location.lng || !location.lat) return null;
     let latNum = Number(location.lat)
     let lngNum = Number(location.lng)
     if (isNaN(latNum) || isNaN(lngNum)) return null
-
+    
     let iconUrl = (iconType === PRIVATE_MEETING) ? '/icons/single-blue.svg' : '/icons/group-orange.svg';
-
+    
     const icon = markerIcon || {
         url: iconUrl,
         scaledSize: (iconType === PRIVATE_MEETING) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(25, 25), // changes position of icon
     }
-
+    
     return (
         <Marker
             icon={icon}

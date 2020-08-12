@@ -6,8 +6,10 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
 
 const SBRouteList = (props) => {
+    
     const { userData, totalTime, totalLength, myMeetings: myRoute, setMyMeetings: setMyRoute, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
     if (!userData) return null;
+    
 
     const textStart = "משך הליכה כולל"
     const msTT = totalTime

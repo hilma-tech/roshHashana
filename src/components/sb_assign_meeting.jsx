@@ -11,7 +11,35 @@ import { getOverviewPath } from './maps/get_overview_path';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
 
+
+const getConstMeetings = (MyMeetings, userData) => {
+    const userStartTime = new Date(userData.startTime).getTime()
+    const userEndTime = userStartTime + userData.maxRouteDuration;
+    const routeStops = [];
+    const constStopsB4 = [];
+    const constStopsAfter = [];
+    let meetingStartTime;
+
+    //fill routeStops, constStopsb4 and constStopsAfter
+    for (let i in MyMeetings) {
+        meetingStartTime = new Date(MyMeetings[i].startTime).getTime()
+        if (MyMeetings[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
+            // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
+            if (meetingStartTime < userStartTime) {
+                constStopsB4.push(MyMeetings[i])
+            } else {
+                // console.log('pushing as a AFTER const stop: ', MyMeetings[i]);
+                constStopsAfter.push(MyMeetings[i])
+            }
+        }
+        else routeStops.push(MyMeetings[i])
+    }
+    return { routeStops, constStopsB4, constStopsAfter }
+}
+
+
 const SBAssignMeeting = (props) => {
+
     const { openGenAlert } = useContext(MainContext)
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
@@ -52,8 +80,15 @@ const SBAssignMeeting = (props) => {
 
     const calcTotalNewTime = (obj) => {
         if (!obj.startTimes || !Array.isArray(obj.startTimes)) return null
-        const totalTime = obj.startTimes.reduce((accumulator, st) => st.duration && st.duration.value ? (accumulator + Number(st.duration.value)) : null, 0) * 1000
-        return totalTime;
+        let totalTime = obj.startTimes.reduce((accumulator, st) => st.duration && st.duration.value ? (accumulator + Number(st.duration.value)) : null, 0) * 1000
+        console.log('totalTime: ', totalTime);
+        let newTotalTime = Number(totalTime) / 60000
+        try {
+            let splitTT = newTotalTime.toString().split(".")
+            newTotalTime = `${splitTT[0]}.${typeof splitTT[1] === "string" ? splitTT[1].substring(0, 2) : "00"}`
+            console.log('newTotalTime: ', newTotalTime);
+        } catch (e) { newTotalTime = totalTime }
+        return newTotalTime;
     }
 
 
@@ -76,7 +111,8 @@ const SBAssignMeeting = (props) => {
             return;
         }
         // newStops should be without const meetings!
-        const newStops = (Array.isArray(myMeetings) && myMeetings.length) ? [...myMeetings, assignMeetingInfo] : assignMeetingInfo
+        const { routeStops, constStopsB4, constStopsAfter } = getConstMeetings(myMeetings, userData)
+        const newStops = (Array.isArray(routeStops) && routeStops.length) ? [...routeStops, assignMeetingInfo] : assignMeetingInfo
         let [errOP, resOP] = await getOverviewPath(window.google, { lat: Number(userData.lat), lng: Number(userData.lng) }, newStops, { getTimes: true, userData })
         if (errOP) {
             console.log('errOP: ', errOP);
@@ -93,7 +129,7 @@ const SBAssignMeeting = (props) => {
 
         // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --START
         if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
-            openGenAlert({ text: `זמן המסלול לאחר השיבוץ שלך יהיה ${newTotalTime / 60000} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${userData.maxRouteDuration / 60000} דקות, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
+            openGenAlert({ text: `זמן המסלול לאחר השיבוץ שלך יהיה ${newTotalTime} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${userData.maxRouteDuration / 60000} דקות, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
             return;
         }
         // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --END
