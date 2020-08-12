@@ -59,6 +59,14 @@ const AddPublicPlace = (props) => {
         props.updatePublicPlace(props.index, 'address', address);
         setAddress(address);
     }
+    const handleCommentsChange = (e) => {
+        if (e.target.value && e.target.value.length && !/^[A-Zא-תa-z0-9 '"-]{0,}$/.test(e.target.value)) {
+            return;
+        }
+        setComments(e.target.value)
+        props.updatePublicPlace(props.index, "comments", e.target.value)
+    }
+
     return (
         <div id="public-place-container">
             {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
@@ -72,15 +80,7 @@ const AddPublicPlace = (props) => {
                 placeholder="תיאור המקום"
                 value={comments}
                 style={props.info && props.info.errMsg ? { marginBottom: 0 } : {}}
-                onChange={
-                    (e) => {
-                        if (!/^[A-Zא-תa-z0-9 '"-]{0,}$/.test(e.target.value)) {
-                            return;
-                        }
-                        setComments(e.target.value)
-                        props.updatePublicPlace(props.index, "placeDescription", e.target.value)
-                    }
-                } />
+                onChange={handleCommentsChange} />
             {props.info && props.info.errMsg && <div style={{ marginBottom: "5%" }} className="err-msg">{props.info.errMsg}</div>}
 
             {/* time input */}
