@@ -6,17 +6,43 @@
    background-repeat: no-repeat;
    background-size: cover;
    height: 100vh;
+   min-height: fit-content;
+   overflow-y: auto;
    width: 100%;
    position: absolute;
    top: 0;
    left: 0;
    padding: 5% 2.5%;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   align-items: center;
+   &::-webkit-scrollbar {
+      display: none;
+   }
+
+   .coap-imgs-container {
+      position: relative;
+      top: 2%;
+      margin: 0 auto 2% auto;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: center;
+      img {
+         filter: drop-shadow(8px 8px 10px rgba(0, 0, 0, 0.363));
+      }
+   }
 
    .content-container {
-      margin: auto;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
    }
    #text1 {
-      font-size: 205%;
+      font-size: 5vh;
       margin-top: 1%;
       font-weight: bold;
    }

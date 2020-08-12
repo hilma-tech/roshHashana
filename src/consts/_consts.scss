@@ -18,5 +18,8 @@ $light-grey-bg: #f6f6f6;
     background-color: transparent;
     &::placeholder {
         font-size: 1rem;
+        opacity: 0.7;
+
+
     }
 }
