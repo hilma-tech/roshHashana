@@ -4,13 +4,15 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SBAssignMeeting from './sb_assign_meeting';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
+import { type } from 'jquery';
 
 
 const SBRouteList = (props) => {
     const [myRoute, setMyRoute] = useState([]);
     const [constB4, setConstB4] = useState([]);
     const [constAfter, setConstAfter] = useState([]);
-    const { userData, totalTime, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, assignMeetingInfo } = useContext(SBContext);
+    const [meetingInfo, setMeetingInfo] = useState(false);
+    const { userData, totalTime, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, assignMeetingInfo, isInRoute, setIsInRoute } = useContext(SBContext);
     const CONST_MEETING = 'CONST_MEETING';
 
     useEffect(() => {
@@ -79,12 +81,13 @@ const SBRouteList = (props) => {
         );
     });
 
-    const openMeetingInfo = (meetingInfo) => {
-        setAssignMeetingInfo(meetingInfo);
+    const openOrCloseMeetingInfo = (val) => {
+        setIsInRoute(true);
+        setAssignMeetingInfo(val);
     }
 
     const createItemContent = (value, index) => {
-        return (<div key={"sb-route-list-" + index} className="meeting-in-route clickAble" onClick={() => openMeetingInfo(value)}>
+        return (<div key={"sb-route-list-" + index} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 <div className="meeting-in-route-img">
                     {index === -1 ?
@@ -107,41 +110,30 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        console.log('route', changePosition(myRoute, oldIndex, newIndex))
-        console.log('meetings', myMeetings)
-        let sortedMyMeetings = myMeetings.sort((a, b) => {
-
-        })
-
-        let meetings = [...myMeetings]; //copy my meetings array
-        for (i in myMeetings) {
-
-        }
-        setMyRoute(
-            changePosition(myRoute, oldIndex, newIndex),
-        );
+        let newRoute = changePosition(myRoute, oldIndex, newIndex);
+        //update myRoute and myMeetings according to the reordering
+        setMyRoute(newRoute,);
+        setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
     return (
-        assignMeetingInfo && typeof assignMeetingInfo === 'object' && Object.keys(assignMeetingInfo).length ?
-            <SBAssignMeeting inRoute />
-            : <div className="sb-route-list" >
-                <div className="sb-side-list-title" >
-                    מפת התקיעות שלי
+        <div className="sb-route-list" >
+            <div className="sb-side-list-title" >
+                מפת התקיעות שלי
             </div>
-                <div className="under-title">
-                    {`${textStart}: ${textValue}`}
-                </div>
-                <div className="sb-list">
-                    {constB4 && Array.isArray(constB4) && constB4.map((item) => {
-                        return createItemContent(item, CONST_MEETING);
-                    })}
-                    {userData && createItemContent(userData, -1)}
-                    <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
-                    {constAfter && Array.isArray(constAfter) && constAfter.map((item) => {
-                        return createItemContent(item, CONST_MEETING);
-                    })}
-                </div>
+            <div className="under-title">
+                {`${textStart}: ${textValue}`}
             </div>
+            <div className="sb-list">
+                {constB4 && Array.isArray(constB4) && constB4.map((item) => {
+                    return createItemContent(item, CONST_MEETING);
+                })}
+                {userData && createItemContent(userData, -1)}
+                <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
+                {constAfter && Array.isArray(constAfter) && constAfter.map((item) => {
+                    return createItemContent(item, CONST_MEETING);
+                })}
+            </div>
+        </div>
     );
 }
 

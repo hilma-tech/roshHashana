@@ -470,7 +470,6 @@ module.exports = function (CustomUser) {
                                 blowerId: userId
                             }
                         })
-                        console.log("publicMeetingsArr to create", publicMeetingsArr)
                         const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
                         if (errDeletePublicMeetings) {
                             console.log("errCreatePublicMeetings", errCreatePublicMeetings)

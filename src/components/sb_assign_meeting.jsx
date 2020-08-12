@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { isBrowser } from 'react-device-detect';
-
+import Auth from '../modules/auth/Auth';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
@@ -17,6 +17,7 @@ const SBAssignMeeting = (props) => {
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
         meetingsReqs, setMeetingsReqs,
+        setIsInRoute,
         startTimes, totalTime
     } = useContext(SBContext)
 
@@ -44,6 +45,7 @@ const SBAssignMeeting = (props) => {
     const closeAssign = () => {
         if (isBrowser) {
             setAssignMeetingInfo(null)
+            setIsInRoute(false);
             return
         }
         setOpenRouteList(false)
@@ -127,6 +129,22 @@ const SBAssignMeeting = (props) => {
 
     }
 
+    const deleteMeeting = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ meetToDelete: assignMeetingInfo })
+        });
+        if (err || !res) { //open alert of something went wrong
+            openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
+        }
+        if (res) {
+            openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
+            setMyMeetings(myMeetings.filter(meet => meet.meetingId !== assignMeetingInfo.meetingId))
+            handleAssignment('close');
+        }
+    }
+
     let iconSrc;
     let iconText;
     if (assignMeetingInfo.isPublicMeeting) {
@@ -163,7 +181,7 @@ const SBAssignMeeting = (props) => {
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 
-            {props.inRoute ? <div className="delete-meeting clickAble">הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
+            {props.inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
         </div>
     );
 }
