@@ -32,7 +32,7 @@ module.exports = function (shofarBlowerPub) {
                     "lng": meetingData.address[1].lng,
                     "lat": meetingData.address[1].lat,
                     city,
-                    "constMeetings": areConstMeetings,
+                    "constMeeting": areConstMeetings,
                     "comments": (meetingData.placeDescription && meetingData.placeDescription.length < 255) ? meetingData.placeDescription : (meetingData.comments && meetingData.comments.length < 255) ? meetingData.comments : '',
                     "start_time": meetingData.time,
                     "blowerId": blowerId

@@ -71,7 +71,6 @@ const IsolatedSettings = (props) => {
     }
 
     const addPublicPlace = () => {
-        console.log("addPublicPlace")
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
@@ -116,7 +115,7 @@ const IsolatedSettings = (props) => {
     }
 
 
-    const updateIsolatedInfo = async (fromX) => {
+    const updateBlowerInfo = async (fromX) => {
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -246,7 +245,7 @@ const IsolatedSettings = (props) => {
 
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings />}>
+            <SettingsLayout handleUpdate={() => { updateBlowerInfo(false) }} handleClose={() => { updateBlowerInfo(true) }} map={<Map blower settings />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
