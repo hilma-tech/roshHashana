@@ -83,7 +83,7 @@ export default class IsolatedForm extends Component {
     //update the public meeting that the shofar blower added
     updatePublicPlace = (index, keyName, publicPlaceVal) => {
         let publicPlaces = this.state.publicPlaces;
-        if (keyName === 'comments' && publicPlaceVal && publicPlaceVal.length && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaceVal)) {
+        if (keyName === 'comments' && publicPlaceVal && publicPlaceVal.length && !/^[A-Zא-תa-z 0-9'"-]$/.test(publicPlaceVal)) {
             this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
             return;
         }

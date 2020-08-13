@@ -142,6 +142,9 @@
             color: $light-blue;
             font-size: 1.2rem;
         }
+        .info-msg {
+            font-size: 0.9rem;
+        }
         .sb-list {
             // all lists - my route -and- all meetings
             overflow-wrap: break-word;
@@ -489,7 +492,7 @@
         flex-direction: row;
         align-items: flex-end;
         justify-content: space-between;
-        width: 80%;
+        width: 85%;
         background-color: white;
         padding: 5px 15px;
         box-shadow: 0px 3px 6px #00000029;
@@ -520,5 +523,11 @@
                 width: 2rem;
             }
         }
+    }
+}
+
+.sort-item-container {
+    .meeting-in-route-info-container {
+        background-color: #c3e7effc;
     }
 }

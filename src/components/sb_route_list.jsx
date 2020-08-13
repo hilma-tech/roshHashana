@@ -1,19 +1,20 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { SBContext } from '../ctx/shofar_blower_context';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 import moment from 'moment'
 
-
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
+
+
 
 const SBRouteList = (props) => {
     const [myRoute, setMyRoute] = useState([]);
     const [constB4, setConstB4] = useState([]);
     const [constAfter, setConstAfter] = useState([]);
-    const [meetingInfo, setMeetingInfo] = useState(false);
     const { userData, totalTime, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, assignMeetingInfo, isInRoute, setIsInRoute } = useContext(SBContext);
     const CONST_MEETING = 'CONST_MEETING';
+    const container = useRef(null);
 
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
@@ -65,7 +66,8 @@ const SBRouteList = (props) => {
     }
 
 
-    const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}`
+    // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}`
+    const textValue = ` ${length ? `${length} ${lengthUnits}` : ""}`
     // textValue = `35 דקות (3 ק"מ)`//testing   
 
     const SortableItem = SortableElement(({ value }) =>
@@ -90,13 +92,13 @@ const SBRouteList = (props) => {
     const createItemContent = (value, index) => {
         return (<div key={"sb-route-list-" + index} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
-                <div className="meeting-in-route-img">
+                {index !== CONST_MEETING ? <div className="meeting-in-route-img">
                     {index === -1 ?
                         <img src="/icons/white_shofar.svg" />
-                        : index === CONST_MEETING ? '' : index + 1}
-                </div>
+                        : index + 1}
+                </div> : null}
             </div>
-            <div className="meeting-in-route-info-container">
+            <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">
                     <div className="meeting-in-route-title" >{index === -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : value.name)}</div>
                     <div className="meeting-in-route-location" >{typeof value.address === "string" ? splitJoinAddressOnIsrael(value.address) : ""}</div>
@@ -117,20 +119,33 @@ const SBRouteList = (props) => {
         setMyRoute(newRoute,);
         setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
+
     return (
         <div className="sb-route-list" >
             <div className="sb-side-list-title" >
                 מפת התקיעות שלי
             </div>
-            <div className="under-title">
+            {textValue ? <div className="under-title">
                 {`${textStart}: ${textValue}`}
-            </div>
-            <div className="sb-list">
+            </div> : null}
+            <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>
+            <div className="sb-list" id="sb-list" ref={container}>
+                {console.log(document.getElementById('sb-list'))}
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => {
                     return createItemContent(item, CONST_MEETING);
                 })}
                 {userData && createItemContent(userData, -1)}
-                <SortableList distance={1} lockToContainerEdges={true} lockAxis={'y'} items={myRoute} onSortEnd={onSortEnd} />
+                {console.log(container, 'container')
+                }
+                <SortableList
+                    helperClass="sort-item-container"
+                    distance={1}
+                    lockToContainerEdges={true}
+                    helperContainer={() => container.current}
+                    lockAxis={'y'}
+                    items={myRoute}
+                    onSortEnd={onSortEnd}
+                />
                 {constAfter && Array.isArray(constAfter) && constAfter.map((item) => {
                     return createItemContent(item, CONST_MEETING);
                 })}
