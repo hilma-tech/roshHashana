@@ -32,7 +32,7 @@
 
 
 
-
+while working on the project, NOTICE: to identify a specific meeting, you will need meetingId _and_ isPublicMeeting (with those two as your identifiers, u can find the specific meeting in db - isolated or shofar_blower_pub) 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

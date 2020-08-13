@@ -140,6 +140,14 @@
             "property": [
                 "InsertDataIsolated"
             ]
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "SHOFARBLOWER",
+            "permission": "ALLOW",
+            "property": [
+                "updateMyStartTime"
+            ]
         }
     ]
 }

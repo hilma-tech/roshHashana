@@ -689,18 +689,18 @@ module.exports = function (CustomUser) {
 
             //my PRIVATE routes
             const priRouteMeetsQ = `
- SELECT 
- isolated.id AS "meetingId", 
- isolated.meeting_time AS "startTime", 
- CustomUser.address,
- CustomUser.lng,
- CustomUser.lat,
- CustomUser.comments, 
- CustomUser.name, 
- IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
- FROM isolated 
- LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
- WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
+                                    SELECT 
+                                        isolated.id AS "meetingId", 
+                                        isolated.meeting_time AS "startTime", 
+                                        CustomUser.address,
+                                        CustomUser.lng,
+                                        CustomUser.lat,
+                                        CustomUser.comments, 
+                                        CustomUser.name, 
+                                        IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
+                                    FROM isolated 
+                                        LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
+                                    WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
 
             let [priReqErr, priReqRes] = await executeMySqlQuery(CustomUser, openPriReqsQ);
             if (priReqErr || !priReqRes) { console.log('private request error : ', priReqErr); }
