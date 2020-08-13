@@ -25,7 +25,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings, myMeetings
+        setMyMeetings,
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -44,7 +44,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
-    }, [myMeetings])
+    }, [data.myMLocs])
 
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
@@ -71,37 +71,38 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             else routeStops.push(data.myMLocs[i])
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            //get times only if there is a stop (a meeting) that doesn't have a start time
-            //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
-            // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
-            if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+            if (err) {
+                console.log("err getoverviewpath 1 : ", err);
+                if (typeof err === "string") { openGenAlert({ text: err }); }
+                return
+            }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
             console.log('newStartTimes: ', newStartTimes);
             const getMyNewST = (mId, isPub) => {
-                console.log('mId: ', mId);
-                console.log('isPub: ', isPub);
                 let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                 return false
             }
             const meetingsToUpdateST = [];
-            for (let m of routeStops) {
+            for (let m of routeStops) { //loop current stops and their start times
                 let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                // console.log('curr start time: ', new Date(m.startTime).toJSON());
-                // console.log('myNewStartTime: ', myNewStartTime);
-                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime)
+                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                console.log("calling updateMyStartTime with ", meetingsToUpdateST);
+                console.log("updateMyStartTime ", meetingsToUpdateST);
                 updateMyStartTime(meetingsToUpdateST, (error => {
                     console.log('updateMyStartTime error: ', error);
                     if (error) { openGenAlert({ text: error }) }
                 }))
+                setMyMeetings(meets => meets.map(m => {
+                    let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                    if (!newMMStartTime) return m
+                    return { ...m, startTime: newMMStartTime.startTime }
+                }))
             }
-            // setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId, m.isPublicMeeting) || new Date(m.startTime).toJSON() })))
             setRoutePath(res.overviewPath)
         }
 

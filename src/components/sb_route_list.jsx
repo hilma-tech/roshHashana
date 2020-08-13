@@ -1,13 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { SBContext } from '../ctx/shofar_blower_context';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-
 
 import moment from 'moment'
 
-import SBAssignMeeting from './sb_assign_meeting';
 
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
-import { SBContext } from '../ctx/shofar_blower_context';
 
 const SBRouteList = (props) => {
     const [myRoute, setMyRoute] = useState([]);
@@ -46,7 +44,7 @@ const SBRouteList = (props) => {
     }, []);
 
     if (!userData) return null;
-    
+
 
 
     const textStart = "משך הליכה כולל"
@@ -113,6 +111,7 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
+        if (oldIndex == newIndex) return //no change, dragged and put back in original place
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);

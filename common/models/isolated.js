@@ -118,7 +118,7 @@ module.exports = function (Isolated) {
     }
 
     Isolated.remoteMethod('updateMyStartTime', {
-        http: { verb: 'post' },
+        http: { verb: 'POST' },
         accepts: [
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
             { arg: 'meetings', type: 'any' },

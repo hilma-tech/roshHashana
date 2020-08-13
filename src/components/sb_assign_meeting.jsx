@@ -51,18 +51,18 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
     const [openAssign, setOpenRouteList] = useState(true)
 
-    useEffect(() => {
+    const addGoogleMaps = () => {
         const script = document.createElement('script')
         script.async = true;
         script.defer = true;
         script.id = "mapScriptHi";
         script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`
         document.head.appendChild(script);
-        return () => {
-            let script = document.getElementById('mapScriptHi')
-            document.head.removeChild(script);
-        }
-    }, [])
+    }
+    const removeGoogleMaps = () => {
+        let script = document.getElementById('mapScriptHi')
+        document.head.removeChild(script);
+    }
 
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
@@ -115,7 +115,12 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         // newStops should be without const meetings!
         const { routeStops, constStopsB4, constStopsAfter } = getConstMeetings(myMeetings, userData)
         const newStops = (Array.isArray(routeStops) && routeStops.length) ? [...routeStops, assignMeetingInfo] : assignMeetingInfo
+
+        
+        addGoogleMaps()
         let [errOP, resOP] = await getOverviewPath(window.google, { lat: Number(userData.lat), lng: Number(userData.lng) }, newStops, { getTimes: true, userData })
+        removeGoogleMaps()
+
         if (errOP) {
             console.log('errOP: ', errOP);
             openGenAlert({ text: assign_error })
