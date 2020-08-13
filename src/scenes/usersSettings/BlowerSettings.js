@@ -101,7 +101,6 @@ const IsolatedSettings = (props) => {
 
 
     const removePubPlace = (i) => {
-        console.log("removePubPlace")
         publicMeetingsChanged = true
         let publicPlaces = [...vals.publicMeetings];
         publicPlaces.splice(i, 1);
@@ -118,7 +117,6 @@ const IsolatedSettings = (props) => {
 
 
     const updateIsolatedInfo = async (fromX) => {
-        console.log("hiii")
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -127,7 +125,6 @@ const IsolatedSettings = (props) => {
             }
         }
         if (fromX) {
-            console.log("publicMeetingsChanged", publicMeetingsChanged)
             if (publicMeetingsChanged || (updateData && Object.keys(updateData).length !== 0)) {
                 openGenAlert({
                     text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
@@ -159,7 +156,6 @@ const IsolatedSettings = (props) => {
                 })
             return;
         }
-        console.log('!updateData info: ', updateData);
 
         let { name, username, volunteering_start_time, can_blow_x_times, volunteering_max_time, address, publicMeetings } = updateData;
         // validate values
