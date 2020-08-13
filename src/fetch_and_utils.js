@@ -9,9 +9,12 @@ export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
         method: "POST",
         body: JSON.stringify({ data: blowerDetails })
     }, true);
-    if (res) {
-        typeof cb === 'function' && cb(false)
+    if (err || !res || !res.ok && typeof cb === "function") {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    } else {
+        typeof cb === "function" && cb(false)
     }
+
 }
 
 export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => {
