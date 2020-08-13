@@ -48,8 +48,8 @@ module.exports = function (ShofarBlower) {
                         //if the shofar blower added publicPlaces,
                         if (data.publicPlaces) {
                             let [errPublicMeetings, resPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options, true));
-                            if (errPublicMeetings) console.log("errPublicMeetings", errPublicMeetings)
-                            if (resPublicMeetings) { console.log("resPublicMeetings", resPublicMeetings); return { ok: false } }
+                            if (errPublicMeetings) { console.log("errPublicMeetings", errPublicMeetings); return { ok: false } }
+                            if (resPublicMeetings) { console.log("resPublicMeetings", resPublicMeetings); }
                         }
                         return { ok: true };
                     } else {
