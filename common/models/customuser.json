@@ -172,7 +172,8 @@
       "permission": "ALLOW",
       "property": [
         "mapInfoSB",
-        "assignSB"
+        "assignSB",
+        "updateMaxDurationAndAssign"
       ]
     },
     {

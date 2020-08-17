@@ -3,7 +3,7 @@ import { CONSTS } from '../../consts/const_messages'
 
 
 export const getOverviewPath = async (google, origin, stops, extraData) => {
-    extraData && extraData.getTimes && console.log('stops: ', stops);
+    console.log('getOverviewPath!');
 
     /**
     * origin: { lng: double, lat: double }
@@ -11,7 +11,7 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
     * extraData: { startTime, userData } 
     **/
 
-    if (!stops || !stops.length) {
+    if (!stops || !Array.isArray(stops) || !stops.length) {
         console.log("no_stops_or_destination", origin, stops);
         return [true];
     }
@@ -48,7 +48,8 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
             travelMode,
             waypoints,
             destination: destination,
-            optimizeWaypoints: false
+            optimizeWaypoints: false,
+            language:"iw"
         }, (result, status) => {
             console.log('result: ', result);
             if (status !== google.maps.DirectionsStatus.OK) {

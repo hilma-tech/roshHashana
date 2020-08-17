@@ -282,7 +282,7 @@ export default class IsolatedForm extends Component {
                             <div className="public-meeting-options">
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
-                                        key={place.id}
+                                        key={"k"+place.id}
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
