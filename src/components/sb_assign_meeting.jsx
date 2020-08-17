@@ -1,42 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { isBrowser } from 'react-device-detect';
-import Auth from '../modules/auth/Auth';
+
+import moment from 'moment'
+
 import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
-import { assignSB } from '../fetch_and_utils';
-import { CONSTS } from '../consts/const_messages';
-import { useEffect } from 'react';
-import { getOverviewPath } from './maps/get_overview_path';
+import Auth from '../modules/auth/Auth';
+import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign } from '../fetch_and_utils';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
-
-
-const getConstMeetings = (MyMeetings, userData) => {
-    const userStartTime = new Date(userData.startTime).getTime()
-    const userEndTime = userStartTime + userData.maxRouteDuration;
-    const routeStops = [];
-    const constStopsB4 = [];
-    const constStopsAfter = [];
-    let meetingStartTime;
-
-    //fill routeStops, constStopsb4 and constStopsAfter
-    for (let i in MyMeetings) {
-        meetingStartTime = new Date(MyMeetings[i].startTime).getTime()
-        if (MyMeetings[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
-            // is a meeting set by sb and is not part of blowing route (is before sb said he starts or after his route finishes)
-            if (meetingStartTime < userStartTime) {
-                constStopsB4.push(MyMeetings[i])
-            } else {
-                // console.log('pushing as a AFTER const stop: ', MyMeetings[i]);
-                constStopsAfter.push(MyMeetings[i])
-            }
-        }
-        else routeStops.push(MyMeetings[i])
-    }
-    return { routeStops, constStopsB4, constStopsAfter }
-}
-
 
 const SBAssignMeeting = ({ history, inRoute }) => {
 
@@ -50,20 +23,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     } = useContext(SBContext)
 
     const [openAssign, setOpenRouteList] = useState(true)
-
-    const addGoogleMaps = () => {
-        const script = document.createElement('script')
-        script.async = true;
-        script.defer = true;
-        script.id = "mapScriptHi";
-        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`
-        document.head.appendChild(script);
-    }
-    const removeGoogleMaps = () => {
-        let script = document.getElementById('mapScriptHi')
-        document.head.removeChild(script);
-    }
-
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
         history.push('/')
@@ -80,94 +39,106 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         setTimeout(() => { setAssignMeetingInfo(null) }, 400)
     }
 
-    const calcTotalNewTime = (obj) => {
-        if (!obj.startTimes || !Array.isArray(obj.startTimes)) return null
-        let totalTime = obj.startTimes.reduce((accumulator, st) => st.duration && st.duration.value ? (accumulator + Number(st.duration.value)) : null, 0) * 1000
-        console.log('totalTime: ', totalTime);
-        let newTotalTime = Number(totalTime) / 60000
-        try {
-            let splitTT = newTotalTime.toString().split(".")
-            newTotalTime = `${splitTT[0]}.${typeof splitTT[1] === "string" ? splitTT[1].substring(0, 2) : "00"}`
-            console.log('newTotalTime: ', newTotalTime);
-        } catch (e) { newTotalTime = totalTime }
-        return newTotalTime;
-    }
-
-
     const handleAssignment = async (close) => {
         if (close === "close") {
             closeAssign()
             return;
         }
-        //set new route and remove meetingId from reqs array
-        if (myMeetings.length == userData.can_blow_x_times) {
-            openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
+
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const myRoute = [];
+        let meetingStartTime;
+        //fill myRoute (without const meetings)
+        for (let i in myMeetings) {
+            meetingStartTime = new Date(myMeetings[i].startTime).getTime()
+            if (!myMeetings[i].constMeeting || (meetingStartTime > userStartTime && meetingStartTime < userEndTime)) {
+                myRoute.push(myMeetings[i])
+            }
+        }
+
+        console.log('myRoute: ', myRoute);
+        if (myRoute.length == userData.can_blow_x_times) {
+            //! MAX_ROUTE_LENGTH
+            handleMaxRouteLength(userData.can_blow_x_times)
             return;
         }
+
         openGenAlert({ text: "..." })
-
-
-        if (!window.google || !window.google.maps) {
-            openGenAlert({ text: assign_error });
-            console.log('no window.google || no window.google.maps');
-            return;
-        }
-        // newStops should be without const meetings!
-        const { routeStops, constStopsB4, constStopsAfter } = getConstMeetings(myMeetings, userData)
-        const newStops = (Array.isArray(routeStops) && routeStops.length) ? [...routeStops, assignMeetingInfo] : assignMeetingInfo
-
-        
-        addGoogleMaps()
-        let [errOP, resOP] = await getOverviewPath(window.google, { lat: Number(userData.lat), lng: Number(userData.lng) }, newStops, { getTimes: true, userData })
-        removeGoogleMaps()
-
-        if (errOP) {
-            console.log('errOP: ', errOP);
-            openGenAlert({ text: assign_error })
-            return;
-        }
-        const newTotalTime = calcTotalNewTime(resOP)
-
-        if (!newTotalTime) {
-            console.log('no newTotalTime : ', newTotalTime);
-            openGenAlert({ text: assign_error })
-            return
-        }
-
-        // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --START
-        if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
-            openGenAlert({ text: `זמן המסלול לאחר השיבוץ שלך יהיה ${newTotalTime} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${userData.maxRouteDuration / 60000} דקות, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "הבנתי" } })
-            return;
-        }
-        // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --END
-
-        //LOCAL STATE UPDATE WITH NEW MEETING --START
-        if (!myMeetings.includes(assignMeetingInfo)) setMyMeetings(mym => Array.isArray(mym) ? [...mym, assignMeetingInfo] : [assignMeetingInfo])
-        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != assignMeetingInfo.meetingId))
-        //LOCAL STATE UPDATE WITH NEW MEETING --END
-
         //ASSIGN --START
-        const newAssignMeetingObj = { meetingId: assignMeetingInfo.meetingId, isPublicMeeting: assignMeetingInfo.isPublicMeeting, startTime: resOP.startTimes[resOP.startTimes.length - 1].startTime }
-        assignSB([newAssignMeetingObj], (error, res) => {
-            if (error || !res) openGenAlert({ text: typeof error === "string" ? error : "קרתה תקלה, נא השתבצו מאוחר יותר, תודה" })
-            else if (Array.isArray(res)) {
-                let success = true
-                for (let i in res) {
-                    if (!res[i] || !res[i].success) {
-                        openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
-                        success = false
-                        break;
-                    }
+        assignSB(assignMeetingInfo, (error, res) => {
+            if (error || !res) {
+                openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                return;
+            }
+            if (res && typeof res === "object" && typeof res.errName === "string") {
+                if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
+                    //! MAX_DURATION
+                    handleMaxDuration(res.errData)
+                    return;
                 }
-                if (success) {
-                    openGenAlert({ text: "שובצת בהצלחה" })
+                else if (res.errName === "MAX_ROUTE_LENGTH" && res.errData && res.errData.currRouteLength !== null && res.errData.currRouteLength !== undefined) {
+                    //! MAX_ROUTE_LENGTH
+                    handleMaxRouteLength(res.errData.currRouteLength)
+                    return
                 }
             }
-            else openGenAlert({ text: "שובצת בהצלחה" })
-            closeAssign()
+            else if (typeof res === "object" && !isNaN(Number(res.meetingId)) && !isNaN(Number(res.isPublicMeeting))) handleAssignSuccess(res)
+            else openGenAlert({ text: assign_error })
         })
         //ASSIGN --END
+    }
+    const handleAssignSuccess = (newMeeting) => {
+        openGenAlert({ text: "שובצת בהצלחה" })
+        closeAssign()
 
+        //LOCAL STATE UPDATE WITH NEW MEETING --START
+        if (!myMeetings.includes(newMeeting)) {
+            console.log("setMyMeetings, ", Array.isArray(myMeetings) ? [...myMeetings, newMeeting] : [newMeeting])
+            setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
+        }
+        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
+        //LOCAL STATE UPDATE WITH NEW MEETING --END
+    }
+    const handleMaxRouteLength = (n) => {
+        openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n}, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
+            updateRouteLength => {
+                if (!updateRouteLength) {
+                    return;
+                }
+                console.log("remote method to update can_blow_x_times to curr length + 1, AND ASSIGN: ", n + 1);
+            })
+    }
+
+    const handleMaxDuration = (data) => {
+        let newTT = data.newTotalTime;
+        try {
+            newTT = moment(Number(data.newTotalTime)).format("mm.ss")
+        } catch (e) { newTT = Number(data.newTotalTime) / 60000 }
+
+        let maxDur = data.maxRouteDuration
+        try {
+            maxDur = moment(Number(data.maxRouteDuration)).format("mm.ss")
+        } catch (e) { maxDur = Number(data.maxRouteDuration) / 60000 }
+
+        let text = `זמן המסלול לאחר השיבוץ שלך יהיה ${newTT} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${maxDur} דקות, לכן לא ניתן כעת לשבצך`
+        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה", cancelText: "סגור" } },
+            updateMaxRouteDuration => {
+                if (!updateMaxRouteDuration) {
+                    return;
+                }
+                console.log('updateMaxDurationAndAssign');
+                updateMaxDurationAndAssign({ ...data.newAssignMeetingObj, newMaxTimeMS: data.newTotalTime },
+                    err => {
+                        if (err) {
+                            console.log('updateMaxDurationAndAssign err: ', err);
+                            openGenAlert({ text: typeof err === "string" ? err : assign_error })
+                            return;
+                        }
+                        handleAssignSuccess(assignMeetingInfo)
+                    })
+            })
+        return;
     }
 
     const deleteMeeting = async () => {
@@ -181,7 +152,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         }
         if (res) {
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
-            setMyMeetings(myMeetings.filter(meet => meet.meetingId !== assignMeetingInfo.meetingId))
+            setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
             handleAssignment('close');
         }
     }
@@ -219,6 +190,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
                 {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
+                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{dateWTimeFormatChange(assignMeetingInfo.startTime).join(", ")}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 

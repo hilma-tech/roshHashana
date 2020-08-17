@@ -29,16 +29,17 @@ export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => 
 }
 
 
-export const assignSB = async (meetingObjs, cb = () => { }) => {
+export const assignSB = async (meetingObj, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
-        method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingObjs })
+        method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingObj })
     }, true);
     if (err || !res) {
-        const error = err === "NO_INTERNET" ? "אין חיבור לאינטרנט, לא ניתן לבצע כעת" : "אירעה שגיאה, לא ניתן להשתסץ כרגע, נא נסו שנית מאוחר יותר"
         console.log("error assigning sb to meeting ", err);
+        const error = err === "NO_INTERNET" ? "אין חיבור לאינטרנט, לא ניתן לבצע כעת" : "אירעה שגיאה, לא ניתן להשתבץ כרגע, נא נסו שנית מאוחר יותר"
         cb && typeof cb === "function" && cb(error)
         return
     }
+    console.log("res assigning sb to meeting ", res);
     cb && typeof cb === "function" && cb(null, res)
     return
 }
@@ -66,12 +67,23 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
     }
     else
-    typeof cb === "function" && cb(false) //no error
+        typeof cb === "function" && cb(false) //no error
 
 }
 
 
-
+export const updateMaxDurationAndAssign = async (meetingData, cb) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateMaxDurationAndAssign`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ meetingData })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
+    }
+    else
+        typeof cb === "function" && cb(false) //no error
+}
 
 
 
@@ -82,16 +94,23 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
 // ***************************** UTILS ********************************** //
 export const dateFormatChange = (date, noDay) => {
     // changes date to the format: dd/mm/yy
-    date = date.substring(0, 10);
-    let arr = date.split(/\-/g);
-    date = `${arr[1]}/${arr[0]}`
+    let arr = []
+    try {
+        date = date.substring(0, 10);
+        arr = date.split(/\-/g);
+        date = `${arr[1]}/${arr[0]}`
+    } catch (e) { date = "" }
     return noDay ? date : `${arr[2]}/${date}`
 }
 
 export const dateWTimeFormatChange = (date) => {
+    // date ~= 2020-06-25T13:36:52.000Z
     let dmy = dateFormatChange(date)
-    // 2020-06-25T13:36:52.000Z
-    return [dmy, date.split("T")[1].substring(0, 5)]
+    let formatted = [];
+    try {
+        formatted = [dmy, date.split("T")[1].substring(0, 5)]
+    } catch (e) { formatted = [] }
+    return formatted
 }
 
 export const viewportToPixels = value => {

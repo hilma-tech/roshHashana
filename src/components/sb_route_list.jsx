@@ -42,7 +42,7 @@ const SBRouteList = (props) => {
         setConstAfter(constStopsAfter);
         setConstB4(constStopsB4);
         setMyRoute(routeStops);
-    }, []);
+    }, [myMeetings]);
 
     if (!userData) return null;
 
@@ -66,7 +66,7 @@ const SBRouteList = (props) => {
     }
 
 
-    // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}`
+    // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}` //goal
     const textValue = ` ${length ? `${length} ${lengthUnits}` : ""}`
     // textValue = `35 דקות (3 ק"מ)`//testing   
 
@@ -78,7 +78,7 @@ const SBRouteList = (props) => {
         return (
             <ul>
                 {items.map((value, index) => (
-                    < SortableItem key={`item-${index}`} index={index} value={{ value: value, index: index }} />
+                    <SortableItem key={`item-${index}`} index={index} value={{ value, index }} />
                 ))}
             </ul>
         );
@@ -130,13 +130,10 @@ const SBRouteList = (props) => {
             </div> : null}
             <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>
             <div className="sb-list" id="sb-list" ref={container}>
-                {console.log(document.getElementById('sb-list'))}
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => {
                     return createItemContent(item, CONST_MEETING);
                 })}
-                {userData && createItemContent(userData, -1)}
-                {console.log(container, 'container')
-                }
+                {userData ? createItemContent(userData, -1) : null}
                 <SortableList
                     helperClass="sort-item-container"
                     distance={1}
