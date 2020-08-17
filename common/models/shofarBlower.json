@@ -136,6 +136,12 @@
                 "InsertDataShofarBlower",
                 "deleteMeeting"
             ]
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": "count"
         }
     ]
 }

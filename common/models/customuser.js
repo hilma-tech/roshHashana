@@ -209,36 +209,36 @@ module.exports = function (CustomUser) {
     CustomUser.getMapData = async (isPubMap = false, options) => {
         // map data for all maps (except for shofar blower map)
 
-        //get all private meetings 
+        //get all private meetings  
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `SELECT 
- isolatedUser.name AS "isolatedName", 
- isolatedUser.address,
- isolatedUser.lat,
- isolatedUser.lng,
- isolatedUser.comments,
- blowerUser.name AS "blowerName"
- FROM isolated 
- LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
- LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
+                isolatedUser.name AS "isolatedName", 
+                isolatedUser.address,
+                isolatedUser.lat,
+                isolatedUser.lng,
+                isolatedUser.comments,
+                blowerUser.name AS "blowerName"
+            FROM isolated 
+                LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+            WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
                 `SELECT
- blowerUser.name AS "blowerName",
- shofar_blower_pub.id,
- shofar_blower_pub.address,
- shofar_blower_pub.lat,
- shofar_blower_pub.lng,
- shofar_blower_pub.comments ,
- shofar_blower_pub.start_time
- FROM shofar_blower_pub
- LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
+                    blowerUser.name AS "blowerName",
+                    shofar_blower_pub.id,
+                    shofar_blower_pub.address,
+                    shofar_blower_pub.lat,
+                    shofar_blower_pub.lng,
+                    shofar_blower_pub.comments ,
+                    shofar_blower_pub.start_time
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
             if (errPublic) throw errPublic;
 
             if (resPublic) {
@@ -271,10 +271,24 @@ module.exports = function (CustomUser) {
                 userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true, lng: true, lat: true } });
                 if (role === 1) {
                     //isolated
-                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
+                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, meeting_time: true, public_meeting: true, blowerMeetingId: true } });
                     if (!isolated) return { errMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
+                    userInfo.meeting_time = isolated.meeting_time;
+                    if (isolated.blowerMeetingId) {
+                        if (!isolated.public_meeting) {
+                            let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
+                            userInfo.blowerName = blowerName.name;
+                        }
+                        else {
+                            let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { blowerId: { neq: null } }, include: ["blowerPublic"] });
+                            userInfo.meeting_time = meetingInfo.start_time;
+                            userInfo.address = meetingInfo.address;
+                            userInfo.blowerName = meetingInfo.blowerPublic().name;
+                        }
+                    }
+                    userInfo.blowerMeetingId = isolated.blowerMeetingId;
                     return userInfo;
                 }
                 else if (role === 2) {
@@ -298,16 +312,16 @@ module.exports = function (CustomUser) {
                 else {
                     //general user
                     const genUserQ = ` SELECT
- shofar_blower_pub.address,
- shofar_blower_pub.comments,
- shofar_blower_pub.start_time,
- CustomUser.name AS blowerName
- FROM 
- isolated
- RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
- INNER JOIN CustomUser ON shofar_blower_pub.blowerId = CustomUser.id
- WHERE
- isolated.userIsolatedId = ${userId}`
+                        shofar_blower_pub.address,
+                        shofar_blower_pub.comments,
+                        shofar_blower_pub.start_time,
+                        CustomUser.name AS blowerName
+                    FROM 
+                        isolated
+                        RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+                        INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
+                    WHERE
+                        isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
                     if (errUserData) {
                         console.log("errUserData", errUserData)
@@ -334,6 +348,7 @@ module.exports = function (CustomUser) {
     CustomUser.getLastItemThatIsNotIsrael = (arr, pos) => {
         //gets an array of strings and the last position of that array (arr.length - 1)
         // returns the first item (from the end) that is not ירושלים
+        //? check if pos is bigger than 1000000 ? (to prevent an infinite loop cos goes from pos to pos===0 (on pos===0 returns))
         if (arr[pos] !== "ישראל") {
             return arr[pos]
         }
@@ -473,6 +488,7 @@ module.exports = function (CustomUser) {
                                 blowerId: userId
                             }
                         })
+                        console.log("publicMeetingsArr to create", publicMeetingsArr)
                         const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
                         if (errDeletePublicMeetings) {
                             console.log("errCreatePublicMeetings", errCreatePublicMeetings)
@@ -526,9 +542,9 @@ module.exports = function (CustomUser) {
                     //find all blower's public meetings
                     let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
                         `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
- from isolated right join shofar_blower_pub on shofar_blower_pub.id = isolated.blowerMeetingId 
- where (blowerId = 10) 
- group by shofar_blower_pub.id `);
+                         from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
+                         where (blowerId = 10) 
+                         group by shofar_blower_pub.id `);
                     if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
                         let meetingsToUpdate = [], meetingsToDelete = [];
 
@@ -651,57 +667,57 @@ module.exports = function (CustomUser) {
 
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT 
- isolated.id AS "meetingId", 
- false AS "isPublicMeeting", 
- IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
- CustomUser.name, 
- CustomUser.address,
- CustomUser.lng,
- CustomUser.lat 
- 
- FROM isolated 
- JOIN CustomUser ON userIsolatedId = CustomUser.id 
- 
- WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
+            isolated.id AS "meetingId", 
+            false AS "isPublicMeeting", 
+            IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
+            CustomUser.name, 
+            CustomUser.address,
+            CustomUser.lng,
+            CustomUser.lat 
+            
+            FROM isolated 
+                JOIN CustomUser ON userIsolatedId  = CustomUser.id 
+            
+            WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
 
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
- SELECT 
- shofar_blower_pub.id AS "meetingId", 
- shofar_blower_pub.constMeeting, 
- start_time AS "startTime", 
- shofar_blower_pub.address, 
- shofar_blower_pub.comments, 
- shofar_blower_pub.lng, 
- shofar_blower_pub.lat,
- true AS "isPublicRoute", 
- COUNT(isolated.id) AS "signedCount", 
- CASE
- WHEN blowerId IS NULL THEN "req"
- WHEN blowerId = ${userId} THEN "route"
- END blowerStatus,
- true AS isPublicMeeting 
- 
- FROM isolated 
- RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
- 
- WHERE (blowerId IS NULL OR blowerId = ${userId}) 
- 
- GROUP BY shofar_blower_pub.id ORDER BY start_time`
+            SELECT 
+            shofar_blower_pub.id AS "meetingId", 
+            shofar_blower_pub.constMeeting, 
+            start_time AS "startTime", 
+            shofar_blower_pub.address, 
+            shofar_blower_pub.comments, 
+            shofar_blower_pub.lng, 
+            shofar_blower_pub.lat,
+            true AS "isPublicRoute", 
+            COUNT(isolated.id) AS "signedCount",  
+            CASE
+                WHEN blowerId IS NULL THEN "req"
+                WHEN blowerId = ${userId} THEN "route"
+            END blowerStatus,
+            true AS isPublicMeeting 
+            
+            FROM isolated 
+                RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
+            
+            WHERE (blowerId IS NULL OR blowerId = ${userId}) 
+            
+            GROUP BY shofar_blower_pub.id ORDER BY start_time`
 
             //my PRIVATE routes
             const priRouteMeetsQ = `
-                                    SELECT 
-                                        isolated.id AS "meetingId", 
-                                        isolated.meeting_time AS "startTime", 
-                                        CustomUser.address,
-                                        CustomUser.lng,
-                                        CustomUser.lat,
-                                        CustomUser.comments, 
-                                        CustomUser.name, 
-                                        IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
-                                    FROM isolated 
-                                        LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
-                                    WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
+            SELECT 
+                isolated.id AS "meetingId", 
+                isolated.meeting_time AS "startTime", 
+                CustomUser.address,
+                CustomUser.lng,
+                CustomUser.lat,
+                CustomUser.comments, 
+                CustomUser.name, 
+                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
+            FROM isolated 
+                LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
+            WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
 
             let [priReqErr, priReqRes] = await executeMySqlQuery(CustomUser, openPriReqsQ);
             if (priReqErr || !priReqRes) { console.log('private request error : ', priReqErr); }
@@ -828,13 +844,15 @@ module.exports = function (CustomUser) {
                     myRoute.push(myMeetings[i])
                 }
             }
-            console.log('userData: ', userData);
-            console.log('myRoute: ', myRoute);
 
+            //! check route length
+            console.log(`checking route length ${myRoute.length}, ${userData.can_blow_x_times} and that is not >= to 20`);
             if (userData.can_blow_x_times == myRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: userData.can_blow_x_times } })
             }
-
+            if (myRoute.length == 20) {
+                return cb(null, { errName: "MAX_ROUTE_LENGTH_20", errData: { currRouteLength: userData.can_blow_x_times } })
+            }
 
             const origin = `${userData.lat},${userData.lng}`
 
@@ -847,7 +865,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&travelMode=WALKING&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -874,9 +892,6 @@ module.exports = function (CustomUser) {
             const totalTimeReducer = (accumulator, s) => { console.log("s", s); return (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null) }
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
 
-
-
-            console.log('newTotalTime: ', newTotalTime);
             let assignStartTime;
             try {
                 assignStartTime = result.startTimes[result.startTimes.length - 1].startTime
@@ -884,14 +899,11 @@ module.exports = function (CustomUser) {
 
             const newAssignMeetingObj = { ...meetingObj, startTime: assignStartTime } //will b returned to client
 
-            // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --START
-            console.log(`checking user's max route duration, userData.maxRouteDuration:${userData.maxRouteDuration}, newTotalTime:${newTotalTime}`);
+            //! check max total time length
+            console.log(`checking max duration ${userData.maxRouteDuration} ${newTotalTime}`);
             if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
-            // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --END
-
-
 
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
@@ -919,52 +931,72 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'any', root: true }
     })
 
-    CustomUser.updateMaxDurationAndAssign = function (options, meetingData, cb) {
+    CustomUser.updateMaxDurationAndAssign = function (options, meetingObj, newMaxTimeVal, cb) {
+        console.log('update max duration and assign: ', newMaxTimeVal, meetingObj);
         (async () => {
-            if (!meetingData || Array.isArray(meetingData) || typeof meetingData !== "object") return cb(true)
+            if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 
             const { userId } = options.accessToken;
             if (isNaN(Number(options.accessToken.userId)) || userId < 1) return cb(true)
 
-            if (!meetingData.newMaxTimeMS) return cb(true)
+            if (!newMaxTimeVal) return cb(true)
             let newMaxTimeMins;
             try {
-                newMaxTimeMins = Number(meetingData.newMaxTimeMS) / 1000
-            } catch (_e) { newMaxTimeMins = null }
-            if (!newMaxTimeMins) return cb(true)
+                newMaxTimeMins = Number(newMaxTimeVal) / 60000
+            } catch (_e) { return cb(true) }
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
 
             //! update volunteering_max_time
-            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins} WHERE userBlowerId = ${userId}`)
+            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : newMaxTimeMins} WHERE userBlowerId = ${userId}`)
             if (durationUpdateErr || !durationUpdateRes) {
                 console.log(`durationUpdateErr, ${durationUpdateErr}`);
                 return cb(true)
             }
 
-            if (!new Date(meetingData.startTime).getTime) return cb(true)
-            let meetingId = Number(meetingData.meetingId)
-            if (isNaN(meetingId) || meetingId < 1) return cb(true)
+            // call assignSB
+            CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
+                console.log('assignE: ', assignE);
+                console.log('assignR: ', assignR);
+                return cb(assignE, assignR)
+            })
 
-            let sqlFormattedStartTime;
-            try {
-                sqlFormattedStartTime = new Date(meetingData.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
-            } catch (e) { console.log("wrong time: ", meetingData.startTime, " ", e); return cb(true) }
-
-            //! assign
-            const blowerUpdateQ = meetingData.isPublicMeeting ?
-                `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${sqlFormattedStartTime}" WHERE id = ${meetingId} AND blowerId IS NULL`
-                : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${sqlFormattedStartTime}" WHERE id = ${meetingId} AND blowerMeetingId IS NULL`
-
-            let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
-            if (err || !res) { console.log('err: ', err); return cb(true) }
-            console.log('assign after duration update res: ', res);
-
-            return cb(null, true)
         })();
     }
     CustomUser.remoteMethod('updateMaxDurationAndAssign', {
         http: { verb: 'post' },
-        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingData", type: "object" }],
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObj", type: "object" }, { arg: "newMaxTimeVal", type: "any" }],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    })
+
+    CustomUser.updateMaxRouteLengthAndAssign = function (options, meetingObj, cb) {
+        console.log('update route length and assign: ', meetingObj);
+        (async () => {
+            if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
+            if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
+
+            const { userId } = options.accessToken;
+            if (isNaN(Number(options.accessToken.userId)) || userId < 1) return cb(true)
+
+            //! update can_blow_x_times
+            const [lengthUpdateErr, lengthUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET can_blow_x_times = shofar_blower.can_blow_x_times+1 WHERE userBlowerId = ${userId}`)
+            if (lengthUpdateErr || !lengthUpdateRes) {
+                console.log(`lengthUpdateErr, ${lengthUpdateErr}`);
+                return cb(true)
+            }
+
+            // call assignSB
+            CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
+                console.log('assignE: ', assignE);
+                console.log('assignR: ', assignR);
+                return cb(assignE, assignR)
+            })
+
+        })();
+    }
+    CustomUser.remoteMethod('updateMaxRouteLengthAndAssign', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObj", type: "object" }],
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 

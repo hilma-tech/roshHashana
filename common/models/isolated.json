@@ -143,6 +143,12 @@
         },
         {
             "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": "count"
+        },
+        {
+            "principalType": "ROLE",
             "principalId": "SHOFARBLOWER",
             "permission": "ALLOW",
             "property": [
