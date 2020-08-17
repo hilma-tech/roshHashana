@@ -11,6 +11,7 @@ import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
+import { AdminProvider } from './ctx/AdminContext';
 
 import "./consts/generalStyles.scss"
 
@@ -78,8 +79,8 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
-                            <Route exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
-                            <Route path = "/login" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
+                            <PrivateRoute exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminProvider><AdminHome {...props} /></AdminProvider>}/>
+                            <Route path = "/ffasfasfasfrefcawaeqwdca" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                         </Switch>
