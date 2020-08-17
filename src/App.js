@@ -78,8 +78,8 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
-                            <Route exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
-                            <Route path = "/login" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
+                            <PrivateRoute exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
+                            <Route path = "/ffasfasfasfrefcawaeqwdca" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                         </Switch>
