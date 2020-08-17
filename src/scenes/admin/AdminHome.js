@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AdminMap from '../../components/maps/adminMap';
+import { fetchIsolateds } from './fetch_and_utils';
 
 const AdminHome = (props) => {
+    // useEffect(() => {
+    //     (async () => {
+    //         await fetchIsolateds({ start: 0, end: 10 }, null, (err, res) => {
+    //             console.log(err, res)
+    //         })
+    //     })()
+    // }, [])
+
     console.log("Hey there");
     return <div> welcome admin!!!
         <div className="map-container">

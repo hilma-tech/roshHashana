@@ -148,6 +148,14 @@
             "property": [
                 "updateMyStartTime"
             ]
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": [
+                "getIsolatedsForAdmin"
+            ]
         }
     ]
 }
