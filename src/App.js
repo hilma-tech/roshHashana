@@ -28,6 +28,7 @@ const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSetti
 
 const AdminHome = loadable(() => import('./scenes/admin/AdminHome'))
 const AdminLogin = loadable(() => import('./scenes/admin/AdminLogin'))
+const BlastsPage = loadable(() => import('./scenes/admin/BlastsPage'))
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/Home'));
@@ -78,6 +79,7 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
+                            <PrivateRoute exact path = "/blasts" compName = "BlastsPage" component = {(props) => <BlastsPage {...props} />}/>
                             <PrivateRoute exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
                             <Route path = "/ffasfasfasfrefcawaeqwdca" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />

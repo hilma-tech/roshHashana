@@ -27,7 +27,8 @@
     "ADMIN": {
         "comps": [
             "AdminLogin",
-            "AdminHome"
+            "AdminHome",
+            "BlastsPage"
         ],
         "deafaultHomePage": "AdminHome"
     }
