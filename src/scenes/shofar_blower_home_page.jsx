@@ -23,6 +23,7 @@ const SBHomePage = (props) => {
         userData, setUserData,
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
+        isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
 
 
@@ -59,11 +60,9 @@ const SBHomePage = (props) => {
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)
             if (!userData || (Array.isArray(userData) && !userData.length)) setUserData(mapContent.userData[0])
             //if got .length == limit, call again -- and on SET need to check if already have some data and then add and not set
-            console.log('mapContent: ', mapContent);
         }
         fetching = false
     }
-
 
     return (
         <div className="sb-homepage-container">
@@ -71,7 +70,7 @@ const SBHomePage = (props) => {
                 !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute}/> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}

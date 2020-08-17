@@ -1,5 +1,6 @@
 'use strict';
 
+
 module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
@@ -76,5 +77,79 @@ module.exports = function (Isolated) {
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
+
+    Isolated.updateMyStartTime = function (options, meetings, cb) {
+        console.log('updateMyStartTime here');
+        if (!options || !options.accessToken || !options.accessToken.userId) {
+            console.log("NO_USER_ID_IN_OPTIONS in updateMyStartTime, meetings are:", meetings);
+            return
+        }
+        (async () => {
+            console.log(`meeting to update: ${meetings}`);
+            if (Isolated.checkMeetingToUpdate(meetings)) {
+                let [uErr, uRes] = await singleStartTimeUpdate(meetings)
+                if (uErr || !uRes) {
+                    console.log('update (not array) start time error: ', uErr);
+                    return cb(true)
+                } else
+                    return cb(null, true)
+            }
+            else if (Array.isArray(meetings)) {
+                let errFlag = false
+                let meeting
+                for (let i in meetings) {
+                    meeting = meetings[i]
+                    let [uErr, uRes] = await Isolated.singleStartTimeUpdate(meeting)
+                    if (uErr) {
+                        errFlag = true;
+                        console.log(`update start time of item (${i}: ${meeting}) from array error: `, uErr);
+                        continue;
+                    }
+                }
+                if (errFlag) return cb("ONE_UPDATE_ERROR_AT_LEAST")
+                return cb(null, true)
+            } else {
+                console.log("wrong var type", meetings);
+                return cb(true)
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('updateMyStartTime', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+            { arg: 'meetings', type: 'any' },
+        ],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    });
+
+
+    Isolated.checkMeetingToUpdate = (m) => {
+        return m && typeof m === "object" && !Array.isArray(m)
+            && m.meetingId
+            && m.isPublicMeeting !== null && m.isPublicMeeting !== undefined
+            && m.startTime
+    }
+
+    Isolated.singleStartTimeUpdate = async (meeting) => {
+        let updateQ = generateUpdateQ(meeting.meetingId, meeting.isPublicMeeting, meeting.startTime)
+        if (!updateQ) return [null]
+        return await new Promise((resolve, reject) => {
+            Isolated.dataSource.connector.query(updateQ, (err, res) => {
+                if (err || !res) resolve([err])
+                else resolve([null, res])
+            })
+        })
+
+    }
+
+    const generateUpdateQ = (meetingId, isPublicMeeting, newStartTime) => {
+        if (!meetingId || isNaN(Number(meetingId)) || (typeof isPublicMeeting !== "boolean" && isPublicMeeting != 0 && isPublicMeeting != 1) || !newStartTime) return null;
+        let formattedStartTime = new Date(newStartTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
+        return `UPDATE ${isPublicMeeting ? "shofar_blower_pub" : "isolated"} 
+        SET ${isPublicMeeting ? "start_time" : "meeting_time"} = "${formattedStartTime}"
+                    WHERE id = ${meetingId}`
+    }
 
 }

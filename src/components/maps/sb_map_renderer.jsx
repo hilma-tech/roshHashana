@@ -7,79 +7,14 @@ import { MainContext } from '../../ctx/MainContext';
 import MarkerGenerator, { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
 
+import { getOverviewPath } from './get_overview_path';
 import { CONSTS } from '../../consts/const_messages';
 
 import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-
-
-const getOverViewPath = async (google, origin, stops, extraData) => {
-    if (!stops || !stops.length) {
-        console.log("no_stops_or_destination", origin, stops);
-        return [true];
-    }
-    const travelMode = google.maps && google.maps.TravelMode && google.maps.TravelMode.WALKING || 'WALKING'
-    let waypoints;
-    try {
-        waypoints = stops.map(s => ({ location: new google.maps.LatLng(s.location.lat, s.location.lng), stopover: true }))
-    } catch (e) {
-        waypoints = []
-    }
-    let destination;
-    try {
-        destination = waypoints.pop().location
-    } catch (e) {
-        destination = {}
-    }
-
-    // console.log('> origin: ', { ...origin });
-    // console.log('> waypoints: ', [...waypoints]);
-    // console.log('> destination: ', { ...destination });
-
-    const directionsService = new google.maps.DirectionsService();
-    if (!directionsService || !directionsService.route || typeof directionsService.route !== "function") {
-        return ["אירעה שגיאה בטעינת המפה, עמכם הסליחה"]
-    }
-    return await new Promise((resolve, reject) => {
-        directionsService.route({
-            origin,
-            travelMode,
-            waypoints,
-            destination: destination,
-            optimizeWaypoints: false
-        }, (result, status) => {
-            console.log('result: ', result);
-            if (status !== google.maps.DirectionsStatus.OK) {
-                resolve(["אירעה שגיאה בטעינת המפה, עמכם הסליחה"])
-                return;
-            }
-            let res = {}
-            if (extraData && extraData.getTimes) {
-                res.startTimes = []
-                let leg;
-                let prevStartTimeVal
-                let legDuration
-                for (let i in stops) {
-                    leg = result.routes[0].legs[i]
-                    legDuration = Number(leg.duration.value) * 1000
-                    if (!res.startTimes[i - 1]) {
-                        if (!extraData.userData || !new Date(extraData.userData.startTime).getTime) continue;
-                        prevStartTimeVal = new Date(extraData.userData.startTime).getTime()
-                    } else {
-                        prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS
-                    }
-                    res.startTimes.push({ duration: leg.duration, distance: leg.distance, meetingId: stops[i].meetingId, startTime: Number(prevStartTimeVal) + legDuration })
-                }
-            }
-            res.overviewPath = result.routes[0].overview_path
-
-            // console.log('Promise.resolve([null, res]): ', [null, res]);
-            resolve([null, res])
-        })
-    })
-}
+import { updateMyStartTime } from '../../fetch_and_utils';
 
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
@@ -90,7 +25,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings
+        setMyMeetings,
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -101,16 +36,18 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
-        scaledSize: new window.google.maps.Size(100, 100),
+        scaledSize: new window.google.maps.Size(80, 80),
         // origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
 
     useEffect(() => {
-        console.log('data changed: ', data);
-        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
-    }, [])
+        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
+            setData();
+            console.log("use effect on myMLocs (which is part myMeetings)");
+        }
+    }, [data.myMLocs])
 
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
@@ -137,21 +74,39 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             else routeStops.push(data.myMLocs[i])
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            //get times only if there is a stop (a meeting) that doesn't have a start time
-            //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
-            // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
-            let getTimes = true
-            let [err, res] = await getOverViewPath(window.google, userOrigin.location, routeStops, { getTimes: getTimes, userData })
-            if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+            console.log('my route, getOverviewPath');
+            let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
+            if (err) {
+                console.log("err getoverviewpath 1 : ", err);
+                if (typeof err === "string") { openGenAlert({ text: err }); }
+                return
+            }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-            const getMyST = (mId) => {
-                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId)
+            console.log('newStartTimes: ', newStartTimes);
+            const getMyNewST = (mId, isPub) => {
+                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                 return false
             }
-            getTimes && setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId) || new Date(m.startTime).toJSON() })))
-            console.log('1 res.overviewPath: ', res.overviewPath);
+            const meetingsToUpdateST = [];
+            for (let m of routeStops) { //loop current stops and their start times
+                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
+                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
+            }
+            if (meetingsToUpdateST && meetingsToUpdateST.length) {
+                console.log("updateMyStartTime ", meetingsToUpdateST);
+                updateMyStartTime(meetingsToUpdateST, (error => {
+                    if (error) { openGenAlert({ text: error }); console.log('updateMyStartTime error: ', error); }
+                }))
+                console.log('setMyMeetings cos meetings to update');
+                setMyMeetings(meets => meets.map(m => {
+                    let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                    if (!newMMStartTime) return m
+                    return { ...m, startTime: newMMStartTime.startTime }
+                }))
+            }
             setRoutePath(res.overviewPath)
         }
 
@@ -159,26 +114,26 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let constOverviewPaths = [];
         if (Array.isArray(constStopsB4) && constStopsB4.length) {
             //const meeting b4 -- get path
-            let [constB4Err, constB4Res] = await getOverViewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
+            console.log('before getOverviewPath');
+            let [constB4Err, constB4Res] = await getOverviewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
             if (constB4Err) {
                 console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
                 if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
             }
             if (constB4Res) {
-                console.log('2 constB4Res.overviewPath: ', constB4Res.overviewPath);
                 constOverviewPaths.push(constB4Res.overviewPath)
             }
         }
         if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
             let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
             //const meeting after -- get path
-            let [constAfterErr, constAfterRes] = await getOverViewPath(window.google, origin.location, constStopsAfter, null)
+            console.log('after getOverviewPath');
+            let [constAfterErr, constAfterRes] = await getOverviewPath(window.google, origin.location, constStopsAfter, null)
             if (constAfterErr) {
                 // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
                 if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
             }
             if (constAfterRes) {
-                console.log('3 constAfterRes.overviewPath: ', constAfterRes.overviewPath);
                 constOverviewPaths.push(constAfterRes.overviewPath)
             }
         }
@@ -197,7 +152,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillOpacity: 0.35
     });
 
-    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null
@@ -248,7 +202,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
             <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                 {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
-                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
+                    <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                    <FontAwesomeIcon icon="angle-down" />
+                </div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
                     :
                     <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
@@ -271,18 +228,18 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
     <>
         {/* reqsLocs */
             Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
-                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.type} location={m.location} info={m.info} />)
+                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
                 : null}
         {/* myMLocs */
             Array.isArray(data.myMLocs) && data.myMLocs.length ?
-                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} type={m.iconType} location={m.location} info={m.info} />)
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
                 : null}
 
         {Array.isArray(routePath) ?
             <Polyline
                 path={routePath}
                 geodesic={false}
-                options={{ strokeColor: '#82C0CC', strokeOpacity: "62%", strokeWeight: 7, }}
+                options={{ strokeColor: '#82C0CC', strokeOpacity: 0.62, strokeWeight: 7, }}
             />
             : null
         }
@@ -294,7 +251,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: `${Number(i * 10) + 62}%`, strokeWeight: 2 + Number(i * 2) }}
+                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 2 + Number(i * 2) }}
                     //todo: check change of opacity (i * 10?)
                     />
                 ))

@@ -83,11 +83,18 @@ export default class IsolatedForm extends Component {
     //update the public meeting that the shofar blower added
     updatePublicPlace = (index, keyName, publicPlaceVal) => {
         let publicPlaces = this.state.publicPlaces;
-        if (keyName === 'comments' && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaceVal)) {
-            this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
-            return;
-        }
-        publicPlaces[index][keyName] = publicPlaceVal;
+        // if (keyName === 'comments' && publicPlaceVal && publicPlaceVal.length && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaceVal)) {
+        //     this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
+        //     return;
+        // }
+
+        let value;
+        if (keyName === 'time') {
+            value = new Date(publicPlaceVal);
+            value.setFullYear(2020, 8, 20);
+        } else value = publicPlaceVal;
+
+        publicPlaces[index][keyName] = value;
         this.setState({ publicPlaces });
     }
 
@@ -124,17 +131,17 @@ export default class IsolatedForm extends Component {
         let publicPlaces = this.state.publicPlaces;
         let updateArrInState = false;
         for (let i in publicPlaces) {
-            if (!/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaces[i].comments)) {
+            if (publicPlaces[i].comments && publicPlaces[i].comments.length && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaces[i].comments)) {
                 this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
                 return false;
             }
-            if (!publicPlaces[i].address && !publicPlaces[i].time) {
-                updateArrInState = true;
-                publicPlaces.splice(i, 1);
-            }
+            // if (!publicPlaces[i].address && !publicPlaces[i].time) {
+            //     updateArrInState = true;
+            //     publicPlaces.splice(i, 1);
+            // }
             else {
                 if (!publicPlaces[i].address || !Array.isArray(publicPlaces[i].address) || !publicPlaces[i].time) {
-                    this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים' });
+                    this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים ( כתובת וזמן פגישה)' });
                     return false;
                 } else if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
                     this.setState({ publicMeetErr: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
@@ -275,7 +282,7 @@ export default class IsolatedForm extends Component {
                             <div className="public-meeting-options">
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
-                                        key={place.id}
+                                        key={"k"+place.id}
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}

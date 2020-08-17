@@ -1,51 +1,160 @@
-import React, { useContext, useState } from 'react';
-
-import { SBContext } from '../ctx/shofar_blower_context';
-
-import { MainContext } from '../ctx/MainContext';
+import React, { useContext, useState, useEffect } from 'react';
 import { isBrowser } from 'react-device-detect';
 
-const SBAssignMeeting = (props) => {
+import moment from 'moment'
+
+import { SBContext } from '../ctx/shofar_blower_context';
+import { MainContext } from '../ctx/MainContext';
+
+import Auth from '../modules/auth/Auth';
+import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign } from '../fetch_and_utils';
+
+const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
+
+const SBAssignMeeting = ({ history, inRoute }) => {
+
     const { openGenAlert } = useContext(MainContext)
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
         meetingsReqs, setMeetingsReqs,
-        assigns, setAssigns,
+        setIsInRoute,
+        startTimes, totalTime
     } = useContext(SBContext)
 
     const [openAssign, setOpenRouteList] = useState(true)
 
     if (!assignMeetingInfo || typeof assignMeetingInfo !== "object") {
-        props.history.push('/')
+        history.push('/')
         return;
     }
 
     const closeAssign = () => {
         if (isBrowser) {
             setAssignMeetingInfo(null)
+            setIsInRoute(false);
             return
         }
         setOpenRouteList(false)
         setTimeout(() => { setAssignMeetingInfo(null) }, 400)
     }
 
-
     const handleAssignment = async (close) => {
         if (close === "close") {
             closeAssign()
             return;
         }
-        //set new route and remove meetingId from reqs array
-        if (myMeetings.length == userData.can_blow_x_times) {
-            openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${myMeetings.length} וציינת שאתה תוקע ${userData.can_blow_x_times}, לכן לא ניתן כעת לשבץ`, isPopup: { okayText: "הבנתי" } })
+
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const myRoute = [];
+        let meetingStartTime;
+        //fill myRoute (without const meetings)
+        for (let i in myMeetings) {
+            meetingStartTime = new Date(myMeetings[i].startTime).getTime()
+            if (!myMeetings[i].constMeeting || (meetingStartTime > userStartTime && meetingStartTime < userEndTime)) {
+                myRoute.push(myMeetings[i])
+            }
+        }
+
+        console.log('myRoute: ', myRoute);
+        if (myRoute.length == userData.can_blow_x_times) {
+            //! MAX_ROUTE_LENGTH
+            handleMaxRouteLength(userData.can_blow_x_times)
             return;
         }
+
         openGenAlert({ text: "..." })
-        setAssigns(a => Array.isArray(a) ? [...a, assignMeetingInfo] : [assignMeetingInfo])
-        if (!myMeetings.includes(assignMeetingInfo)) setMyMeetings(mym => Array.isArray(mym) ? [...mym, assignMeetingInfo] : [assignMeetingInfo])
-        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != assignMeetingInfo.meetingId))
+        //ASSIGN --START
+        assignSB(assignMeetingInfo, (error, res) => {
+            if (error || !res) {
+                openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                return;
+            }
+            if (res && typeof res === "object" && typeof res.errName === "string") {
+                if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
+                    //! MAX_DURATION
+                    handleMaxDuration(res.errData)
+                    return;
+                }
+                else if (res.errName === "MAX_ROUTE_LENGTH" && res.errData && res.errData.currRouteLength !== null && res.errData.currRouteLength !== undefined) {
+                    //! MAX_ROUTE_LENGTH
+                    handleMaxRouteLength(res.errData.currRouteLength)
+                    return
+                }
+            }
+            else if (typeof res === "object" && !isNaN(Number(res.meetingId)) && !isNaN(Number(res.isPublicMeeting))) handleAssignSuccess(res)
+            else openGenAlert({ text: assign_error })
+        })
+        //ASSIGN --END
+    }
+    const handleAssignSuccess = (newMeeting) => {
+        openGenAlert({ text: "שובצת בהצלחה" })
         closeAssign()
+
+        //LOCAL STATE UPDATE WITH NEW MEETING --START
+        if (!myMeetings.includes(newMeeting)) {
+            console.log("setMyMeetings, ", Array.isArray(myMeetings) ? [...myMeetings, newMeeting] : [newMeeting])
+            setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
+        }
+        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
+        //LOCAL STATE UPDATE WITH NEW MEETING --END
+    }
+    const handleMaxRouteLength = (n) => {
+        openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n}, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
+            updateRouteLength => {
+                if (!updateRouteLength) {
+                    return;
+                }
+                console.log("remote method to update can_blow_x_times to curr length + 1, AND ASSIGN: ", n + 1);
+            })
+    }
+
+    const handleMaxDuration = (data) => {
+        let newTT = data.newTotalTime;
+        try {
+            newTT = moment(Number(data.newTotalTime)).format("mm.ss")
+        } catch (e) { newTT = Number(data.newTotalTime) / 60000 }
+
+        let maxDur = data.maxRouteDuration
+        try {
+            maxDur = moment(Number(data.maxRouteDuration)).format("mm.ss")
+        } catch (e) { maxDur = Number(data.maxRouteDuration) / 60000 }
+
+        let text = `זמן המסלול לאחר השיבוץ שלך יהיה ${newTT} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${maxDur} דקות, לכן לא ניתן כעת לשבצך`
+        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה", cancelText: "סגור" } },
+            updateMaxRouteDuration => {
+                if (!updateMaxRouteDuration) {
+                    return;
+                }
+                console.log('updateMaxDurationAndAssign');
+                updateMaxDurationAndAssign({ ...data.newAssignMeetingObj, newMaxTimeMS: data.newTotalTime },
+                    err => {
+                        if (err) {
+                            console.log('updateMaxDurationAndAssign err: ', err);
+                            openGenAlert({ text: typeof err === "string" ? err : assign_error })
+                            return;
+                        }
+                        handleAssignSuccess(assignMeetingInfo)
+                    })
+            })
+        return;
+    }
+
+    const deleteMeeting = async () => {
+        let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ meetToDelete: assignMeetingInfo })
+        });
+        if (err || !res) { //open alert of something went wrong
+            openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
+        }
+        if (res) {
+            openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
+            setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
+            handleAssignment('close');
+        }
     }
 
     let iconSrc;
@@ -69,7 +178,7 @@ const SBAssignMeeting = (props) => {
             </div>
 
             <div>
-                <div id="assign-title" className="width100" >שיבוץ תקיעה בשופר</div>
+                <div id="assign-title" className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
                     <img id="assign-icon" src={iconSrc} />
@@ -78,13 +187,14 @@ const SBAssignMeeting = (props) => {
             </div>
 
             <div className="sb-assign-content-container">
-                <div className="input-div" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
-                {assignMeetingInfo.isPublicMeeting ? null : < div className="input-div" id="meeting-phone" >{assignMeetingInfo.phone}</div>}
-                <div className="input-div" id="meeting-address" >{assignMeetingInfo.address}</div>
-                <div className={`input-div ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
+                <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
+                {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
+                <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
+                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{dateWTimeFormatChange(assignMeetingInfo.startTime).join(", ")}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
+                <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
             </div>
 
-            <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>
+            {inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
         </div>
     );
 }

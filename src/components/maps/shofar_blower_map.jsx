@@ -9,7 +9,7 @@ import { MainContext } from '../../ctx/MainContext';
 
 import { SBMapComponent } from './sb_map_renderer'
 
-import { dateWTimeFormatChange } from '../../fetch_and_utils';
+import { dateWTimeFormatChange, splitJoinAddressOnIsrael } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
@@ -29,7 +29,9 @@ const ShofarBlowerMap = (props) => {
         userData,
         myMeetings, meetingsReqs,
         setAssignMeetingInfo,
-        startTimes } = useContext(SBContext)
+        startTimes,
+        setIsInRoute,
+    } = useContext(SBContext)
 
 
     const [center, setCenter] = useState({});
@@ -45,16 +47,14 @@ const ShofarBlowerMap = (props) => {
 
 
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
-        {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
-        {meetingData && meetingData.address ? <div className="pub-address-container">{meetingData.address}</div> : null}
+        {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}
         <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
-        {meetingData && meetingData.comments ? <div className="pub-address-container" >{meetingData.comments}</div> : null}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
         <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
-        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
-        {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address) + `${meetingData.comments ? ", " + meetingData.comments : ""}`}</div></div> : null}
         <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
         {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
         {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
@@ -133,6 +133,7 @@ const ShofarBlowerMap = (props) => {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
                     startTime: myStartT && myStartT.startTime || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
+                    isPublicMeeting: myMeeting.isPublicMeeting,
                     constMeeting: myMeeting.constMeeting,
                     info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
                 }
@@ -187,7 +188,7 @@ const ShofarBlowerMap = (props) => {
 
 
     const getLngLatOfLocation = async (address) => {
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
+        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND_SECOND);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log(`error getting geoCode of ${address}: `, error); return; }
@@ -198,7 +199,8 @@ const ShofarBlowerMap = (props) => {
 
 
     const handleAssign = (meetingInfo) => {
-        setAssignMeetingInfo(meetingInfo)
+        setAssignMeetingInfo(meetingInfo);
+        setIsInRoute(false)
     }
 
     const handleMapChanged = (needGenInfo) => {

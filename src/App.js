@@ -9,7 +9,6 @@ import { PrivateRoute, MultipleRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
 import ResetPassword from './modules/auth/client/components/ResetPassword';
-import SBHomePage from './scenes/shofar_blower_home_page';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
 
@@ -21,6 +20,7 @@ const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'))
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
 const GeneralUserPage = loadable(() => import('./scenes/mainPages/GeneralUserPage'));
+const SBHomePage = loadable(() => import('./scenes/shofar_blower_home_page'));
 
 const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedSettigns'));
 const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));
@@ -78,8 +78,8 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
-                            <Route exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
-                            <Route path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i/login" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
+                            <PrivateRoute exact path = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName = "AdminHome" component = {(props) => <AdminHome {...props} />}/>
+                            <Route path = "/ffasfasfasfrefcawaeqwdca" compName = "AdminLogin" component = {(props) => <AdminLogin {...props} />}/>
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                         </Switch>

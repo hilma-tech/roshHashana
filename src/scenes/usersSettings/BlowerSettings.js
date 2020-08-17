@@ -71,7 +71,6 @@ const IsolatedSettings = (props) => {
     }
 
     const addPublicPlace = () => {
-        console.log("addPublicPlace")
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
@@ -101,7 +100,6 @@ const IsolatedSettings = (props) => {
 
 
     const removePubPlace = (i) => {
-        console.log("removePubPlace")
         publicMeetingsChanged = true
         let publicPlaces = [...vals.publicMeetings];
         publicPlaces.splice(i, 1);
@@ -117,8 +115,7 @@ const IsolatedSettings = (props) => {
     }
 
 
-    const updateIsolatedInfo = async (fromX) => {
-        console.log("hiii")
+    const updateBlowerInfo = async (fromX) => {
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -127,7 +124,6 @@ const IsolatedSettings = (props) => {
             }
         }
         if (fromX) {
-            console.log("publicMeetingsChanged", publicMeetingsChanged)
             if (publicMeetingsChanged || (updateData && Object.keys(updateData).length !== 0)) {
                 openGenAlert({
                     text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
@@ -159,7 +155,6 @@ const IsolatedSettings = (props) => {
                 })
             return;
         }
-        console.log('!updateData info: ', updateData);
 
         let { name, username, volunteering_start_time, can_blow_x_times, volunteering_max_time, address, publicMeetings } = updateData;
         // validate values
@@ -193,7 +188,7 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (!/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                if (publicMeetings[i].comments && publicMeetings[i].comments.length && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
                     let pms = [...publicMeetings];
                     pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
                     setValues(pms, "publicMeetings")
@@ -237,15 +232,20 @@ const IsolatedSettings = (props) => {
     }
 
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        let value;
+        if (keyName === 'time') {
+            value = new Date(publicPlaceVal);
+            value.setFullYear(2020, 8, 20);
+        } else value = publicPlaceVal;
         publicMeetingsChanged = true
         let publicPlaces = vals.publicMeetings;
-        publicPlaces[index][keyName] = publicPlaceVal;
+        publicPlaces[index][keyName] = value;
         setValues(publicPlaces, "publicMeetings")
     }
 
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateIsolatedInfo(false) }} handleClose={() => { updateIsolatedInfo(true) }} map={<Map blower settings />}>
+            <SettingsLayout handleUpdate={() => { updateBlowerInfo(false) }} handleClose={() => { updateBlowerInfo(true) }} map={<Map blower settings />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}

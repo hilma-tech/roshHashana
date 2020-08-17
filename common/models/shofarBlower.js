@@ -47,9 +47,9 @@ module.exports = function (ShofarBlower) {
                         let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
                         //if the shofar blower added publicPlaces,
                         if (data.publicPlaces) {
-                            let [resPublicMeetings, errPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options));
-                            if (resPublicMeetings) console.log("resPublicMeetings", resPublicMeetings)
-                            if (errPublicMeetings) console.log("errPublicMeetings", errPublicMeetings)
+                            let [errPublicMeetings, resPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, options.accessToken.userId, options, true));
+                            if (errPublicMeetings) { console.log("errPublicMeetings", errPublicMeetings); return { ok: false } }
+                            if (resPublicMeetings) { console.log("resPublicMeetings", resPublicMeetings); }
                         }
                         return { ok: true };
                     } else {
@@ -61,6 +61,34 @@ module.exports = function (ShofarBlower) {
                 throw error;
             }
         }
+    }
+
+//delete meeting from blower meetings
+    ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
+        if (options.accessToken && options.accessToken.userId) {
+            try {
+                const { userId } = options.accessToken;
+                const { meetingId } = meetToDelete;
+                if (meetToDelete.isPublicMeeting) {
+                    let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
+                    if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
+                        //only delete the connection between the blower and the meeting
+                        await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0 });
+                    }
+                    else await ShofarBlower.app.models.shofarBlowerPub.destroyById(meetingId); //there are no participants in this meeting, delete this meeting
+                }
+                else {
+                    //private meeting -> change blowerMeetingId to null -> 
+                    //only delete the connection between the blower and the meeting
+                    await ShofarBlower.app.models.Isolated.upsertWithWhere({ and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, { blowerMeetingId: null });
+                }
+                return true;
+            } catch (error) {
+                throw error;
+                //return false
+            }
+        }
+        else return false;
     }
 
 
@@ -75,5 +103,12 @@ module.exports = function (ShofarBlower) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-
+    ShofarBlower.remoteMethod('deleteMeeting', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'meetToDelete', type: 'object' },
+            { arg: 'options', type: 'object', http: "optionsFromRequest" }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 }
