@@ -209,36 +209,36 @@ module.exports = function (CustomUser) {
     CustomUser.getMapData = async (isPubMap = false, options) => {
         // map data for all maps (except for shofar blower map)
 
-        //get all private meetings 
+        //get all private meetings  
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `SELECT 
- isolatedUser.name AS "isolatedName", 
- isolatedUser.address,
- isolatedUser.lat,
- isolatedUser.lng,
- isolatedUser.comments,
- blowerUser.name AS "blowerName"
- FROM isolated 
- LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
- LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
+            isolatedUser.name AS "isolatedName", 
+            isolatedUser.address,
+            isolatedUser.lat,
+            isolatedUser.lng,
+            isolatedUser.comments,
+            blowerUser.name AS "blowerName"
+            FROM isolated 
+                LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+            WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
                 `SELECT
- blowerUser.name AS "blowerName",
- shofar_blower_pub.id,
- shofar_blower_pub.address,
- shofar_blower_pub.lat,
- shofar_blower_pub.lng,
- shofar_blower_pub.comments ,
- shofar_blower_pub.start_time
- FROM shofar_blower_pub
- LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
+                blowerUser.name AS "blowerName",
+                shofar_blower_pub.id,
+                shofar_blower_pub.address,
+                shofar_blower_pub.lat,
+                shofar_blower_pub.lng,
+                shofar_blower_pub.comments ,
+                shofar_blower_pub.start_time
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
             if (errPublic) throw errPublic;
 
             if (resPublic) {
@@ -271,10 +271,24 @@ module.exports = function (CustomUser) {
                 userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true, lng: true, lat: true } });
                 if (role === 1) {
                     //isolated
-                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
+                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, meeting_time: true, public_meeting: true, blowerMeetingId: true } });
                     if (!isolated) return { errMsg: 'LOG_OUT' };
                     userInfo.public_meeting = isolated.public_meeting;
                     userInfo.public_phone = isolated.public_phone;
+                    userInfo.meeting_time = isolated.meeting_time;
+                    if (isolated.blowerMeetingId) {
+                        if (!isolated.public_meeting) {
+                            let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
+                            userInfo.blowerName = blowerName.name;
+                        }
+                        else {
+                            let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { blowerId: { neq: null } }, include: ["blowerPublic"] });
+                            userInfo.meeting_time = meetingInfo.start_time;
+                            userInfo.address = meetingInfo.address;
+                            userInfo.blowerName = meetingInfo.blowerPublic().name;
+                        }
+                    }
+                    userInfo.blowerMeetingId = isolated.blowerMeetingId;
                     return userInfo;
                 }
                 else if (role === 2) {
@@ -298,16 +312,16 @@ module.exports = function (CustomUser) {
                 else {
                     //general user
                     const genUserQ = ` SELECT
- shofar_blower_pub.address,
- shofar_blower_pub.comments,
- shofar_blower_pub.start_time,
- CustomUser.name AS blowerName
- FROM 
- isolated
- RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
- INNER JOIN CustomUser ON shofar_blower_pub.blowerId = CustomUser.id
- WHERE
- isolated.userIsolatedId = ${userId}`
+                        shofar_blower_pub.address,
+                        shofar_blower_pub.comments,
+                        shofar_blower_pub.start_time,
+                        CustomUser.name AS blowerName
+                    FROM 
+                        isolated
+                        RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+                        INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
+                    WHERE
+                        isolated.userIsolatedId = ${userId}`
                     let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
                     if (errUserData) {
                         console.log("errUserData", errUserData)
@@ -334,6 +348,7 @@ module.exports = function (CustomUser) {
     CustomUser.getLastItemThatIsNotIsrael = (arr, pos) => {
         //gets an array of strings and the last position of that array (arr.length - 1)
         // returns the first item (from the end) that is not ירושלים
+        //? check if pos is bigger than 1000000 ? (to prevent an infinite loop cos goes from pos to pos===0 (on pos===0 returns))
         if (arr[pos] !== "ישראל") {
             return arr[pos]
         }
@@ -473,6 +488,7 @@ module.exports = function (CustomUser) {
                                 blowerId: userId
                             }
                         })
+                        console.log("publicMeetingsArr to create", publicMeetingsArr)
                         const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
                         if (errDeletePublicMeetings) {
                             console.log("errCreatePublicMeetings", errCreatePublicMeetings)
@@ -526,9 +542,9 @@ module.exports = function (CustomUser) {
                     //find all blower's public meetings
                     let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
                         `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
- from isolated right join shofar_blower_pub on shofar_blower_pub.id = isolated.blowerMeetingId 
- where (blowerId = 10) 
- group by shofar_blower_pub.id `);
+                         from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
+                         where (blowerId = 10) 
+                         group by shofar_blower_pub.id `);
                     if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
                         let meetingsToUpdate = [], meetingsToDelete = [];
 
@@ -651,57 +667,57 @@ module.exports = function (CustomUser) {
 
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT 
- isolated.id AS "meetingId", 
- false AS "isPublicMeeting", 
- IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
- CustomUser.name, 
- CustomUser.address,
- CustomUser.lng,
- CustomUser.lat 
- 
- FROM isolated 
- JOIN CustomUser ON userIsolatedId = CustomUser.id 
- 
- WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
+            isolated.id AS "meetingId", 
+            false AS "isPublicMeeting", 
+            IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
+            CustomUser.name, 
+            CustomUser.address,
+            CustomUser.lng,
+            CustomUser.lat 
+            
+            FROM isolated 
+                JOIN CustomUser ON userIsolatedId  = CustomUser.id 
+            
+            WHERE public_meeting = 0 AND blowerMeetingId IS NULL`;
 
             const allPubsQ = /* open PUBLIC meeting requests and MY PUbLIC routes */ `
- SELECT 
- shofar_blower_pub.id AS "meetingId", 
- shofar_blower_pub.constMeeting, 
- start_time AS "startTime", 
- shofar_blower_pub.address, 
- shofar_blower_pub.comments, 
- shofar_blower_pub.lng, 
- shofar_blower_pub.lat,
- true AS "isPublicRoute", 
- COUNT(isolated.id) AS "signedCount", 
- CASE
- WHEN blowerId IS NULL THEN "req"
- WHEN blowerId = ${userId} THEN "route"
- END blowerStatus,
- true AS isPublicMeeting 
- 
- FROM isolated 
- RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
- 
- WHERE (blowerId IS NULL OR blowerId = ${userId}) 
- 
- GROUP BY shofar_blower_pub.id ORDER BY start_time`
+            SELECT 
+            shofar_blower_pub.id AS "meetingId", 
+            shofar_blower_pub.constMeeting, 
+            start_time AS "startTime", 
+            shofar_blower_pub.address, 
+            shofar_blower_pub.comments, 
+            shofar_blower_pub.lng, 
+            shofar_blower_pub.lat,
+            true AS "isPublicRoute", 
+            COUNT(isolated.id) AS "signedCount",  
+            CASE
+                WHEN blowerId IS NULL THEN "req"
+                WHEN blowerId = ${userId} THEN "route"
+            END blowerStatus,
+            true AS isPublicMeeting 
+            
+            FROM isolated 
+                RIGHT JOIN shofar_blower_pub ON shofar_blower_pub.id = isolated.blowerMeetingId 
+            
+            WHERE (blowerId IS NULL OR blowerId = ${userId}) 
+            
+            GROUP BY shofar_blower_pub.id ORDER BY start_time`
 
             //my PRIVATE routes
             const priRouteMeetsQ = `
-                                    SELECT 
-                                        isolated.id AS "meetingId", 
-                                        isolated.meeting_time AS "startTime", 
-                                        CustomUser.address,
-                                        CustomUser.lng,
-                                        CustomUser.lat,
-                                        CustomUser.comments, 
-                                        CustomUser.name, 
-                                        IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
-                                    FROM isolated 
-                                        LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
-                                    WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
+            SELECT 
+                isolated.id AS "meetingId", 
+                isolated.meeting_time AS "startTime", 
+                CustomUser.address,
+                CustomUser.lng,
+                CustomUser.lat,
+                CustomUser.comments, 
+                CustomUser.name, 
+                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
+            FROM isolated 
+                LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
+            WHERE public_meeting = 0 AND blowerMeetingId = ${userId}`
 
             let [priReqErr, priReqRes] = await executeMySqlQuery(CustomUser, openPriReqsQ);
             if (priReqErr || !priReqRes) { console.log('private request error : ', priReqErr); }
