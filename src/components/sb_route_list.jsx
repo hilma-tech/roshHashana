@@ -71,14 +71,14 @@ const SBRouteList = (props) => {
     // textValue = `35 דקות (3 ק"מ)`//testing   
 
     const SortableItem = SortableElement(({ value }) =>
-        createItemContent(value.value, value.index)
+        createItemContent(value.value, value.index, value.uniqueKey)
     );
 
     const SortableList = SortableContainer(({ items }) => {
         return (
             <ul>
                 {items.map((value, index) => (
-                    <SortableItem key={`item-${index}`} index={index} value={{ value, index }} />
+                    <SortableItem key={`item-${index}`} index={index} value={{ value, index, uniqueKey: `${value.meetingId}${value.isPublicMeeting}` }} />
                 ))}
             </ul>
         );
@@ -89,8 +89,8 @@ const SBRouteList = (props) => {
         setAssignMeetingInfo(val);
     }
 
-    const createItemContent = (value, index) => {
-        return (<div key={"sb-route-list-" + index} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
+    const createItemContent = (value, index, uniqueKey) => {
+        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 {index !== CONST_MEETING ? <div className="meeting-in-route-img">
                     {index === -1 ?
@@ -130,10 +130,8 @@ const SBRouteList = (props) => {
             </div> : null}
             <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>
             <div className="sb-list" id="sb-list" ref={container}>
-                {constB4 && Array.isArray(constB4) && constB4.map((item) => {
-                    return createItemContent(item, CONST_MEETING);
-                })}
-                {userData ? createItemContent(userData, -1) : null}
+                {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
+                {userData ? createItemContent(userData, -1, -1) : null}
                 <SortableList
                     helperClass="sort-item-container"
                     distance={1}
@@ -143,9 +141,7 @@ const SBRouteList = (props) => {
                     items={myRoute}
                     onSortEnd={onSortEnd}
                 />
-                {constAfter && Array.isArray(constAfter) && constAfter.map((item) => {
-                    return createItemContent(item, CONST_MEETING);
-                })}
+                {constAfter && Array.isArray(constAfter) && constAfter.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
             </div>
         </div>
     );

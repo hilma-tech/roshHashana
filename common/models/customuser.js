@@ -212,33 +212,33 @@ module.exports = function (CustomUser) {
         //get all private meetings 
         let [errPrivate, resPrivate] = await executeMySqlQuery(CustomUser,
             `SELECT 
- isolatedUser.name AS "isolatedName", 
- isolatedUser.address,
- isolatedUser.lat,
- isolatedUser.lng,
- isolatedUser.comments,
- blowerUser.name AS "blowerName"
- FROM isolated 
- LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
- LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
+                isolatedUser.name AS "isolatedName", 
+                isolatedUser.address,
+                isolatedUser.lat,
+                isolatedUser.lng,
+                isolatedUser.comments,
+                blowerUser.name AS "blowerName"
+            FROM isolated 
+                LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+            WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
         if (errPrivate) throw errPrivate;
         //get all public meetings
         if (resPrivate) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
                 `SELECT
- blowerUser.name AS "blowerName",
- shofar_blower_pub.id,
- shofar_blower_pub.address,
- shofar_blower_pub.lat,
- shofar_blower_pub.lng,
- shofar_blower_pub.comments ,
- shofar_blower_pub.start_time
- FROM shofar_blower_pub
- LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
- LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
- WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
+                    blowerUser.name AS "blowerName",
+                    shofar_blower_pub.id,
+                    shofar_blower_pub.address,
+                    shofar_blower_pub.lat,
+                    shofar_blower_pub.lng,
+                    shofar_blower_pub.comments ,
+                    shofar_blower_pub.start_time
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
             if (errPublic) throw errPublic;
 
             if (resPublic) {
@@ -828,13 +828,15 @@ module.exports = function (CustomUser) {
                     myRoute.push(myMeetings[i])
                 }
             }
-            console.log('userData: ', userData);
-            console.log('myRoute: ', myRoute);
 
+            //! check route length
+            console.log(`checking route length ${myRoute.length}, ${userData.can_blow_x_times} and that is not >= to 20`);
             if (userData.can_blow_x_times == myRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: userData.can_blow_x_times } })
             }
-
+            if (myRoute.length == 20) {
+                return cb(null, { errName: "MAX_ROUTE_LENGTH_20", errData: { currRouteLength: userData.can_blow_x_times } })
+            }
 
             const origin = `${userData.lat},${userData.lng}`
 
@@ -847,7 +849,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&travelMode=WALKING&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -874,9 +876,6 @@ module.exports = function (CustomUser) {
             const totalTimeReducer = (accumulator, s) => { console.log("s", s); return (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null) }
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
 
-
-
-            console.log('newTotalTime: ', newTotalTime);
             let assignStartTime;
             try {
                 assignStartTime = result.startTimes[result.startTimes.length - 1].startTime
@@ -884,14 +883,11 @@ module.exports = function (CustomUser) {
 
             const newAssignMeetingObj = { ...meetingObj, startTime: assignStartTime } //will b returned to client
 
-            // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --START
-            console.log(`checking user's max route duration, userData.maxRouteDuration:${userData.maxRouteDuration}, newTotalTime:${newTotalTime}`);
+            //! check max total time length
+            console.log(`checking max duration ${userData.maxRouteDuration} ${newTotalTime}`);
             if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
-            // CHECK MAX TOTAL TIME LENGTH with CURRENT TOTAL TIME --END
-
-
 
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
@@ -919,52 +915,72 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'any', root: true }
     })
 
-    CustomUser.updateMaxDurationAndAssign = function (options, meetingData, cb) {
+    CustomUser.updateMaxDurationAndAssign = function (options, meetingObj, newMaxTimeVal, cb) {
+        console.log('update max duration and assign: ', newMaxTimeVal, meetingObj);
         (async () => {
-            if (!meetingData || Array.isArray(meetingData) || typeof meetingData !== "object") return cb(true)
+            if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 
             const { userId } = options.accessToken;
             if (isNaN(Number(options.accessToken.userId)) || userId < 1) return cb(true)
 
-            if (!meetingData.newMaxTimeMS) return cb(true)
+            if (!newMaxTimeVal) return cb(true)
             let newMaxTimeMins;
             try {
-                newMaxTimeMins = Number(meetingData.newMaxTimeMS) / 1000
-            } catch (_e) { newMaxTimeMins = null }
-            if (!newMaxTimeMins) return cb(true)
+                newMaxTimeMins = Number(newMaxTimeVal) / 60000
+            } catch (_e) { return cb(true) }
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
 
             //! update volunteering_max_time
-            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins} WHERE userBlowerId = ${userId}`)
+            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : newMaxTimeMins} WHERE userBlowerId = ${userId}`)
             if (durationUpdateErr || !durationUpdateRes) {
                 console.log(`durationUpdateErr, ${durationUpdateErr}`);
                 return cb(true)
             }
 
-            if (!new Date(meetingData.startTime).getTime) return cb(true)
-            let meetingId = Number(meetingData.meetingId)
-            if (isNaN(meetingId) || meetingId < 1) return cb(true)
+            // call assignSB
+            CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
+                console.log('assignE: ', assignE);
+                console.log('assignR: ', assignR);
+                return cb(assignE, assignR)
+            })
 
-            let sqlFormattedStartTime;
-            try {
-                sqlFormattedStartTime = new Date(meetingData.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
-            } catch (e) { console.log("wrong time: ", meetingData.startTime, " ", e); return cb(true) }
-
-            //! assign
-            const blowerUpdateQ = meetingData.isPublicMeeting ?
-                `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${sqlFormattedStartTime}" WHERE id = ${meetingId} AND blowerId IS NULL`
-                : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${sqlFormattedStartTime}" WHERE id = ${meetingId} AND blowerMeetingId IS NULL`
-
-            let [err, res] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
-            if (err || !res) { console.log('err: ', err); return cb(true) }
-            console.log('assign after duration update res: ', res);
-
-            return cb(null, true)
         })();
     }
     CustomUser.remoteMethod('updateMaxDurationAndAssign', {
         http: { verb: 'post' },
-        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingData", type: "object" }],
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObj", type: "object" }, { arg: "newMaxTimeVal", type: "any" }],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    })
+
+    CustomUser.updateMaxRouteLengthAndAssign = function (options, meetingObj, cb) {
+        console.log('update route length and assign: ', meetingObj);
+        (async () => {
+            if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
+            if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
+
+            const { userId } = options.accessToken;
+            if (isNaN(Number(options.accessToken.userId)) || userId < 1) return cb(true)
+
+            //! update can_blow_x_times
+            const [lengthUpdateErr, lengthUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET can_blow_x_times = shofar_blower.can_blow_x_times+1 WHERE userBlowerId = ${userId}`)
+            if (lengthUpdateErr || !lengthUpdateRes) {
+                console.log(`lengthUpdateErr, ${lengthUpdateErr}`);
+                return cb(true)
+            }
+
+            // call assignSB
+            CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
+                console.log('assignE: ', assignE);
+                console.log('assignR: ', assignR);
+                return cb(assignE, assignR)
+            })
+
+        })();
+    }
+    CustomUser.remoteMethod('updateMaxRouteLengthAndAssign', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "meetingObj", type: "object" }],
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
