@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;900&display=swap");
+$grey: #eeeeee;
+$orange: #fda42a;
+$dark-turquise: #156879;
+$light-blue: #489fb5;
+$Heebo: "Heebo", sans-serif;
+
+.admin-header {
+    background-color: $grey;
+    display: flex;
+    place-content: space-between;
+    font-family: $Heebo;
+    padding: 2vh;
+}
+
+.general-numbers {
+    display: flex;
+    span {
+        display: flex;
+        align-items: center;
+        margin: 0.25vw;
+        line-height: 1;
+        text-align: right;
+    }
+}
+
+.black-font {
+    font-weight: 900;
+    font-size: 2rem;
+}
+
+.header-detail {
+    font-size: 0.75rem;
+    width: 6vw;
+}
+
+.dark-turq {
+    color: $dark-turquise;
+    border-left: 1px solid gainsboro;
+    border-right: 1px solid gainsboro;
+}
+
+.light-blue {
+    color: $light-blue;
+}
+
+.orange {
+    color: $orange;
+}
+
+.map-container {
+    position: relative;
+    margin: 10;
+}
