@@ -1,185 +1,114 @@
 import React from 'react';
+import Login from '../../modules/auth/Login'
 import Auth from "../../modules/auth/Auth";
-import '../Register.scss';
-import { isBrowser } from "react-device-detect";
-const errKey = "קוד שגוי"
-const timeOut = "זמן הקוד פג"
-const SomethingMissing = "שם או מספר טלפון לא תקין"
+import GenericTools from '../../modules/tools/GenericTools'
+// import logo from '../../icons/logo.svg'
+import '../Register.scss'
 
-class AdminLogin extends React.Component {
-  constructor(props) {
-    super(props);
+class DashLogin extends Login {
 
-
-    this.state = {
-      status: "start",
-      phone: "",
-      name: "",
-      key: "",
-      alart: null,
-      sendKey: false,
-      imgLoadedNum: 0
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  componentDidMount() {
-    if (Auth.isAuthenticated()) {
-      return this.props.history.push('/');
+  onFocus = () => {
+    if (this.state.error) {
+      this.setState({ error: false })
     }
   }
 
-  handleChange(event) {
-    this.setState({ alart: null })
-    if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e") ||
-      (event.target.id === "name" && event.target.value.length < 20) ||
-      (event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".")) {
-      this.setState({ [event.target.id]: event.target.value })
-    }
-
-  }
-
-  async handleSubmit() {
-    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ "name": this.state.name, "phone": this.state.phone, "role": 'ADMIN' })
-      });
-      if (err) {
-        console.log("ERR", err);
-      }
-      if (res) {
-        this.setState({ status: "stepTwo" })
-        return
-
-      }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
-      this.setState({ alart: SomethingMissing })
-    }
-    if (this.state.status == "stepTwo" && this.state.key.length == 4) {
-      //TODO id for generalUser this.props.location.state.meetingInfo
-      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${'ADMIN'}`, {
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
-        method: "get",
-      });
-      if (err) {
-        console.log("ERR", err);
-      }
-      if (res && res.ok) {
-        switch (res.ok) {
-          case "err key":
-            this.setState({ alart: errKey })
-            break;
-          case "time out":
-            this.setState({ alart: timeOut });
-
-            break;
-          case "blower new":
-            this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
-
-            break;
-          case "blower with data":
-            this.props.history.push('/');
-
-            break;
-          case "isolator new":
-            this.props.history.push('/addDetails', { name: res.data.name, noDetails: true });
-            break;
-          case "isolator with data":
-            this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
-
-            break;
-          case "isolated with new public meeting":
-            //TODO להודיע לו שהוא נרשם 
-            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
-
-
-            break;
-          case "isolated with public meeting":
-            //TODO להכניס אותו שוב לאיפה שהוא נירשם
-            this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
-
-
-            break;
-          case "public meeting already exists":
-            //TODO "להגיד לו שהוא לא יכול להרשם פעמיים לפגישה ציבורית"
-            this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name, cantSignUpAgain: true });
-
-            break;
-          default:
-            this.setState({ status: "start", })
-            break;
-        }
-
-      }
-
-    } else if (this.state.status == "stepTwo" && this.state.key.length < 4) {
-      this.setState({ alart: errKey })
-    }
-
-
-  }
-  sendKey = async () => {
-    if (!this.state.sendKey) {
-      let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ "name": this.state.name, "phone": this.state.phone })
-      });
-      if (err) {
-        console.log("ERR", err);
-      }
-      if (res) {
-        this.setState({ sendKey: true })
-        setTimeout(() => { this.setState({ sendKey: false, }) }, 300000);
-      }
+  _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      this.myHandleLogin(e)
     }
   }
 
-  updateImgLoadedNum = () => {
-    let num = this.state.imgLoadedNum;
-    num++;
-    this.setState({ imgLoadedNum: num })
+  myHandleLogin = async (e) => {
+    e.preventDefault();
+    let error = "";
+    let email = this.refs.email.value;
+    let pw = this.refs.pw.value;
+    this.setState({ isLoading: true });
+    let res = await Auth.login(email, pw);
+    if (res.msg === "No response, check your network connectivity") {
+      error = 'שגיאה בהתחברות, נסה שנית מאוחר יותר'
+      this.setState({ isLoading: false, error });
+    }
+
+    else if (res.msg && res.msg.error && res.msg.error.statusCode === 500) {
+      error = 'שגיאה בהתחברות, נסה שנית מאוחר יותר'
+      this.setState({ isLoading: false, error });
+      return;
+    }
+
+    else if (res.msg && res.msg.error && res.msg.error.statusCode === 401) {
+      error = 'שם המשתמש או הסיסמא אינם נכונים'
+      this.setState({ isLoading: false, error });
+      return;
+    }
+    if (res.success === true) {
+      this.redirect()
+    }
+    this.setState({ isLoading: false });
   }
+
+  redirect = () => {
+    let redir = "/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i";
+    GenericTools.safe_redirect(redir);
+  }
+
+
 
   render() {
-
+    Auth.isAuthenticated() && this.redirect();
     return (
-      <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
-        {this.state.status === "start" ?
-          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => this.props.history.push('/')} />
-          :
-          <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start" }) }} />
-        }
+      <div className='browserRegisterPage fade-in mainlogindiv'>
+        <div className='containLoginMain logindiv'>
+          <form>
+            <div className="">
+              <img alt="" style={{width:"100%", marginBottom:"4vh"}} src="/images/header.svg" />
 
-        <><img alt="" style={{ width: isBrowser ? '26vw' : '50vw', marginTop: isBrowser ? "2%" : "6%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></>
 
-        {this.state.status === "start" ?
-          <div className="allInputInRegisterPage" >
-            <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"שם משתמש"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
-            <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"סיסמא"} value={this.state.phone} onChange={this.handleChange} />
-            <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-            <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
-              התחבר
-                 </button>
-
-          </div>
-          : <div className="allInputInRegisterPage" >
-              <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"הכנס את הקוד שקבלת"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
-              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
-              <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> התחבר </button>
-              <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
-                שלח לי קוד מחדש
-                </button>
-
-              <div>
+              <div className='position-relative' >
+                <div>
+                  <input className="loginInput"
+                    type='email'
+                    ref='email'
+                    onKeyDown={this._handleKeyDown}
+                    onFocus={this.onFocus}
+                    placeholder='אימייל'
+                    required />
+                </div>
+                <div>
+                  <input className="loginInput"
+                    type='password'
+                    ref='pw'
+                    onKeyDown={this._handleKeyDown}
+                    onFocus={this.onFocus}
+                    placeholder='סיסמא'
+                    required />
+                </div>
+                <div className='loginError'
+                  style={{ opacity: this.state.error ? '1' : '0' }}
+                >
+                  {this.state.error}
+                </div>
               </div>
-            </div>}
+              {this.state.isLoading ?
+                <div className='browserbutton1 connect pointer'  >
+                  <div>
+                    מתחבר...
+                                </div>
+                </div>
+                :
+                <div onClick={this.myHandleLogin} className='browserbutton1 connect pointer'>
+                  <div>
+                    התחבר
+                                </div>
+                </div>
+              }
+            </div>
+          </form>
+        </div>
       </div>
-    );
+    )
   }
 }
-export default AdminLogin;
+
+export default DashLogin;
