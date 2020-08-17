@@ -78,7 +78,7 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/ api / CustomUsers / deleteUser`, {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });
