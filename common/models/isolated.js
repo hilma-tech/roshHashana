@@ -81,16 +81,15 @@ module.exports = function (Isolated) {
     Isolated.updateMyStartTime = function (options, meetings, cb) {
         console.log('updateMyStartTime here');
         if (!options || !options.accessToken || !options.accessToken.userId) {
-            console.log("NO USER_ID IN OPTIONS, updateMyStartTime function. meetings are:", meetings);
+            console.log("NO_USER_ID_IN_OPTIONS in updateMyStartTime, meetings are:", meetings);
             return
         }
         (async () => {
-            console.log('meetings: ', meetings);
+            console.log(`meeting to update: ${meetings}`);
             if (Isolated.checkMeetingToUpdate(meetings)) {
                 let [uErr, uRes] = await singleStartTimeUpdate(meetings)
-                console.log('single uRes: ', uRes);
                 if (uErr || !uRes) {
-                    console.log('single uErr: ', uErr);
+                    console.log('update (not array) start time error: ', uErr);
                     return cb(true)
                 } else
                     return cb(null, true)
@@ -102,23 +101,22 @@ module.exports = function (Isolated) {
                     meeting = meetings[i]
                     let [uErr, uRes] = await Isolated.singleStartTimeUpdate(meeting)
                     if (uErr) {
-                        console.log('in for uErr: ', uErr);
                         errFlag = true;
+                        console.log(`update start time of item (${i}: ${meeting}) from array error: `, uErr);
                         continue;
                     }
-                    console.log('in for uRes: ', uRes);
                 }
                 if (errFlag) return cb("ONE_UPDATE_ERROR_AT_LEAST")
                 return cb(null, true)
             } else {
-                console.log("wrong var type");
+                console.log("wrong var type", meetings);
                 return cb(true)
             }
         })()
     }
 
     Isolated.remoteMethod('updateMyStartTime', {
-        http: { verb: 'post' },
+        http: { verb: 'POST' },
         accepts: [
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
             { arg: 'meetings', type: 'any' },

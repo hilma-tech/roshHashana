@@ -64,7 +64,6 @@ const SBHomePage = (props) => {
         fetching = false
     }
 
-
     return (
         <div className="sb-homepage-container">
             {

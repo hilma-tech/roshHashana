@@ -29,7 +29,9 @@ const ShofarBlowerMap = (props) => {
         userData,
         myMeetings, meetingsReqs,
         setAssignMeetingInfo,
-        startTimes } = useContext(SBContext)
+        startTimes,
+        setIsInRoute,
+    } = useContext(SBContext)
 
 
     const [center, setCenter] = useState({});
@@ -197,7 +199,8 @@ const ShofarBlowerMap = (props) => {
 
 
     const handleAssign = (meetingInfo) => {
-        setAssignMeetingInfo(meetingInfo)
+        setAssignMeetingInfo(meetingInfo);
+        setIsInRoute(false)
     }
 
     const handleMapChanged = (needGenInfo) => {

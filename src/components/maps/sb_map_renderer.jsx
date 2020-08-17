@@ -25,7 +25,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings, myMeetings
+        setMyMeetings,
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -36,15 +36,18 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const userLocationIcon = {
         url: '/icons/sb_origin.svg',
-        scaledSize: new window.google.maps.Size(100, 100),
+        scaledSize: new window.google.maps.Size(80, 80),
         // origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
 
     useEffect(() => {
-        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) setData()
-    }, [myMeetings])
+        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
+            setData();
+            console.log("use effect on myMLocs (which is part myMeetings)");
+        }
+    }, [data.myMLocs])
 
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
@@ -71,37 +74,39 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             else routeStops.push(data.myMLocs[i])
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            //get times only if there is a stop (a meeting) that doesn't have a start time
-            //cos if they have start times it means: either we just calculated them before, or we have the times in the db (and nothing since has changed)
-            // let getTimes = routeStops.find(stop => !stop.startTime || !new Date(stop.startTime).getTime)
+            console.log('my route, getOverviewPath');
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
-            if (err) { console.log("err getoverviewpath 1 : ", err); if (typeof err === "string") { openGenAlert({ text: err }); } return }
+            if (err) {
+                console.log("err getoverviewpath 1 : ", err);
+                if (typeof err === "string") { openGenAlert({ text: err }); }
+                return
+            }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
             console.log('newStartTimes: ', newStartTimes);
             const getMyNewST = (mId, isPub) => {
-                console.log('mId: ', mId);
-                console.log('isPub: ', isPub);
                 let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                 return false
             }
             const meetingsToUpdateST = [];
-            for (let m of routeStops) {
+            for (let m of routeStops) { //loop current stops and their start times
                 let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                // console.log('curr start time: ', new Date(m.startTime).toJSON());
-                // console.log('myNewStartTime: ', myNewStartTime);
-                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime)
+                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                console.log("calling updateMyStartTime with ", meetingsToUpdateST);
+                console.log("updateMyStartTime ", meetingsToUpdateST);
                 updateMyStartTime(meetingsToUpdateST, (error => {
-                    console.log('updateMyStartTime error: ', error);
-                    if (error) { openGenAlert({ text: error }) }
+                    if (error) { openGenAlert({ text: error }); console.log('updateMyStartTime error: ', error); }
+                }))
+                console.log('setMyMeetings cos meetings to update');
+                setMyMeetings(meets => meets.map(m => {
+                    let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                    if (!newMMStartTime) return m
+                    return { ...m, startTime: newMMStartTime.startTime }
                 }))
             }
-            // setMyMeetings(meets => meets.map(m => ({ ...m, startTime: getMyST(m.meetingId, m.isPublicMeeting) || new Date(m.startTime).toJSON() })))
             setRoutePath(res.overviewPath)
         }
 
@@ -109,6 +114,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let constOverviewPaths = [];
         if (Array.isArray(constStopsB4) && constStopsB4.length) {
             //const meeting b4 -- get path
+            console.log('before getOverviewPath');
             let [constB4Err, constB4Res] = await getOverviewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
             if (constB4Err) {
                 console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
@@ -121,6 +127,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
             let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
             //const meeting after -- get path
+            console.log('after getOverviewPath');
             let [constAfterErr, constAfterRes] = await getOverviewPath(window.google, origin.location, constStopsAfter, null)
             if (constAfterErr) {
                 // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
@@ -195,7 +202,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
             <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                 {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
-                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
+                    <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
+                    <FontAwesomeIcon icon="angle-down" />
+                </div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
                     :
                     <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >

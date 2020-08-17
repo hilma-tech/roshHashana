@@ -1,8 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import moment from 'moment'
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { SBContext } from '../ctx/shofar_blower_context';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+
+import moment from 'moment'
+
 import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
+
 
 
 const SBRouteList = (props) => {
@@ -39,7 +42,7 @@ const SBRouteList = (props) => {
         setConstAfter(constStopsAfter);
         setConstB4(constStopsB4);
         setMyRoute(routeStops);
-    }, []);
+    }, [myMeetings]);
 
     if (!userData) return null;
 
@@ -63,7 +66,7 @@ const SBRouteList = (props) => {
     }
 
 
-    // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}`
+    // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}` //goal
     const textValue = ` ${length ? `${length} ${lengthUnits}` : ""}`
     // textValue = `35 דקות (3 ק"מ)`//testing   
 
@@ -75,7 +78,7 @@ const SBRouteList = (props) => {
         return (
             <ul>
                 {items.map((value, index) => (
-                    < SortableItem key={`item-${index}`} index={index} value={{ value: value, index: index }} />
+                    <SortableItem key={`item-${index}`} index={index} value={{ value, index }} />
                 ))}
             </ul>
         );
@@ -110,6 +113,7 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
+        if (oldIndex == newIndex) return //no change, dragged and put back in original place
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);
@@ -126,13 +130,10 @@ const SBRouteList = (props) => {
             </div> : null}
             <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>
             <div className="sb-list" id="sb-list" ref={container}>
-                {console.log(document.getElementById('sb-list'))}
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => {
                     return createItemContent(item, CONST_MEETING);
                 })}
-                {userData && createItemContent(userData, -1)}
-                {console.log(container, 'container')
-                }
+                {userData ? createItemContent(userData, -1) : null}
                 <SortableList
                     helperClass="sort-item-container"
                     distance={1}

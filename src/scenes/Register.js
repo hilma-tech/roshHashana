@@ -15,7 +15,7 @@ class Register extends React.Component {
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
-      role: this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3,
+      role: this.props.location.state ? (this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3) : null,
       phone: "",
       name: "",
       key: "",
@@ -152,6 +152,7 @@ class Register extends React.Component {
   }
 
   render() {
+    if (!this.props.location || !this.props.location.state) this.props.history.push("/")
 
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
@@ -161,11 +162,11 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
-        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "12%" : "22%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location.state.type === 'blower' ?
+        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "6%" : "45%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        {this.props.location && this.props.location.state && this.props.location.state.type === 'blower' ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
-          this.props.location.state.type === 'isolator' ?
+          this.props.location && this.props.location.state && this.props.location.state.type === 'isolator' ?
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhoneisolator"}`} >{this.isolator}</div>
             :
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
