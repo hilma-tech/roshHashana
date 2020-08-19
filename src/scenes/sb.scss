@@ -365,7 +365,7 @@
     padding: 20px 40px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-evenly;
     #assign-x-btn-cont {
         width: 100%;
@@ -391,6 +391,14 @@
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
+        #assign-text {
+            font-size: 1.2rem;
+        }
+    }
+    #signedCount {
+        text-align: right;
+        color: $turquoise;
+        font-size: 1.1rem;
     }
     .sb-assign-content-container {
         overflow-wrap: break-word;

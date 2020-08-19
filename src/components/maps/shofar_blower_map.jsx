@@ -28,6 +28,7 @@ const ShofarBlowerMap = (props) => {
     const {
         userData,
         myMeetings, meetingsReqs,
+        genMapMeetings, setGenMapMeetings,
         setAssignMeetingInfo,
         startTimes,
         setIsInRoute,
@@ -99,6 +100,10 @@ const ShofarBlowerMap = (props) => {
         }
     }, [myMeetings, meetingsReqs])
 
+    useEffect(() => {
+        handleSetAllGenMapData(genMapMeetings)
+    }, [genMapMeetings])
+
 
     const fetchAllGenLocations = async () => {
         let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${true}`, {
@@ -110,6 +115,7 @@ const ShofarBlowerMap = (props) => {
             return;
         }
         if (mapContent) {
+            setGenMapMeetings(mapContent)
             handleSetAllGenMapData(mapContent)
         }
     }

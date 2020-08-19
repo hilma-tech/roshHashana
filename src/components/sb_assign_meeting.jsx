@@ -17,6 +17,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
+        genMapMeetings, setGenMapMeetings,
         meetingsReqs, setMeetingsReqs,
         setIsInRoute,
         startTimes, totalTime
@@ -163,7 +164,16 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
         }
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
-        //LOCAL STATE UPDATE WITH NEW MEETING --END
+
+        if (!genMapMeetings) return
+        if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+            setGenMapMeetings(genMeets => ({ privateMeetings: genMeets.privateMeetings, publicMeetings: Array.isArray(genMeets.publicMeetings) ? [...genMeets.publicMeetings, newMeeting] : [newMeeting] }))
+        }
+        else if (Array.isArray(genMapMeetings.publicMeetings)) {
+            setGenMapMeetings(genMeets => ({ publicMeetings: genMeets.publicMeetings, privateMeetings: Array.isArray(genMeets.privateMeetings) ? [...genMeets.publicMeetings, newMeeting] : [newMeeting] }))
+        }
+
+        //LOCAL STATE (genMeetings and myMeetings) UPDATE WITH NEW MEETING --END
     }
 
 
@@ -182,6 +192,16 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
             setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
+
+            if (genMapMeetings) {
+                if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+                    setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                }
+                else if (Array.isArray(genMapMeetings.privateMeetings)) {
+                    setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                }
+            }
+
             handleAssignment('close');
         }
     }
@@ -213,6 +233,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                     <img id="assign-icon" src={iconSrc} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
+                {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount || "טרם קיימים רשומים"}</div> : null}
             </div>
 
             <div className="sb-assign-content-container">
