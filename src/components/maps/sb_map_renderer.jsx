@@ -43,10 +43,6 @@ const getOverViewPath = async (google, origin, stops, extraData, cb = () => { })
         destination = {}
     }
 
-    console.log('> origin: ', { ...origin });
-    console.log('> waypoints: ', [...waypoints]);
-    console.log('> destination: ', { ...destination });
-
     const directionsService = new google.maps.DirectionsService();
     directionsService.route({
         origin,
@@ -203,7 +199,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillOpacity: 0.35
     });
     
-    console.log('israelPolygon: ', israelPolygon);
     var bounds = new window.google.maps.LatLngBounds();
     
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function")
@@ -227,7 +222,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setShowMeetingsListAni(false)
     }
 
-    props.data && console.log('props.data: ', props.data);
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
