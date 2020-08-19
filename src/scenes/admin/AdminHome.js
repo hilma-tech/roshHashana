@@ -5,6 +5,7 @@ import './AdminHome.scss'
 import { AdminContext } from '../../ctx/AdminContext';
 import { color } from 'd3';
 import { Link } from 'react-router-dom';
+
 const AdminHome = (props) => {
 
     const { isolatedNum, blowersNum, blowsNum } = useContext(AdminContext)

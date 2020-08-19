@@ -1,5 +1,16 @@
 'use strict';
+const to = require('../../server/common/to');
 
+const executeMySqlQuery = async (Model, query) =>
+    await to(new Promise((resolve, reject) => {
+        Model.dataSource.connector.query(query, (err, res) => {
+            if (err) {
+                reject(err);
+                return
+            }
+            resolve(res);
+        });
+    }));
 
 module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
@@ -151,5 +162,56 @@ module.exports = function (Isolated) {
         SET ${isPublicMeeting ? "start_time" : "meeting_time"} = "${formattedStartTime}"
                     WHERE id = ${meetingId}`
     }
+
+
+
+
+
+
+    //admin 
+    Isolated.getIsolatedsForAdmin = function (limit, filter, cb) {
+        (async () => {
+            try {
+                let where = ''
+                if (filter.length > 0) {
+                    where += `WHERE MATCH(cu.address) AGAINST ('"${filter}"') 
+                    OR MATCH(cu.name) AGAINST ('"${filter}"')`
+                }
+                
+                const isolatedQ = `SELECT cu.name, isolated.public_phone, cu.username, cu.address 
+                FROM isolated 
+                    LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                ${where}
+                ORDER BY cu.name
+                LIMIT 0, 10`
+
+                let [isolatedErr, isolatedRes] = await executeMySqlQuery(Isolated, isolatedQ);
+                if (isolatedErr || !isolatedRes) {
+                    console.log('get isolated admin request error : ', isolatedErr);
+                    throw isolatedErr
+                }
+                isolatedRes = isolatedRes.map(isolated => {
+                    if (isolated.public_phone === 1) isolated.phone = isolated.username
+                    delete isolated.username
+                    delete isolated.public_phone
+                    return isolated
+                })
+                return cb(null, isolatedRes)
+            }
+            catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getIsolatedsForAdmin', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'string' },
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
 
 }
