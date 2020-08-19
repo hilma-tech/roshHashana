@@ -22,6 +22,8 @@ export const SBProvider = ({ children }) => {
     const [totalLength, setTotalLength] = useState(null)
     const [isInRoute, setIsInRoute] = useState(false)
 
+    const [genMapMeetings, setGenMapMeetings] = useState(null)
+
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
         const startTimeRoute = new Date(myMeetings[0].startTime).getTime()
@@ -43,6 +45,7 @@ export const SBProvider = ({ children }) => {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
+        genMapMeetings, setGenMapMeetings,
         assigns, setAssigns,
         startTimes, setStartTimes,
         isInRoute, setIsInRoute,
@@ -52,7 +55,7 @@ export const SBProvider = ({ children }) => {
     return <SBContext.Provider value={ctxValue} >
         <>
             {children}
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
     </SBContext.Provider>
 }

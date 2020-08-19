@@ -55,7 +55,7 @@ const IsolatedSettings = (props) => {
         }
     }
 
-    const updateIsolatedInfo = async (fromX) => {
+    const updateIsolatedInfo = async (fromX = false) => {
 
         if (checkDateBlock()) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
@@ -70,17 +70,12 @@ const IsolatedSettings = (props) => {
                 props.history.goBack();
                 return
             } else {
-                openGenAlert({
-                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
-                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
-                },
+                openGenAlert({ text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`, isPopup: { okayText: "צא", cancelText: "המשך לערוך" } },
                     (res) => {
                         if (res) {
                             props.history.goBack();
-                            return
-                        } else {
-                            return
                         }
+                        return
                     })
                 return
             }
@@ -119,7 +114,7 @@ const IsolatedSettings = (props) => {
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "PUT",
-            body: JSON.stringify({ "data": newData })
+            body: JSON.stringify({ data: newData })
         }, true);
         if (res) {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
@@ -159,7 +154,7 @@ const IsolatedSettings = (props) => {
                 </div>
                 <div className="err-msg">{msgErr}</div>
             </SettingsLayout>
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
     );
 }

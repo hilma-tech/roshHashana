@@ -14,7 +14,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-import { updateMyStartTime , checkDateBlock} from '../../fetch_and_utils';
+import { updateMyStartTime } from '../../fetch_and_utils';
 
 import { logE } from '../../handlers/consoleLogHandler'
 
@@ -169,7 +169,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
-    const disableEdit = checkDateBlock();
 
     return (
         <GoogleMap
@@ -200,11 +199,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
                 </div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-                    : !disableEdit ?
-                        <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
-                            <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
-                            <div className="list-switch-text">הצג מחפשים ברשימה</div>
-                        </div> : null}
+                    :
+                    <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
+                        <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
+                        <div className="list-switch-text">הצג מחפשים ברשימה</div>
+                    </div>}
                 {showMeetingsList ?
                     <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
                         <SBAllMeetingsList />
@@ -244,8 +243,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 2 + Number(i * 2) }}
-                    //todo: check change of opacity (i * 10?)
+                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
                     />
                 ))
                 : null}

@@ -50,7 +50,7 @@ const IsolatedSettings = (props) => {
     useEffect(() => {
         (async () => {
             if (!vals || typeof vals !== "object" || !Object.keys(vals).length) {
-                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
@@ -342,7 +342,7 @@ const IsolatedSettings = (props) => {
                 <div className="err-msg">{errs.general}</div>
             </SettingsLayout >
 
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
     );
 }

@@ -1,4 +1,3 @@
-
 #general-alert-container {
   color: white;
 
@@ -18,7 +17,7 @@
   height: 2.5rem;
   line-height: 2.5rem; //must be the same as the height
 }
-.timeout-animation{
+.timeout-animation {
   animation: alert-msg-animation;
   animation-duration: 5s;
   opacity: 0;
@@ -28,6 +27,9 @@
 }
 .default-color {
   background-color: rgba(0, 0, 0, 0.5);
+}
+.block {
+  margin: auto !important;
 }
 
 @keyframes alert-msg-animation {

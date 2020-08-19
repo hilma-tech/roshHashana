@@ -225,7 +225,8 @@ module.exports = function (CustomUser) {
                 isolatedUser.lat,
                 isolatedUser.lng,
                 isolatedUser.comments,
-                blowerUser.name AS "blowerName"
+                blowerUser.name AS "blowerName",
+                isolated.id AS "meetingId" 
             FROM isolated 
                 LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
                 LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
@@ -237,11 +238,11 @@ module.exports = function (CustomUser) {
             let [errPublic, resPublic] = await executeMySqlQuery(CustomUser,
                 `SELECT
                     blowerUser.name AS "blowerName",
-                    shofar_blower_pub.id,
+                    shofar_blower_pub.id AS "meetingId",
                     shofar_blower_pub.address,
                     shofar_blower_pub.lat,
                     shofar_blower_pub.lng,
-                    shofar_blower_pub.comments ,
+                    shofar_blower_pub.comments,
                     shofar_blower_pub.start_time
                 FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
@@ -894,7 +895,6 @@ module.exports = function (CustomUser) {
                 let legDuration
                 for (let i in stops) {
                     leg = result.routes[0].legs[i]
-                    console.log('leg: ', leg);
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
@@ -909,7 +909,7 @@ module.exports = function (CustomUser) {
                 console.log('google maps request for directions, in assign: err, ', e)
                 return cb(true)
             }
-            const totalTimeReducer = (accumulator, s) => { console.log("s", s); return (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null) }
+            const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
 
             let assignStartTime;
@@ -972,11 +972,13 @@ module.exports = function (CustomUser) {
             if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
 
             //! update volunteering_max_time
-            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : newMaxTimeMins} WHERE userBlowerId = ${userId}`)
+            const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${userId}`)
             if (durationUpdateErr || !durationUpdateRes) {
                 console.log(`durationUpdateErr, ${durationUpdateErr}`);
                 return cb(true)
             }
+            console.log('update volunteering_max_time, newMaxTimeMins: ', newMaxTimeMins);
+
 
             // call assignSB
             CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {

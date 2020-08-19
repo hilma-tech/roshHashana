@@ -106,7 +106,6 @@ module.exports = function (Isolated) {
             return
         }
         (async () => {
-            console.log(`meeting to update: ${meetings}`);
             if (Isolated.checkMeetingToUpdate(meetings)) {
                 let [uErr, uRes] = await singleStartTimeUpdate(meetings)
                 if (uErr || !uRes) {
