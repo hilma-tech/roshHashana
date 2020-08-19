@@ -78,7 +78,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 return;
             }
             else if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ'});
                 return;
             }
             checkAssignResForError(res)

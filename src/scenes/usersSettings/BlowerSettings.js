@@ -50,7 +50,7 @@ const IsolatedSettings = (props) => {
     useEffect(() => {
         (async () => {
             if (!vals || typeof vals !== "object" || !Object.keys(vals).length) {
-            let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                 }, true);
                 if (err || !res) { openGenAlert({ text: "אירעה שגיאה בעת הבאת המידע, נא נסו שנית מאוחר יותר, תודה" }); console.log("getUserInfo err ", err, " or that !res"); return }
@@ -119,6 +119,7 @@ const IsolatedSettings = (props) => {
     const updateBlowerInfo = async (fromX) => {
         if (!fromX && checkDateBlock()) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים', block: true });
+            setVals(originalVals)
             return;
         }
 
@@ -225,6 +226,7 @@ const IsolatedSettings = (props) => {
         if (res) {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+                setVals(originalVals)
                 return;
             }
             openGenAlert({

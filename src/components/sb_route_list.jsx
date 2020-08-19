@@ -16,6 +16,8 @@ const SBRouteList = (props) => {
     const CONST_MEETING = 'CONST_MEETING';
     const container = useRef(null);
 
+    const disableEdit = checkDateBlock();
+
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
         const userStartTime = new Date(userData.startTime).getTime()
@@ -113,14 +115,12 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex == newIndex) return //no change, dragged and put back in original place
+        if (oldIndex == newIndex || disableEdit) return //no change, dragged and put back in original place
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);
         setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
-
-    const disableEdit = checkDateBlock();
 
     return (
         <div className="sb-route-list" >
