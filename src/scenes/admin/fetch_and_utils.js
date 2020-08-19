@@ -1,7 +1,8 @@
 import Auth from '../../modules/auth/Auth'
 import { CONSTS } from '../../consts/const_messages'
 
-export const fetchIsolateds = async (limit, filter, cb = () => { }) => {
+export const fetchIsolateds = async (limit, filter = '', cb = () => { }) => {
+    if (!filter) filter = ''
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getIsolatedsForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",

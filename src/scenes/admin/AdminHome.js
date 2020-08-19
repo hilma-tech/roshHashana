@@ -5,20 +5,11 @@ import './AdminHome.scss'
 import { AdminContext } from '../../ctx/AdminContext';
 import { color } from 'd3';
 import { Link } from 'react-router-dom';
-// import { fetchIsolateds } from './fetch_and_utils';
 
 const AdminHome = (props) => {
 
     const { isolatedNum, blowersNum, blowsNum } = useContext(AdminContext)
     const [sidebar, setSidebar] = useState (false);
-    
-    // useEffect(() => {
-    //     (async () => {
-    //         await fetchIsolateds({ start: 0, end: 10 }, null, (err, res) => {
-    //             console.log(err, res)
-    //         })
-    //     })()
-    // }, [])
 
     return <>
         <div className = "admin-header">

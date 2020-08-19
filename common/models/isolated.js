@@ -172,9 +172,16 @@ module.exports = function (Isolated) {
     Isolated.getIsolatedsForAdmin = function (limit, filter, cb) {
         (async () => {
             try {
+                let where = ''
+                if (filter.length > 0) {
+                    where += `WHERE MATCH(cu.address) AGAINST ('"${filter}"') 
+                    OR MATCH(cu.name) AGAINST ('"${filter}"')`
+                }
+                
                 const isolatedQ = `SELECT cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                ${where}
                 ORDER BY cu.name
                 LIMIT 0, 10`
 
@@ -201,7 +208,7 @@ module.exports = function (Isolated) {
         http: { verb: 'POST' },
         accepts: [
             { arg: 'limit', type: 'object' },
-            { arg: 'filter', type: 'object' },
+            { arg: 'filter', type: 'string' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });

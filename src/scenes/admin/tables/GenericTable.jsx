@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/table.scss'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const GenericTable = (props) => {
     const [tr, setTr] = useState(null)
@@ -11,17 +12,20 @@ const GenericTable = (props) => {
     return (
         <div>
             <table className="allTableStyle">
-                <tbody>
+                <thead>
                     {props.th ? <tr className="tableHead">
                         {props.th.map((i, index) => <th key={index}>{i[1]}</th>)}
                     </tr> : null}
+                </thead>
+                <tbody>
                     {!tr ?
                         props.loading ?
                             <tr className='headLine'>
                                 <td colSpan="9" className='noRes'>
-                                    <div className="spinner-border" role="status">
+                                    {/* loading...... */}
+                                    {/* <div className="spinner-border" role="status">
                                         <span className="sr-only">טוען...</span>
-                                    </div>
+                                    </div> */}
                                 </td>
                             </tr> :
                             <tr className='headLine'>
@@ -41,17 +45,15 @@ const GenericTable = (props) => {
                     }
                 </tbody>
             </table>
-            {/* {props.ManagerStore.readMore ?
-                <div
-                    className='readMore'
-                    onClick={() => {
-                        (async () => {
-                            await props.ManagerStore.fetchMeetingsDashboard({}, true)
-                        })()
-                    }}>
-                    {props.t("load more")}
-                </div> : null
-            } */}
+            {props.navigation &&
+                <div>
+                    <div className='tableNavigation'>
+                        <FontAwesomeIcon icon={['fas', "chevron-right"]} className='navArrow' onClick={props.nextPage} />
+                        <div>עמוד 1 מתוך 2</div>
+                        <FontAwesomeIcon icon={['fas', "chevron-left"]} className='navArrow' onClick={props.lastPage} />
+                    </div>
+                </div>
+            }
         </div>
     );
 }
