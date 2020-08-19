@@ -80,7 +80,7 @@ const GeneralUserPage = (props) => {
     //cancel the request and delete the user
     const cancelRequest = async () => {
         if (checkDateBlock()) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
             return;
         }
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {

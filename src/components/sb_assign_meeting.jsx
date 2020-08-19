@@ -87,7 +87,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //ASSIGN --END
     }
     const checkAssignResForError = (res) => {
-        
+
         if (res && typeof res === "object" && typeof res.errName === "string") { //actually an error. (It's in res on purpose, so I have control over it)
             if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
                 //! MAX_DURATION
@@ -122,6 +122,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                         if (error || !res) {
                             console.log('updateMaxDurationAndAssign err: ', error);
                             openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                            return;
+                        }
+                        else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                            openGenAlert({ text: res, block: true })
                             return;
                         }
                         checkAssignResForError(res)

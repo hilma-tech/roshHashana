@@ -46,7 +46,7 @@ const IsolatedPage = (props) => {
     //cancel the request and delete the user
     const cancelRequest = () => {
         if (checkDateBlock()) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש',block: true});
             return;
         }
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {

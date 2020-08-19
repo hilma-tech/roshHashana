@@ -998,6 +998,10 @@ module.exports = function (CustomUser) {
     CustomUser.updateMaxRouteLengthAndAssign = function (options, meetingObj, cb) {
         console.log('update route length and assign: ', meetingObj);
         (async () => {
+            if (checkDateBlock()) {
+                //block the function
+                return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+            }
             if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 
