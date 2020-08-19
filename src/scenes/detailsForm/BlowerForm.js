@@ -70,6 +70,9 @@ export default class IsolatedForm extends Component {
                 this.props.history.push('/');
                 return;
             }
+            if (err || !res) {
+                this.context.openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+            }
         })();
     }
 
