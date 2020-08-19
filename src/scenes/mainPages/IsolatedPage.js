@@ -45,10 +45,10 @@ const IsolatedPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = () => {
-        // if (checkDateBlock()) {
-        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
-        //     return;
-        // }
+        if (checkDateBlock()) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש',block: true});
+            return;
+        }
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
             if (!continuE) return
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
@@ -58,7 +58,7 @@ const IsolatedPage = (props) => {
             if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
             }
-            if (res && res.res === 'SUCCESS') {
+            else if (res && res.res === 'SUCCESS') {
                 Auth.logout(window.location.href = window.location.origin);
             }
             else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })

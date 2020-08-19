@@ -103,7 +103,7 @@ export const updateMaxRouteLengthAndAssign = async (meetingObj, cb) => {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
     }
     else
-        cb && typeof cb === "function" && cb(null, res)
+        cb && typeof cb === "function" && cb(null, res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
 }
 
 

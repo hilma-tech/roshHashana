@@ -31,7 +31,7 @@ export default class IsolatedForm extends Component {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
             if (disableEdit) {
-                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', isPopup: { okayText: "הבנתי" } }, () => {
+                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true, isPopup: { okayText: "הבנתי" } }, () => {
                     this.props.history.push('/');
                     return;
                 });
@@ -62,7 +62,7 @@ export default class IsolatedForm extends Component {
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
         if (checkDateBlock()) {
-            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים' });
+            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true });
             return;
         }
         const { address, comments, approval, publicMeeting } = this.state

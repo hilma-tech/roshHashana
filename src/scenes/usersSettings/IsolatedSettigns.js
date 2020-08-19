@@ -59,10 +59,10 @@ const IsolatedSettings = (props) => {
         setValues(placeName[1] ? placeName[1].lat : null, "lat")
     }
     const updateIsolatedInfo = async (fromX = false) => {
-        // if (checkDateBlock()) {
-        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
-        //     return;
-        // }
+        if (!fromX && checkDateBlock()) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים',block: true });
+            return;
+        }
 
         const updateData = {};
 
@@ -103,7 +103,6 @@ const IsolatedSettings = (props) => {
                 })
             return;
         }
-        console.log("updateData", updateData)
 
         let { name, username, address, lng, lat, public_meeting, public_phone, comments } = updateData;
         // validate values

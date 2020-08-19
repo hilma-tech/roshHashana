@@ -57,10 +57,10 @@ const IsolatedSettings = (props) => {
 
     const updateIsolatedInfo = async (fromX = false) => {
 
-        // if (checkDateBlock()) {
-        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
-        //     return;
-        // }
+        if (checkDateBlock()) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים',block: true });
+            return;
+        }
 
         //2 lines: checking if info has changed, otherwise is null
         let nameVal = name === originalIsolatedInfo.name ? null : name;

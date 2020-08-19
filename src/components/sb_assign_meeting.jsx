@@ -122,6 +122,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                             openGenAlert({ text: typeof error === "string" ? error : assign_error })
                             return;
                         }
+                        else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                            openGenAlert({ text: res, block: true })
+                            return;
+                        }
                         checkAssignResForError(res)
                     })
             })

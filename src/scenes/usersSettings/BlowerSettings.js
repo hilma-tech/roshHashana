@@ -118,7 +118,7 @@ const IsolatedSettings = (props) => {
 
     const updateBlowerInfo = async (fromX) => {
         // if (!fromX && checkDateBlock()) {
-        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים', block: true });
         //     return;
         // }
 

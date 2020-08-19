@@ -79,10 +79,10 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        // if (checkDateBlock()) {
-        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
-        //     return;
-        // }
+        if (checkDateBlock()) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
+            return;
+        }
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
@@ -90,7 +90,7 @@ const GeneralUserPage = (props) => {
         if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
         }
-        if (res && res.res === 'SUCCESS') {
+        else if (res && res.res === 'SUCCESS') {
             Auth.logout(window.location.href = window.location.origin);
         }
         else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
