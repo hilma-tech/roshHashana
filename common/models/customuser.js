@@ -257,7 +257,7 @@ module.exports = function (CustomUser) {
 
     //get the user info according to his role
     CustomUser.getUserInfo = async (options) => {
-        if (options.accessToken || !options.accessToken.userId) {
+        if (!options.accessToken || !options.accessToken.userId) {
             throw true
         }
         try {
