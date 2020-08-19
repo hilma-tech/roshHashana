@@ -3,15 +3,17 @@ import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { isBrowser } from "react-device-detect";
+import { CONSTS } from '../consts/const_messages';
+import { MainContext } from '../ctx/MainContext';
+import GeneralAlert from '../components/modals/general_alert';
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
+  static contextType = MainContext;
   constructor(props) {
     super(props);
-
-
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
@@ -57,8 +59,12 @@ class Register extends React.Component {
         console.log("ERR", err);
       }
       if (res) {
-        this.setState({ status: "stepTwo" })
-        return
+        if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+          this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן ליצור יותר משתמשים' });
+        } else {
+          this.setState({ status: "stepTwo" })
+        }
+        return;
 
       }
     } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
@@ -152,6 +158,7 @@ class Register extends React.Component {
   }
 
   render() {
+    const { showAlert } = this.context;
     if (!this.props.location || !this.props.location.state) this.props.history.push("/")
 
     return (
@@ -196,6 +203,7 @@ class Register extends React.Component {
               </div>
             </div></>}
         {/* </div> */}
+        {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
       </div>
     );
   }

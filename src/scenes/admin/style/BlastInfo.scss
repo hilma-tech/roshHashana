@@ -1,0 +1,68 @@
+.BlastInfo {
+    height: 100vh;
+    background: #e5e5e6 0% 0% no-repeat padding-box;
+    width: 25vw;
+    align-items: left;
+    padding: 20vh 32px 12px 12px;
+    color: #156879;
+    font-size: 20px;
+}
+
+.flexContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.leftdives {
+    justify-content: flex-start;
+    width: fit-content;
+    text-align: right;
+}
+
+.fonttkia {
+    font-size: 30px;
+}
+
+.flexRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4vh;
+}
+
+.width25 {
+    width: 25%;
+}
+.icon {
+    width: 3vh;
+}
+
+.width75 {
+    width: 75%;
+    text-align: right;
+    padding-right: 35px;
+    font-size: 20px;
+}
+
+.info {
+    width: fit-content;
+    height: fit-content;
+}
+
+.infoBox {
+    margin-top: 5vh;
+}
+
+.bottomToList {
+    width: fit-content !important;
+    height: fit-content !important;
+    color: white;
+    font-size: 25px;
+    background: #ffa62b 0% 0% no-repeat padding-box;
+    border-radius: 30px;
+    padding: 6px 25px;
+}
+.delete{
+    font-size: 18px;
+    margin-top: 5vh;
+}

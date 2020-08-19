@@ -3,9 +3,9 @@ var logUser = require('debug')('model:user');
 const moment = require('moment');
 const randomstring = require("randomstring");
 
-let sendMsg = require('../../server/sendSms/SendSms.js')
-const CONSTS = require('../../server/common/consts/consts')
-
+let sendMsg = require('../../server/sendSms/SendSms.js');
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
 const { default: Axios } = require('axios');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
@@ -15,22 +15,23 @@ let msgText2 = `הקוד שלך הוא:`
 
 
 module.exports = function (CustomUser) {
-
-
     CustomUser.createUser = async (name, phone, role) => {
+
         let resKey = await CustomUser.app.models.keys.createKey();
         console.log(resKey);
         try {
             let ResFindUser = await CustomUser.findOne({ where: { username: phone } })
 
             if (!ResFindUser) {
-
+                if (checkDateBlock() && role !== 3) {
+                    //need to block the function
+                    return CONSTS.CURRENTLY_BLOCKED_ERR;
+                }
                 let user = {
                     name: name,
                     username: phone,
                     keyId: resKey.id,
                 };
-
                 let ResCustom = await CustomUser.create(user);
 
                 let roleMapping = {
@@ -43,9 +44,6 @@ module.exports = function (CustomUser) {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 }
                 return ResCustom;
-
-
-
             } else {
                 if (ResFindUser && ResFindUser.keyId) {
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId);
@@ -136,6 +134,10 @@ module.exports = function (CustomUser) {
                 switch (roleId) {
                     case 1:
                         if (res.address == null) {
+                            if (checkDateBlock()) {
+                                //need to block the function
+                                return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+                            }
                             cb(null, { ok: "isolator new", data: { name: res.name } })
                         } else {
                             cb(null, { ok: "isolator with data", data: { name: res.name, address: res.address, comments: res.comments } })
@@ -144,6 +146,10 @@ module.exports = function (CustomUser) {
 
                     case 2:
                         if (res.address == null) {
+                            if (checkDateBlock()) {
+                                //need to block the function
+                                return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+                            }
                             cb(null, { ok: "blower new", data: { name: res.name } })
                         } else cb(null, { ok: "blower with data", data: { name: res.name } })
                         break;
@@ -360,6 +366,10 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.updateUserInfo = async (data, options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
         if (!options.accessToken || !options.accessToken.userId) {
             throw true
@@ -513,6 +523,10 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.deleteUser = async (options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         if (!options.accessToken || !options.accessToken.userId) {
             throw true
         }
@@ -754,7 +768,10 @@ module.exports = function (CustomUser) {
 
         console.log('assignSB: ');
         (async () => {
-
+            if (checkDateBlock()) {
+                //block the function
+                return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+            }
             if (!meetingObj || typeof (meetingObj) !== "object" || Array.isArray(meetingObj)) return cb(true)
 
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
@@ -935,6 +952,10 @@ module.exports = function (CustomUser) {
     CustomUser.updateMaxDurationAndAssign = function (options, meetingObj, newMaxTimeVal, cb) {
         console.log('update max duration and assign: ', newMaxTimeVal, meetingObj);
         (async () => {
+            if (checkDateBlock()) {
+                //block the function
+                return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+            }
             if (!meetingObj || Array.isArray(meetingObj) || typeof meetingObj !== "object") return cb(true)
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 

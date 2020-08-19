@@ -12,7 +12,7 @@ export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
     if (err || !res || !res.ok && typeof cb === "function") {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
     } else {
-        typeof cb === "function" && cb(false)
+        typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
     }
 
 }
@@ -24,12 +24,17 @@ export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => 
         body: JSON.stringify({ data: isolatedDetails })
     }, true);
     if (res) {
-        typeof cb === "function" && cb(false)
+        typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
     } else if (err) return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err)
 }
 
 
 export const assignSB = async (meetingObj, cb = () => { }) => {
+    // if (checkDateBlock()) {
+    //     cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
+    //     return;
+    // }
+
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
         method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingObj })
     }, true);
@@ -40,18 +45,22 @@ export const assignSB = async (meetingObj, cb = () => { }) => {
         return
     }
     console.log("res assigning sb to meeting ", res);
-    cb && typeof cb === "function" && cb(null, res)
+    cb && typeof cb === "function" && cb(null, res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
     return
 }
 
 export const deleteUser = async (cb = () => { }) => {
+    // if (checkDateBlock()) {
+    //     cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+    //     return;
+    // }
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "DELETE",
     });
     if (res && res.res === 'SUCCESS') {
         Auth.logout(window.location.href = window.location.origin);
-        typeof cb === "function" && cb(false) //no error
+        typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
     }
     else
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "סליחה, הפעולה נכשלה, נא נסו שנית מאוחר יותר") //yes error
@@ -67,7 +76,7 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
     }
     else
-        typeof cb === "function" && cb(false) //no error
+        typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
 
 }
 
@@ -82,7 +91,7 @@ export const updateMaxDurationAndAssign = async (meetingObj, newMaxTimeVal, cb) 
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
     }
     else
-        cb && typeof cb === "function" && cb(null, res)
+        cb && typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
 }
 
 export const updateMaxRouteLengthAndAssign = async (meetingObj, cb) => {
@@ -95,8 +104,8 @@ export const updateMaxRouteLengthAndAssign = async (meetingObj, cb) => {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
     }
     else
-    cb && typeof cb === "function" && cb(null, res)
-    }
+        cb && typeof cb === "function" && cb(null, res)
+}
 
 
 
@@ -139,4 +148,17 @@ export const changePosition = (array, from, to) => {
 
 export const splitJoinAddressOnIsrael = (address) => {
     return address.split(", ישראל").join('') // maybe add a split on ישראל only
+}
+
+export const checkDateBlock = () => {
+    let now = new Date(Date.now());
+    if (Date.parse(CONSTS.DATE_TO_BLOCK) < Date.parse(now)) {
+        //CONSTS.DATE_TO_BLOCK is less than now
+        //block
+        return true;
+    } else {
+        //now is less than CONSTS.DATE_TO_BLOCK
+        return false;
+    }
+
 }

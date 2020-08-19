@@ -2,8 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
-import { MainContext } from '../../ctx/MainContext';
+import { checkDateBlock } from '../../fetch_and_utils';
 import { CONSTS } from '../../consts/const_messages';
+import { MainContext } from '../../ctx/MainContext';
 import { isIOS } from "react-device-detect";
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
@@ -58,6 +59,11 @@ const IsolatedSettings = (props) => {
         setValues(placeName[1] ? placeName[1].lat : null, "lat")
     }
     const updateIsolatedInfo = async (fromX = false) => {
+        // if (checkDateBlock()) {
+        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+        //     return;
+        // }
+
         const updateData = {};
 
         for (let field in { ...vals }) { // remove values that are as origin
@@ -135,6 +141,10 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ "data": updateData })
         }, true);
         if (res) {
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+                return;
+            }
             openGenAlert({
                 text: "נשמר בהצלחה",
                 isPopup: { okayText: "אישור" }
@@ -149,9 +159,11 @@ const IsolatedSettings = (props) => {
         }
     }
 
+    const disableEdit = checkDateBlock();
+
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings />}>
+            <SettingsLayout disabled={disableEdit} handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map isolated settings />}>
                 <div className="personal-info-btn clickAble" onClick={() => setOpenPersInfo(!openPersInfo)}>
                     <div>פרטים אישיים</div>
                     <div>{openPersInfo ? '-' : '+'}</div>
@@ -159,11 +171,11 @@ const IsolatedSettings = (props) => {
 
                 <div className="personal-info fade-in" style={{ display: openPersInfo ? 'block' : 'none' }}>
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} disabled={disableEdit} />
                     <div className="err-msg">{errs.name || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} disabled={disableEdit} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
@@ -175,26 +187,26 @@ const IsolatedSettings = (props) => {
 
                 <div id="blowing-set" className="fade-in" style={{ display: openBlowingSet ? 'block' : 'none' }}>
                     <div className="header">כתובת</div>
-                    <FormSearchBoxGenerator value={vals.address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={vals.address} />
+                    <FormSearchBoxGenerator disabled={disableEdit} value={vals.address} onAddressChange={handleAddressChange} uId="publicPlaces-form-search-input-1" className='address' defaultValue={vals.address} />
                     <div className="err-msg">{errs.address || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="preferance header2">מהם העדפותיך לשמיעת תקיעת השופר?</div>
                     <div className="checkbox-container ">
                         <div className="header">בפתח הבית - תקיעה פרטית</div>
-                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
+                        <input className="clickAble" onChange={(e) => { setValues(e.target.checked ? false : true, "public_meeting") }} checked={vals.public_meeting ? false : true} type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} disabled={disableEdit} />
                     </div>
                     <div className="checkbox-container ">
                         <div className="header">בחלון או במרפסת הפונה לרחוב - תקיעה ציבורית</div>
-                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} />
+                        <input id="public-meeting" onChange={(e) => { setValues(e.target.checked ? true : false, "public_meeting") }} checked={vals.public_meeting ? true : false} className="clickAble" type="radio" name="preferance" style={{ marginTop: isIOS ? '0' : '2%' }} disabled={disableEdit} />
                     </div>
 
                     <div className="header">הערות ותיאור הכתובת</div>
-                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} />
+                    <input autoComplete={'off'} id="comments" type="text" value={vals.comments || ""} onChange={(e) => setValues(e.target.value, "comments")} maxLength={254} disabled={disableEdit} />
                     <div className="err-msg">{errs.comments || ""}</div>
 
                     <div className="checkbox-container approval header">
                         <div className="header2">אני מאשר שמספר הפלאפון שלי ישלח לבעל התוקע</div>
-                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }}></input>
+                        <input id="public-phone" onChange={(e) => { setValues(e.target.checked ? true : false, "public_phone") }} checked={vals.public_phone ? true : false || ""} className="clickAble" type="checkbox" style={{ marginTop: isIOS ? '0' : '2%' }} disabled={disableEdit} />
                     </div>
                 </div>
                 <div className="err-msg">{errs.general || ""}</div>

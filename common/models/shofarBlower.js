@@ -1,5 +1,7 @@
 'use strict';
 const to = require('../../server/common/to');
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 
 module.exports = function (ShofarBlower) {
     const SHOFAR_BLOWER_ROLE = 2
@@ -12,6 +14,11 @@ module.exports = function (ShofarBlower) {
     //         "comments": null
     //     }
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
+
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
@@ -65,6 +72,10 @@ module.exports = function (ShofarBlower) {
 
 //delete meeting from blower meetings
     ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         if (options.accessToken && options.accessToken.userId) {
             try {
                 const { userId } = options.accessToken;

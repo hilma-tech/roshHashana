@@ -5,10 +5,11 @@ import { isBrowser } from "react-device-detect";
 import Auth from '../../modules/auth/Auth';
 import moment from "moment"
 import Map from '../../components/maps/map';
-
+import { checkDateBlock } from '../../fetch_and_utils';
 import GeneralAlert from '../../components/modals/general_alert';
 
 import './MainPage.scss';
+import { CONSTS } from '../../consts/const_messages';
 
 const IsolatedPage = (props) => {
     const { showAlert, openGenAlert, userInfo, setUserInfo } = useContext(MainContext);
@@ -44,18 +45,26 @@ const IsolatedPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = () => {
+        // if (checkDateBlock()) {
+        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
+        //     return;
+        // }
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
             if (!continuE) return
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 method: "DELETE",
             });
+            if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
+            }
             if (res && res.res === 'SUCCESS') {
                 Auth.logout(window.location.href = window.location.origin);
             }
             else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
         })
     }
+    const disableEdit = checkDateBlock();
 
     const name = (userInfo && userInfo.name) ? userInfo.name : '',
         comment = (userInfo && userInfo.comments) ? userInfo.comments : '',
@@ -95,7 +104,7 @@ const IsolatedPage = (props) => {
                             </div>
                         </>
                     }
-                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
+                    {!disableEdit ? <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div> : null}
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />

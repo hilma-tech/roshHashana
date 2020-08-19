@@ -8,6 +8,7 @@ import { MainContext } from '../ctx/MainContext';
 
 import Auth from '../modules/auth/Auth';
 import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign } from '../fetch_and_utils';
+import { CONSTS } from '../consts/const_messages';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
 
@@ -76,11 +77,17 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: typeof error === "string" ? error : assign_error })
                 return;
             }
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
+                return;
+            }
             checkAssignResForError(res)
         })
         //ASSIGN --END
     }
     const checkAssignResForError = (res) => {
+        
         if (res && typeof res === "object" && typeof res.errName === "string") { //actually an error. (It's in res on purpose, so I have control over it)
             if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
                 //! MAX_DURATION
@@ -141,11 +148,14 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateMaxRouteDuration) {
                     return;
                 }
-                console.log('updateMaxDurationAndAssign');
                 updateMaxDurationAndAssign(assignMeetingInfo, data.newTotalTime,
                     err => {
                         if (err) {
-                            console.log('updateMaxDurationAndAssign err: ', err);
+                            if (err === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן להשתבץ יותר' });
+                                return;
+
+                            }
                             openGenAlert({ text: typeof err === "string" ? err : assign_error })
                             return;
                         }
@@ -189,6 +199,9 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
         }
         if (res) {
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
+            }
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
             setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])

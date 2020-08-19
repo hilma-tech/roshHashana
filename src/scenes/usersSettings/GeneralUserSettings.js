@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import GeneralAlert from '../../components/modals/general_alert';
-import { MainContext } from '../../ctx/MainContext';
+import { checkDateBlock } from '../../fetch_and_utils';
 import { CONSTS } from '../../consts/const_messages';
+import { MainContext } from '../../ctx/MainContext';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import './Settings.scss';
-
-
-
 
 
 const IsolatedSettings = (props) => {
@@ -59,6 +57,10 @@ const IsolatedSettings = (props) => {
 
     const updateIsolatedInfo = async (fromX = false) => {
 
+        // if (checkDateBlock()) {
+        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+        //     return;
+        // }
 
         //2 lines: checking if info has changed, otherwise is null
         let nameVal = name === originalIsolatedInfo.name ? null : name;
@@ -115,7 +117,10 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ data: newData })
         }, true);
         if (res) {
-
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+                return;
+            }
             openGenAlert({
                 text: "נשמר בהצלחה",
                 isPopup: { okayText: "אישור" }
@@ -134,15 +139,17 @@ const IsolatedSettings = (props) => {
         }
     }
 
+    const disableEdit = checkDateBlock();
+
     return (
         <>
-            <SettingsLayout handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated settings />}>
+            <SettingsLayout disabled={disableEdit} handleClose={() => { updateIsolatedInfo(true) }} handleUpdate={() => { updateIsolatedInfo(false) }} map={<Map meetAddress={meetAddres} isolated settings />}>
                 <div className="personal-info fade-in" >
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} minLength={2} />
+                    <input autoComplete={'off'} id="name" type="text" value={name} onChange={(e) => setValues(e.target.value, setName)} maxLength={20} minLength={2} disabled={disableEdit} />
                     <div className="err-msg">{nameMsgErr}</div>
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={username} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} disabled={disableEdit} />
                     <div className="err-msg">{phoneMsgErr}</div>
                 </div>
                 <div className="err-msg">{msgErr}</div>
