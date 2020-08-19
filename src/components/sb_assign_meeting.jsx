@@ -77,8 +77,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: typeof error === "string" ? error : assign_error })
                 return;
             }
-            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-
+            else if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
                 return;
             }
@@ -87,7 +86,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //ASSIGN --END
     }
     const checkAssignResForError = (res) => {
-        
         if (res && typeof res === "object" && typeof res.errName === "string") { //actually an error. (It's in res on purpose, so I have control over it)
             if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
                 //! MAX_DURATION
@@ -231,7 +229,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     }
 
     const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
-
     return (
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
@@ -246,7 +243,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                     <img id="assign-icon" src={iconSrc} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
-                {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount || "טרם קיימים רשומים"}</div> : null}
+                {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
             </div>
 
             <div className="sb-assign-content-container">

@@ -67,7 +67,7 @@ const SBRouteList = (props) => {
 
 
     // const textValue = `${tt} ${timeUnits} ${length ? `(${length} ${lengthUnits})` : ""}` //goal
-    const textValue = ` ${length ? `${length} ${lengthUnits}` : ""}`
+    const textValue = ` ${length ? `${length} ${lengthUnits}` : "0 ק\"מ"}`
     // textValue = `35 דקות (3 ק"מ)`//testing   
 
     const SortableItem = SortableElement(({ value }) =>
@@ -130,7 +130,7 @@ const SBRouteList = (props) => {
             {textValue ? <div className="under-title">
                 {`${textStart}: ${textValue}`}
             </div> : null}
-            <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>
+            {disableEdit ? null : <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>}
             <div className="sb-list" id="sb-list" ref={container}>
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
                 {userData ? createItemContent(userData, -1, -1) : null}
