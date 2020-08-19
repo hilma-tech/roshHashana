@@ -143,10 +143,24 @@
         },
         {
             "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": "count"
+        },
+        {
+            "principalType": "ROLE",
             "principalId": "SHOFARBLOWER",
             "permission": "ALLOW",
             "property": [
                 "updateMyStartTime"
+            ]
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": [
+                "getIsolatedsForAdmin"
             ]
         }
     ]

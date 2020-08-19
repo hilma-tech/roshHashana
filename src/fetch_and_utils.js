@@ -81,20 +81,31 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
 }
 
 
-export const updateMaxDurationAndAssign = async (meetingData, cb) => {
+export const updateMaxDurationAndAssign = async (meetingObj, newMaxTimeVal, cb) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateMaxDurationAndAssign`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ meetingData })
+        body: JSON.stringify({ meetingObj, newMaxTimeVal })
     })
     if (err || !res) {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
     }
     else
-        typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
+        cb && typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
 }
 
-
+export const updateMaxRouteLengthAndAssign = async (meetingObj, cb) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateMaxRouteLengthAndAssign`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ meetingObj })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
+    }
+    else
+        cb && typeof cb === "function" && cb(null, res)
+}
 
 
 

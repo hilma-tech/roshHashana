@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
 import { updateMyStartTime , checkDateBlock} from '../../fetch_and_utils';
 
+import { logE } from '../../handlers/consoleLogHandler'
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { err, data } = props
@@ -45,7 +46,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
             setData();
-            console.log("use effect on myMLocs (which is part myMeetings)");
         }
     }, [data.myMLocs])
 
@@ -74,16 +74,14 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             else routeStops.push(data.myMLocs[i])
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            console.log('my route, getOverviewPath');
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
-                console.log("err getoverviewpath 1 : ", err);
+                logE("err getoverviewpath 1 : ", err);
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
             let newStartTimes = res.startTimes;
             if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-            console.log('newStartTimes: ', newStartTimes);
             const getMyNewST = (mId, isPub) => {
                 let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                 if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
@@ -96,13 +94,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                console.log("updateMyStartTime ", meetingsToUpdateST);
                 updateMyStartTime(meetingsToUpdateST, (error => {
-                    if (error) {
-                        openGenAlert({ text: error }); console.log('updateMyStartTime error: ', error);
-                    }
+                    if (error) { openGenAlert({ text: error }); logE('updateMyStartTime error: ', error); }
                 }))
-                console.log('setMyMeetings cos meetings to update');
                 setMyMeetings(meets => meets.map(m => {
                     let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
                     if (!newMMStartTime) return m
@@ -116,10 +110,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let constOverviewPaths = [];
         if (Array.isArray(constStopsB4) && constStopsB4.length) {
             //const meeting b4 -- get path
-            console.log('before getOverviewPath');
             let [constB4Err, constB4Res] = await getOverviewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
             if (constB4Err) {
-                console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
+                // console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
                 if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
             }
             if (constB4Res) {
@@ -129,7 +122,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         if (Array.isArray(constStopsAfter) && constStopsAfter.length) {
             let origin = Array.isArray(routeStops) && routeStops.length ? routeStops[routeStops.length - 1] : userOrigin
             //const meeting after -- get path
-            console.log('after getOverviewPath');
             let [constAfterErr, constAfterRes] = await getOverviewPath(window.google, origin.location, constStopsAfter, null)
             if (constAfterErr) {
                 // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
@@ -206,7 +198,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
                 <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
                     <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
-                    <FontAwesomeIcon icon="angle-down" />
                 </div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
                     : !disableEdit ?
@@ -234,7 +225,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                 : null}
         {/* myMLocs */
             Array.isArray(data.myMLocs) && data.myMLocs.length ?
-                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconUrl={m.iconUrl} iconType={m.iconType} location={m.location} info={m.info} />)
                 : null}
 
         {Array.isArray(routePath) ?
@@ -263,9 +254,14 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
 );
 
 const BringAllGenMapInfo = ({ allLocations }) => {
-    if (!Array.isArray(allLocations)) return null;
+    if (!allLocations || typeof allLocations !== "object") return null;
 
-    return <>{allLocations.map((locationInfo, index) => {
-        return <MarkerGenerator key={index} blower locationInfo={locationInfo} /> /* all blowing meetings locations */
-    })}</>
+    return <>
+        {Array.isArray(allLocations.priMeetLocs) ? allLocations.priMeetLocs.map((locationInfo, index) => {
+            return <MarkerGenerator key={index} blower locationInfo={locationInfo} /> /* all blowing meetings locations */
+        }) : null}
+        {Array.isArray(allLocations.pubMeetLocs) ? allLocations.pubMeetLocs.map((locationInfo, index) => {
+            return <MarkerGenerator key={index} blower locationInfo={locationInfo} /> /* all blowing meetings locations */
+        }) : null}
+    </>
 }

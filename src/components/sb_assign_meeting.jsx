@@ -7,7 +7,7 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
 import Auth from '../modules/auth/Auth';
-import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign } from '../fetch_and_utils';
+import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign } from '../fetch_and_utils';
 import { CONSTS } from '../consts/const_messages';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
@@ -58,11 +58,15 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             }
         }
 
-        console.log('myRoute: ', myRoute);
         if (myRoute.length == userData.can_blow_x_times) {
             //! MAX_ROUTE_LENGTH
             handleMaxRouteLength(userData.can_blow_x_times)
             return;
+        }
+        if (myRoute.length == 20) {
+            //! MAX_ROUTE_LENGTH_20
+            openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
+            return
         }
 
         openGenAlert({ text: "..." })
@@ -73,50 +77,59 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 return;
             }
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                
+
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
                 return;
             }
-            if (res && typeof res === "object" && typeof res.errName === "string") {
-                if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
-                    //! MAX_DURATION
-                    handleMaxDuration(res.errData)
-                    return;
-                }
-                else if (res.errName === "MAX_ROUTE_LENGTH" && res.errData && res.errData.currRouteLength !== null && res.errData.currRouteLength !== undefined) {
-                    //! MAX_ROUTE_LENGTH
-                    handleMaxRouteLength(res.errData.currRouteLength)
-                    return
-                }
-            }
-            else if (typeof res === "object" && !isNaN(Number(res.meetingId)) && !isNaN(Number(res.isPublicMeeting))) handleAssignSuccess(res)
-            else openGenAlert({ text: assign_error })
+            checkAssignResForError(res)
         })
         //ASSIGN --END
     }
-    const handleAssignSuccess = (newMeeting) => {
-        openGenAlert({ text: "שובצת בהצלחה" })
-        closeAssign()
-
-        //LOCAL STATE UPDATE WITH NEW MEETING --START
-        if (!myMeetings.includes(newMeeting)) {
-            console.log("setMyMeetings, ", Array.isArray(myMeetings) ? [...myMeetings, newMeeting] : [newMeeting])
-            setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
+    const checkAssignResForError = (res) => {
+        
+        if (res && typeof res === "object" && typeof res.errName === "string") { //actually an error. (It's in res on purpose, so I have control over it)
+            if (res.errName === "MAX_DURATION" && res.errData && res.errData.newTotalTime !== null && res.errData.newTotalTime !== undefined && res.errData.maxRouteDuration !== undefined && res.errData.maxRouteDuration !== null) {
+                //! MAX_DURATION
+                handleMaxDuration(res.errData)
+                return;
+            }
+            else if (res.errName === "MAX_ROUTE_LENGTH" && res.errData && res.errData.currRouteLength !== null && res.errData.currRouteLength !== undefined) {
+                //! MAX_ROUTE_LENGTH
+                handleMaxRouteLength(res.errData.currRouteLength)
+                return
+            }
+            else if (res.errName === "MAX_ROUTE_LENGTH_20" && res.errData && res.errData.currRouteLength !== null && res.errData.currRouteLength !== undefined) {
+                //! MAX_ROUTE_LENGTH_20
+                openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
+                return
+            }
+            else openGenAlert({ text: assign_error })
         }
-        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
-        //LOCAL STATE UPDATE WITH NEW MEETING --END
+        else if (typeof res === "object" && !isNaN(Number(res.meetingId)) && !isNaN(Number(res.isPublicMeeting))) handleAssignSuccess(res) //RES (need new meeting info to update myMeetings)
+        else openGenAlert({ text: assign_error })
     }
+
     const handleMaxRouteLength = (n) => {
-        openGenAlert({ text: `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n}, לכן לא ניתן כעת לשבצך`, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
+        let text = `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
+        openGenAlert({ text, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
             updateRouteLength => {
                 if (!updateRouteLength) {
                     return;
                 }
-                console.log("remote method to update can_blow_x_times to curr length + 1, AND ASSIGN: ", n + 1);
+                updateMaxRouteLengthAndAssign(assignMeetingInfo,
+                    (error, res) => {
+                        if (error || !res) {
+                            console.log('updateMaxDurationAndAssign err: ', error);
+                            openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                            return;
+                        }
+                        checkAssignResForError(res)
+                    })
             })
     }
 
     const handleMaxDuration = (data) => {
+        //format
         let newTT = data.newTotalTime;
         try {
             newTT = moment(Number(data.newTotalTime)).format("mm.ss")
@@ -126,6 +139,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         try {
             maxDur = moment(Number(data.maxRouteDuration)).format("mm.ss")
         } catch (e) { maxDur = Number(data.maxRouteDuration) / 60000 }
+        //format end
 
         let text = `זמן המסלול לאחר השיבוץ שלך יהיה ${newTT} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${maxDur} דקות, לכן לא ניתן כעת לשבצך`
         openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה", cancelText: "סגור" } },
@@ -133,7 +147,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateMaxRouteDuration) {
                     return;
                 }
-                updateMaxDurationAndAssign({ ...data.newAssignMeetingObj, newMaxTimeMS: data.newTotalTime },
+                updateMaxDurationAndAssign(assignMeetingInfo, data.newTotalTime,
                     err => {
                         if (err) {
                             if (err === CONSTS.CURRENTLY_BLOCKED_ERR) {
@@ -150,6 +164,21 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         return;
     }
 
+    const handleAssignSuccess = (newMeeting) => {
+        openGenAlert({ text: "שובצת בהצלחה" })
+        closeAssign()
+
+        //LOCAL STATE UPDATE WITH NEW MEETING --START
+        if (!myMeetings.includes(newMeeting)) {
+            setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
+        }
+        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
+        //LOCAL STATE UPDATE WITH NEW MEETING --END
+    }
+
+
+
+
     const deleteMeeting = async () => {
         let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -165,6 +194,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             }
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
+            setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
             handleAssignment('close');
         }
     }

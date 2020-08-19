@@ -125,11 +125,20 @@ const ShofarBlowerMap = (props) => {
                     info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
                 }
             })
+        let myRouteCnt = 0;
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        let myStartT
+        let meetingStartTime
+        let isConstMeeting
+        let locObj = {}
         let myMeetingsLocs = !Array.isArray(myMeetings) ? []
-            : myMeetings.map(myMeeting => {
-                let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
-                return {
-                    iconType: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
+            : myMeetings.map((myMeeting, i) => {
+                myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
+                meetingStartTime = new Date(myMeeting.startTime).getTime()
+                isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
+                if (!isConstMeeting) { myRouteCnt++ }
+                locObj = {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
                     startTime: myStartT && myStartT.startTime || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
@@ -137,6 +146,10 @@ const ShofarBlowerMap = (props) => {
                     constMeeting: myMeeting.constMeeting,
                     info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
                 }
+                isConstMeeting ?
+                    locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
+                    locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
+                return locObj;
             })
 
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
@@ -154,7 +167,7 @@ const ShofarBlowerMap = (props) => {
                 location: { lat, lng },
                 info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                     <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                    <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                </div>
             })
         }
 

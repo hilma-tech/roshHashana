@@ -11,8 +11,7 @@
     "GENERALUSER": { 
         "comps": [
             "GeneralUserSettings",
-            "AdminLogin",
-            "AdminHome"
+            "AdminLogin"
         ],
         "defaultHomePage": "GeneralUserPage"
     },
@@ -27,7 +26,8 @@
     "ADMIN": {
         "comps": [
             "AdminLogin",
-            "AdminHome"
+            "AdminHome",
+            "BlastsPage"
         ],
         "deafaultHomePage": "AdminHome"
     }
