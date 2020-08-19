@@ -134,16 +134,17 @@ const SBRouteList = (props) => {
             <div className="sb-list" id="sb-list" ref={container}>
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
                 {userData ? createItemContent(userData, -1, -1) : null}
-                <SortableList
-                    disabled={disableEdit}
-                    helperClass="sort-item-container"
-                    distance={1}
-                    lockToContainerEdges={true}
-                    helperContainer={() => container.current}
-                    lockAxis={'y'}
-                    items={myRoute}
-                    onSortEnd={onSortEnd}
-                />
+                {disableEdit ? (myRoute && Array.isArray(myRoute) && myRoute.map((item, index) => createItemContent(item, index, `${item.meetingId}${item.isPublicMeeting}`)))
+                    : <SortableList
+                        disabled={disableEdit}
+                        helperClass="sort-item-container"
+                        distance={1}
+                        lockToContainerEdges={true}
+                        helperContainer={() => container.current}
+                        lockAxis={'y'}
+                        items={myRoute}
+                        onSortEnd={onSortEnd}
+                    />}
                 {constAfter && Array.isArray(constAfter) && constAfter.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
             </div>
         </div>

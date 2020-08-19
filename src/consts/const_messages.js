@@ -23,5 +23,5 @@ export const CONSTS = {
         clickableIcons: false
     },
     JERUSALEM_POSITION: { lat: 31.771959, lng: 35.217018 },
-    DATE_TO_BLOCK: new Date(2020, 8, 17, 0, 0, 0)
+    DATE_TO_BLOCK: new Date(2019, 8, 17, 0, 0, 0)
 }
