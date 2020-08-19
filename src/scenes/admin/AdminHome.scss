@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;900&display=swap");
+$grey: #eeeeee;
+$background: #F6F6F6;
+$dark-grey: #707070;
+$orange: #fda42a;
+$dark-turquise: #156879;
+$light-blue: #489fb5;
+$Heebo: "Heebo", sans-serif;
+
+.admin-header {
+    background-color: $grey;
+    display: flex;
+    place-content: space-between;
+    font-family: $Heebo;
+    padding: 2vh;
+}
+
+.general-numbers {
+    display: flex;
+    span {
+        display: flex;
+        align-items: center;
+        margin: 0.25vw;
+        line-height: 1;
+        text-align: right;
+    }
+}
+
+.black-font {
+    font-weight: 900;
+    font-size: 2rem;
+}
+
+.header-detail {
+    font-size: 0.75rem;
+    width: 6vw;
+}
+
+.hamburger {
+    color: $dark-grey;
+    font-size: larger;
+}
+
+.admin-sidebar {
+    position: absolute;
+    width: 33vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    z-index: 10;
+
+    background-color: $background;
+    color: $dark-grey;
+}
+
+.close-icon {
+    width: 1.75rem;
+    top: 4vh;
+    right: 4vh;
+    position: absolute;
+}
+
+table {
+    position: relative;
+    top: 15vh;
+    right: 0;
+    margin-right: 2vw;
+    margin-left: 2vw;
+    width: -webkit-fill-available;
+    text-align: right;
+    font-size: 1.75rem;
+}
+tr {
+    margin-right: 6vw;
+    width: 30vw;
+    border-bottom: 1px solid $grey;
+}
+
+td {
+    height: 10vh;
+    vertical-align: bottom;
+    padding-right: 3vw;
+}
+
+a, a:hover {
+    color: unset; /* blue colors for links too */
+    text-decoration: unset; /* no underline */
+  }
+
+.dark-turq {
+    color: $dark-turquise;
+    border-left: 1px solid gainsboro;
+    border-right: 1px solid gainsboro;
+}
+
+.light-blue {
+    color: $light-blue;
+}
+
+.orange {
+    color: $orange;
+}
+
+.map-container {
+    position: relative;
+    margin: 10;
+}
