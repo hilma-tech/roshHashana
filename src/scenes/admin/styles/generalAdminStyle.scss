@@ -1,0 +1,21 @@
+.inputContainer
+{
+    position: relative; 
+    width: 100%;
+
+    input {
+        width: 100%;
+        font-size: 2.3vh;
+        padding: 0.5vh 1.5vw;
+        color: #747474;
+        outline: none;
+    }
+
+    .inputIcon{
+        position: absolute;
+        color: #747474c5;
+        font-size: 2.5vh;
+        left: 1.5vw;
+        top: 1.1vh;
+    }
+}
