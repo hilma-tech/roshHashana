@@ -11,7 +11,9 @@ import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateSBDetails } from '../../fetch_and_utils';
-import { CONSTS } from '../../consts/const_messages';
+import { CONSTS } from '../../const_messages';
+import { MainContext } from '../../ctx/MainContext';
+import GeneralAlert from '../../components/modals/general_alert';
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -35,6 +37,9 @@ const materialTheme = createMuiTheme({
 const format = 'HH:mm';
 
 export default class IsolatedForm extends Component {
+
+    static contextType = MainContext
+
     constructor(props) {
         super(props);
         this.state = {
@@ -58,6 +63,9 @@ export default class IsolatedForm extends Component {
             if (res && res.address) {
                 this.props.history.push('/');
                 return;
+            }
+            if (err || !res) {
+                this.context.openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
             }
         })();
     }
@@ -309,6 +317,8 @@ export default class IsolatedForm extends Component {
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" alt="" src="/icons/shofar.png" />
                 </BrowserView>
+
+                {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
             </div>
         );
     }

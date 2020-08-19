@@ -6,8 +6,13 @@ import './detailsForm.scss';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import { updateIsolatedDetails } from '../../fetch_and_utils';
 import { CONSTS } from '../../consts/const_messages';
+import { MainContext } from '../../ctx/MainContext';
+import GeneralAlert from '../../components/modals/general_alert';
 
 export default class IsolatedForm extends Component {
+
+    static contextType = MainContext
+
     constructor(props) {
         super(props);
         this.state = {
@@ -29,6 +34,9 @@ export default class IsolatedForm extends Component {
             if (res && res.address) {
                 this.props.history.push('/');
                 return;
+            }
+            if (err || !res) {
+                this.context.openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
             }
         })();
     }
@@ -147,6 +155,8 @@ export default class IsolatedForm extends Component {
                 {this.state.openModal ?
                     <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי, תודה" closeSelf={this.goToMainPage} /></div>
                     : null}
+                {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
+
             </>
         );
     }

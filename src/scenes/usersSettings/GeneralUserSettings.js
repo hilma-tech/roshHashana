@@ -130,7 +130,7 @@ const IsolatedSettings = (props) => {
                 })
         }
         if (err) {
-            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר" })
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר" })
         }
     }
 

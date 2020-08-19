@@ -25,7 +25,7 @@ const SBNotConfirmed = (props) => {
             if (!continuE) return;
             deleteUser((error) => {
                 if (error) props.openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
-            })
+            })  
         })
 
     }

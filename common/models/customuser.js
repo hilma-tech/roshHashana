@@ -261,58 +261,60 @@ module.exports = function (CustomUser) {
 
     //get the user info according to his role
     CustomUser.getUserInfo = async (options) => {
-        if (options.accessToken && options.accessToken.userId) {
-            try {
-                const userId = options.accessToken.userId;
-                let role = await getUserRole(userId);
-                if (!role) return;
+        if (!options.accessToken || !options.accessToken.userId) {
+            throw true
+        }
+        try {
+            const userId = options.accessToken.userId;
+            let role = await getUserRole(userId);
+            if (!role) return;
 
-                let userInfo = {};
-                //get the user info from customuser -> user address and phone number
-                userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true, lng: true, lat: true } });
-                if (role === 1) {
-                    //isolated
-                    let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, meeting_time: true, public_meeting: true, blowerMeetingId: true } });
-                    if (!isolated) return { errMsg: 'LOG_OUT' };
-                    userInfo.public_meeting = isolated.public_meeting;
-                    userInfo.public_phone = isolated.public_phone;
-                    userInfo.meeting_time = isolated.meeting_time;
-                    if (isolated.blowerMeetingId) {
-                        if (!isolated.public_meeting) {
-                            let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
-                            userInfo.blowerName = blowerName.name;
-                        }
-                        else {
-                            let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { blowerId: { neq: null } }, include: ["blowerPublic"] });
-                            userInfo.meeting_time = meetingInfo.start_time;
-                            userInfo.address = meetingInfo.address;
-                            userInfo.blowerName = meetingInfo.blowerPublic().name;
-                        }
+            let userInfo = {};
+            //get the user info from customuser -> user address and phone number
+            userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true, lng: true, lat: true } });
+            if (role === 1) {
+                //isolated
+                let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, meeting_time: true, public_meeting: true, blowerMeetingId: true } });
+                if (!isolated) return { errMsg: 'LOG_OUT' };
+                userInfo.public_meeting = isolated.public_meeting;
+                userInfo.public_phone = isolated.public_phone;
+                userInfo.meeting_time = isolated.meeting_time;
+                if (isolated.blowerMeetingId) {
+                    if (!isolated.public_meeting) {
+                        let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
+                        userInfo.blowerName = blowerName.name;
                     }
-                    userInfo.blowerMeetingId = isolated.blowerMeetingId;
-                    return userInfo;
+                    else {
+                        let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { blowerId: { neq: null } }, include: ["blowerPublic"] });
+                        userInfo.meeting_time = meetingInfo.start_time;
+                        userInfo.address = meetingInfo.address;
+                        userInfo.blowerName = meetingInfo.blowerPublic().name;
+                    }
                 }
-                else if (role === 2) {
-                    //shofar blower 
-                    let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
-                    if (!blower) return { errMsg: 'LOG_OUT' };
-                    userInfo.can_blow_x_times = blower.can_blow_x_times;
-                    userInfo.volunteering_start_time = blower.volunteering_start_time;
-                    userInfo.volunteering_max_time = blower.volunteering_max_time;
+                userInfo.blowerMeetingId = isolated.blowerMeetingId;
+                return userInfo;
+            }
+            else if (role === 2) {
+                //shofar blower 
+                let blower = await CustomUser.app.models.ShofarBlower.findOne({ where: { userBlowerId: userId } });
+                if (!blower) return { errMsg: 'LOG_OUT' };
+                userInfo.can_blow_x_times = blower.can_blow_x_times;
+                userInfo.volunteering_start_time = blower.volunteering_start_time;
+                userInfo.volunteering_max_time = blower.volunteering_max_time;
 
-                    let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
-                    userInfo.publicMeetings = [];
-                    let pm;
-                    if (Array.isArray(publicMeetings))
-                        for (let i in [...publicMeetings]) {
-                            pm = [...publicMeetings][i] && [...publicMeetings][i].__data || [...publicMeetings][i]
-                            userInfo.publicMeetings.push({ ...pm, address: [pm.address, { lng: pm.lng, lat: pm.lat }] });
-                        }
-                    return userInfo;
-                }
-                else {
-                    //general user
-                    const genUserQ = ` SELECT
+                let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
+                userInfo.publicMeetings = [];
+                let pm;
+                if (Array.isArray(publicMeetings))
+                    for (let i in [...publicMeetings]) {
+                        pm = [...publicMeetings][i] && [...publicMeetings][i].__data || [...publicMeetings][i]
+                        userInfo.publicMeetings.push({ ...pm, address: [pm.address, { lng: pm.lng, lat: pm.lat }] });
+                    }
+                return userInfo;
+            }
+            else {
+                //general user
+                const genUserQ = ` SELECT
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.start_time,
@@ -323,25 +325,23 @@ module.exports = function (CustomUser) {
                         INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
                     WHERE
                         isolated.userIsolatedId = ${userId}`
-                    let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
-                    if (errUserData) {
-                        console.log("errUserData", errUserData)
+                let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
+                if (errUserData) {
+                    console.log("errUserData", errUserData)
+                }
+                if (resUserData) {
+                    userInfo.meetingInfo = {
+                        address: resUserData[0].address,
+                        comments: resUserData[0].comments,
+                        start_time: resUserData[0].start_time,
+                        blowerName: resUserData[0].blowerName
                     }
-                    if (resUserData) {
-                        userInfo.meetingInfo = {
-                            address: resUserData[0].address,
-                            comments: resUserData[0].comments,
-                            start_time: resUserData[0].start_time,
-                            blowerName: resUserData[0].blowerName
-                        }
-                        return userInfo; //general user
-                    }
+                    return userInfo; //general user
                 }
             }
-            catch (err) {
-                throw err;
-            }
-
+        }
+        catch (err) {
+            throw err;
         }
     }
 
@@ -361,147 +361,148 @@ module.exports = function (CustomUser) {
 
     CustomUser.updateUserInfo = async (data, options) => {
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
-        if (options.accessToken && options.accessToken.userId) {
-            try {
-                const userId = options.accessToken.userId;
-                let role = await getUserRole(userId);
-                if (!role) return;
-                let userData = {}
-                if (data.name) userData.name = data.name
-                if (data.username) userData.username = data.username
-                if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
-                if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-                if (data.comments && data.comments.length < 255) userData.comments = data.comments
-                else userData.comments = '';
+        if (!options.accessToken || !options.accessToken.userId) {
+            throw true
+        }
+        try {
+            const userId = options.accessToken.userId;
+            let role = await getUserRole(userId);
+            if (!role) return;
+            let userData = {}
+            if (data.name) userData.name = data.name
+            if (data.username) userData.username = data.username
+            if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
+            if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
+            if (data.comments && data.comments.length < 255) userData.comments = data.comments
+            else userData.comments = '';
 
-                if (data.address && data.address[0]) {
-                    userData.address = data.address[0]
-                    let addressArr = data.address[0]
-                    if (typeof addressArr === "string" && addressArr.length) {
-                        addressArr = addressArr.split(", ")
-                        let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
-                        userData.city = city || addressArr[addressArr.length - 1];
-                    }
+            if (data.address && data.address[0]) {
+                userData.address = data.address[0]
+                let addressArr = data.address[0]
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                    userData.city = city || addressArr[addressArr.length - 1];
                 }
+            }
 
-                if (Object.keys(userData).length) {
-                    let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
-                }
-                if (role === 1) {
-                    //isolated
-                    let pubMeetId = null;
-                    let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
+            if (Object.keys(userData).length) {
+                let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+            }
+            if (role === 1) {
+                //isolated
+                let pubMeetId = null;
+                let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
 
-                    //if the user changed his address and he has a public meeting
-                    if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
-                        let meetingId = isolatedInfo.blowerMeetingId;
-                        let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
-                        //we can update the meeting so update the address of the meeting
-                        if (canEditPubMeeting) pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
-                        //we can not update the meeting so create a new meeting with the new address
-                        else {
-                            let meetData = {}
-                            if (data.address) meetData.address = data.address
-                            if (data.comments && data.comments.length < 255) meetData.comments = data.comments
-                            else meetData.comments = '';
-                            if (data.start_time) meetData.start_time = data.start_time
-
-                            if (Object.keys(meetData).length) {
-                                pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
-                            }
-                        }
-                    }
-
-                    else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
+                //if the user changed his address and he has a public meeting
+                if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
+                    let meetingId = isolatedInfo.blowerMeetingId;
+                    let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                    //we can update the meeting so update the address of the meeting
+                    if (canEditPubMeeting) pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
+                    //we can not update the meeting so create a new meeting with the new address
+                    else {
                         let meetData = {}
-                        if (data.address) meetData.address = data.address;
-                        else {
-                            const address = [isolatedInfo.UserToIsolated().address, { lat: isolatedInfo.UserToIsolated().lat, lng: isolatedInfo.UserToIsolated().lng }];
-                            meetData.address = address;
-                        }
-                        if (data.comments && data.comments.length < 255) meetData.comments = data.comments;
-                        else meetData.comments = isolatedInfo.UserToIsolated().comments;
-                        if (data.start_time) meetData.start_time = data.start_time;
+                        if (data.address) meetData.address = data.address
+                        if (data.comments && data.comments.length < 255) meetData.comments = data.comments
+                        else meetData.comments = '';
+                        if (data.start_time) meetData.start_time = data.start_time
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
                         }
                     }
+                }
+
+                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
+                    let meetData = {}
+                    if (data.address) meetData.address = data.address;
                     else {
-
-                        //the user is changing from public to private
-                        if (isolatedInfo) {
-                            let meetingId = isolatedInfo.blowerMeetingId;
-                            let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
-                            if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
-                        }
+                        const address = [isolatedInfo.UserToIsolated().address, { lat: isolatedInfo.UserToIsolated().lat, lng: isolatedInfo.UserToIsolated().lng }];
+                        meetData.address = address;
                     }
+                    if (data.comments && data.comments.length < 255) meetData.comments = data.comments;
+                    else meetData.comments = isolatedInfo.UserToIsolated().comments;
+                    if (data.start_time) meetData.start_time = data.start_time;
 
-                    let newIsoData = {
-                        userIsolatedId: userId,
-                        public_phone: data.public_phone,
-                        public_meeting: data.public_meeting,
-                        blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
+                    if (Object.keys(meetData).length) {
+                        pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
                     }
-                    if (Object.values(newIsoData).find(d => d)) {
-                        let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
-                    }
-
-
                 }
-                else if (role === 2) {
-                    //shofar blower
+                else {
 
-                    let newBloData = {}
-                    if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
-                    if (data.can_blow_x_times) newBloData.can_blow_x_times = data.can_blow_x_times
-                    if (data.volunteering_start_time) newBloData.volunteering_start_time = data.volunteering_start_time
-                    if (Object.values(newBloData).length) {
-                        let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
+                    //the user is changing from public to private
+                    if (isolatedInfo) {
+                        let meetingId = isolatedInfo.blowerMeetingId;
+                        let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                        if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                     }
-                    if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
-                        // update also all the public meetings
-                        const [errDeletePublicMeetings, resDeletePublicMeetings] = await to(shofarBlowerPub.destroyAll({ blowerId: userId }))
-                        if (errDeletePublicMeetings) {
-                            console.log("errDeletePublicMeetings", errDeletePublicMeetings)
-                        }
-                        else console.log("successfully deleted all public meetings (in order to create)");
-
-                        let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
-
-                        let city;
-                        publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
-                            if (publicMeeting.address && publicMeeting.address[0]) {
-                                let addressArr = publicMeeting.address[0]
-                                if (typeof addressArr === "string" && addressArr.length) {
-                                    addressArr = addressArr.split(", ")
-                                    city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
-                                }
-                            }
-                            return {
-                                address: publicMeeting.address && publicMeeting.address[0],
-                                lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
-                                lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
-                                city,
-                                constMeeting: true,
-                                comments: publicMeeting.placeDescription || publicMeeting.comments,
-                                start_time: publicMeeting.time || publicMeeting.start_time,
-                                blowerId: userId
-                            }
-                        })
-                        console.log("publicMeetingsArr to create", publicMeetingsArr)
-                        const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
-                        if (errDeletePublicMeetings) {
-                            console.log("errCreatePublicMeetings", errCreatePublicMeetings)
-                        } else console.log("successfully created the publicMeetings");
-                    }
-
                 }
-                else return; //general user
 
-            } catch (error) {
-                throw error;
+                let newIsoData = {
+                    userIsolatedId: userId,
+                    public_phone: data.public_phone,
+                    public_meeting: data.public_meeting,
+                    blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
+                }
+                if (Object.values(newIsoData).find(d => d)) {
+                    let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
+                }
+
+
             }
+            else if (role === 2) {
+                //shofar blower
+
+                let newBloData = {}
+                if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
+                if (data.can_blow_x_times) newBloData.can_blow_x_times = data.can_blow_x_times
+                if (data.volunteering_start_time) newBloData.volunteering_start_time = data.volunteering_start_time
+                if (Object.values(newBloData).length) {
+                    let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
+                }
+                if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
+                    // update also all the public meetings
+                    const [errDeletePublicMeetings, resDeletePublicMeetings] = await to(shofarBlowerPub.destroyAll({ blowerId: userId }))
+                    if (errDeletePublicMeetings) {
+                        console.log("errDeletePublicMeetings", errDeletePublicMeetings)
+                    }
+                    else console.log("successfully deleted all public meetings (in order to create)");
+
+                    let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
+
+                    let city;
+                    publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
+                        if (publicMeeting.address && publicMeeting.address[0]) {
+                            let addressArr = publicMeeting.address[0]
+                            if (typeof addressArr === "string" && addressArr.length) {
+                                addressArr = addressArr.split(", ")
+                                city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                            }
+                        }
+                        return {
+                            address: publicMeeting.address && publicMeeting.address[0],
+                            lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
+                            lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
+                            city,
+                            constMeeting: true,
+                            comments: publicMeeting.placeDescription || publicMeeting.comments,
+                            start_time: publicMeeting.time || publicMeeting.start_time,
+                            blowerId: userId
+                        }
+                    })
+                    console.log("publicMeetingsArr to create", publicMeetingsArr)
+                    const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
+                    if (errDeletePublicMeetings) {
+                        console.log("errCreatePublicMeetings", errCreatePublicMeetings)
+                    } else console.log("successfully created the publicMeetings");
+                }
+
+            }
+            else return; //general user
+
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -512,71 +513,71 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.deleteUser = async (options) => {
-        if (options.accessToken && options.accessToken.userId) {
-            try {
-                const userId = options.accessToken.userId;
-                let role = await getUserRole(userId);
-                if (!role) return;
+        if (!options.accessToken || !options.accessToken.userId) {
+            throw true
+        }
+        try {
+            const userId = options.accessToken.userId;
+            let role = await getUserRole(userId);
+            if (!role) return;
 
-                let userData = await CustomUser.findOne({ where: { id: userId }, fields: { name: true, username: true } });
-                userData.userId = userId;
-                //add deleted user to the archive
-                CustomUser.app.models.usersArchive.addUserToArchive(userData);
+            let userData = await CustomUser.findOne({ where: { id: userId }, fields: { name: true, username: true } });
+            userData.userId = userId;
+            //add deleted user to the archive
+            CustomUser.app.models.usersArchive.addUserToArchive(userData);
 
-                if (role === 1) {
-                    //isolated
-                    let isolatedInfo = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_meeting: true, blowerMeetingId: true } });
-                    if (isolatedInfo.public_meeting) {
-                        //check the user's public meeting and see if there are other isolated registered in the meeting
-                        //go to public meetings and check if the meeting has people in it or blower
-                        let participantsNum = await CustomUser.app.models.Isolated.count({ and: [{ 'blowerMeetingId': isolatedInfo.blowerMeetingId }, { public_meeting: 1 }] });
-                        if (participantsNum <= 1) {
-                            // if not delete the meeting
-                            await CustomUser.app.models.shofarBlowerPub.destroyById(isolatedInfo.blowerMeetingId);
+            if (role === 1) {
+                //isolated
+                let isolatedInfo = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_meeting: true, blowerMeetingId: true } });
+                if (isolatedInfo.public_meeting) {
+                    //check the user's public meeting and see if there are other isolated registered in the meeting
+                    //go to public meetings and check if the meeting has people in it or blower
+                    let participantsNum = await CustomUser.app.models.Isolated.count({ and: [{ 'blowerMeetingId': isolatedInfo.blowerMeetingId }, { public_meeting: 1 }] });
+                    if (participantsNum <= 1) {
+                        // if not delete the meeting
+                        await CustomUser.app.models.shofarBlowerPub.destroyById(isolatedInfo.blowerMeetingId);
 
-                        }
                     }
-                    //delete user info
-                    await CustomUser.app.models.Isolated.destroyAll({ 'userIsolatedId': userId });
                 }
-                else if (role === 2) {//shofar blower
-                    //find all blower's public meetings
-                    let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
-                        `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
+                //delete user info
+                await CustomUser.app.models.Isolated.destroyAll({ 'userIsolatedId': userId });
+            }
+            else if (role === 2) {//shofar blower
+                //find all blower's public meetings
+                let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
+                    `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
                          from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
                          where (blowerId = 10) 
                          group by shofar_blower_pub.id `);
-                    if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
-                        let meetingsToUpdate = [], meetingsToDelete = [];
+                if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
+                    let meetingsToUpdate = [], meetingsToDelete = [];
 
-                        //sort all public meetings according to delete or update
-                        for (let i in resPublicMeeting) {
-                            const meet = resPublicMeeting[i];
-                            if (meet.participantsNum > 0) meetingsToUpdate.push(meet.meetingId);
-                            else meetingsToDelete.push(meet.meetingId);
-                        }
-                        //change blower id in the meeting to null
-                        meetingsToUpdate.length > 0 && await CustomUser.app.models.shofarBlowerPub.updateAll({ id: { inq: meetingsToUpdate } }, { blowerId: null });
-                        //delete the meeting
-                        meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
+                    //sort all public meetings according to delete or update
+                    for (let i in resPublicMeeting) {
+                        const meet = resPublicMeeting[i];
+                        if (meet.participantsNum > 0) meetingsToUpdate.push(meet.meetingId);
+                        else meetingsToDelete.push(meet.meetingId);
                     }
-
-                    await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
-                    //TODO: להודיע למבודדים שבוטלה להם הפגישה
-                    await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
-
+                    //change blower id in the meeting to null
+                    meetingsToUpdate.length > 0 && await CustomUser.app.models.shofarBlowerPub.updateAll({ id: { inq: meetingsToUpdate } }, { blowerId: null });
+                    //delete the meeting
+                    meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
-                else {
-                    //general user
-                    await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
-                }
-                await CustomUser.destroyById(userId);
-                return { res: 'SUCCESS' };
 
-            } catch (error) {
-                return { err: 'FAILED' };
+                await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+                //TODO: להודיע למבודדים שבוטלה להם הפגישה
+                await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
+
             }
+            else {
+                //general user
+                await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
+            }
+            await CustomUser.destroyById(userId);
+            return { res: 'SUCCESS' };
 
+        } catch (error) {
+            return { err: 'FAILED' };
         }
 
     }

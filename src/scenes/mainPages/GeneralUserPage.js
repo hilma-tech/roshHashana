@@ -6,6 +6,7 @@ import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
+import { CONSTS } from '../../const_messages';
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
@@ -36,7 +37,10 @@ const GeneralUserPage = (props) => {
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
-                    if (res) {
+                    if (err || !res) {
+                        openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+                    }
+                    else {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
@@ -78,7 +82,7 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/ api / CustomUsers / deleteUser`, {
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });

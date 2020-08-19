@@ -145,7 +145,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillColor: '#FF0000',
         fillOpacity: 0.35
     });
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> df274c5114e46e1060f1d9395d93be55e559a860
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null
@@ -169,8 +173,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setShowMeetingsListAni(false)
     }
 
+<<<<<<< HEAD
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
 
+=======
+>>>>>>> df274c5114e46e1060f1d9395d93be55e559a860
     return (
         <GoogleMap
             defaultZoom={16} //!change back to 20
