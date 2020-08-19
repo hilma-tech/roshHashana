@@ -4,7 +4,7 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 import moment from 'moment'
 
-import { changePosition, splitJoinAddressOnIsrael } from '../fetch_and_utils';
+import { changePosition, splitJoinAddressOnIsrael, checkDateBlock } from '../fetch_and_utils';
 
 
 
@@ -120,6 +120,8 @@ const SBRouteList = (props) => {
         setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
 
+    const disableEdit = checkDateBlock();
+
     return (
         <div className="sb-route-list" >
             <div className="sb-side-list-title" >
@@ -135,6 +137,7 @@ const SBRouteList = (props) => {
                 })}
                 {userData ? createItemContent(userData, -1) : null}
                 <SortableList
+                    disabled={disableEdit}
                     helperClass="sort-item-container"
                     distance={1}
                     lockToContainerEdges={true}

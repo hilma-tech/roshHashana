@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import loadable from '@loadable/component';
 
-import { deleteUser } from '../fetch_and_utils';
+import { deleteUser, checkDateBlock } from '../fetch_and_utils';
 
 import { isBrowser } from "react-device-detect";
 
@@ -30,6 +30,7 @@ const SBNotConfirmed = (props) => {
 
     }
 
+    const disableEdit = checkDateBlock();
 
     return (
         <>
@@ -39,7 +40,7 @@ const SBNotConfirmed = (props) => {
                     <div id="thank-you-msg">תודה על הרשמתך.</div>
                     <div>בזמן הקרוב נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
                     <div>בברכה,<br></br>צוות יום תרועה.</div>
-                    <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%', marginTop: isBrowser ? '10%' : '5%' }} className="clickAble">לביטול הרשמתך</div>
+                    {!disableEdit ? <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%', marginTop: isBrowser ? '10%' : '5%' }} className="clickAble">לביטול הרשמתך</div> : null}
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                                 <img alt="" src='/images/map.svg' />

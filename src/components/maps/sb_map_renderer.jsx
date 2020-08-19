@@ -14,7 +14,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-import { updateMyStartTime } from '../../fetch_and_utils';
+import { updateMyStartTime , checkDateBlock} from '../../fetch_and_utils';
 
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
@@ -98,7 +98,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
                 console.log("updateMyStartTime ", meetingsToUpdateST);
                 updateMyStartTime(meetingsToUpdateST, (error => {
-                    if (error) { openGenAlert({ text: error }); console.log('updateMyStartTime error: ', error); }
+                    if (error) {
+                        openGenAlert({ text: error }); console.log('updateMyStartTime error: ', error);
+                    }
                 }))
                 console.log('setMyMeetings cos meetings to update');
                 setMyMeetings(meets => meets.map(m => {
@@ -176,6 +178,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
+    const disableEdit = checkDateBlock();
 
     return (
         <GoogleMap
@@ -207,11 +210,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     <FontAwesomeIcon icon="angle-down" />
                 </div>
                 {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-                    :
-                    <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
-                        <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
-                        <div className="list-switch-text">הצג מחפשים ברשימה</div>
-                    </div>}
+                    : !disableEdit ?
+                        <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
+                            <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
+                            <div className="list-switch-text">הצג מחפשים ברשימה</div>
+                        </div> : null}
                 {showMeetingsList ?
                     <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
                         <SBAllMeetingsList />

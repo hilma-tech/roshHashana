@@ -21,9 +21,10 @@ const Settings = (props) => {
         <div>
             <div style={{ width: isBrowser ? "40%" : "100%", right: isBrowser ? "0" : "none", left: isBrowser ? "none" : "0" }} id="settings-container" className="fade-in">
                 <img id="close" alt="" className="clickAble" src="/icons/close.svg" onClick={handleClose} />
-                <div className="save-button" onClick={props.handleUpdate} > עדכן</div>
+                <div className="save-button" onClick={() => { !props.disabled && props.handleUpdate() }} > עדכן</div>
                 <div id="content-container">
                     <div id="title">הגדרות</div>
+                    {props.disabled ? <div>מועד התקיעה מתקרב, לא ניתן יותר לערוך את הפרטים</div> : null}
                     <div id="settigns-content">{props.children}</div>
                     <div id="log-out" className="clickAble" onClick={() => Auth.logout(logOut)} >התנתק</div>
 

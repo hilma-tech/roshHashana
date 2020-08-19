@@ -1,10 +1,15 @@
 'use strict';
-
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 
 module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
@@ -79,6 +84,10 @@ module.exports = function (Isolated) {
     });
 
     Isolated.updateMyStartTime = function (options, meetings, cb) {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         console.log('updateMyStartTime here');
         if (!options || !options.accessToken || !options.accessToken.userId) {
             console.log("NO_USER_ID_IN_OPTIONS in updateMyStartTime, meetings are:", meetings);

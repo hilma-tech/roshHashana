@@ -4,11 +4,12 @@ import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
 import GeneralAlert from '../../components/modals/general_alert';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { checkDateBlock } from '../../fetch_and_utils';
+import { CONSTS } from '../../consts/const_messages';
 import { MainContext } from '../../ctx/MainContext';
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
-import { CONSTS } from '../../consts/const_messages';
 import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
@@ -116,6 +117,11 @@ const IsolatedSettings = (props) => {
 
 
     const updateBlowerInfo = async (fromX) => {
+        // if (!fromX && checkDateBlock()) {
+        //     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+        //     return;
+        // }
+
         //filter out unchanged values
         const updateData = {};
         for (let field in { ...vals }) { // remove values that are as origin
@@ -217,6 +223,10 @@ const IsolatedSettings = (props) => {
             body: JSON.stringify({ data: updateData })
         }, true);
         if (res) {
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
+                return;
+            }
             openGenAlert({
                 text: "נשמר בהצלחה",
                 isPopup: { okayText: "אישור" }
@@ -227,7 +237,7 @@ const IsolatedSettings = (props) => {
                 })
         }
         if (err) {
-            openGenAlert({ text: "חלה תקלה, לא ניתן לעכן כעת. נסו שוב מאוחר יותר." })
+            openGenAlert({ text: "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
         }
     }
 
@@ -243,9 +253,10 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, "publicMeetings")
     }
 
+    const disableEdit = checkDateBlock();
     return (
         <>
-            <SettingsLayout handleUpdate={() => { updateBlowerInfo(false) }} handleClose={() => { updateBlowerInfo(true) }} map={<Map blower settings />}>
+            <SettingsLayout disabled={disableEdit} handleUpdate={() => { updateBlowerInfo(false) }} handleClose={() => { updateBlowerInfo(true) }} map={<Map blower settings />}>
                 <div id="personal-info" className="personal-info-btn clickAble" onClick={changeSettingsType}>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }} className="noSelect">פרטים אישיים</div>
                     <div onClick={() => { changeSettingsTypeWithParameter('personal-info') }}
@@ -255,12 +266,12 @@ const IsolatedSettings = (props) => {
                 <div className="personal-info fade-in" style={{ display: settingsType === 'personal-info' ? 'block' : 'none' }}>
 
                     <div className="header">שם מלא</div>
-                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} />
+                    <input autoComplete={'off'} id="name" type="text" value={vals.name || ""} onChange={(e) => setValues(e.target.value, "name")} maxLength={20} minLength={2} disabled={disableEdit} />
                     <div className="err-msg">{errs.name || ""}</div>
 
 
                     <div style={{ marginTop: "5%" }} className="header">טלפון</div>
-                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} />
+                    <input autoComplete={'off'} id="phone-number" type="tel" value={vals.username || ""} onChange={(e) => handlePhoneChange(e)} maxLength={10} minLength={7} pattern={'/^[0-9]+$/'} disabled={disableEdit} />
                     <div className="err-msg">{errs.username || ""}</div>
 
                 </div>
@@ -273,7 +284,7 @@ const IsolatedSettings = (props) => {
                 <div id="blowing-set" className="fade-in" style={{ display: settingsType === 'blowing-set-btn' ? 'block' : 'none' }}>
 
                     <div className="header">כמה פעמים תוכל לתקוע?</div>
-                    <input id="blowingTimes" type="number" value={vals.can_blow_x_times || ""} maxLength={2} onChange={(e) => setValues(e.target.value, 'can_blow_x_times')} />
+                    <input id="blowingTimes" type="number" value={vals.can_blow_x_times || ""} maxLength={2} onChange={(e) => setValues(e.target.value, 'can_blow_x_times')} disabled={disableEdit} />
                     <div className="err-msg">{errs && errs.can_blow_x_times || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">שעת יציאה</div>
@@ -281,6 +292,7 @@ const IsolatedSettings = (props) => {
                         <MuiPickersUtilsProvider utils={MomentUtils}>
                             <Fragment>
                                 <TimePicker
+                                    disabled={disableEdit}
                                     ampm={false}
                                     value={vals.volunteering_start_time}
                                     onChange={(time) => setValues(time._d, 'volunteering_start_time')}
@@ -292,11 +304,11 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">כתובת יציאה</div>
 
-                    <FormSearchBoxGenerator value={vals.address || ""} onAddressChange={handleAddressChange} uId='address' defaultValue={originalVals.address} />
+                    <FormSearchBoxGenerator value={vals.address || ""} onAddressChange={handleAddressChange} uId='address' defaultValue={originalVals.address} disabled={disableEdit} />
                     <div className="err-msg" style={{ marginBottom: "1rem" }}>{errs.address || ''}</div>
 
                     <div style={{ marginTop: "5%" }} className="max-time header">סמן את זמן ההליכה</div>
-                    <Slider value={vals.volunteering_max_time || 0} min={15} max={180} onChange={(e, val) => setValues(val, "volunteering_max_time")} aria-labelledby="continuous-slider" />
+                    <Slider disabled={disableEdit} value={vals.volunteering_max_time || 0} min={15} max={180} onChange={(e, val) => setValues(val, "volunteering_max_time")} aria-labelledby="continuous-slider" />
                     <div className="max-time-val">{`עד ${vals.volunteering_max_time || 0} דקות`}</div>
                 </div>
 
@@ -310,6 +322,7 @@ const IsolatedSettings = (props) => {
                         return (
                             <div key={place.id}>
                                 <AddPublicPlace
+                                    disabled={disableEdit}
                                     removePubPlace={removePubPlace}
                                     index={index}
                                     format={format}
@@ -321,10 +334,10 @@ const IsolatedSettings = (props) => {
                             </div>
                         );
                     })}
-                    <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
+                    {!disableEdit ? <div id="add-public-place" className={'clickAble'} onClick={() => { !disableEdit && addPublicPlace() }}>
                         <div id="plus">+</div>
                         <div>הוסף תקיעה במקום ציבורי</div>
-                    </div>
+                    </div> : null}
                 </div>
                 <div className="err-msg">{errs.general}</div>
             </SettingsLayout >
