@@ -22,8 +22,8 @@ const Home = (props) => {
 
     return (
         <>
-            <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: isBrowser ? '8%' : '5%' }} >
-                <div className="coap-imgs-container" style={{ width: isBrowser ? '50%' : '65%' }}>
+            <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: '5%' }} >
+                <div className="coap-imgs-container" style={{ width: isBrowser ? '50%' : '75%' }}>
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" />
                     <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/SynagogueOrg.png" />
@@ -44,7 +44,7 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '5vw', marginTop: "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
                     </>
                         : <>
