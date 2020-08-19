@@ -4,7 +4,7 @@ import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import {CONSTS} from '../../consts/const_messages';
+import { CONSTS } from '../../consts/const_messages';
 import './map.scss';
 import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -84,7 +84,9 @@ const MapComp = (props) => {
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                            {console.log('privateMeet: ', privateMeet)}
+                            {props.blower ? null : <div>לא ניתן להצטרף לתקיעה זו</div>}
+                        </div>
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }

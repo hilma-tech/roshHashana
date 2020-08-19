@@ -109,8 +109,6 @@ input[type="number"] {
         padding-right: 2%;
         color: black;
         opacity: 0.7;
-
-
     }
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -123,7 +121,7 @@ input[type="number"] {
 #name {
     @include input();
     font-size: 1.3rem;
-    width:100%;
+    width: 100%;
     margin-bottom: 0 !important;
     width: 100% !important;
     &::placeholder {
@@ -131,8 +129,6 @@ input[type="number"] {
         padding-right: 2%;
         color: black;
         opacity: 0.7;
-
-
     }
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -142,7 +138,7 @@ input[type="number"] {
     #place-description {
         @include input();
         font-size: 1.3rem;
-        width:100%;
+        width: 100%;
         margin-bottom: 5% !important;
         margin-top: 5% !important;
 
@@ -151,7 +147,6 @@ input[type="number"] {
             padding-right: 2%;
             color: black;
             opacity: 0.7;
-
         }
         &::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -260,18 +255,18 @@ input[type="number"] {
     font-size: 1.2rem;
     color: darkred;
 }
-.save-button{
-padding: 0.5% 6%;
-position:absolute;
-top:4%;
-left:6%;
-color: white;
-border: none;
-font-size: 1rem;
-font-weight: bold;
-text-align: center;
-cursor: pointer;
-background-color:#1F717E;
+.save-button {
+    padding: 0.5% 6%;
+    position: absolute;
+    top: 4%;
+    left: 6%;
+    color: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    background-color: #1f717e;
 }
 #add-public-place {
     display: flex;
@@ -282,7 +277,7 @@ background-color:#1F717E;
     align-items: center;
     margin-bottom: 2%;
     font-size: 1rem;
-    color :#1F717E;
+    color: #1f717e;
     #plus {
         display: flex;
         justify-content: center;
@@ -293,7 +288,7 @@ background-color:#1F717E;
         border-radius: 50%;
         width: 1em;
         height: 1em;
-        background-color: #1F717E;
+        background-color: #1f717e;
         color: white;
     }
 }

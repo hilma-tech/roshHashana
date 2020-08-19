@@ -44,8 +44,7 @@ export const assignSB = async (meetingObj, cb = () => { }) => {
         cb && typeof cb === "function" && cb(error)
         return
     }
-    console.log("res assigning sb to meeting ", res);
-    cb && typeof cb === "function" && cb(null, res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
+    cb && typeof cb === "function" && cb(null, res)
     return
 }
 
