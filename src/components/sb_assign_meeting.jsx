@@ -7,7 +7,7 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
 import Auth from '../modules/auth/Auth';
-import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign } from '../fetch_and_utils';
+import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign, checkDateBlock } from '../fetch_and_utils';
 import { CONSTS } from '../consts/const_messages';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
@@ -77,7 +77,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: typeof error === "string" ? error : assign_error })
                 return;
             }
-            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+            else if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
 
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
                 return;
@@ -115,6 +115,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         openGenAlert({ text, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
             updateRouteLength => {
                 if (!updateRouteLength) {
+                    return;
+                }
+                if (checkDateBlock()) {
+                    openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
                     return;
                 }
                 updateMaxRouteLengthAndAssign(assignMeetingInfo,
@@ -194,6 +198,11 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
 
     const deleteMeeting = async () => {
+        if (checkDateBlock()) {
+            openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
+            return;
+        }
+
         let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "POST",
@@ -205,6 +214,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         if (res) {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
+                return;
             }
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))

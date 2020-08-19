@@ -30,10 +30,10 @@ export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => 
 
 
 export const assignSB = async (meetingObj, cb = () => { }) => {
-    // if (checkDateBlock()) {
-    //     cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
-    //     return;
-    // }
+    if (checkDateBlock()) {
+        cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
+        return;
+    }
 
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/assignSB`, {
         method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingObj })
@@ -50,10 +50,10 @@ export const assignSB = async (meetingObj, cb = () => { }) => {
 }
 
 export const deleteUser = async (cb = () => { }) => {
-    // if (checkDateBlock()) {
-    //     cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
-    //     return;
-    // }
+    if (checkDateBlock()) {
+        cb(CONSTS.CURRENTLY_BLOCKED_ERR);
+        return;
+    }
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "DELETE",
@@ -67,6 +67,10 @@ export const deleteUser = async (cb = () => { }) => {
 }
 
 export const updateMyStartTime = async (obj, cb = () => { }) => {
+    if (checkDateBlock()) {
+        cb(CONSTS.CURRENTLY_BLOCKED_ERR);
+        return;
+    }
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/updateMyStartTime`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -82,6 +86,10 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
 
 
 export const updateMaxDurationAndAssign = async (meetingObj, newMaxTimeVal, cb) => {
+    if (checkDateBlock()) {
+        cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+        return;
+    }
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateMaxDurationAndAssign`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
