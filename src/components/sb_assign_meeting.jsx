@@ -7,7 +7,8 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
 import Auth from '../modules/auth/Auth';
-import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign } from '../fetch_and_utils';
+import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign, checkDateBlock } from '../fetch_and_utils';
+import { CONSTS } from '../consts/const_messages';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
 
@@ -17,9 +18,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
+        genMapMeetings, setGenMapMeetings,
         meetingsReqs, setMeetingsReqs,
         setIsInRoute,
-        startTimes, totalTime
+        getLengthFromPrevStop
     } = useContext(SBContext)
 
     const [openAssign, setOpenRouteList] = useState(true)
@@ -75,6 +77,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: typeof error === "string" ? error : assign_error })
                 return;
             }
+            else if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
+                return;
+            }
             checkAssignResForError(res)
         })
         //ASSIGN --END
@@ -109,11 +115,19 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateRouteLength) {
                     return;
                 }
+                if (checkDateBlock()) {
+                    openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
+                    return;
+                }
                 updateMaxRouteLengthAndAssign(assignMeetingInfo,
                     (error, res) => {
                         if (error || !res) {
                             console.log('updateMaxDurationAndAssign err: ', error);
                             openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                            return;
+                        }
+                        else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                            openGenAlert({ text: res, block: true })
                             return;
                         }
                         checkAssignResForError(res)
@@ -140,11 +154,14 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateMaxRouteDuration) {
                     return;
                 }
-                console.log('updateMaxDurationAndAssign');
                 updateMaxDurationAndAssign(assignMeetingInfo, data.newTotalTime,
                     err => {
                         if (err) {
-                            console.log('updateMaxDurationAndAssign err: ', err);
+                            if (err === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן להשתבץ יותר' });
+                                return;
+
+                            }
                             openGenAlert({ text: typeof err === "string" ? err : assign_error })
                             return;
                         }
@@ -163,13 +180,27 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
         }
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
-        //LOCAL STATE UPDATE WITH NEW MEETING --END
+
+        if (!genMapMeetings) return
+        if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+            setGenMapMeetings(genMeets => ({ privateMeetings: genMeets.privateMeetings, publicMeetings: Array.isArray(genMeets.publicMeetings) ? [...genMeets.publicMeetings, newMeeting] : [newMeeting] }))
+        }
+        else if (Array.isArray(genMapMeetings.publicMeetings)) {
+            setGenMapMeetings(genMeets => ({ publicMeetings: genMeets.publicMeetings, privateMeetings: Array.isArray(genMeets.privateMeetings) ? [...genMeets.publicMeetings, newMeeting] : [newMeeting] }))
+        }
+
+        //LOCAL STATE (genMeetings and myMeetings) UPDATE WITH NEW MEETING --END
     }
 
 
 
 
     const deleteMeeting = async () => {
+        if (checkDateBlock()) {
+            openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
+            return;
+        }
+
         let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "POST",
@@ -179,9 +210,23 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
         }
         if (res) {
+            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
+                return;
+            }
             openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
             setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
+
+            if (genMapMeetings) {
+                if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+                    setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                }
+                else if (Array.isArray(genMapMeetings.privateMeetings)) {
+                    setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                }
+            }
+
             handleAssignment('close');
         }
     }
@@ -198,7 +243,8 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     }
 
     const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
-
+    const block = checkDateBlock()
+    const walkDuration = getLengthFromPrevStop(assignMeetingInfo.meetingId, assignMeetingInfo.isPublicMeeting)
     return (
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
@@ -206,13 +252,14 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
             </div>
 
-            <div>
+            <div className="assign-title-container">
                 <div id="assign-title" className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
                     <img id="assign-icon" src={iconSrc} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
+                {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
             </div>
 
             <div className="sb-assign-content-container">
@@ -221,9 +268,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
                 {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{dateWTimeFormatChange(assignMeetingInfo.startTime).join(", ")}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
+                {inRoute && walkDuration ? <div className="walk-duration" >{`זמן הליכה מהנקודה הקודמת ${walkDuration}`}</div> : null}
             </div>
 
-            {inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>}
+            {block ? null : (inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>)}
         </div>
     );
 }

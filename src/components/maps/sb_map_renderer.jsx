@@ -14,7 +14,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-import { updateMyStartTime } from '../../fetch_and_utils';
+import { updateMyStartTime, checkDateBlock } from '../../fetch_and_utils';
 
 import { logE } from '../../handlers/consoleLogHandler'
 
@@ -94,8 +94,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                updateMyStartTime(meetingsToUpdateST, (error => {
-                    if (error) { openGenAlert({ text: error }); logE('updateMyStartTime error: ', error); }
+                if (!checkDateBlock()) updateMyStartTime(meetingsToUpdateST, (error => {
+                    if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                 }))
                 setMyMeetings(meets => meets.map(m => {
                     let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
@@ -145,7 +145,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         fillColor: '#FF0000',
         fillOpacity: 0.35
     });
-
     var bounds = new window.google.maps.LatLngBounds();
 
     if (!israelPolygon || typeof israelPolygon.getPaths !== "function" || !israelPolygon.getPaths() || typeof israelPolygon.getPaths().getLength !== "function") return null
@@ -244,8 +243,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 2 + Number(i * 2) }}
-                    //todo: check change of opacity (i * 10?)
+                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
                     />
                 ))
                 : null}

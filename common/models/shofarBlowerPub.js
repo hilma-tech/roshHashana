@@ -1,7 +1,8 @@
 'use strict';
 const to = require('../../server/common/to');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
-
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 
 module.exports = function (shofarBlowerPub) {
 
@@ -14,6 +15,10 @@ module.exports = function (shofarBlowerPub) {
 
     //this function excepts to get data as an array!!!!
     shofarBlowerPub.createNewPubMeeting = async (data, blowerId, options, areConstMeetings = false) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         if (!Array.isArray(data)) { console.log("cannot get data in createNewPubMeeting cos not an array. data:", data); return; }
         let meetingDataArray = []
         if (options.accessToken && options.accessToken.userId) {

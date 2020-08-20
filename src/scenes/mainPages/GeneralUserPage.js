@@ -6,6 +6,8 @@ import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
+import { CONSTS } from '../../consts/const_messages';
+import { checkDateBlock } from '../../fetch_and_utils';
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
@@ -21,7 +23,6 @@ const GeneralUserPage = (props) => {
                 sessionStorage.setItem("dontShowPopup", true)
             }
             if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
-                console.log("from props", props)
                 if (props.location.state.name) {
                     setName(props.location.state.name);
                 }
@@ -32,11 +33,13 @@ const GeneralUserPage = (props) => {
                 }
             } else {
                 if (!userInfo) {
-                    console.log("from server")
                     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
-                    if (res) {
+                    if (err || !res) {
+                        openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+                    }
+                    else {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
@@ -44,7 +47,6 @@ const GeneralUserPage = (props) => {
                         setTime(`${res.meetingInfo.start_time ? moment(res.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
                 } else {
-                    console.log("from context", userInfo)
                     setName(userInfo.name);
                     if (userInfo.meetingInfo) {
                         setShofarBlowerName(userInfo.meetingInfo.blowerName);
@@ -53,7 +55,6 @@ const GeneralUserPage = (props) => {
                     }
                 }
             }
-
         })()
 
     }, []);
@@ -78,15 +79,24 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        let [res, err] = await Auth.superAuthFetch(`/ api / CustomUsers / deleteUser`, {
+        if (checkDateBlock()) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
+            return;
+        }
+        let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/deleteUser`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });
-        if (res && res.res === 'SUCCESS') {
+        if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
+        }
+        else if (res && res.res === 'SUCCESS') {
             Auth.logout(window.location.href = window.location.origin);
         }
         else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
     }
+
+    const disableEdit = checkDateBlock();
 
     return (
         <>
@@ -115,7 +125,7 @@ const GeneralUserPage = (props) => {
                             </div>
 
                         </div>
-                        <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div>
+                        {!disableEdit ? <div id="cancel-request" className="clickAble cancel" onClick={cancelRequest}>בטל השתתפותי בתקיעה זו</div> : null}
                     </div>
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
@@ -125,7 +135,7 @@ const GeneralUserPage = (props) => {
                 </div>
             </div>
             {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
 
         </>
     );

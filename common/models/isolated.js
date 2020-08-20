@@ -1,4 +1,6 @@
 'use strict';
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
 
 const executeMySqlQuery = async (Model, query) =>
@@ -16,6 +18,10 @@ module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
+        if (checkDateBlock()) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
@@ -90,13 +96,16 @@ module.exports = function (Isolated) {
     });
 
     Isolated.updateMyStartTime = function (options, meetings, cb) {
-        console.log('updateMyStartTime here');
+        if (checkDateBlock()) {
+            //block the function
+            return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
+        }
+        console.log('updateMyStartTime:');
         if (!options || !options.accessToken || !options.accessToken.userId) {
             console.log("NO_USER_ID_IN_OPTIONS in updateMyStartTime, meetings are:", meetings);
             return
         }
         (async () => {
-            console.log(`meeting to update: ${meetings}`);
             if (Isolated.checkMeetingToUpdate(meetings)) {
                 let [uErr, uRes] = await singleStartTimeUpdate(meetings)
                 if (uErr || !uRes) {
@@ -177,7 +186,7 @@ module.exports = function (Isolated) {
                     where += `WHERE MATCH(cu.address) AGAINST ('"${filter}"') 
                     OR MATCH(cu.name) AGAINST ('"${filter}"')`
                 }
-                
+
                 const isolatedQ = `SELECT cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
