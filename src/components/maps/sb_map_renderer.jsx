@@ -14,7 +14,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-import { updateMyStartTime } from '../../fetch_and_utils';
+import { updateMyStartTime, checkDateBlock } from '../../fetch_and_utils';
 
 import { logE } from '../../handlers/consoleLogHandler'
 
@@ -94,8 +94,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                updateMyStartTime(meetingsToUpdateST, (error => {
-                    if (error) { openGenAlert({ text: error }); logE('updateMyStartTime error: ', error); }
+                if (!checkDateBlock()) updateMyStartTime(meetingsToUpdateST, (error => {
+                    if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                 }))
                 setMyMeetings(meets => meets.map(m => {
                     let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)

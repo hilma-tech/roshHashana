@@ -360,13 +360,14 @@
 }
 #sb-assign-container {
     //mobile and desktop
+    overflow-y: auto;
     height: 100%;
     background-color: white;
     padding: 20px 40px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     #assign-x-btn-cont {
         width: 100%;
         display: flex;
@@ -383,7 +384,6 @@
         text-align: right;
         color: $turquoise;
         font-size: 1.7rem;
-        margin-bottom: 5px;
     }
     #assign-icon-and-text-cont {
         color: $turquoise;
@@ -412,6 +412,10 @@
         .no-value-text {
             color: grey;
         }
+        .walk-duration {
+            color: $turquoise;
+            font-size: 1.1rem;
+        }
     }
     #assign-btn {
         align-self: flex-end;
@@ -423,6 +427,7 @@
     .delete-meeting {
         text-decoration: underline;
         color: $turquoise;
+        width: 100%;
     }
 }
 

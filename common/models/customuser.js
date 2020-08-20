@@ -15,6 +15,9 @@ let msgText2 = `הקוד שלך הוא:`
 
 
 module.exports = function (CustomUser) {
+
+    const SHOFAR_BLOWER_ROLE = 2
+
     CustomUser.createUser = async (name, phone, role) => {
 
         let resKey = await CustomUser.app.models.keys.createKey();
@@ -731,7 +734,8 @@ module.exports = function (CustomUser) {
                 CustomUser.lng,
                 CustomUser.lat,
                 CustomUser.comments, 
-                CustomUser.name, 
+                CustomUser.name,
+                IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 
                 LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 
@@ -939,6 +943,12 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
+            // find phone number of isolater
+            console.log(meetingObj);
+            console.log('assignRes: ', assignRes);
+            const findIsolatedQ = `select name, username from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            console.log('findIsolatedQ: ', findIsolatedQ);
+            
             return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }
@@ -982,8 +992,6 @@ module.exports = function (CustomUser) {
 
             // call assignSB
             CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
-                console.log('assignE: ', assignE);
-                console.log('assignR: ', assignR);
                 return cb(assignE, assignR)
             })
 
@@ -996,7 +1004,7 @@ module.exports = function (CustomUser) {
     })
 
     CustomUser.updateMaxRouteLengthAndAssign = function (options, meetingObj, cb) {
-        console.log('update route length and assign: ', meetingObj);
+        console.log('update route length and assign: ');
         (async () => {
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
@@ -1017,8 +1025,6 @@ module.exports = function (CustomUser) {
 
             // call assignSB
             CustomUser.assignSB(options, meetingObj, (assignE, assignR) => {
-                console.log('assignE: ', assignE);
-                console.log('assignR: ', assignR);
                 return cb(assignE, assignR)
             })
 
@@ -1030,4 +1036,11 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
+
+    CustomUser.h = () => {
+        const sbQ = `select name, username from CustomUser left join RoleMapping on CustomUser.id = RoleMapping.principalId where roleId = ${SHOFAR_BLOWER_ROLE}`
+
+    }
+
 };
+

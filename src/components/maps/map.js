@@ -98,7 +98,7 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
+            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'טרם נקבעה שעה';
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {

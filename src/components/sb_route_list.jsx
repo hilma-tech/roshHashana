@@ -16,6 +16,7 @@ const SBRouteList = (props) => {
     const CONST_MEETING = 'CONST_MEETING';
     const container = useRef(null);
 
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
         const userStartTime = new Date(userData.startTime).getTime()
@@ -113,14 +114,12 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex == newIndex) return //no change, dragged and put back in original place
+        if (oldIndex == newIndex || disableEdit) return //no change, dragged and put back in original place
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);
         setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
-
-    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
 
     return (
         <div className="sb-route-list" >
@@ -134,16 +133,17 @@ const SBRouteList = (props) => {
             <div className="sb-list" id="sb-list" ref={container}>
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
                 {userData ? createItemContent(userData, -1, -1) : null}
-                <SortableList
-                    disabled={disableEdit}
-                    helperClass="sort-item-container"
-                    distance={1}
-                    lockToContainerEdges={true}
-                    helperContainer={() => container.current}
-                    lockAxis={'y'}
-                    items={myRoute}
-                    onSortEnd={onSortEnd}
-                />
+                {disableEdit ? (myRoute && Array.isArray(myRoute) && myRoute.map((item, index) => createItemContent(item, index, `${item.meetingId}${item.isPublicMeeting}`)))
+                    : <SortableList
+                        disabled={disableEdit}
+                        helperClass="sort-item-container"
+                        distance={1}
+                        lockToContainerEdges={true}
+                        helperContainer={() => container.current}
+                        lockAxis={'y'}
+                        items={myRoute}
+                        onSortEnd={onSortEnd}
+                    />}
                 {constAfter && Array.isArray(constAfter) && constAfter.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
             </div>
         </div>

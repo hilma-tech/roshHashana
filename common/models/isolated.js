@@ -98,9 +98,9 @@ module.exports = function (Isolated) {
     Isolated.updateMyStartTime = function (options, meetings, cb) {
         if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
-            return CONSTS.CURRENTLY_BLOCKED_ERR;
+            return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
         }
-        console.log('updateMyStartTime here');
+        console.log('updateMyStartTime:');
         if (!options || !options.accessToken || !options.accessToken.userId) {
             console.log("NO_USER_ID_IN_OPTIONS in updateMyStartTime, meetings are:", meetings);
             return
@@ -186,7 +186,7 @@ module.exports = function (Isolated) {
                     where += `WHERE MATCH(cu.address) AGAINST ('"${filter}"') 
                     OR MATCH(cu.name) AGAINST ('"${filter}"')`
                 }
-                
+
                 const isolatedQ = `SELECT cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id

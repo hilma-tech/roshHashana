@@ -7,12 +7,12 @@
   border: 1px solid transparent;
   border-radius: 0.2rem;
   padding: 0 10px;
-
+  
   position: absolute;
   bottom: 0;
   left: 0;
   // right: 0;
-
+  
   width: fit-content !important;
   height: 2.5rem;
   line-height: 2.5rem; //must be the same as the height
@@ -29,7 +29,11 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 .block {
-  margin: auto !important;
+  margin: 0 auto !important;
+  margin-bottom: 1rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  // transform: translate(50%)!important;
 }
 
 @keyframes alert-msg-animation {

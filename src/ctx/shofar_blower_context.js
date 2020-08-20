@@ -24,6 +24,11 @@ export const SBProvider = ({ children }) => {
 
     const [genMapMeetings, setGenMapMeetings] = useState(null)
 
+    const getLengthFromPrevStop = (meetingId, isPublicMeeting) => {
+        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == meetingId && st.isPublicMeeting == isPublicMeeting))
+        return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות") : st.duration.text) : null //google sometimes returns in english
+    }
+
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
         const startTimeRoute = new Date(myMeetings[0].startTime).getTime()
@@ -50,6 +55,7 @@ export const SBProvider = ({ children }) => {
         startTimes, setStartTimes,
         isInRoute, setIsInRoute,
         totalTime, totalLength,
+        getLengthFromPrevStop,
     }
 
     return <SBContext.Provider value={ctxValue} >

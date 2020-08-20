@@ -50,13 +50,13 @@ const ShofarBlowerMap = (props) => {
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
         {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}
-        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
+        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
         <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address) + `${meetingData.comments ? ", " + meetingData.comments : ""}`}</div></div> : null}
-        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
+        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
         {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
