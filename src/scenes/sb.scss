@@ -366,17 +366,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     #assign-x-btn-cont {
         width: 100%;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
+        margin: 3rem 0;
         #assign-x-btn {
             cursor: pointer;
             width: 1.5rem;
         }
+    }
+    .assign-title-container {
+        margin-bottom: 3rem;
     }
     #assign-title {
         justify-content: flex-start;
@@ -403,6 +407,7 @@
     .sb-assign-content-container {
         overflow-wrap: break-word;
         width: 100%;
+        margin: 2rem 0;
         .inputDiv {
             text-align: right;
             cursor: default;
@@ -412,6 +417,10 @@
         .no-value-text {
             color: grey;
         }
+        .walk-duration {
+            color: $turquoise;
+            font-size: 1.1rem;
+        }
     }
     #assign-btn {
         align-self: flex-end;
@@ -419,10 +428,13 @@
         color: black;
         border: none;
         background-color: $orange;
+        margin-top: 5rem;
     }
     .delete-meeting {
         text-decoration: underline;
         color: $turquoise;
+        width: 100%;
+        margin-top: 5rem;
     }
 }
 

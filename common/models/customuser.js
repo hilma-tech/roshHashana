@@ -731,7 +731,8 @@ module.exports = function (CustomUser) {
                 CustomUser.lng,
                 CustomUser.lat,
                 CustomUser.comments, 
-                CustomUser.name, 
+                CustomUser.name,
+                IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             FROM isolated 
                 LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId 

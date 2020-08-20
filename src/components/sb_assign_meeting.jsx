@@ -21,7 +21,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         genMapMeetings, setGenMapMeetings,
         meetingsReqs, setMeetingsReqs,
         setIsInRoute,
-        startTimes, totalTime
+        getLengthFromPrevStop
     } = useContext(SBContext)
 
     const [openAssign, setOpenRouteList] = useState(true)
@@ -78,7 +78,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 return;
             }
             else if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ'});
+                openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להשתבץ' });
                 return;
             }
             checkAssignResForError(res)
@@ -244,6 +244,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
     const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
     const block = checkDateBlock()
+    const walkDuration = getLengthFromPrevStop(assignMeetingInfo.meetingId, assignMeetingInfo.isPublicMeeting)
     return (
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
@@ -251,7 +252,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
             </div>
 
-            <div>
+            <div className="assign-title-container">
                 <div id="assign-title" className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
@@ -267,6 +268,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
                 {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{dateWTimeFormatChange(assignMeetingInfo.startTime).join(", ")}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
+                {inRoute && walkDuration ? <div className="walk-duration" >{`זמן הליכה מהנקודה הקודמת ${walkDuration}`}</div> : null}
             </div>
 
             {block ? null : (inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>)}
