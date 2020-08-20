@@ -26,7 +26,7 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            const disableEdit = checkDateBlock();
+            const disableEdit = checkDateBlock('DATE_TO_BLOCK_ISOLATED');
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
@@ -61,7 +61,7 @@ export default class IsolatedForm extends Component {
     //save the isolated details
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
             this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true });
             return;
         }

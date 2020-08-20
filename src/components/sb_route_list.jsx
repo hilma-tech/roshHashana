@@ -16,8 +16,7 @@ const SBRouteList = (props) => {
     const CONST_MEETING = 'CONST_MEETING';
     const container = useRef(null);
 
-    const disableEdit = checkDateBlock();
-
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
         const userStartTime = new Date(userData.startTime).getTime()

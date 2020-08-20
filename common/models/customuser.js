@@ -27,7 +27,7 @@ module.exports = function (CustomUser) {
 
             if (!ResFindUser) {
                 //sign up
-                if (checkDateBlock() && role != 3) {
+                if ((role == 1 && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
                     //need to block the function
                     return CONSTS.CURRENTLY_BLOCKED_ERR;
                 }
@@ -139,7 +139,7 @@ module.exports = function (CustomUser) {
                 switch (roleId) {
                     case 1:
                         if (res.address == null) {
-                            if (checkDateBlock()) {
+                            if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
                                 //need to block the function
                                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
                             }
@@ -151,7 +151,7 @@ module.exports = function (CustomUser) {
 
                     case 2:
                         if (res.address == null) {
-                            if (checkDateBlock()) {
+                            if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                                 //need to block the function
                                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
                             }
@@ -371,18 +371,18 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.updateUserInfo = async (data, options) => {
-        if (checkDateBlock()) {
-            //block the function
-            return CONSTS.CURRENTLY_BLOCKED_ERR;
-        }
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
         if (!options.accessToken || !options.accessToken.userId) {
             throw true
         }
+        const userId = options.accessToken.userId;
+        let role = await getUserRole(userId);
+        if (!role) return;
+        if (((role == 1 || role == 3) && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         try {
-            const userId = options.accessToken.userId;
-            let role = await getUserRole(userId);
-            if (!role) return;
             let userData = {}
             if (data.name) userData.name = data.name
             if (data.username) userData.username = data.username
@@ -528,17 +528,17 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.deleteUser = async (options) => {
-        if (checkDateBlock()) {
-            //block the function
-            return CONSTS.CURRENTLY_BLOCKED_ERR;
-        }
         if (!options.accessToken || !options.accessToken.userId) {
             throw true
         }
+        const userId = options.accessToken.userId;
+        let role = await getUserRole(userId);
+        if (!role) return;
+        if (((role == 1 || role == 3) && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
         try {
-            const userId = options.accessToken.userId;
-            let role = await getUserRole(userId);
-            if (!role) return;
 
             let userData = await CustomUser.findOne({ where: { id: userId }, fields: { name: true, username: true } });
             userData.userId = userId;
@@ -774,7 +774,7 @@ module.exports = function (CustomUser) {
 
         console.log('assignSB: ');
         (async () => {
-            if (checkDateBlock()) {
+            if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             }
@@ -964,7 +964,7 @@ module.exports = function (CustomUser) {
     CustomUser.updateMaxDurationAndAssign = function (options, meetingObj, newMaxTimeVal, cb) {
         console.log('update max duration and assign: ', newMaxTimeVal, meetingObj);
         (async () => {
-            if (checkDateBlock()) {
+            if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             }
@@ -1006,7 +1006,7 @@ module.exports = function (CustomUser) {
     CustomUser.updateMaxRouteLengthAndAssign = function (options, meetingObj, cb) {
         console.log('update route length and assign: ');
         (async () => {
-            if (checkDateBlock()) {
+            if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             }

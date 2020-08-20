@@ -79,7 +79,7 @@ const GeneralUserPage = (props) => {
 
     //cancel the request and delete the user
     const cancelRequest = async () => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
             return;
         }
@@ -96,7 +96,7 @@ const GeneralUserPage = (props) => {
         else openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
     }
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_ISOLATED');
 
     return (
         <>

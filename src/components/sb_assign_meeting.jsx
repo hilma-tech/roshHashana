@@ -115,7 +115,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateRouteLength) {
                     return;
                 }
-                if (checkDateBlock()) {
+                if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
                     return;
                 }
@@ -196,7 +196,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
 
     const deleteMeeting = async () => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
             return;
         }
