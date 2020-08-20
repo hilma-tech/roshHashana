@@ -1,5 +1,7 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './style/BlastInfo.scss'
+
 
 const BlastInfo = (props) => {
     return (
@@ -53,9 +55,9 @@ const BlastInfo = (props) => {
                         <div className="bottomToList">רשימת המשתתפים</div>
                     </div>
                 </div>
-                <div className="flexRow delete">
-                    <div className="width25">
-                        <img className="icon" style={{ width: "1vh" }} src="/icons/blueClock.svg" />
+                <div className="flexRow delete pointer">
+                    <div className="width25" style={{ fontSize: "17px" }}>
+                    <FontAwesomeIcon icon={['fas', 'trash']} color='#A5A4BF'/>
                     </div>
                     <div className="width75">
                         <div className="info ">מחק מפגש תקיעה בשופר</div>
