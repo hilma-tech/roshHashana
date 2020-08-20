@@ -1,4 +1,6 @@
 'use strict';
+const to = require('../../server/common/to');
+const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 
@@ -68,5 +70,35 @@ module.exports = function (shofarBlowerPub) {
         }
         else return false;
     }
+
+    shofarBlowerPub.getPublicMeetings = function (limit, cb) {
+        (async () => {
+            //get all public meetings
+            let [errPublic, resPublic] = await executeMySqlQuery(shofarBlowerPub,
+                `SELECT
+                    blowerUser.name AS "blowerName",
+                    shofar_blower_pub.id,
+                    shofar_blower_pub.address,
+                    shofar_blower_pub.comments ,
+                    shofar_blower_pub.start_time
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
+            if (errPublic) cb(errPublic);
+
+            if (resPublic) {
+                return cb(null,{ publicMeetings: resPublic });
+            }
+        })()
+    }
+
+    shofarBlowerPub.remoteMethod('getPublicMeetings', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'limit', type: 'object' }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 }
 
