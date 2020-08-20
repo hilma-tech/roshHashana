@@ -57,7 +57,7 @@ const IsolatedSettings = (props) => {
 
     const updateIsolatedInfo = async (fromX = false) => {
 
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים',block: true });
             return;
         }
@@ -139,7 +139,7 @@ const IsolatedSettings = (props) => {
         }
     }
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_ISOLATED');
 
     return (
         <>

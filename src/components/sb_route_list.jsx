@@ -120,7 +120,7 @@ const SBRouteList = (props) => {
         setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
 
     return (
         <div className="sb-route-list" >

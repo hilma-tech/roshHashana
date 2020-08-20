@@ -46,7 +46,7 @@ const ShofarBlowerMap = (props) => {
 
     // const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
         {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}

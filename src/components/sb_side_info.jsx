@@ -12,7 +12,7 @@ const SBSideInfo = (props) => {
 
     const switchBool = (state) => state(prev => !prev)
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
 
     return (
         <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList === null ? "" : (openRouteList ? "open-animation" : "close-animation")}`} id="sb-side-list-container" >

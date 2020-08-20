@@ -14,7 +14,7 @@ module.exports = function (ShofarBlower) {
     //         "comments": null
     //     }
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
@@ -72,7 +72,7 @@ module.exports = function (ShofarBlower) {
 
 //delete meeting from blower meetings
     ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }

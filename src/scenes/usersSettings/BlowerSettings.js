@@ -117,7 +117,7 @@ const IsolatedSettings = (props) => {
 
 
     const updateBlowerInfo = async (fromX) => {
-        if (!fromX && checkDateBlock()) {
+        if (!fromX && checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים', block: true });
             return;
         }
@@ -253,7 +253,7 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, "publicMeetings")
     }
 
-    const disableEdit = checkDateBlock();
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
     return (
         <>
             <SettingsLayout disabled={disableEdit} handleUpdate={() => { updateBlowerInfo(false) }} handleClose={() => { updateBlowerInfo(true) }} map={<Map blower settings />}>
