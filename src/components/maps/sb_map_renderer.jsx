@@ -94,7 +94,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                if (!checkDateBlock()) updateMyStartTime(meetingsToUpdateST, (error => {
+                if (!checkDateBlock('DATE_TO_BLOCK_BLOWER')) updateMyStartTime(meetingsToUpdateST, (error => {
                     if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                 }))
                 setMyMeetings(meets => meets.map(m => {
