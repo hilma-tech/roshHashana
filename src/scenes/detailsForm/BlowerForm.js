@@ -55,7 +55,7 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
-            const disableEdit = checkDateBlock();
+            const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
@@ -178,7 +178,7 @@ export default class IsolatedForm extends Component {
     //save all shofar blower details including public places
     saveShofarBlowerDetails = async (e) => {
         e.preventDefault();
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true });
             return;
         }

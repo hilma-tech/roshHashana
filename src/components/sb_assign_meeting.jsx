@@ -115,7 +115,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 if (!updateRouteLength) {
                     return;
                 }
-                if (checkDateBlock()) {
+                if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                     openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
                     return;
                 }
@@ -196,7 +196,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
 
     const deleteMeeting = async () => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
             return;
         }
@@ -243,17 +243,18 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     }
 
     const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
-    const block = checkDateBlock()
+    const block = checkDateBlock('DATE_TO_BLOCK_BLOWER')
+    const startDate = new Date(assignMeetingInfo.startTime)
     const walkDuration = getLengthFromPrevStop(assignMeetingInfo.meetingId, assignMeetingInfo.isPublicMeeting)
     return (
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
-            <div id="assign-x-btn-cont" >
+            <div id="assign-x-btn-cont" style={{ margin: isBrowser ? "6% 0" : "3% 0" }} >
                 <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
             </div>
 
-            <div className="assign-title-container">
-                <div id="assign-title" className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
+            <div className="assign-title-container" style={{ marginBottom: isBrowser ? "6%" : "3%", marginTop: isBrowser ? "3%" : "3%" }} >
+                <div id="assign-title" style={{ marginBottom: isBrowser ? "10%" : "5%" }} className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
                     <img id="assign-icon" src={iconSrc} />
@@ -262,16 +263,16 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
             </div>
 
-            <div className="sb-assign-content-container">
+            <div style={{ margin: isBrowser ? "20% 0" : "2% 0" }} className="sb-assign-content-container">
                 <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
                 {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
-                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{dateWTimeFormatChange(assignMeetingInfo.startTime).join(", ")}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
+                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{`${startDate.toLocaleDateString("en-US")}, ${startDate.getHours().toString().padStart(2, 0)}:${startDate.getMinutes().toString().padStart(2, 0)}`}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
                 {inRoute && walkDuration ? <div className="walk-duration" >{`זמן הליכה מהנקודה הקודמת ${walkDuration}`}</div> : null}
             </div>
 
-            {block ? null : (inRoute ? <div className="delete-meeting clickAble" onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" onClick={() => { handleAssignment() }} >שבץ אותי</button>)}
+            {block ? null : (inRoute ? <div className="delete-meeting clickAble" style={{ marginTop: isBrowser ? "10%" : "5%" }} onClick={deleteMeeting}>הסירו את מפגש התקיעה מהמסלול שלי ומהמאגר</div> : <button id="assign-btn" style={{ marginTop: isBrowser ? "10%" : "5%" }} onClick={() => { handleAssignment() }} >שבץ אותי</button>)}
         </div>
     );
 }

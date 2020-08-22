@@ -360,6 +360,7 @@
 }
 #sb-assign-container {
     //mobile and desktop
+    overflow-y: auto;
     height: 100%;
     background-color: white;
     padding: 20px 40px;
@@ -373,21 +374,16 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        margin: 3rem 0;
         #assign-x-btn {
             cursor: pointer;
             width: 1.5rem;
         }
-    }
-    .assign-title-container {
-        margin-bottom: 3rem;
     }
     #assign-title {
         justify-content: flex-start;
         text-align: right;
         color: $turquoise;
         font-size: 1.7rem;
-        margin-bottom: 5px;
     }
     #assign-icon-and-text-cont {
         color: $turquoise;
@@ -407,7 +403,6 @@
     .sb-assign-content-container {
         overflow-wrap: break-word;
         width: 100%;
-        margin: 2rem 0;
         .inputDiv {
             text-align: right;
             cursor: default;
@@ -428,13 +423,11 @@
         color: black;
         border: none;
         background-color: $orange;
-        margin-top: 5rem;
     }
     .delete-meeting {
         text-decoration: underline;
         color: $turquoise;
         width: 100%;
-        margin-top: 5rem;
     }
 }
 

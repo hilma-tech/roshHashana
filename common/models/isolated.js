@@ -18,7 +18,7 @@ module.exports = function (Isolated) {
     const ISOLATED_ROLE = 1
 
     Isolated.InsertDataIsolated = async (data, options) => {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
@@ -96,7 +96,7 @@ module.exports = function (Isolated) {
     });
 
     Isolated.updateMyStartTime = function (options, meetings, cb) {
-        if (checkDateBlock()) {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
             return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
         }

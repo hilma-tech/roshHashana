@@ -30,7 +30,7 @@ export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => 
 
 
 export const assignSB = async (meetingObj, cb = () => { }) => {
-    if (checkDateBlock()) {
+    if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
         cb(null, CONSTS.CURRENTLY_BLOCKED_ERR)
         return;
     }
@@ -48,8 +48,8 @@ export const assignSB = async (meetingObj, cb = () => { }) => {
     return
 }
 
-export const deleteUser = async (cb = () => { }) => {
-    if (checkDateBlock()) {
+export const deleteUser = async (cb = () => { }, blockType = 'DATE_TO_BLOCK_ISOLATED') => {
+    if (checkDateBlock(blockType)) {
         cb(CONSTS.CURRENTLY_BLOCKED_ERR);
         return;
     }
@@ -66,7 +66,7 @@ export const deleteUser = async (cb = () => { }) => {
 }
 
 export const updateMyStartTime = async (obj, cb = () => { }) => {
-    if (checkDateBlock()) {
+    if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
         cb(CONSTS.CURRENTLY_BLOCKED_ERR);
         return;
     }
@@ -85,7 +85,7 @@ export const updateMyStartTime = async (obj, cb = () => { }) => {
 
 
 export const updateMaxDurationAndAssign = async (meetingObj, newMaxTimeVal, cb) => {
-    if (checkDateBlock()) {
+    if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
         cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
         return;
     }
@@ -157,15 +157,14 @@ export const splitJoinAddressOnIsrael = (address) => {
     return address.split(", ישראל").join('') // maybe add a split on ישראל only
 }
 
-export const checkDateBlock = () => {
-    let now = new Date(Date.now());
-    if (Date.parse(CONSTS.DATE_TO_BLOCK) < Date.parse(now)) {
-        //CONSTS.DATE_TO_BLOCK is less than now
+export const checkDateBlock = (blockType) => {
+    let now = new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" });
+    if (Date.parse(CONSTS[blockType]) < Date.parse(now)) {
+        //CONSTS.blockType is less than now
         //block
         return true;
     } else {
-        //now is less than CONSTS.DATE_TO_BLOCK
+        //now is less than CONSTS.blockType
         return false;
     }
-
 }
