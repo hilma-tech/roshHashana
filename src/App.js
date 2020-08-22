@@ -1,14 +1,10 @@
 import React, { Component, useEffect, Suspense, useState } from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
-import Auth from "./modules/auth/Auth";
-import Login from "./modules/auth/Login";
 import Home from './scenes/Home';
-import Samples from './modules/samples/Samples';
 import { PrivateRoute, MultipleRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
-import ResetPassword from './modules/auth/client/components/ResetPassword';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
 import { AdminMainProvider } from './scenes/admin/ctx/AdminMainContext';
@@ -96,5 +92,4 @@ const App = (props) => {
     );
 }
 
-//export default inject('ExampleStore')(observer(App)); 
 export default App;

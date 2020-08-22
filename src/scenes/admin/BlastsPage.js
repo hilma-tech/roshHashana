@@ -8,7 +8,7 @@ import './style/BlastsPage.scss'
 
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub } = useContext(AdminMainContext)
+    const { setLoadingBlastsPub, setBlastsPub, blastInfo } = useContext(AdminMainContext)
 
     useEffect(() => {
         (async () => {
@@ -25,10 +25,11 @@ const BlastsPage = (props) => {
     return (
         <div className="BlastsPage">
             <div className="width75">
+                <div>תקיעות</div>
+                <div>סה"כ 259 תקיעות</div>
                 <BlastsTable />
             </div>
-            <BlastInfo />
-            {/* <BlastInfoPrev/> */}
+            {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}
         </div>
     );
 }

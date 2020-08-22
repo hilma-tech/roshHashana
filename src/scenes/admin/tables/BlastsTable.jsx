@@ -1,33 +1,40 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
-import { getTime } from '../fetch_and_utils';
+import { getTime, deletePublicMeeting } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
+import BlastInfo from '../BlastInfo';
 
 
 const BlastsTable = (props) => {
-    const { loadingBlastsPub, blastsPub } = useContext(AdminMainContext)
+    const { loadingBlastsPub, blastsPub, setBlastInfo } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
-    const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'],['time', 'שעה משוערת'], ['info', ''], ['delete', '']]
+    const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info', ''], ['delete', '']]
 
-    const handleInfoClick = (e) => {
-
+    const handleInfoClick = (blast) => {
+        blast.type = "ציבורית"
+        blast.start_time = getTime(blast.start_time);
+        setBlastInfo(blast)
     }
 
-    const handleTrashClick = (e) => {
-
+    const handleTrashClick = (id) => {
+        (async () => {
+            await deletePublicMeeting(id, (err, res) => {
+                console.log(err, res)
+            })
+        })()
     }
 
     useEffect(() => {
-        if (blastsPub) setTr(blastsPub.map(isolated => {
+        if (blastsPub) setTr(blastsPub.map(blast => {
             return [
-                isolated.blowerName,
+                blast.blowerName,
                 "ציבורית",
-                isolated.address,
-                getTime(isolated.start_time),
-                <FontAwesomeIcon icon={['fas', 'info-circle']} color='#A5A4BF' onClick={handleInfoClick} />,
-                <FontAwesomeIcon icon={['fas', 'trash']} color='#A5A4BF' onClick={handleTrashClick} />
+                blast.address,
+                getTime(blast.start_time),
+                <FontAwesomeIcon className="pointer" icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
+                <FontAwesomeIcon className="pointer" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
 
             ]
         }))
