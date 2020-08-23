@@ -243,7 +243,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     }
 
     const gotComments = assignMeetingInfo.comments && typeof assignMeetingInfo.comments === "string" && assignMeetingInfo.comments.length && assignMeetingInfo.comments.split(" ").join("").length
-    const block = checkDateBlock()
+    const block = checkDateBlock('DATE_TO_BLOCK_BLOWER')
     const startDate = new Date(assignMeetingInfo.startTime)
     const walkDuration = getLengthFromPrevStop(assignMeetingInfo.meetingId, assignMeetingInfo.isPublicMeeting)
     return (

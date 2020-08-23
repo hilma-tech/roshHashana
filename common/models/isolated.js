@@ -182,30 +182,44 @@ module.exports = function (Isolated) {
         (async () => {
             try {
                 let where = ''
-                if (filter.length > 0) {
-                    where += `WHERE MATCH(cu.address) AGAINST ('"${filter}"') 
-                    OR MATCH(cu.name) AGAINST ('"${filter}"')`
+                if (filter.address && filter.address.length > 0) {
+                    where += `WHERE MATCH(cu.address) AGAINST ('${filter.address}') `
                 }
 
-                const isolatedQ = `SELECT cu.name, isolated.public_phone, cu.username, cu.address 
+                if (filter.name && filter.name.length > 0) {
+                    where += `${where.length > 0 ? 'AND' : 'WHERE'} MATCH(cu.name) AGAINST ('${filter.name}')`
+                }
+
+                const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                 ${where}
                 ORDER BY cu.name
-                LIMIT 0, 10`
+                LIMIT 0, 20`
+
+                const countQ = `SELECT COUNT(*) as resNum
+                FROM isolated 
+                    LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                ${where}`
 
                 let [isolatedErr, isolatedRes] = await executeMySqlQuery(Isolated, isolatedQ);
                 if (isolatedErr || !isolatedRes) {
                     console.log('get isolated admin request error : ', isolatedErr);
                     throw isolatedErr
                 }
+                let [countErr, countRes] = await executeMySqlQuery(Isolated, countQ);
+                if (countErr || !countRes) {
+                    console.log('get isolated admin request error : ', countErr);
+                    throw countErr
+                }
+
                 isolatedRes = isolatedRes.map(isolated => {
                     if (isolated.public_phone === 1) isolated.phone = isolated.username
                     delete isolated.username
                     delete isolated.public_phone
                     return isolated
                 })
-                return cb(null, isolatedRes)
+                return cb(null, { isolateds: isolatedRes, resNum: countRes[0].resNum })
             }
             catch (err) {
                 cb(err);
@@ -217,10 +231,46 @@ module.exports = function (Isolated) {
         http: { verb: 'POST' },
         accepts: [
             { arg: 'limit', type: 'object' },
-            { arg: 'filter', type: 'string' },
+            { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
 
 
+    Isolated.deleteIsolatedAdmin = function (id, cb) {
+        (async () => {
+            try {
+                let isolatedInfo = await Isolated.findById(id, { fields: { public_meeting: true, blowerMeetingId: true, userIsolatedId: true } });
+                if (isolatedInfo.public_meeting) {
+                    //check the user's public meeting and see if there are other isolated registered in the meeting
+                    //go to public meetings and check if the meeting has people in it or blower
+                    if (isolatedInfo.blowerMeetingId) {
+                        let participantsNum = await Isolated.count({ and: [{ 'blowerMeetingId': isolatedInfo.blowerMeetingId }, { public_meeting: 1 }] });
+                        if (participantsNum <= 1) {
+                            // if not delete the meeting
+                            await Isolated.app.models.shofarBlowerPub.destroyById(isolatedInfo.blowerMeetingId);
+                        }
+                    }
+                }
+                //delete user info
+                await Isolated.destroyById(id);
+
+                await Isolated.app.models.CustomUser.destroyById(isolatedInfo.userIsolatedId);
+
+                return cb(null, 'SUCCESS');
+
+            } catch (error) {
+                console.log(error);
+                return cb(error);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('deleteIsolatedAdmin', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'id', type: 'number', require: true },
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 }

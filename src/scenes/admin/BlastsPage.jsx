@@ -3,12 +3,13 @@ import { AdminMainContext } from './ctx/AdminMainContext';
 import { fetchBlastsPub } from './fetch_and_utils';
 import BlastsTable from './tables/BlastsTable';
 import BlastInfo from "./BlastInfo"
+import TopNavBar from "./TopNavBar"
 import BlastInfoPrev from "./BlastInfoPrev"
-import './style/BlastsPage.scss'
+import './styles/blastsPage.scss'
 
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub } = useContext(AdminMainContext)
+    const { setLoadingBlastsPub, setBlastsPub, blastInfo } = useContext(AdminMainContext)
 
     useEffect(() => {
         (async () => {
@@ -23,12 +24,16 @@ const BlastsPage = (props) => {
 
 
     return (
-        <div className="BlastsPage">
-            <div className="width75">
-                <BlastsTable />
+        <div >
+            <TopNavBar history={props.history}/>
+            <div className="BlastsPage">
+                <div className="width75">
+                    <div>תקיעות</div>
+                    <div>סה"כ 259 תקיעות</div>
+                    <BlastsTable />
+                </div>
+                {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}
             </div>
-            <BlastInfo />
-            {/* <BlastInfoPrev/> */}
         </div>
     );
 }

@@ -108,6 +108,9 @@ INSERT INTO `CustomUser` VALUES (24,NULL,'maayanthebestadmin','maayan',NULL,NULL
 /*!40000 ALTER TABLE `CustomUser` ENABLE KEYS */;
 UNLOCK TABLES;
 
+create FULLTEXT index user_name_ftsix ON CustomUser(name);
+create FULLTEXT index user_address_ftsix ON CustomUser(address);
+
 --
 -- Table structure for table `Files`
 --

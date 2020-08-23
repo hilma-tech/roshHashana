@@ -1,8 +1,8 @@
 import Auth from '../../modules/auth/Auth'
 import { CONSTS } from '../../consts/const_messages'
 
-export const fetchIsolateds = async (limit, filter = '', cb = () => { }) => {
-    if (!filter) filter = ''
+export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
+    if (!filter) filter = {}
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getIsolatedsForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -35,4 +35,34 @@ export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
 export const getTime = (datatime) => {
     let date = new Date(datatime)
     return `${date.getHours()}:${date.getMinutes()}`
+}
+
+export const deletePublicMeeting = async (meetingId, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowerPubs/deletePublicMeeting`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ meetingId })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const deleteIsolated = async (id, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/deleteIsolatedAdmin`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, true)
+    }
 }

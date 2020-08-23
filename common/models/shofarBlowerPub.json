@@ -150,7 +150,9 @@
             "principalId": "ADMIN",
             "permission": "ALLOW",
             "property": [
-                "getPublicMeetings"
+                "getPublicMeetings",
+                "deletePublicMeeting",
+                "getAllPublicMeetingPeople"
             ]
         }
     ]
