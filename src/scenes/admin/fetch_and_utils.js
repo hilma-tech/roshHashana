@@ -36,3 +36,18 @@ export const getTime = (datatime) => {
     let date = new Date(datatime)
     return `${date.getHours()}:${date.getMinutes()}`
 }
+
+export const deletePublicMeeting = async (meetingId, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowerPubs/deletePublicMeeting`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ meetingId })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}

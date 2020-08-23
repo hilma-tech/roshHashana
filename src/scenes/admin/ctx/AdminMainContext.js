@@ -7,16 +7,17 @@ export const AdminMainProvider = ({ children }) => {
     const [isolateds, setIsolateds] = useState(null)
     const [blastsPub, setBlastsPub] = useState(null)
     const [loadingBlastsPub, setLoadingBlastsPub] = useState(false)
-
+    const [blastInfo, setBlastInfo] = useState(null)
+    const [isOpenParticipantsPopUp, setOpenParticipantsPopUp] = useState(false)
 
     const ctxValue = {
         loading, setLoading,
         isolateds, setIsolateds,
         blastsPub, setBlastsPub,
-        loadingBlastsPub, setLoadingBlastsPub
+        loadingBlastsPub, setLoadingBlastsPub,
+        blastInfo, setBlastInfo,
+        isOpenParticipantsPopUp, setOpenParticipantsPopUp
     }
 
-    return <AdminMainContext.Provider value={ctxValue} >
-        {children}
-    </AdminMainContext.Provider>
+    return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>
 }
