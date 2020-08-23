@@ -160,7 +160,8 @@
             "principalId": "ADMIN",
             "permission": "ALLOW",
             "property": [
-                "getIsolatedsForAdmin"
+                "getIsolatedsForAdmin",
+                "deleteIsolatedAdmin"
             ]
         }
     ]

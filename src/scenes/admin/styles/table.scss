@@ -16,6 +16,7 @@ thead th {
     background-color: #b6b6bc54;
     padding: 1vh 0;
     font-size: 1.75vh;
+    text-align: right;
     // width: 100px;
 }
 
@@ -40,6 +41,7 @@ thead th {
     // min-width: 3vw;
     max-width: 12vw;
     background-color: white;
+    text-align: right;
     // width: 100px;
 }
 
@@ -48,7 +50,7 @@ thead th {
 }
 
 .tableBodyStyle td:first-child, .tableHead th:first-child {
-    padding-right: 3vw;
+    padding-right: 5vw;
 }
 
 // .allTableStyle tr:not(:last-child){

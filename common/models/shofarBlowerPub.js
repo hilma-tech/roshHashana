@@ -81,7 +81,7 @@ module.exports = function (shofarBlowerPub) {
                 FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1;`); //confirm change
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
 
             if (errPublic) cb(errPublic);
 
