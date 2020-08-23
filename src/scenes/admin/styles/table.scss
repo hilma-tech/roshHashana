@@ -16,12 +16,12 @@ thead th {
     background-color: #b6b6bc54;
     padding: 1vh 0;
     font-size: 1.75vh;
+    text-align: right;
     // width: 100px;
 }
 
 .allTableStyle {
     width: 100%;
-    margin: 3vh 0 0;
     color: #747474;
     border-radius: 5px 5px 0 0;
     border-collapse: separate;
@@ -41,6 +41,7 @@ thead th {
     // min-width: 3vw;
     max-width: 12vw;
     background-color: white;
+    text-align: right;
     // width: 100px;
 }
 
@@ -49,7 +50,7 @@ thead th {
 }
 
 .tableBodyStyle td:first-child, .tableHead th:first-child {
-    padding-right: 3vw;
+    padding-right: 5vw;
 }
 
 // .allTableStyle tr:not(:last-child){
@@ -83,5 +84,10 @@ thead th {
 
 .navArrowDisabled {
     color: #74747480;
+    cursor: unset;
+}
+
+.disabledNavArrow {
+    color: #74747436;
     cursor: unset;
 }

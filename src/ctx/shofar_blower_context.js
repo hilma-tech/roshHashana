@@ -26,7 +26,7 @@ export const SBProvider = ({ children }) => {
 
     const getLengthFromPrevStop = (meetingId, isPublicMeeting) => {
         let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == meetingId && st.isPublicMeeting == isPublicMeeting))
-        return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות") : st.duration.text) : null //google sometimes returns in english
+        return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות").split("min").join("דקה") : st.duration.text) : null //google sometimes returns in english
     }
 
     const getTotalTime = () => {

@@ -2,11 +2,12 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
 import GenericTable from './GenericTable'
+import { deleteIsolated } from '../fetch_and_utils';
 // import '../styles/staffList.scss'
 // import Loading from '../Loading';
 
 const IsolatedTable = (props) => {
-    const { loading, isolateds } = useContext(AdminMainContext)
+    const { loading, isolateds, setIsolateds } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
     const th = [['name', 'שם'], ['phone', 'פלאפון'], ['address', 'כתובת'], ['info', ''], ['delete', '']]
@@ -15,49 +16,36 @@ const IsolatedTable = (props) => {
 
     }
 
-    const handleTrashClick = (e) => {
+    const handleTrashClick = (id, index) => {
+        (async () => {
+            await deleteIsolated(id, (err, res) => {
+                if (!err) {
+                    let newIsolateds = [...isolateds]
+                    newIsolateds.splice(index, 1)
+                    setIsolateds(newIsolateds)
+                }
+            })
 
+        })()
     }
 
     useEffect(() => {
-        if (isolateds) setTr(isolateds.map(isolated => {
+        if (isolateds) setTr(isolateds.map((isolated, index) => {
             return [
                 isolated.name,
                 isolated.phone,
                 isolated.address,
-                <FontAwesomeIcon icon={['fas', 'info-circle']} color='#A5A4BF' onClick={handleInfoClick} />,
-                <FontAwesomeIcon icon={['fas', 'trash']} color='#A5A4BF' onClick={handleTrashClick} />
-                // <div>
-                //     <div className='tooltipContainer'>
-                //         <div style={{
-                //             WebkitMaskImage: `Url(icons/pen.svg)`,
-                //             background: '#747474',
-                //             width: '2.5vh',
-                //             height: '2.5vh',
-                //             WebkitMaskSize: '2.5vh 2.5vh'
-                //         }}
-                //             className="pointer"
-                //             onClick={() => props.history.push('/edit-badge/' + badge.id)}
-                //         ></div>
-                //         <div className='passwordTooltip'>עריכת תג</div>
-                //     </div>
-                // </div>
+                // <img src='images/map.svg' alt='map' style={{ height: '3vh' }} />
+                <FontAwesomeIcon className='pointer' icon={['fas', 'info-circle']} color='#A5A4BF' onClick={handleInfoClick} />
+                ,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.id, index)} />
             ]
         }))
-    }, [isolateds
-        // , allIsolateds
-    ])
+    }, [isolateds])
 
-    // if (props.AdminStore.loading)
-    //     return (
-    //         <div className='staffList'>
-    //             <Loading height="45vh" size="10vh" />
-    //         </div>
-    //     );
-    // else
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
         </div>
     );
 }

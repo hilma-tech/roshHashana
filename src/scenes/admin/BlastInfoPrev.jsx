@@ -1,5 +1,5 @@
 import React from 'react';
-import './style/BlastInfoPrev.scss'
+import './styles/blastInfoPrev.scss'
 
 const BlastInfoPrev = (props) => {
     return (
