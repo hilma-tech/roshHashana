@@ -30,12 +30,36 @@
     margin: 3.5vh 0 2vh 0;
 }
 
-.blueSubTitle{
+.blueSubTitle, .orangeSubTitle{
     font-size: 2vh;
-    color: #156879;
-    font-weight: 600;
+    font-weight: 500;
     text-align: right;
-    margin: 2vh 0 0 0;
+}
+
+.blueSubTitle{
+    color: #156879;   
+}
+
+.orangeSubTitle{
+    color: #FDA42A;  
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.orangeBorderBottom{
+    border-bottom: #FDA42A solid 0.5px;
+}
+
+.resultNum{
+    flex-grow: 1;
+    text-align: end;
+}
+
+.statusNavContainer {
+   display: flex;
+   margin: 3vh 0 1vh 0;
 }
 
 .pointer{

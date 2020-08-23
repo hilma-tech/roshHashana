@@ -13,11 +13,12 @@ let delayTime = null
 const Search = (props) => {
 
     const [searchValue, setSearchValue] = useState('')
-    const [didMount, setDidmount] = useState(true)
+    const [didMount, setDidMount] = useState(true)
 
     useEffect(() => {
         if (didMount) {
-            setDidmount(false)
+            setDidMount(false)
+            return
         }
         if (delayTime) clearTimeout(delayTime)
         if (searchValue === '') props.onSearch(searchValue)

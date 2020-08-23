@@ -4,7 +4,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ParticipantsTable from './tables/ParticipantsTable';
-// import './styles/participantsPopUp.scss'
+import './styles/participantsPopUp.scss'
 
 const ParticipantsPopUp = (props) => {
 
@@ -17,7 +17,7 @@ const ParticipantsPopUp = (props) => {
                 <div>רשימת המשתתפים</div>
                 <div style={{ padding: '0 3vw 2vh', textAlign: "center", fontFamily: "Heebo", width: '90vw', height: "100vh" }}>
                     <DialogContent className="p-0" >
-                        <div >
+                        <div>
                             <div style={{ width: '90vw', height: "100vh" }} >
                                 <ParticipantsTable />
                             </div>

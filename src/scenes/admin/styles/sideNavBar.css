@@ -1,5 +1,5 @@
 .sideOptionsContainer {
-    width: 25vw;
+    width: 35vw;
     height: 100%;
     overflow: auto;
     background: #F6F6F6 0% 0% no-repeat padding-box;
@@ -11,11 +11,12 @@
 .optionTextContainer {
     font-weight: 100 !important;
     font-size: 2vh !important;
-    border-bottom: 1px solid #00000029;
+    padding: 2vh 0;
+    border-bottom: 1px solid #0000000d;
 }
 
 .MuiList-padding {
-    padding: 25vh 4vw 35vh 4vw !important;
+    padding: 15vh 0 40vh 0 !important;
 }
 
 .outerSidebarContainer {
@@ -47,4 +48,19 @@
     /* width: 5vh; */
     font-size: 3vh;
     font-weight: 100;
+}
+
+.MuiListItemText-root {
+    margin-top: 0 !important; 
+    margin-bottom: 0 !important;
+}
+
+.MuiListItem-root {
+        padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.MuiListItem-gutters {
+    padding-left: 3vw !important;
+    padding-right: 3vw !important;
 }
