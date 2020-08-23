@@ -25,39 +25,15 @@ const IsolatedTable = (props) => {
                 isolated.name,
                 isolated.phone,
                 isolated.address,
-                <FontAwesomeIcon icon={['fas', 'info-circle']} color='#A5A4BF' onClick={handleInfoClick} />,
-                <FontAwesomeIcon icon={['fas', 'trash']} color='#A5A4BF' onClick={handleTrashClick} />
-                // <div>
-                //     <div className='tooltipContainer'>
-                //         <div style={{
-                //             WebkitMaskImage: `Url(icons/pen.svg)`,
-                //             background: '#747474',
-                //             width: '2.5vh',
-                //             height: '2.5vh',
-                //             WebkitMaskSize: '2.5vh 2.5vh'
-                //         }}
-                //             className="pointer"
-                //             onClick={() => props.history.push('/edit-badge/' + badge.id)}
-                //         ></div>
-                //         <div className='passwordTooltip'>עריכת תג</div>
-                //     </div>
-                // </div>
+                <FontAwesomeIcon className='pointer' icon={['fas', 'info-circle']} color='#A5A4BF' onClick={handleInfoClick} />,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={handleTrashClick} />
             ]
         }))
-    }, [isolateds
-        // , allIsolateds
-    ])
+    }, [isolateds])
 
-    // if (props.AdminStore.loading)
-    //     return (
-    //         <div className='staffList'>
-    //             <Loading height="45vh" size="10vh" />
-    //         </div>
-    //     );
-    // else
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
         </div>
     );
 }
