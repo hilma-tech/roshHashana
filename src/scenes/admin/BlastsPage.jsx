@@ -5,7 +5,7 @@ import BlastsTable from './tables/BlastsTable';
 import BlastInfo from "./BlastInfo"
 import TopNavBar from "./TopNavBar"
 import BlastInfoPrev from "./BlastInfoPrev"
-import './styles/BlastsPage.scss'
+import './styles/blastsPage.scss'
 
 const BlastsPage = (props) => {
 
