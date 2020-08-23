@@ -214,7 +214,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
                 return;
             }
-            openGenAlert({ text: "הפגישה נמחקה בהצלחה" })
+            openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
             setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
             setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
 

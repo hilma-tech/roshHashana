@@ -17,7 +17,7 @@ read confirm
 if [ "$confirm" == "Y" ] || [ "$confirm" == "y" ]; then
 
     #select all isolated's meeting info
-    hello=$(mysql -hlocalhost -uroot -pz10mz10m roshHashana -se 'SELECT 
+    mysql -hlocalhost -uroot -pz10mz10m roshHashana -se 'SELECT 
 	true AS "isPublicMeeting", CustomUser.name, CustomUser.username AS "phoneNumber" , shofar_blower_pub.address AS "meetingAddress" ,shofar_blower_pub.start_time AS "meetingStartTime",  blowerUser.name AS "blowerName" 
         FROM isolated 
 	        LEFT JOIN shofar_blower_pub ON isolated.blowerMeetingId=shofar_blower_pub.id 
@@ -31,9 +31,14 @@ if [ "$confirm" == "Y" ] || [ "$confirm" == "y" ]; then
 	        LEFT JOIN CustomUser ON CustomUser.id= isolated.userIsolatedId 
 	        LEFT JOIN CustomUser blowerUser ON blowerUser.id=blowerMeetingId 
             LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
-        WHERE isolated.public_meeting=0')
-    echo $hello
-    hello_arr=($(for i in $hello; do echo "i " $i; done))
+        WHERE isolated.public_meeting=0' | while IFS= read -r loop; do
+        # check if the isolated has meeting or not
+
+        # msg= has meeting
+        
+        # msg= doesn't have meeting
+        echo "loop $loop"
+    done
 
     available_number=$(curl -X GET \
         "https://api.twilio.com/2010-04-01/Accounts/${account_sid}/AvailablePhoneNumbers/US/Local" \

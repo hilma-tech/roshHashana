@@ -216,6 +216,7 @@ export default class IsolatedForm extends Component {
         let startTime = new Date(this.state.chosenTime);
         startTime.setFullYear(2020, 8, 20);
 
+
         let success = await this.checkForMissingDataInPublicPlaces();
         if (!success) {
             return;
