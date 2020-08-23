@@ -9,6 +9,9 @@ export const AdminMainProvider = ({ children }) => {
     const [loadingBlastsPub, setLoadingBlastsPub] = useState(false)
     const [blastInfo, setBlastInfo] = useState(null)
     const [isOpenParticipantsPopUp, setOpenParticipantsPopUp] = useState(false)
+    const [blowersNum, setBlowerNum] = useState(0);
+    const [isolatedNum, setIsolatedNum] = useState(0);
+    const [blowsNum, setBlowsNum] = useState(0);
 
     const ctxValue = {
         loading, setLoading,
@@ -16,7 +19,10 @@ export const AdminMainProvider = ({ children }) => {
         blastsPub, setBlastsPub,
         loadingBlastsPub, setLoadingBlastsPub,
         blastInfo, setBlastInfo,
-        isOpenParticipantsPopUp, setOpenParticipantsPopUp
+        isOpenParticipantsPopUp, setOpenParticipantsPopUp,
+        blowersNum, setBlowerNum,
+        isolatedNum, setIsolatedNum,
+        blowsNum, setBlowsNum
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

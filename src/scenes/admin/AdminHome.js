@@ -3,7 +3,6 @@ import AdminMap from '../../components/maps/adminMap';
 import MenuIcon from '@material-ui/icons/Menu';
 import './AdminHome.scss'
 import { AdminContext } from '../../ctx/AdminContext';
-import { color } from 'd3';
 import { Link } from 'react-router-dom';
 
 const AdminHome = (props) => {
