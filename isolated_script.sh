@@ -11,7 +11,7 @@ read confirm
 if [ "$confirm" == "Y" ] || [ "$confirm" == "y" ]; then
 
     #select all isolated's meeting info
-    hello=$(mysql -hlocalhost -uroot -pz10mz10m roshHashana -se 'SELECT 
+    mysql -hlocalhost -uroot -pz10mz10m roshHashana -se 'SELECT 
 	true AS "isPublicMeeting", CustomUser.name, CustomUser.username AS "phoneNumber" , shofar_blower_pub.address AS "meetingAddress" ,shofar_blower_pub.start_time AS "meetingStartTime",  blowerUser.name AS "blowerName" 
         FROM isolated 
 	        LEFT JOIN shofar_blower_pub ON isolated.blowerMeetingId=shofar_blower_pub.id 
@@ -25,7 +25,26 @@ if [ "$confirm" == "Y" ] || [ "$confirm" == "y" ]; then
 	        LEFT JOIN CustomUser ON CustomUser.id= isolated.userIsolatedId 
 	        LEFT JOIN CustomUser blowerUser ON blowerUser.id=blowerMeetingId 
             LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
-        WHERE isolated.public_meeting=0')
-    echo $hello
-    hello_arr=( $( for i in $hello ; do echo "i " $i ; done ) )
+        WHERE isolated.public_meeting=0' | while IFS= read -r loop
+    do
+        echo "loop $loop"
+    done 
+    
+    
+    # isolated=$(mysql -hlocalhost -uroot -pz10mz10m roshHashana -se 'SELECT 
+	# true AS "isPublicMeeting", CustomUser.name, CustomUser.username AS "phoneNumber" , shofar_blower_pub.address AS "meetingAddress" ,shofar_blower_pub.start_time AS "meetingStartTime",  blowerUser.name AS "blowerName" 
+    #     FROM isolated 
+	#         LEFT JOIN shofar_blower_pub ON isolated.blowerMeetingId=shofar_blower_pub.id 
+	#         LEFT JOIN CustomUser ON isolated.userIsolatedId= CustomUser.id 
+	#         LEFT JOIN CustomUser blowerUser ON blowerUser.id= shofar_blower_pub.blowerId 
+	#         LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
+    #     WHERE isolated.public_meeting=1
+    #     UNION SELECT
+ 	#         false AS "isPublicMeeting", CustomUser.name, CustomUser.username AS "phoneNumber", CustomUser.address AS "meetingAddress",isolated.meeting_time AS "meetingStartTime"  ,blowerUser.name AS "blowerName" 
+    #     FROM isolated 
+	#         LEFT JOIN CustomUser ON CustomUser.id= isolated.userIsolatedId 
+	#         LEFT JOIN CustomUser blowerUser ON blowerUser.id=blowerMeetingId 
+    #         LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
+    #     WHERE isolated.public_meeting=0' > /dev/null )
+    # echo $isolated
 fi
