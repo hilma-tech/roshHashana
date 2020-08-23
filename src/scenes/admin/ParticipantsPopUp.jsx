@@ -4,6 +4,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ParticipantsTable from './tables/ParticipantsTable';
+import './styles/participantsPopUp.scss'
 
 const ParticipantsPopUp = (props) => {
 
