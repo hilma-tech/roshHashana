@@ -5,6 +5,7 @@ export const CONSTS = {
     ADDRESS_MSG_ERROR: "הכתובת שהזנת אינה תקינה",
     PICK_FROM_LIST_ADDRESS_MSG_ERROR: 'אנא בחר מיקום מהרשימה הנפתחת',
     NO_SETTINGS_CHANGE_MSG: "הפרטים לא שונו",
+    CURRENTLY_BLOCKED_ERR: 'BLOCKED',
     ISRAEL_COORDS: [
         { lat: 32.863532, lng: 35.889902 },
         { lat: 33.458826, lng: 35.881345 },
@@ -21,5 +22,7 @@ export const CONSTS = {
         disableDefaultUI: true,
         clickableIcons: false
     },
-    JERUSALEM_POSITION: { lat: 31.771959, lng: 35.217018 }
+    JERUSALEM_POSITION: { lat: 31.771959, lng: 35.217018 },
+    DATE_TO_BLOCK_ISOLATED: new Date(2020, 8, 19, 23, 59, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }),
+    DATE_TO_BLOCK_BLOWER: new Date(2020, 8, 20, 23, 59, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" })
 }

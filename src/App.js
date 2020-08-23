@@ -83,7 +83,7 @@ const App = (props) => {
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
                             <Route exact path="/table" compName="IsolatedTable" component={(props) => <AdminMainProvider><IsolatedsPage {...props} /></AdminMainProvider>} />
                             <Route path="/login" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
-                            <PrivateRoute exact path="/blasts" compName="BlastsPage" component={(props) => <BlastsPage {...props} />} />
+                            <PrivateRoute exact path="/blasts" compName="BlastsPage" component={(props) => <AdminMainProvider><BlastsPage {...props} /></AdminMainProvider>} />
                             <PrivateRoute exact path="/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName="AdminHome" component={(props) => <AdminProvider><AdminHome {...props} /></AdminProvider>} />
                             <Route path="/ffasfasfasfrefcawaeqwdca" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />

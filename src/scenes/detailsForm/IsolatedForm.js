@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
+import { updateIsolatedDetails, checkDateBlock } from '../../fetch_and_utils';
 import { BrowserView, isBrowser, isIOS } from "react-device-detect";
+import GeneralAlert from '../../components/modals/general_alert';
 import Popup from '../../components/modals/general_popup';
+import { CONSTS } from '../../consts/const_messages';
+import { MainContext } from '../../ctx/MainContext';
 import Auth from '../../modules/auth/Auth';
 import './detailsForm.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
-import { updateIsolatedDetails } from '../../fetch_and_utils';
-import { CONSTS } from '../../consts/const_messages';
 
 export default class IsolatedForm extends Component {
+    static contextType = MainContext
     constructor(props) {
         super(props);
         this.state = {
@@ -23,12 +26,24 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
+            const disableEdit = checkDateBlock('DATE_TO_BLOCK_ISOLATED');
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
-            if (res && res.address) {
+            if (disableEdit) {
+                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true, isPopup: { okayText: "הבנתי" } }, () => {
+                    this.props.history.push('/');
+                    return;
+                });
                 this.props.history.push('/');
                 return;
+            }
+            if ((res && res.address)) {
+                this.props.history.push('/');
+                return;
+            }
+            if (err || !res) {
+                this.context.openGenAlert({ text: "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
             }
         })();
     }
@@ -46,6 +61,10 @@ export default class IsolatedForm extends Component {
     //save the isolated details
     saveIsolatedDetails = async (e) => {
         e.preventDefault();
+        if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
+            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true });
+            return;
+        }
         const { address, comments, approval, publicMeeting } = this.state
         if (comments && comments.length && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(comments)) { this.setState({ errorMsg: 'לא ניתן להכניס תווים מיוחדים בתיאור' }); return; }
         //cheked address
@@ -72,6 +91,9 @@ export default class IsolatedForm extends Component {
             if (!error) {
                 //open modal with message
                 this.setState({ openModal: true });
+            }
+            else if (error === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר לעדכן את הפרטים' });
             }
             else this.setState({ errorMsg: "אירעה שגיאה בעת שמירת הפרטים, נא נסו שנית מאוחר יותר" })
         })
@@ -101,7 +123,7 @@ export default class IsolatedForm extends Component {
 
     render() {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
-
+        const { showAlert } = this.context;
         return (
             <>
                 <div id="isolated-form-container" style={{ opacity: this.state.openModal ? '0' : '1' }} >
@@ -147,6 +169,8 @@ export default class IsolatedForm extends Component {
                 {this.state.openModal ?
                     <div id="override-popup-container" ><Popup text={`תודה \nהפרטים שלך התקבלו אצלנו, ואנחנו מעבדים את הבקשה.\nביום חמישי , כ"ח באלול 17.9 נשלח אליך הודעה עם פרטי בעל התוקע ושעה משוערת `} okayText="הבנתי, תודה" closeSelf={this.goToMainPage} /></div>
                     : null}
+                {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+
             </>
         );
     }
