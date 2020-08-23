@@ -4,7 +4,7 @@ import { fetchBlastsPub } from './fetch_and_utils';
 import BlastsTable from './tables/BlastsTable';
 import BlastInfo from "./BlastInfo"
 import BlastInfoPrev from "./BlastInfoPrev"
-import './style/BlastsPage.scss'
+import './styles/BlastsPage.scss'
 
 const BlastsPage = (props) => {
 

@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
 import { getTime, deletePublicMeeting } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
-import BlastInfo from '../BlastInfo';
 
 
 const BlastsTable = (props) => {
@@ -14,7 +13,6 @@ const BlastsTable = (props) => {
 
     const handleInfoClick = (blast) => {
         blast.type = "ציבורית"
-        blast.start_time = getTime(blast.start_time);
         setBlastInfo(blast)
     }
 
@@ -33,8 +31,8 @@ const BlastsTable = (props) => {
                 "ציבורית",
                 blast.address,
                 getTime(blast.start_time),
-                <FontAwesomeIcon className="pointer" icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
-                <FontAwesomeIcon className="pointer" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
+                <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
+                <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
 
             ]
         }))

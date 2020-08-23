@@ -2,12 +2,14 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import { deletePublicMeeting } from './fetch_and_utils';
-import './style/BlastInfo.scss'
+import './styles/BlastInfo.scss'
+import ParticipantsPopUp from "./ParticipantsPopUp"
+import { getTime} from './fetch_and_utils';
 
 
 const BlastInfo = (props) => {
 
-    const { blastInfo } = useContext(AdminMainContext)
+    const { blastInfo, isOpenParticipantsPopUp, setOpenParticipantsPopUp } = useContext(AdminMainContext)
 
     const handleTrashClick = (id) => {
         (async () => {
@@ -15,6 +17,10 @@ const BlastInfo = (props) => {
                 console.log(err, res)
             })
         })()
+    }
+
+    const handleParticipantsClick = () => {
+        setOpenParticipantsPopUp(true)
     }
 
     return (
@@ -40,7 +46,7 @@ const BlastInfo = (props) => {
                         <img className="icon" style={{ width: "2vh" }} src="/icons/blueClock.svg" />
                     </div>
                     <div className="width75">
-                        <div className="info">{blastInfo.start_time}</div>
+                        <div className="info">{getTime(blastInfo.start_time)}</div>
                     </div>
                 </div>
                 {blastInfo.type !== "ציבורית" && < div className="flexRow">
@@ -65,19 +71,19 @@ const BlastInfo = (props) => {
                     <div className="width25">
                     </div>
                     <div className="width75" >
-                        <div className="bottomToList pointer">רשימת המשתתפים</div>
+                        <div className="bottomToList pointer" onClick={() => { handleParticipantsClick() }}>רשימת המשתתפים</div>
                     </div>
                 </div>}
                 <div className="flexRow delete pointer" onClick={() => { handleTrashClick(blastInfo.id) }}>
-                    <div className="width25" style={{ fontSize: "17px" }}>
-                        <FontAwesomeIcon icon={['fas', 'trash']} color='#A5A4BF' />
+                    <div className="width25" style={{ fontSize: "1.7vh" }}>
+                        <FontAwesomeIcon icon={['fas', 'trash']} color='#156879' />
                     </div>
                     <div className="width75">
                         <div className="info">מחק מפגש תקיעה בשופר</div>
                     </div>
                 </div>
             </div>
-
+            <ParticipantsPopUp />
 
         </div >
     );
