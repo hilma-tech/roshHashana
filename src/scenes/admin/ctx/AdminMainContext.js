@@ -12,6 +12,8 @@ export const AdminMainProvider = ({ children }) => {
     const [blowersNum, setBlowerNum] = useState(0);
     const [isolatedNum, setIsolatedNum] = useState(0);
     const [blowsNum, setBlowsNum] = useState(0);
+    const [isOpenSideBar, setOpenSideBar] = useState(false);
+
 
     const ctxValue = {
         loading, setLoading,
@@ -22,7 +24,8 @@ export const AdminMainProvider = ({ children }) => {
         isOpenParticipantsPopUp, setOpenParticipantsPopUp,
         blowersNum, setBlowerNum,
         isolatedNum, setIsolatedNum,
-        blowsNum, setBlowsNum
+        blowsNum, setBlowsNum,
+        isOpenSideBar, setOpenSideBar
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

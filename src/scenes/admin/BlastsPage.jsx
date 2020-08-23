@@ -24,8 +24,8 @@ const BlastsPage = (props) => {
 
 
     return (
-        <div>
-            <TopNavBar />
+        <div >
+            <TopNavBar history={props.history}/>
             <div className="BlastsPage">
                 <div className="width75">
                     <div>תקיעות</div>
