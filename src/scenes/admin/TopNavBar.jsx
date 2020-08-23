@@ -6,8 +6,9 @@ import './styles/topNavBar.scss'
 
 
 const TopNavBar = (props) => {
-
     const { isolatedNum, blowersNum, blowsNum, setOpenSideBar } = useContext(AdminMainContext)
+
+    // const { isolatedNum, blowersNum, blowsNum, setOpenSideBar } = useContext(AdminMainContext)
 
     return <>
         <SideNavBar history={props.history} />
