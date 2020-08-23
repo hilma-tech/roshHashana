@@ -43,6 +43,7 @@ const Home = (props) => {
                                 אני רוצה לתקוע בשופר </button>
                         </div>
                     </div>
+                    <div id="shivuki-credit">{'תוכן שיווקי: אפרת שפירא www.my-idea.co.il'}</div>
                     {isBrowser ? <>
                         <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
