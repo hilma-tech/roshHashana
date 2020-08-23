@@ -48,7 +48,7 @@ export default class IsolatedForm extends Component {
             address: '', //the address of the shofar blower
             chosenTime: null, //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
-            publicPlaces: [{}], //a list of all the public places that the shofar blower added,
+            publicPlaces: [], //a list of all the public places that the shofar blower added,
             walkTime: -15 //the total time the shofar blower wants to walk
         }
     }
@@ -143,6 +143,7 @@ export default class IsolatedForm extends Component {
 
     checkForMissingDataInPublicPlaces = async () => {
         let publicPlaces = this.state.publicPlaces;
+        if (!publicPlaces || !Array.isArray(publicPlaces) || !publicPlaces.length) return true
         let updateArrInState = false;
         for (let i in publicPlaces) {
             if (publicPlaces[i].comments && publicPlaces[i].comments.length && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaces[i].comments)) {
@@ -155,7 +156,7 @@ export default class IsolatedForm extends Component {
             // }
             else {
                 if (!publicPlaces[i].address || !Array.isArray(publicPlaces[i].address) || !publicPlaces[i].time) {
-                    this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים ( כתובת וזמן פגישה)' });
+                    this.setState({ publicMeetErr: 'אנא מלא את כל הפרטים (כתובת וזמן פגישה)' });
                     return false;
                 } else if (!Array.isArray(publicPlaces[i].address) || publicPlaces[i].address.length !== 2 || publicPlaces[i].address[0] === CONSTS.NOT_A_VALID_ADDRESS || !publicPlaces[i].address[1] || !publicPlaces[i].address[1].lng || !publicPlaces[i].address[1].lat) {
                     this.setState({ publicMeetErr: 'אנא בחר מיקום מהרשימה הנפתחת בתקיעות הציבוריות' });
