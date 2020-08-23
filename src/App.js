@@ -24,9 +24,9 @@ const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/Genera
 const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSettings'));
 
 const AdminHome = loadable(() => import('./scenes/admin/AdminHome'))
-const AdminLogin = loadable(() => import('./scenes/admin/AdminLogin'))
+const AdminLogin = loadable(() => import('./scenes/admin/AdminLogin.jsx'))
 const IsolatedsPage = loadable(() => import('./scenes/admin/IsolatedsPage'))
-const BlastsPage = loadable(() => import('./scenes/admin/BlastsPage'))
+const BlastsPage = loadable(() => import('./scenes/admin/BlastsPage.jsx'))
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
 const SimpleUserHome = loadable(() => import('./scenes/Home'));
@@ -81,7 +81,7 @@ const App = (props) => {
                             <Route path="/login" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
                             <PrivateRoute exact path="/blasts" compName="BlastsPage" component={(props) => <AdminMainProvider><BlastsPage {...props} /></AdminMainProvider>} />
                             <PrivateRoute exact path="/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName="AdminHome" component={(props) => <AdminProvider><AdminHome {...props} /></AdminProvider>} />
-                            <Route path="/ffasfasfasfrefcawaeqwdca" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
+                            {/* <Route path="/ffasfasfasfrefcawaeqwdca" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} /> */}
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                         </Switch>
