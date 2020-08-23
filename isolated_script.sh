@@ -4,6 +4,12 @@ GRE='\033[0;32m'
 YEL='\033[0;33m'
 RED='\e[31m'
 
+# QUERY=
+
+account_sid="AC283aebc6a8ab4d0f1cd4532520b3f83b"
+auth_token="9957ad90195d2c722ecc2884319d1c6a"
+phone_number="+972546969090"
+
 echo -e "\\n${YEL}This script finds all the meeting info for each isolated and sends sms to all of them with that information\\n${NC}"
 echo -e -n "${RED}Are you sure you want to run this script? [y/n]\\n${NC}"
 
@@ -27,5 +33,21 @@ if [ "$confirm" == "Y" ] || [ "$confirm" == "y" ]; then
             LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
         WHERE isolated.public_meeting=0')
     echo $hello
-    hello_arr=( $( for i in $hello ; do echo "i " $i ; done ) )
+    hello_arr=($(for i in $hello; do echo "i " $i; done))
+
+    available_number=$(curl -X GET \
+        "https://api.twilio.com/2010-04-01/Accounts/${account_sid}/AvailablePhoneNumbers/US/Local" \
+        -u "${account_sid}:${auth_token}" |
+        sed -n "/PhoneNumber/{s/.*<PhoneNumber>//;s/<\/PhoneNumber.*//;p;}") &&
+        echo "a " $available_number
+
+    curl -X POST -d "Body=שלום שלום שלום." \
+        -d "From=${available_number}" -d "To=${phone_number}" \
+        "https://api.twilio.com/2010-04-01/Accounts/${account_sid}/Messages" \
+        -u "${account_sid}:${auth_token}"
+    # available_number=`curl -X GET \
+    # "https://api.twilio.com/2010-04-01/Accounts/${account_sid}/AvailablePhoneNumbers/US/Local"  \
+    # -u "${account_sid}:${auth_token}" | \
+    # sed -n "/PhoneNumber/{s/.*<PhoneNumber>//;s/<\/PhoneNumber.*//;p;}"` \
+    # && echo $available_number
 fi
