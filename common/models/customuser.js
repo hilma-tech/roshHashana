@@ -1037,8 +1037,12 @@ module.exports = function (CustomUser) {
     })
 
 
-    CustomUser.h = () => {
+    const sqlForScripts = () => {
         const sbQ = `select name, username from CustomUser left join RoleMapping on CustomUser.id = RoleMapping.principalId where roleId = ${SHOFAR_BLOWER_ROLE}`
+
+        const publicMeetings = `select isolated.id meetingId, public_meeting isPublicMeeting , pub_meetings.start_time meetingTime , pub_meetings.address, blower.name from isolated left join shofar_blower_pub pub_meetings on pub_meetings.id = blowerMeetingId left join CustomUser blower on blower.id = pub_meetings.blowerId where public_meeting = 1`
+
+        const privateMeetings = `select isolated.id meetingId, public_meeting isPublicMeeting , meeting_time meetingTime , blower.name blowerName from isolated left join CustomUser blower on blower.id = blowerMeetingId where public_meeting = 0`
 
     }
 
