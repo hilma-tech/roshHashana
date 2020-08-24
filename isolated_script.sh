@@ -33,9 +33,13 @@ else
         read -a isolated_row_arr <<<"$isolated_row"
         #Read the split words into an array based on space delimiter
         for val in "${isolated_row_arr[@]}"; do
-            echo "$isolated_row_cnt val $val"
+            if [ $isolated_row_cnt == "1" ]; then
+                echo "name? val $val"
+            fi
+
             ((isolated_row_cnt++))
         done
         isolated_row_cnt=0
     done
+    
 fi
