@@ -10,7 +10,7 @@ import './styles/blastsPage.scss'
 
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub, blastInfo } = useContext(AdminMainContext)
+    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, pubMeetingsNum  } = useContext(AdminMainContext)
 
     const onSearchName = (value) => {
         // setFilters(pervFilters => {
@@ -36,7 +36,10 @@ const BlastsPage = (props) => {
             await fetchBlastsPub({ start: 0, end: 10 }, '', (err, res) => {
                 console.log(err, res)
                 setLoadingBlastsPub(false)
-                if (!err) setBlastsPub(res)
+                if (!err) {
+                    setBlastsPub(res.publicMeetings)
+                    setPubMeetingsNum(res.num)
+                }
             })
         })()
     }, [])
@@ -53,7 +56,7 @@ const BlastsPage = (props) => {
                         <div style={{ margin: '0 2vw' }}></div>
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
-                    <div className="overallNum">סה"כ 259 תקיעות</div>
+                    <div className="overallNum">{pubMeetingsNum} תוצאות</div>
                     <BlastsTable />
                 </div>
                 {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}

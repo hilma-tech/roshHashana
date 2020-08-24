@@ -69,7 +69,7 @@ const App = (props) => {
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
                             
                             {/* תוסיפו ראוטים רק מעליי */}
-                            <Route path="/"  component={(props) => <AdminRouter {...props} />} />
+                            {/* <Route path="/"  component={(props) => <AdminRouter {...props} />} /> */}
                         </Switch>
                     </MainProvider>
                 </div>

@@ -14,7 +14,7 @@ const SideNavBar = (props) => {
 
     const navBarOptions = [
         { name: "ראשי", path: '/home' },
-        { name: "מחפשים", path: '/translate-words' },
+        { name: "מחפשים", path: '/table' },
         { name: "בעלי תקיעה", path: '/dictionry-class' },
         { name: "תקיעות", path: '/blasts' }
     ]

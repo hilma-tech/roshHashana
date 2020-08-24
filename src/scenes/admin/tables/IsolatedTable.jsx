@@ -45,7 +45,7 @@ const IsolatedTable = (props) => {
 
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} prevPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
         </div>
     );
 }
