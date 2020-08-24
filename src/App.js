@@ -67,7 +67,6 @@ const App = (props) => {
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
-
                             {/* תוסיפו ראוטים רק מעליי */}
                             <Route path="/" component={(props) => <AdminRouter {...props} />} />
                         </Switch>

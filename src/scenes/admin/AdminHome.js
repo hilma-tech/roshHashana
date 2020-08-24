@@ -7,7 +7,7 @@ const AdminHome = (props) => {
 
     return (
         <div>
-            <TopNavBar history={props.history}/>
+            <TopNavBar />
             <div className="admin-map-container">
                 <AdminMap
                     googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}

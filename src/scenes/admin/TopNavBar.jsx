@@ -33,7 +33,7 @@ const TopNavBar = (props) => {
 
 
     return <>
-        <SideNavBar history={props.history} />
+        <SideNavBar />
         <div className="admin-header">
             <div>
                 <FontAwesomeIcon icon={['fas', 'bars']} color="#747474" className="menueIcon pointer" onClick={() => { setOpenSideBar(true) }} />

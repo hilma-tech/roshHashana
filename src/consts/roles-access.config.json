@@ -28,7 +28,8 @@
             "AdminLogin",
             "AdminHome",
             "BlastsPage",
-            "IsolatedTable"
+            "IsolatedTable",
+            "ShofarBlowersTable"
         ],
         "deafaultHomePage": "AdminHome"
     }

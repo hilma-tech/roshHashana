@@ -3,6 +3,17 @@ const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
 
+const executeMySqlQuery = async (Model, query) =>
+    await to(new Promise((resolve, reject) => {
+        Model.dataSource.connector.query(query, (err, res) => {
+            if (err) {
+                reject(err);
+                return
+            }
+            resolve(res);
+        });
+    }));
+
 module.exports = function (ShofarBlower) {
     const SHOFAR_BLOWER_ROLE = 2
 
@@ -133,6 +144,58 @@ module.exports = function (ShofarBlower) {
         accepts: [
             { arg: 'meetToDelete', type: 'object' },
             { arg: 'options', type: 'object', http: "optionsFromRequest" }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
+        (async () => {
+            try {
+                let where = ''
+                const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
+                    (SELECT COUNT(*) 
+                    FROM shofar_blower_pub
+                    WHERE blowerId = cu.id
+                    )+(
+                    SELECT COUNT(*)
+                    FROM isolated
+                    WHERE public_meeting = 0 AND blowerMeetingId = cu.id
+                    ) 
+                ) AS blastsNum
+                FROM shofar_blower as sb 
+                    LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
+                ORDER BY cu.name
+                LIMIT 0, 20`
+
+                const countQ = `SELECT COUNT(*) as resNum
+                FROM shofar_blower 
+                LEFT JOIN CustomUser cu ON shofar_blower.userBlowerId = cu.id
+                ${where}`
+
+                let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerQ);
+                if (shofarBlowerErr || !shofarBlowerRes) {
+                    console.log('get shofarBlower admin request error : ', shofarBlowerErr);
+                    throw shofarBlowerErr
+                }
+                let [countErr, countRes] = await executeMySqlQuery(ShofarBlower, countQ);
+                if (countErr || !countRes) {
+                    console.log('get shofarBlower admin request error : ', countErr);
+                    throw countErr
+                }
+
+                return cb(null, { shofarBlowers: shofarBlowerRes, resNum: countRes[0].resNum })
+            }
+            catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('getShofarBlowersForAdmin', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });

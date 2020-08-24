@@ -190,16 +190,19 @@ module.exports = function (Isolated) {
                     where += `${where.length > 0 ? ' AND' : 'WHERE'} MATCH(cu.name) AGAINST ('${filter.name}')`
                 }
                 if (filter.haveMeeting === true) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} isolated.blowerMeetingId IS NOT NULL`
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NOT NULL) OR
+                    (isolated.public_meeting = 1 AND sbp.blowerId IS NOT NULL)`
                 }
                 else if (filter.haveMeeting === false) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} isolated.blowerMeetingId IS NULL`
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NULL) OR
+                    (isolated.public_meeting = 1 AND sbp.blowerId IS NULL)`
                 }
 
 
                 const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                    LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 ${where}
                 ORDER BY cu.name
                 LIMIT 0, 20`
@@ -207,6 +210,7 @@ module.exports = function (Isolated) {
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM isolated 
                 LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 ${where}`
 
                 let [isolatedErr, isolatedRes] = await executeMySqlQuery(Isolated, isolatedQ);
