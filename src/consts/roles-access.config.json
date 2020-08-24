@@ -27,7 +27,8 @@
         "comps": [
             "AdminLogin",
             "AdminHome",
-            "BlastsPage"
+            "BlastsPage",
+            "IsolatedTable"
         ],
         "deafaultHomePage": "AdminHome"
     }

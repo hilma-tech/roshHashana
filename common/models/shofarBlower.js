@@ -1,7 +1,7 @@
 'use strict';
-const to = require('../../server/common/to');
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
+const to = require('../../server/common/to');
 
 module.exports = function (ShofarBlower) {
     const SHOFAR_BLOWER_ROLE = 2
@@ -103,7 +103,21 @@ module.exports = function (ShofarBlower) {
     }
 
 
+    ShofarBlower.countAllVolunteers = function (cb) {
+        (async () => {
+            let [err, res] = await to(ShofarBlower.count());
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
 
+    ShofarBlower.remoteMethod('countAllVolunteers', {
+        http: { verb: 'post' },
+        accepts: [],
+        returns: { arg: 'res', type: 'number', root: true }
+    });
 
     ShofarBlower.remoteMethod('InsertDataShofarBlower', {
         http: { verb: 'post' },

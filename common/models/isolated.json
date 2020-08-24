@@ -161,7 +161,9 @@
             "permission": "ALLOW",
             "property": [
                 "getIsolatedsForAdmin",
-                "deleteIsolatedAdmin"
+                "deleteIsolatedAdmin",
+                "getNumberOfIsolatedWithoutMeeting",
+                "getNumberOfMeetings"
             ]
         }
     ]
