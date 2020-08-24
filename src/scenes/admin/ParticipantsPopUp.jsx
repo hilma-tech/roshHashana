@@ -15,10 +15,10 @@ const ParticipantsPopUp = (props) => {
             <Dialog open={isOpenParticipantsPopUp} aria-labelledby="reset-modal">
                 <FontAwesomeIcon icon={['fas', 'times']} className="timesPopUp" color='#489FB5' onClick={() => { setOpenParticipantsPopUp(false)}} />
                 <div>רשימת המשתתפים</div>
-                <div style={{ padding: '0 3vw 2vh', textAlign: "center", fontFamily: "Heebo", width: '90vw', height: "100vh" }}>
+                <div style={{ padding: '0 3vw 2vh', textAlign: "center", fontFamily: "Heebo", width: '85vw', height: "85vh" }}>
                     <DialogContent className="p-0" >
-                        <div>
-                            <div style={{ width: '90vw', height: "100vh" }} >
+                        <div >
+                            <div>
                                 <ParticipantsTable />
                             </div>
                         </div>

@@ -73,7 +73,7 @@ const IsolatedPage = function (props) {
                     <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
                     <div style={{ width: '3.5vw' }}></div>
                     <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
-                    <div className='blueSubTitle resultNum'>{`סה"כ ${resultNum} תוצאות`}</div>
+                    <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
                 <IsolatedTable resultNum={resultNum} />
             </div>

@@ -18,6 +18,23 @@ export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
     }
 }
 
+export const fetchShofarBlowers = async (limit, filter = {}, cb = () => { }) => {
+    if (!filter) filter = {}
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/getShofarBlowersForAdmin`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ limit, filter })
+    }, true);
+    if (typeof cb === "function") {
+        if (err || !res) {
+            return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+        }
+        else {
+            return cb(null, res)
+        }
+    }
+}
+
 export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowerPubs/getPublicMeetings`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -64,5 +81,47 @@ export const deleteIsolated = async (id, cb = () => { }) => {
     }
     else {
         return cb(null, true)
+    }
+}
+
+export const getNumVolunteers = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/countAllVolunteers`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const getNumberOfIsolatedWithoutMeeting = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getNumberOfIsolatedWithoutMeeting`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res[0].resNum)
+    }
+}
+
+export const getNumberOfMeetings = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getNumberOfMeetings`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
     }
 }

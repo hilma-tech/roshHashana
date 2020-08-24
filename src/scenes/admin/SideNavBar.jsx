@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { withRouter } from 'react-router';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import List from '@material-ui/core/List';
@@ -13,9 +14,9 @@ const SideNavBar = (props) => {
     const { isOpenSideBar, setOpenSideBar } = useContext(AdminMainContext)
 
     const navBarOptions = [
-        { name: "ראשי", path: '/all-stories' },
-        { name: "מחפשים", path: '/translate-words' },
-        { name: "בעלי תקיעה", path: '/dictionry-class' },
+        { name: "ראשי", path: '/home' },
+        { name: "מחפשים", path: '/searchings' },
+        { name: "בעלי תקיעה", path: '/shofar-blowers' },
         { name: "תקיעות", path: '/blasts' }
     ]
 
@@ -63,6 +64,7 @@ const SideNavBar = (props) => {
                         return (
                             <ListItem index={index} button className='containSideListItem' key={text.name} onClick={() => {
                                 props.history.push(text.path)
+                                setOpenSideBar(false)
                             }}>
                                 <ListItemText disableTypography className='optionTextContainer' primary={text.name} />
                             </ListItem>
@@ -76,4 +78,4 @@ const SideNavBar = (props) => {
         </SwipeableDrawer>)
 }
 
-export default SideNavBar;
+export default withRouter(SideNavBar);

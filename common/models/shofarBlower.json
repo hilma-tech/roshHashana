@@ -141,7 +141,11 @@
             "principalType": "ROLE",
             "principalId": "ADMIN",
             "permission": "ALLOW",
-            "property": "count"
+            "property": [
+                "count",
+                "countAllVolunteers",
+                "getShofarBlowersForAdmin"
+            ]
         }
     ]
 }

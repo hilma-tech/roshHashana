@@ -3,7 +3,7 @@
     background: #e5e5e6 0% 0% no-repeat padding-box;
     width: 25vw;
     align-items: left;
-    padding: 8vh 2vw 0px 1vw;
+    padding: 8vh 2vw 0px 0.5vw;
     color: #156879;
     font-size: 2.5vh;
 }
@@ -57,12 +57,12 @@
     width: fit-content !important;
     height: fit-content !important;
     color: white;
-    font-size: 3vh;
+    font-size: 2.6vh;
     background: #ffa62b 0% 0% no-repeat padding-box;
     border-radius: 30px;
     padding: 6px 25px;
 }
-.delete{
+.blastsTable .delete{
     font-size: 12px !important;
-    margin-top: 18vh;
+    margin-top: 12vh;
 }

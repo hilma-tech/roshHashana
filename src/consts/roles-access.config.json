@@ -27,7 +27,9 @@
         "comps": [
             "AdminLogin",
             "AdminHome",
-            "BlastsPage"
+            "BlastsPage",
+            "IsolatedTable",
+            "ShofarBlowersTable"
         ],
         "deafaultHomePage": "AdminHome"
     }

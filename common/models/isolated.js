@@ -3,6 +3,7 @@ const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
 
+
 const executeMySqlQuery = async (Model, query) =>
     await to(new Promise((resolve, reject) => {
         Model.dataSource.connector.query(query, (err, res) => {
@@ -189,16 +190,19 @@ module.exports = function (Isolated) {
                     where += `${where.length > 0 ? ' AND' : 'WHERE'} MATCH(cu.name) AGAINST ('${filter.name}')`
                 }
                 if (filter.haveMeeting === true) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} isolated.blowerMeetingId IS NOT NULL`
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NOT NULL) OR
+                    (isolated.public_meeting = 1 AND sbp.blowerId IS NOT NULL)`
                 }
                 else if (filter.haveMeeting === false) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} isolated.blowerMeetingId IS NULL`
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NULL) OR
+                    (isolated.public_meeting = 1 AND sbp.blowerId IS NULL)`
                 }
 
 
                 const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address 
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                    LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 ${where}
                 ORDER BY cu.name
                 LIMIT 0, 20`
@@ -206,6 +210,7 @@ module.exports = function (Isolated) {
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM isolated 
                 LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 ${where}`
 
                 let [isolatedErr, isolatedRes] = await executeMySqlQuery(Isolated, isolatedQ);
@@ -278,5 +283,58 @@ module.exports = function (Isolated) {
             { arg: 'id', type: 'number', require: true },
         ],
         returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
+
+
+    Isolated.getNumberOfIsolatedWithoutMeeting = function (cb) {
+        (async () => {
+            //get all public meetings
+            let [err, res] = await executeMySqlQuery(Isolated,
+                `SELECT COUNT(*) as resNum
+                FROM isolated
+                WHERE isolated.blowerMeetingId IS NULL;`);
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getNumberOfIsolatedWithoutMeeting', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
+    Isolated.getNumberOfMeetings = function (cb) {
+        (async () => {
+            let [err, res] = await executeMySqlQuery(Isolated.app.models.shofarBlowerPub,
+                `SELECT COUNT(*) as resNum
+                FROM shofar_blower_pub
+                WHERE shofar_blower_pub.blowerId IS NOT NULL;`);
+            if (err) cb(err);
+            if (res) {
+                // return cb(null, res);
+                let [err1, res1] = await executeMySqlQuery(Isolated,
+                    `SELECT COUNT(*) as resNum
+                    FROM isolated
+                    WHERE 
+                    isolated.blowerMeetingId IS NOT NULL
+                    AND isolated.public_meeting = 0;`);
+                if (err1) cb(err1);
+                if (res) {
+                    return cb(null, res[0].resNum + res1[0].resNum)
+                }
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getNumberOfMeetings', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'number', root: true }
     });
 }
