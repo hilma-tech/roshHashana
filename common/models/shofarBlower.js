@@ -84,14 +84,14 @@ module.exports = function (ShofarBlower) {
                     let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                     if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
                         //only delete the connection between the blower and the meeting
-                        await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0 });
+                        await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0, start_time: null });
                     }
                     else await ShofarBlower.app.models.shofarBlowerPub.destroyById(meetingId); //there are no participants in this meeting, delete this meeting
                 }
                 else {
                     //private meeting -> change blowerMeetingId to null -> 
                     //only delete the connection between the blower and the meeting
-                    await ShofarBlower.app.models.Isolated.upsertWithWhere({ and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, { blowerMeetingId: null });
+                    await ShofarBlower.app.models.Isolated.upsertWithWhere({ and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, { blowerMeetingId: null, meeting_time: null });
                 }
                 return true;
             } catch (error) {

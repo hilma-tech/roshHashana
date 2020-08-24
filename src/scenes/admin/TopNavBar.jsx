@@ -31,6 +31,7 @@ const TopNavBar = (props) => {
         })()
     }, [])
 
+
     return <>
         <SideNavBar history={props.history} />
         <div className="admin-header">

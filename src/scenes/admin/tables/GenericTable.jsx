@@ -25,11 +25,13 @@ const GenericTable = (props) => {
     const lastPageClicked = () => {
         if (1 === page) return
         props.lastPage()
+        setPage(prev => prev--)
     }
 
     const nextPageClicked = () => {
         if (Math.ceil(props.resaultsNum / props.columnNum) === page) return
         props.nextPage()
+        setPage(prev => prev++)
     }
 
     return (

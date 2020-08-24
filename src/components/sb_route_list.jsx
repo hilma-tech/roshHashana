@@ -129,7 +129,7 @@ const SBRouteList = (props) => {
             {textValue ? <div className="under-title">
                 {`${textStart}: ${textValue}`}
             </div> : null}
-            {disableEdit ? null : <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>}
+            {disableEdit ? <div className="info-msg">יום התקיעה מתקרב והמסלול נעול לשינויים</div> : <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>}
             <div className="sb-list" id="sb-list" ref={container}>
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
                 {userData ? createItemContent(userData, -1, -1) : null}
