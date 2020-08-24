@@ -64,7 +64,7 @@ const App = (props) => {
                     <MainProvider>
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
-                            <Route path="/"  component={(props) => <AdminRouter {...props} />} />
+                            {/* <Route path="/"  component={(props) => <AdminRouter {...props} />} /> */}
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />                            
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
