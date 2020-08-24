@@ -33,13 +33,12 @@ con.connect(err => {
     con.query(q, (err, isolated, _fields) => {
         if (err) throw err;
         for (let isolater of isolated) {
-            date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('MM/DD/YYYY HH:mm') : null
-            msg = isolater.blowerName ? `שלום ${isolater.name}, נקבעה לך תקיעת שופר ביום שני של ראש השנה, ב' אלול ${date ? `בשעה ${date}` : "טרם נקבעה שעה"}, ב${isolater.meetingAddress} ע"י ${isolater.blowerName}` : "טרם נמצא לך תוקע, צוות האתר על זה (;"
-            if (isolater.blowerName) { //! to remove if statement, this is just for testing cos in local sql got only one isolated with meeting 
-                console.log('calling ');
-                sendMsg(isolater.phoneNumber, msg)
-            }
-            console.log(`send msg to isolateds with: phoneNumber:${isolater.phoneNumber}, msg:${msg}`);
+            date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
+            msg = isolater.blowerName ?
+                `שלום ${isolater.name}\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress}\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}\nשעת תקיעה משוערת ${date}\nבריאות טובה\nשנה טובה ומתוקה!`
+                : "טרם נמצא לך תוקע, צוות האתר על זה (;"
+            sendMsg(isolater.phoneNumber, msg)
+            console.log(`-> \ncalling send msg to isolateds with: phoneNumber:${isolater.phoneNumber}, msg: ${msg}\n<-\n`);
         }
     });
 });
