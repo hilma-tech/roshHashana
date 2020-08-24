@@ -51,6 +51,7 @@ const Home = (props) => {
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "12%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
+                    <div id="shivuki-credit">{'תוכן שיווקי: אפרת שפירא www.my-idea.co.il'}</div>
                 </div>
             </div>
             {openMap && <Map publicMap closeMap={() => setOpenMap(false)} history={props.history} />}
