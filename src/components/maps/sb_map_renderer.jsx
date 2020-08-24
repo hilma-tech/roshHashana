@@ -243,7 +243,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
+                        options={{ strokeColor: "#ffa62b", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
                     />
                 ))
                 : null}
