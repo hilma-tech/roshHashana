@@ -23,18 +23,18 @@ const ParticipantsPopUp = (props) => {
     return (
         <div>
             <Dialog open={isOpenParticipantsPopUp} aria-labelledby="reset-modal">
-                <FontAwesomeIcon icon={['fas', 'times']} className="timesPopUp" color='#489FB5' onClick={() => { setOpenParticipantsPopUp(false) }} />
-                <div style={{ padding: '0 3vw 2vh', textAlign: "center", fontFamily: "Heebo", width: '55vw', height: "75vh" }}>
+                <div style={{ display: 'flex' }}>
+                    <FontAwesomeIcon icon={['fas', 'times']} className="timesPopUp pointer" color='#489FB5' onClick={() => { setOpenParticipantsPopUp(false) }} />
+                    <span className="mb-3 participantList bold">רשימת המשתתפים</span>
+                </div>
+                <div style={{ padding: '1vh 5vw 2vh 5vw', textAlign: "center", fontFamily: "Heebo", width: '55vw', height: "75vh" }}>
                     <DialogContent className="p-0" >
                         <div >
-                            <div>
-                                <div className="mb-3">רשימת המשתתפים</div>
                                 <div className="mb-3">
                                     <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                                 </div>
-                                {participantsPublicMeeting && <div>סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
+                                {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
                                 <ParticipantsTable />
-                            </div>
                         </div>
                     </DialogContent>
                 </div>
