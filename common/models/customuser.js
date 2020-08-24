@@ -270,10 +270,26 @@ module.exports = function (CustomUser) {
             userInfo = await CustomUser.findOne({ where: { id: userId }, fields: { username: true, name: true, address: true, comments: true, lng: true, lat: true } });
             if (role === 1) {
                 //isolated
-                let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, public_meeting: true } });
+                let isolated = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_phone: true, meeting_time: true, public_meeting: true, blowerMeetingId: true } });
                 if (!isolated) return { errMsg: 'LOG_OUT' };
                 userInfo.public_meeting = isolated.public_meeting;
                 userInfo.public_phone = isolated.public_phone;
+                userInfo.meeting_time = isolated.meeting_time;
+                if (isolated.blowerMeetingId) {
+                    if (!isolated.public_meeting) { // isoalted with private meeting
+                        let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
+                        userInfo.blowerName = blowerName.name;
+                    }
+                    else { // isolated with public meeting
+                        let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { id: isolated.blowerMeetingId }, include: ["blowerPublic"] });
+                        if (meetingInfo) {
+                            userInfo.meeting_time = meetingInfo.start_time ? meetingInfo.start_time : null;
+                            userInfo.address = meetingInfo.address ? meetingInfo.address : null;
+                            userInfo.blowerName = (meetingInfo.blowerPublic && meetingInfo.blowerPublic()) ? meetingInfo.blowerPublic().name : null;
+                        }
+                    }
+                }
+                userInfo.blowerMeetingId = isolated.blowerMeetingId;
                 return userInfo;
             }
             else if (role === 2) {
