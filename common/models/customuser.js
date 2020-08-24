@@ -594,6 +594,7 @@ module.exports = function (CustomUser) {
                 //general user
                 await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
             }
+            await CustomUser.app.models.RoleMapping.destroyAll({ principalId: userId });
             await CustomUser.destroyById(userId);
             return { res: 'SUCCESS' };
 
