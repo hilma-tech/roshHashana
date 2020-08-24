@@ -66,3 +66,45 @@ export const deleteIsolated = async (id, cb = () => { }) => {
         return cb(null, true)
     }
 }
+
+export const getNumVolunteers = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/countAllVolunteers`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const getNumberOfIsolatedWithoutMeeting = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getNumberOfIsolatedWithoutMeeting`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res[0].resNum)
+    }
+}
+
+export const getNumberOfMeetings = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getNumberOfMeetings`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}

@@ -11,7 +11,7 @@ export const AdminMainProvider = ({ children }) => {
     const [isOpenParticipantsPopUp, setOpenParticipantsPopUp] = useState(false)
     const [blowersNum, setBlowerNum] = useState(0);
     const [isolatedNum, setIsolatedNum] = useState(0);
-    const [blowsNum, setBlowsNum] = useState(0);
+    const [blastsNum, setBlastsNum] = useState(0);
     const [isOpenSideBar, setOpenSideBar] = useState(false);
 
 
@@ -24,7 +24,7 @@ export const AdminMainProvider = ({ children }) => {
         isOpenParticipantsPopUp, setOpenParticipantsPopUp,
         blowersNum, setBlowerNum,
         isolatedNum, setIsolatedNum,
-        blowsNum, setBlowsNum,
+        blastsNum, setBlastsNum,
         isOpenSideBar, setOpenSideBar
     }
 

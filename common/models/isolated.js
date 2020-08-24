@@ -3,6 +3,7 @@ const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
 
+
 const executeMySqlQuery = async (Model, query) =>
     await to(new Promise((resolve, reject) => {
         Model.dataSource.connector.query(query, (err, res) => {
@@ -278,5 +279,58 @@ module.exports = function (Isolated) {
             { arg: 'id', type: 'number', require: true },
         ],
         returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
+
+
+    Isolated.getNumberOfIsolatedWithoutMeeting = function (cb) {
+        (async () => {
+            //get all public meetings
+            let [err, res] = await executeMySqlQuery(Isolated,
+                `SELECT COUNT(*) as resNum
+                FROM isolated
+                WHERE isolated.blowerMeetingId IS NULL;`);
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getNumberOfIsolatedWithoutMeeting', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
+    Isolated.getNumberOfMeetings = function (cb) {
+        (async () => {
+            let [err, res] = await executeMySqlQuery(Isolated.app.models.shofarBlowerPub,
+                `SELECT COUNT(*) as resNum
+                FROM shofar_blower_pub
+                WHERE shofar_blower_pub.blowerId IS NOT NULL;`);
+            if (err) cb(err);
+            if (res) {
+                // return cb(null, res);
+                let [err1, res1] = await executeMySqlQuery(Isolated,
+                    `SELECT COUNT(*) as resNum
+                    FROM isolated
+                    WHERE 
+                    isolated.blowerMeetingId IS NOT NULL
+                    AND isolated.public_meeting = 0;`);
+                if (err1) cb(err1);
+                if (res) {
+                    return cb(null, res[0].resNum + res1[0].resNum)
+                }
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getNumberOfMeetings', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'number', root: true }
     });
 }

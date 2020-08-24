@@ -13,7 +13,7 @@ const SideNavBar = (props) => {
     const { isOpenSideBar, setOpenSideBar } = useContext(AdminMainContext)
 
     const navBarOptions = [
-        { name: "ראשי", path: '/all-stories' },
+        { name: "ראשי", path: '/home' },
         { name: "מחפשים", path: '/translate-words' },
         { name: "בעלי תקיעה", path: '/dictionry-class' },
         { name: "תקיעות", path: '/blasts' }
@@ -64,6 +64,7 @@ const SideNavBar = (props) => {
                         return (
                             <ListItem index={index} button className='containSideListItem' key={text.name} onClick={() => {
                                 props.history.push(text.path)
+                                setOpenSideBar(false)
                             }}>
                                 <ListItemText disableTypography className='optionTextContainer' primary={text.name} />
                             </ListItem>
