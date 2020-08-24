@@ -24,7 +24,7 @@ const Home = (props) => {
         <>
             <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: '5%' }} >
                 <div className="coap-imgs-container" style={{ width: isBrowser ? '50%' : '75%' }}>
-                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" />
+                    <a href="https://www.hilma.tech/"> <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" /></a>
                     <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/SynagogueOrg.png" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
