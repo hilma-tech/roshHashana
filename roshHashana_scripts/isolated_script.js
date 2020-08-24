@@ -14,7 +14,7 @@ LEFT JOIN CustomUser blowerUser ON blowerUser.id=blowerMeetingId
 LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
 WHERE isolated.public_meeting=0`
 
-const { sendMsg } = require('./server/sendSms/SendSms');
+const { sendMsg } = require('../server/sendSms/SendSms');
 const moment = require('moment');
 const useQuery = require('./query_excecute');
 let msg = "";
