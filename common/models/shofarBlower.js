@@ -70,7 +70,7 @@ module.exports = function (ShofarBlower) {
         }
     }
 
-//delete meeting from blower meetings
+    //delete meeting from blower meetings
     ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
         if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
@@ -122,4 +122,54 @@ module.exports = function (ShofarBlower) {
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
+
+//     ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
+//         (async () => {
+//             try {
+//                 let where = ''
+//                 const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
+//                     (SELECT COUNT(*) 
+//                     FROM shofar_blower_pub
+//                     WHERE blowerId = cu.id
+//                     )+(
+//                     SELECT COUNT(*)
+//                     FROM isolated
+//                     WHERE public_meeting = 0 AND blowerMeetingId = cu.id
+//                     ) 
+//                 ) AS blastsNum
+//                 FROM shofar_blower as sb 
+//                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
+//                 ORDER BY cu.name
+//                 LIMIT 0, 20`
+                
+//                 const countQ = `SELECT COUNT(*) as resNum
+//                 FROM shofar_blower 
+//                 LEFT JOIN CustomUser cu ON shofar_blower.userBlowerId = cu.id
+//                 ${where}`
+
+//                 let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(shofarBlower, shofarBlowerQ);
+//                 if (shofarBlowerErr || !shofarBlowerRes) {
+//                     console.log('get shofarBlower admin request error : ', shofarBlowerErr);
+//                     throw shofarBlowerErr
+//                 }
+//                 let [countErr, countRes] = await executeMySqlQuery(shofarBlower, countQ);
+//                 if (countErr || !countRes) {
+//                     console.log('get shofarBlower admin request error : ', countErr);
+//                     throw countErr
+//                 }
+//             }
+//             catch (err) {
+//                 cb(err);
+//             }
+//         })()
+//     }
+
+//     ShofarBlower.remoteMethod('getShofarBlowersForAdmin', {
+//         http: { verb: 'POST' },
+//         accepts: [
+//             { arg: 'limit', type: 'object' },
+//             { arg: 'filter', type: 'object' },
+//         ],
+//         returns: { arg: 'res', type: 'object', root: true }
+//     });
 }

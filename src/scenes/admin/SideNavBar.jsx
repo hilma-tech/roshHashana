@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import List from '@material-ui/core/List';
@@ -43,7 +43,6 @@ const SideNavBar = (props) => {
         });
     }
 
-
     return (
         <SwipeableDrawer
             anchor="right"
@@ -57,8 +56,8 @@ const SideNavBar = (props) => {
             // onClick={props.toggleDrawer(false)}
             // onKeyDown={props.toggleDrawer(false)}
             >
-                <List className='sideOptionsContainer d-flex flex-column justify-content-around'>
-                    <FontAwesomeIcon icon={['fas', 'times']} className="cancelIcon pointer"  onClick={() => { setOpenSideBar(false) }} />
+                <List className='sideOptionsContainer'>
+                    <FontAwesomeIcon icon={['fas', 'times']} className="cancelIcon pointer" onClick={() => { setOpenSideBar(false) }} />
                     {navBarOptions.map((text, index) => {
                         if (text === null) return null
                         return (

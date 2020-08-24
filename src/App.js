@@ -26,6 +26,7 @@ const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSetti
 const AdminHome = loadable(() => import('./scenes/admin/AdminHome'))
 const AdminLogin = loadable(() => import('./scenes/admin/AdminLogin.jsx'))
 const IsolatedsPage = loadable(() => import('./scenes/admin/IsolatedsPage'))
+const ShofarBlowersPage = loadable(() => import('./scenes/admin/ShofarBlowersPage'))
 const BlastsPage = loadable(() => import('./scenes/admin/BlastsPage.jsx'))
 
 // const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
@@ -77,7 +78,8 @@ const App = (props) => {
                         <Switch>
                             <HomeRoute force exact path="/" component={(props) => <Home {...props} />} comps={homePages} />
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
-                            <Route exact path="/table" compName="IsolatedTable" component={(props) => <AdminMainProvider><IsolatedsPage {...props} /></AdminMainProvider>} />
+                            <PrivateRoute exact path="/searching" compName="IsolatedsPage" component={(props) => <AdminMainProvider><IsolatedsPage {...props} /></AdminMainProvider>} />
+                            <PrivateRoute exact path="/shofar-blowers" compName="ShofarBlowersPage" component={(props) => <AdminMainProvider><ShofarBlowersPage {...props} /></AdminMainProvider>} />
                             <Route path="/login" compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
                             <PrivateRoute exact path="/blasts" compName="BlastsPage" component={(props) => <AdminMainProvider><BlastsPage {...props} /></AdminMainProvider>} />
                             <PrivateRoute exact path="/si4583j791WTsa5ga3rwyJERBRfgt54fo3225jfWan32sgba5i" compName="AdminHome" component={(props) => <AdminProvider><AdminHome {...props} /></AdminProvider>} />
