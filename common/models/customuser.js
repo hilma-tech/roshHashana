@@ -291,15 +291,17 @@ module.exports = function (CustomUser) {
                 userInfo.public_phone = isolated.public_phone;
                 userInfo.meeting_time = isolated.meeting_time;
                 if (isolated.blowerMeetingId) {
-                    if (!isolated.public_meeting) {
+                    if (!isolated.public_meeting) { // isoalted with private meeting
                         let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
                         userInfo.blowerName = blowerName.name;
                     }
-                    else {
-                        let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { blowerId: { neq: null } }, include: ["blowerPublic"] });
-                        userInfo.meeting_time = meetingInfo.start_time;
-                        userInfo.address = meetingInfo.address;
-                        userInfo.blowerName = meetingInfo.blowerPublic().name;
+                    else { // isolated with public meeting
+                        let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { id: isolated.blowerMeetingId }, include: ["blowerPublic"] });
+                        if (meetingInfo) {
+                            userInfo.meeting_time = meetingInfo.start_time ? meetingInfo.start_time : null;
+                            userInfo.address = meetingInfo.address ? meetingInfo.address : null;
+                            userInfo.blowerName = (meetingInfo.blowerPublic && meetingInfo.blowerPublic()) ? meetingInfo.blowerPublic().name : null;
+                        }
                     }
                 }
                 userInfo.blowerMeetingId = isolated.blowerMeetingId;
@@ -948,7 +950,7 @@ module.exports = function (CustomUser) {
             console.log('assignRes: ', assignRes);
             const findIsolatedQ = `select name, username from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
             console.log('findIsolatedQ: ', findIsolatedQ);
-            
+
             return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }
