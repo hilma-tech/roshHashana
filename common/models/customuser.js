@@ -47,8 +47,8 @@ module.exports = function (CustomUser) {
                 if (ResFindUser && ResFindUser.keyId) {
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId);
                 }
-
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
+
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 }
@@ -89,7 +89,7 @@ module.exports = function (CustomUser) {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
                                             if (resRole.roleId != role && !resUser.address) {
-                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                                RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
                                                         CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
