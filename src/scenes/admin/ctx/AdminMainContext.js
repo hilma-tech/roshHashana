@@ -14,9 +14,12 @@ export const AdminMainProvider = ({ children }) => {
     const [isolatedNum, setIsolatedNum] = useState(0);
     const [blastsNum, setBlastsNum] = useState(0);
     const [isOpenSideBar, setOpenSideBar] = useState(false);
+    const [pubMeetingsNum, setPubMeetingsNum] = useState(false);
+    const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
 
 
     const ctxValue = {
+        pubMeetingsNum, setPubMeetingsNum,
         loading, setLoading,
         isolateds, setIsolateds,
         shofarBlowers, setShofarBlowers,
@@ -27,7 +30,8 @@ export const AdminMainProvider = ({ children }) => {
         blowersNum, setBlowerNum,
         isolatedNum, setIsolatedNum,
         blastsNum, setBlastsNum,
-        isOpenSideBar, setOpenSideBar
+        isOpenSideBar, setOpenSideBar,
+        participantsPublicMeeting, setParticipantsPublicMeeting
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
 import AdminMap from '../../components/maps/adminMap';
-import './AdminHome.scss'
 import TopNavBar from "./TopNavBar"
+import './AdminHome.scss'
 
 const AdminHome = (props) => {
 
     return (
         <div>
             <TopNavBar />
-            <div className="map-container">
+            <div className="admin-map-container">
                 <AdminMap
                     googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                     loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}

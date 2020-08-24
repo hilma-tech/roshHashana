@@ -312,22 +312,25 @@ module.exports = function (Isolated) {
     Isolated.getNumberOfMeetings = function (cb) {
         (async () => {
             let [err, res] = await executeMySqlQuery(Isolated.app.models.shofarBlowerPub,
-                `SELECT COUNT(*) as resNum
-                FROM shofar_blower_pub
-                WHERE shofar_blower_pub.blowerId IS NOT NULL;`);
-            if (err) cb(err);
-            if (res) {
-                // return cb(null, res);
-                let [err1, res1] = await executeMySqlQuery(Isolated,
-                    `SELECT COUNT(*) as resNum
+                `SELECT  (	
+                    (
+                    SELECT COUNT(*) as resNum
+                    FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                    WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1
+                    )+(
+                    SELECT COUNT(*)                     
                     FROM isolated
                     WHERE 
                     isolated.blowerMeetingId IS NOT NULL
-                    AND isolated.public_meeting = 0;`);
-                if (err1) cb(err1);
-                if (res) {
-                    return cb(null, res[0].resNum + res1[0].resNum)
-                }
+                    AND isolated.public_meeting = 0
+                    )
+                    ) 
+                    AS resNum;`);
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res[0].resNum);
             }
         })()
     }
@@ -336,5 +339,31 @@ module.exports = function (Isolated) {
         http: { verb: 'POST' },
         accepts: [],
         returns: { arg: 'res', type: 'number', root: true }
+    });
+
+    Isolated.getParticipantsMeeting = function (id, cb) {
+        (async () => {
+            let [err, res] = await executeMySqlQuery(Isolated,
+                `
+                SELECT
+                    isolatedUser.name AS "name",
+                    isolatedUser.username AS "phone",
+                    isolatedUser.id AS "id"
+                FROM isolated
+                    LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
+                WHERE blowerMeetingId = ${id};
+            `
+            );
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getParticipantsMeeting', {
+        http: { verb: 'POST' },
+        accepts: [{ arg: 'id', type: 'number', require: true }],
+        returns: { arg: 'res', type: 'object', root: true }
     });
 }

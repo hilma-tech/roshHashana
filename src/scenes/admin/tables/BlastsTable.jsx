@@ -6,7 +6,7 @@ import GenericTable from './GenericTable'
 
 
 const BlastsTable = (props) => {
-    const { loadingBlastsPub, blastsPub, setBlastInfo } = useContext(AdminMainContext)
+    const { loadingBlastsPub, blastsPub, setBlastInfo, pubMeetingsNum } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
     const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info', ''], ['delete', '']]
@@ -32,7 +32,7 @@ const BlastsTable = (props) => {
                 blast.address,
                 getTime(blast.start_time),
                 <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
-                <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
+                // <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
 
             ]
         }))
@@ -41,7 +41,7 @@ const BlastsTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={() => { }} lastPage={() => { }} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={pubMeetingsNum}/>
         </div>
     );
 }

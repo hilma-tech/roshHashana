@@ -61,7 +61,7 @@ const IsolatedPage = function (props) {
 
     return (
         <div className='isolatedsContainer'>
-            <TopNavBar />
+            <TopNavBar history={props.history}/>
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                 <div style={{ display: 'flex' }}>

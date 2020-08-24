@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import { deletePublicMeeting } from './fetch_and_utils';
 import ParticipantsPopUp from "./ParticipantsPopUp"
-import { getTime} from './fetch_and_utils';
+import { getTime, getParticipantsMeeting, deletePublicMeeting } from './fetch_and_utils';
 import './styles/blastInfo.scss'
 
 
 const BlastInfo = (props) => {
 
-    const { blastInfo, isOpenParticipantsPopUp, setOpenParticipantsPopUp } = useContext(AdminMainContext)
+    const { blastInfo, setOpenParticipantsPopUp, setParticipantsPublicMeeting } = useContext(AdminMainContext)
 
     const handleTrashClick = (id) => {
         (async () => {
@@ -19,8 +18,16 @@ const BlastInfo = (props) => {
         })()
     }
 
-    const handleParticipantsClick = () => {
-        setOpenParticipantsPopUp(true)
+    const handleParticipantsClick = (id) => {
+        (async () => {
+            setOpenParticipantsPopUp(true)
+            await getParticipantsMeeting(id, (err, res) => {
+                if (res) {
+                    setParticipantsPublicMeeting(res)
+                }
+            })
+        })()
+
     }
 
     return (
@@ -71,17 +78,17 @@ const BlastInfo = (props) => {
                     <div className="width25">
                     </div>
                     <div className="width75" >
-                        <div className="bottomToList pointer" onClick={() => { handleParticipantsClick() }}>רשימת המשתתפים</div>
+                        <div className="bottomToList pointer" onClick={() => { handleParticipantsClick(blastInfo.id) }}>רשימת המשתתפים</div>
                     </div>
                 </div>}
-                <div className="flexRow delete pointer" onClick={() => { handleTrashClick(blastInfo.id) }}>
+                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer" onClick={() => { handleTrashClick(blastInfo.id) }}>
                     <div className="width25" style={{ fontSize: "1.7vh" }}>
                         <FontAwesomeIcon icon={['fas', 'trash']} color='#156879' />
                     </div>
                     <div className="width75">
                         <div className="info">מחק מפגש תקיעה בשופר</div>
                     </div>
-                </div>
+                </div>}
             </div>
             <ParticipantsPopUp />
 
