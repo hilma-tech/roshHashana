@@ -15,6 +15,8 @@ module.exports = function (CustomUser) {
 
 
     CustomUser.createUser = async (name, phone, role) => {
+        //creates key and/or created user (with no data)
+        //this function is called on Register's submit and on 'שלח קוד מחדש'
         let resKey = await CustomUser.app.models.keys.createKey();
         console.log(resKey);
         try {
@@ -35,6 +37,7 @@ module.exports = function (CustomUser) {
                     "principalId": ResCustom.id,
                     "roleId": role
                 }
+                console.log('RoleMapping.create: ', roleMapping);
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
@@ -89,6 +92,7 @@ module.exports = function (CustomUser) {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
                                             if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
+                                                console.log(`RoleMapping.updateAll: where { principalId: resUser.id(=${resUser.id}) } , { roleId: role(=${role}) }`);
                                                 RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
