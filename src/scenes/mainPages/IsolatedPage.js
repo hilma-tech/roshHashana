@@ -98,8 +98,8 @@ const IsolatedPage = (props) => {
                             <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
                             <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                             <div>לכתובת:</div>
-                            <div style={{ marginBottom: isBrowser ? '15%' : '0%' }} >
-                                <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
+                            <div style={{ marginBottom: isBrowser ? '5%' : '0%' }} >
+                                <div id="address-info" style={{ marginBottom:  '0%' }}>{address}</div>
                                 {comment && comment.length ? <div style={{ marginTop: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
                             </div>
                         </>

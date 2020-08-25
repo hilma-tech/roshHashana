@@ -71,6 +71,7 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
+        if (role == 3 && !meetingId || isNaN(Number(meetingId))) return cb(null, "LOG_OUT")
         const { RoleMapping } = CustomUser.app.models;
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {

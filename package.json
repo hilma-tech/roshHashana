@@ -101,6 +101,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "^3.4.1",
     "react-sortable-hoc": "1.11.0",
+    "react-swipeable": "^5.5.1",
     "resize-optimize-images": "^1.1.0",
     "resolve": "1.12.0",
     "resolve-url-loader": "3.1.0",

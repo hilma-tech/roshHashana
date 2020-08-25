@@ -5,6 +5,7 @@ import { checkDateBlock } from '../fetch_and_utils';
 import SBRouteList from './sb_route_list';
 import SBAllMeetingsList from './sb_all_meetings_list';
 import { isBrowser } from 'react-device-detect';
+import { Swipeable } from 'react-swipeable'
 
 const SBSideInfo = (props) => {
     const [routeDis, setRouteDis] = useState(true)
@@ -16,7 +17,19 @@ const SBSideInfo = (props) => {
 
     return (
         <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList === null ? "" : (openRouteList ? "open-animation" : "close-animation")}`} id="sb-side-list-container" >
-            {!isBrowser ? <div className="blue-line-container" onClick={() => /* the on click could be on click of WHOLE route side list, (when on mobile) */switchBool(setOpenRouteList)}><div className="blue-line" ></div></div> :
+            {!isBrowser ?
+                <Swipeable onSwiping={(e)=>{
+                    if(e.dir === 'Up'){
+                        setOpenRouteList(true)
+                    }
+                    if(e.dir === 'Down'){
+                        setOpenRouteList(false)
+                    }
+                }} >
+                    <div className="blue-line-container" onClick={() => /* the on click could be on click of WHOLE route side list, (when on mobile) */switchBool(setOpenRouteList)}>
+                        <div className="blue-line" ></div>
+                    </div>
+                </Swipeable> :
                 routeDis
                     ?
                     <div id="sb-route-list-top" >
