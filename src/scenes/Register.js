@@ -17,11 +17,7 @@ class Register extends React.Component {
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
-<<<<<<< HEAD
-      role: this.props.location.state ? (this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3) : null,
-=======
       role: (this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null,
->>>>>>> 16c2c942318a07b24f365297e6bfe41f4ff7da47
       phone: "",
       name: "",
       key: "",
@@ -111,7 +107,7 @@ class Register extends React.Component {
             this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
 
             break;
-          case "isolated with new public meeting": 
+          case "isolated with new public meeting":
             this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
 
 
@@ -175,16 +171,11 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
-<<<<<<< HEAD
-        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "6%" : "45%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location && this.props.location.state && this.props.location.state.type === 'blower' ?
-=======
         <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location.state.type === 'blower' ?
->>>>>>> 16c2c942318a07b24f365297e6bfe41f4ff7da47
+        {(this.props.location && this.props.location.state && this.props.location.state.type === 'blower') ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
-          this.props.location && this.props.location.state && this.props.location.state.type === 'isolator' ?
+          (this.props.location && this.props.location.state && this.props.location.state.type === 'isolator') ?
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhoneisolator"}`} >{this.isolator}</div>
             :
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
