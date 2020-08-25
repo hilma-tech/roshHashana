@@ -163,7 +163,8 @@
                 "getIsolatedsForAdmin",
                 "deleteIsolatedAdmin",
                 "getNumberOfIsolatedWithoutMeeting",
-                "getNumberOfMeetings"
+                "getNumberOfMeetings",
+                "getParticipantsMeeting"
             ]
         }
     ]

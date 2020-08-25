@@ -172,7 +172,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     return (
         <GoogleMap
-            defaultZoom={16} //!change back to 20
+            defaultZoom={18} //!change back to 18
             defaultOptions={mapOptions}
             center={props.center}
             onClick={closeSideMeetingsList}
@@ -243,7 +243,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                         key={"k" + i}
                         path={routePath}
                         geodesic={false}
-                        options={{ strokeColor: "purple", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
+                        options={{ strokeColor: "#ffa62b", strokeOpacity: Number(i * 0.1) + 0.54, strokeWeight: 3 }}
                     />
                 ))
                 : null}

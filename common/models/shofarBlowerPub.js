@@ -81,12 +81,27 @@ module.exports = function (shofarBlowerPub) {
                 FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1`); //confirm change
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1
+                LIMIT ${limit.start}, ${limit.end}`); //confirm change
 
             if (errPublic) cb(errPublic);
 
             if (resPublic) {
-                return cb(null, { publicMeetings: resPublic });
+                let [err, res] = await executeMySqlQuery(shofarBlowerPub,
+                    `SELECT COUNT(*) as resNum
+                    FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                    WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1`
+                );
+                if (err) cb(err);
+                if (res) {
+                    return cb(null,
+                        {
+                            publicMeetings: resPublic,
+                            num: res[0].resNum
+                        });
+                }
             }
         })()
     }

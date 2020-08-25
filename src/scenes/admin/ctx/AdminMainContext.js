@@ -5,6 +5,7 @@ export const AdminMainContext = React.createContext()
 export const AdminMainProvider = ({ children }) => {
     const [loading, setLoading] = useState(false)
     const [isolateds, setIsolateds] = useState(null)
+    const [shofarBlowers, setShofarBlowers] = useState(null)
     const [blastsPub, setBlastsPub] = useState(null)
     const [loadingBlastsPub, setLoadingBlastsPub] = useState(false)
     const [blastInfo, setBlastInfo] = useState(null)
@@ -13,11 +14,15 @@ export const AdminMainProvider = ({ children }) => {
     const [isolatedNum, setIsolatedNum] = useState(0);
     const [blastsNum, setBlastsNum] = useState(0);
     const [isOpenSideBar, setOpenSideBar] = useState(false);
+    const [pubMeetingsNum, setPubMeetingsNum] = useState(false);
+    const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
 
 
     const ctxValue = {
+        pubMeetingsNum, setPubMeetingsNum,
         loading, setLoading,
         isolateds, setIsolateds,
+        shofarBlowers, setShofarBlowers,
         blastsPub, setBlastsPub,
         loadingBlastsPub, setLoadingBlastsPub,
         blastInfo, setBlastInfo,
@@ -25,7 +30,8 @@ export const AdminMainProvider = ({ children }) => {
         blowersNum, setBlowerNum,
         isolatedNum, setIsolatedNum,
         blastsNum, setBlastsNum,
-        isOpenSideBar, setOpenSideBar
+        isOpenSideBar, setOpenSideBar,
+        participantsPublicMeeting, setParticipantsPublicMeeting
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

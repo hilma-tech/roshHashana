@@ -46,7 +46,7 @@ thead th {
 }
 
 .tableBodyStyle td:last-child {
-    padding-left: 3vw;
+    padding-left: 5vw;
 }
 
 .tableBodyStyle td:first-child, .tableHead th:first-child {
@@ -90,4 +90,21 @@ thead th {
 .disabledNavArrow {
     color: #74747436;
     cursor: unset;
+}
+
+.tableIcons{
+    width: 4vw;
+}
+
+.circleCheckBox{
+    width: 2vh;
+    height: 2vh;
+    border-radius: 50%;
+    border: 0.5px #707070 solid;
+    margin-left: 2vw;
+}
+
+.confrim{
+    width: 2vw;
+    padding-right: 4vw !important;
 }

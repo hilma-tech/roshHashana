@@ -10,7 +10,6 @@ const useQuery = require('./query_excecute');
 let msg = "";
 useQuery(query, (err, data, _fields) => {
     if (err) throw err;
-    console.log(data, 'data')
     for (let blower of data) {
         msg = `שלום ${blower.name}, שים לב, היום בשעה 00:00 תיסגר האפשרות לערוך את פרטייך ואת פרטי המסלול. בברכה, מיזם "יום תרועה"`;
         sendMsg(blower.phoneNumber, msg)

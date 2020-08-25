@@ -6,33 +6,38 @@ import GenericTable from './GenericTable'
 
 
 const ParticipantsTable = (props) => {
-    const { loadingBlastsPub, blastsPub, setBlastInfo } = useContext(AdminMainContext)
+    const { loadingBlastsPub, participantsPublicMeeting, setParticipantsPublicMeeting } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
     const th = [['name', 'שם'], ['phone', 'טלפון'], ['delete', '']]
 
-    
 
-    const handleTrashClick = (id) => {
+
+    const handleTrashClick = (id, index) => {
         (async () => {
-           
+            let newParticipantsPublicMeeting = [...participantsPublicMeeting]
+            newParticipantsPublicMeeting.splice(index, 1)
+            setParticipantsPublicMeeting(newParticipantsPublicMeeting)
         })()
     }
 
     useEffect(() => {
-        if (blastsPub) setTr(blastsPub.map(blast => {
-            return [
-                blast.blowerName,
-                blast.phone,
-                <FontAwesomeIcon className="pointer" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
-            ]
-        }))
-    }, [blastsPub])
+
+        if (participantsPublicMeeting) {
+            setTr(participantsPublicMeeting.map((participant, index) => {
+                return [
+                    participant.name,
+                    participant.phone,
+                    <FontAwesomeIcon className="pointer trash" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(participant.id, index) }} />
+                ]
+            }))
+        }
+    }, [participantsPublicMeeting])
 
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={() => { }} lastPage={() => { }} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={false} />
         </div>
     );
 }

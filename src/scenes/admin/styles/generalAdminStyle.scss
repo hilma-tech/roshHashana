@@ -10,7 +10,7 @@
         color: #747474;
         outline: none;
         background: none;
-        border: 1px solid #000000;;
+        border: 0.5px solid #444444;;
     }
 
     .inputIcon{
@@ -64,4 +64,9 @@
 
 .pointer{
     cursor: pointer;
+}
+
+.isolatedsContainer{
+    height: 100vh;
+    background: #F3F3F3 0% 0% no-repeat padding-box;
 }

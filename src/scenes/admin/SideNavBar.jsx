@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
+import { withRouter } from 'react-router';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import List from '@material-ui/core/List';
@@ -14,8 +15,8 @@ const SideNavBar = (props) => {
 
     const navBarOptions = [
         { name: "ראשי", path: '/home' },
-        { name: "מחפשים", path: '/translate-words' },
-        { name: "בעלי תקיעה", path: '/dictionry-class' },
+        { name: "מחפשים", path: '/searchings' },
+        { name: "בעלי תקיעה", path: '/shofar-blowers' },
         { name: "תקיעות", path: '/blasts' }
     ]
 
@@ -43,7 +44,6 @@ const SideNavBar = (props) => {
         });
     }
 
-
     return (
         <SwipeableDrawer
             anchor="right"
@@ -57,8 +57,8 @@ const SideNavBar = (props) => {
             // onClick={props.toggleDrawer(false)}
             // onKeyDown={props.toggleDrawer(false)}
             >
-                <List className='sideOptionsContainer d-flex flex-column justify-content-around'>
-                    <FontAwesomeIcon icon={['fas', 'times']} className="cancelIcon pointer"  onClick={() => { setOpenSideBar(false) }} />
+                <List className='sideOptionsContainer'>
+                    <FontAwesomeIcon icon={['fas', 'times']} className="cancelIcon pointer" onClick={() => { setOpenSideBar(false) }} />
                     {navBarOptions.map((text, index) => {
                         if (text === null) return null
                         return (
@@ -78,4 +78,4 @@ const SideNavBar = (props) => {
         </SwipeableDrawer>)
 }
 
-export default SideNavBar;
+export default withRouter(SideNavBar);

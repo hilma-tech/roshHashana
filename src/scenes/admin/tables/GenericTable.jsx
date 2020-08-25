@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         loading- boolean, true if the table loads.
         navigation- boolean, arrows back and forward.
             if navigation is true:
-                nextPage- function, onClick the right arrow.
-                lastPage- function, onClick the left arrow.
+                prevPage- function, onClick the right arrow.
+                nextPage- function, onClick the left arrow.
                 columnNum- the numberof column in one page
                 resaultsNum- the number of all the columns in the database. like: יש לי 345 אנשים שמחפשים בעל תוקע ואני מראה רק 20 מתוכם. המספר של הפרופס הוא 345
 */
@@ -22,13 +22,15 @@ const GenericTable = (props) => {
         if (props.tr) setTr(props.tr)
     }, [props.tr])
 
-    const lastPageClicked = () => {
+    const prevPageClicked = () => {
+        console.log("prev")
         if (1 === page) return
-        props.lastPage()
+        props.prevPage()
         setPage(prev => prev--)
     }
 
     const nextPageClicked = () => {
+        console.log("nextPage")
         if (Math.ceil(props.resaultsNum / props.columnNum) === page) return
         props.nextPage()
         setPage(prev => prev++)
@@ -73,9 +75,9 @@ const GenericTable = (props) => {
             {props.navigation &&
                 <div>
                     <div className='tableNavigation'>
-                        <FontAwesomeIcon icon={['fas', "chevron-right"]} className={'navArrow' + (Math.ceil(props.resaultsNum / props.columnNum) === page ? ' disabledNavArrow' : '')} onClick={nextPageClicked} />
+                        <FontAwesomeIcon icon={['fas', "chevron-right"]} className={'navArrow' + (Math.ceil(props.resaultsNum / props.columnNum) === page ? ' disabledNavArrow' : '')} onClick={prevPageClicked}  />
                         <div>עמוד {page} מתוך {Math.ceil(props.resaultsNum / props.columnNum)}</div>
-                        <FontAwesomeIcon icon={['fas', "chevron-left"]} className={'navArrow' + (page === 1 ? ' disabledNavArrow' : '')} onClick={lastPageClicked} />
+                        <FontAwesomeIcon icon={['fas', "chevron-left"]} className={'navArrow' + (page === 1 ? ' disabledNavArrow' : '')} onClick={nextPageClicked} />
                     </div>
                 </div>
             }
