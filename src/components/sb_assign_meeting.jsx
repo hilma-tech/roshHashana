@@ -139,8 +139,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //format
         let newTT = data.newTotalTime;
         try {
-            newTT = moment(Number(data.newTotalTime)).format("mm.ss")
-        } catch (e) { newTT = Number(data.newTotalTime) / 60000 }
+            newTT = Number(newTT) / 60000
+            let newTTSplit = newTT.toString().split(".")
+            newTT = `${newTTSplit[0]}.${newTTSplit[1].substring(0, 2).padEnd(2, 0)}`
+        } catch (e) { newTT = Number(newTT) / 60000 }
 
         let maxDur = data.maxRouteDuration
         try {
