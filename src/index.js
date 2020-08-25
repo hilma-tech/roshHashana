@@ -16,17 +16,22 @@ import { StylesProvider, jssPreset } from '@material-ui/styles';
 import { Provider } from 'mobx-react';
 import stores from './stores';
 
+import { SocketProvider } from "@hilma/socket.io-react";
+
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
 
 library.add(fas)
 
 //ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
-<Provider {...stores}>
-	<StylesProvider jss={jss}>
-        <App />
-	</StylesProvider>
-</Provider>
+    <StylesProvider jss={jss}>
+        <SocketProvider
+            uri={`https://${process.env.SOCKET_IO_REACT_URI}`}
+            options={{ transports: ['websocket'] }}
+        >
+            <App />
+        </SocketProvider>
+    </StylesProvider>
     , document.getElementById('root'));
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
