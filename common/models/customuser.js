@@ -806,7 +806,7 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
-            if (!userDataRes[0] || !userDataRes[0].confirm) return cb(true)
+            if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
             let userData = userDataRes[0]
 
             //! check that number of meetings in not at max

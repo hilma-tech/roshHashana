@@ -63,6 +63,10 @@ const SBHomePage = (props) => {
         }
         fetching = false
     }
+    const click = () => {
+        document.scrollTop = 0
+        window.print()
+    }
 
     return (
         <div className="sb-homepage-container">
@@ -74,6 +78,7 @@ const SBHomePage = (props) => {
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
+                        <div id="print-btn" style={{ position: "absolute", right: 0, top: 0 }} onClick={click} >click</div>
                     </>
                     :
                     /* USER IS NOT CONFIRMED */
