@@ -1,12 +1,46 @@
+@media print {
+  @page {
+    background-color: transparent !important;
+    size: landscape !important;
+    margin: 5mm 5mm 5mm 5mm !important; /* change the margins as you want them to be. */
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+  }
+  .sb-route-list {
+    .sb-side-list-title {
+      font-size: 1.9rem !important;
+    }
+    .under-title {
+      font-size: 1.5rem !important;
+    }
+  }
+  #sb-route-list-top,
+  .sb-overmap-container,
+  #print-btn {
+    display: none !important;
+  }
+  #sb-side-list-container {
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+  }
+  #sb-map-container {
+    height: 100%;
+  }
+}
+
 .App {
   text-align: center;
 }
 
-*{
+* {
   box-sizing: border-box !important;
 }
 
-.pointer{
+.pointer {
   cursor: pointer;
 }
 
@@ -76,6 +110,6 @@
   }
 }
 
-.bold{
+.bold {
   font-weight: bold;
 }
