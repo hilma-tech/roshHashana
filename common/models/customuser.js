@@ -94,8 +94,8 @@ module.exports = function (CustomUser) {
                                     RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            if (resRole.roleId != role && !resUser.address) {
-                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                            if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
+                                                RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
                                                         CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
@@ -586,7 +586,6 @@ module.exports = function (CustomUser) {
                 }
 
                 await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
-                //TODO: להודיע למבודדים שבוטלה להם הפגישה
                 await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
 
             }

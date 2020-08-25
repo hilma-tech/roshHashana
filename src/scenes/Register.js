@@ -104,14 +104,12 @@ class Register extends React.Component {
             this.props.history.push('/', { name: res.data.name, address: res.data.address, comments: res.data.comments });
 
             break;
-          case "isolated with new public meeting":
-            //TODO להודיע לו שהוא נרשם 
+          case "isolated with new public meeting": 
             this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
 
 
             break;
           case "isolated with public meeting":
-            //TODO להכניס אותו שוב לאיפה שהוא נירשם
             this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
 
 
