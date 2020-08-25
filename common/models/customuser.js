@@ -88,7 +88,7 @@ module.exports = function (CustomUser) {
                                     RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            if (resRole.roleId != role && !resUser.address) {
+                                            if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
                                                 RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
@@ -562,7 +562,7 @@ module.exports = function (CustomUser) {
                     meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
 
-                await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+                await CustomUser.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { blowerMeetingId: null, meeting_time: null });
                 //TODO: להודיע למבודדים שבוטלה להם הפגישה
                 await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
 
