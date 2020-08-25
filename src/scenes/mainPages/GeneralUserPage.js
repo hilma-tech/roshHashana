@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 import moment from "moment"
-import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
 import { CONSTS } from '../../consts/const_messages';
 import { checkDateBlock } from '../../fetch_and_utils';
+import './MainPage.scss';
+
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);

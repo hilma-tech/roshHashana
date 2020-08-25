@@ -59,6 +59,7 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res) {
         if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
@@ -82,9 +83,13 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res && res.ok) {
         switch (res.ok) {
+          case "LOG_OUT":
+            this.props.history.push('/')
+            break;
           case "err key":
             this.setState({ alart: errKey })
             break;
@@ -145,6 +150,7 @@ class Register extends React.Component {
       if (err) {
         console.log("ERR", err);
         this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+
       }
       if (res) {
         this.setState({ sendKey: true })
