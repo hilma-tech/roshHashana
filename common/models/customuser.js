@@ -550,7 +550,7 @@ module.exports = function (CustomUser) {
                 let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
                     `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
                          from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
-                         where (blowerId = 10) 
+                         where (blowerId = ${userId}) 
                          group by shofar_blower_pub.id `);
                 if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
                     let meetingsToUpdate = [], meetingsToDelete = [];
