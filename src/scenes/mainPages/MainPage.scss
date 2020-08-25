@@ -124,11 +124,10 @@
         font-weight: bold;
     }
     .containerContent {
-        position: absolute;
-        top: 4rem;
+        position: relative;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
     }
     .header {
         position: absolute;
