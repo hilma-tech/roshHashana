@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { checkDateBlock } from '../fetch_and_utils';
@@ -6,23 +6,25 @@ import SBRouteList from './sb_route_list';
 import SBAllMeetingsList from './sb_all_meetings_list';
 import { isBrowser } from 'react-device-detect';
 import { Swipeable } from 'react-swipeable'
+import { SBContext } from '../ctx/shofar_blower_context';
 
 const SBSideInfo = (props) => {
-    const [routeDis, setRouteDis] = useState(true)
-    const [openRouteList, setOpenRouteList] = useState(null)
+    const [routeDis, setRouteDis] = useState(true);
+    const [openRouteList, setOpenRouteList] = useState(null);
+    const { isPrint, setIsPrint } = useContext(SBContext);
 
     const switchBool = (state) => state(prev => !prev)
 
     const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
 
     return (
-        <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList === null ? "" : (openRouteList ? "open-animation" : "close-animation")}`} id="sb-side-list-container" >
+        <div className={`${isBrowser ? "sb-side-list-container" : "sb-side-list-mobile-container"} ${openRouteList === null ? "" : (openRouteList ? "open-animation" : "close-animation")} ${isPrint ? 'print-style' : ''}`} id="sb-side-list-container" >
             {!isBrowser ?
-                <Swipeable onSwiping={(e)=>{
-                    if(e.dir === 'Up'){
+                <Swipeable onSwiping={(e) => {
+                    if (e.dir === 'Up') {
                         setOpenRouteList(true)
                     }
-                    if(e.dir === 'Down'){
+                    if (e.dir === 'Down') {
                         setOpenRouteList(false)
                     }
                 }} >
