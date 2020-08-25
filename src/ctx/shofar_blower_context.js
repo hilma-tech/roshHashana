@@ -14,6 +14,7 @@ export const SBProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [myMeetings, setMyMeetings] = useState(null);
     const [meetingsReqs, setMeetingsReqs] = useState(null);
+    const [isPrint, setIsPrint] = useState(false);
 
     const [assignMeetingInfo, setAssignMeetingInfo] = useState(null)
     const [assigns, setAssigns] = useState(null)
@@ -56,6 +57,7 @@ export const SBProvider = ({ children }) => {
         isInRoute, setIsInRoute,
         totalTime, totalLength,
         getLengthFromPrevStop,
+        isPrint, setIsPrint
     }
 
     return <SBContext.Provider value={ctxValue} >

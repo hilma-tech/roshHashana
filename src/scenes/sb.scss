@@ -343,6 +343,12 @@
         }
     }
 }
+.print-style {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 5;
+}
 
 .sb-assign-container {
     width: 30%;
@@ -548,5 +554,12 @@
 .sort-item-container {
     .meeting-in-route-info-container {
         background-color: #c3e7effc;
+    }
+}
+
+.print-map-style {
+    display: none;
+    & * {
+        display: none;
     }
 }
