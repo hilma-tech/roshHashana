@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 import moment from "moment"
-import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
-import { CONSTS } from '../../const_messages';
+import './MainPage.scss';
+
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
@@ -22,7 +22,6 @@ const GeneralUserPage = (props) => {
                 sessionStorage.setItem("dontShowPopup", true)
             }
             if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
-                console.log("from props", props)
                 if (props.location.state.name) {
                     setName(props.location.state.name);
                 }

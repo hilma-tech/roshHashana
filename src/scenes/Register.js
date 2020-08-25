@@ -3,11 +3,17 @@ import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { isBrowser } from "react-device-detect";
+import { MainContext } from '../ctx/MainContext'
+import { CONSTS } from '../const_messages'
+
+import GeneralAlert from '../components/modals/general_alert'
+
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
+  static contextType = MainContext
   constructor(props) {
     super(props);
 
@@ -57,6 +63,7 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res) {
         this.setState({ status: "stepTwo" })
@@ -75,9 +82,13 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res && res.ok) {
         switch (res.ok) {
+          case "LOG_OUT":
+            this.props.history.push('/')
+            break;
           case "err key":
             this.setState({ alart: errKey })
             break;
@@ -139,6 +150,8 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
+
       }
       if (res) {
         this.setState({ sendKey: true })
@@ -197,6 +210,8 @@ class Register extends React.Component {
               </div>
             </div></>}
         {/* </div> */}
+        {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
+
       </div>
     );
   }
