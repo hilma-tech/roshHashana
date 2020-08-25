@@ -15,7 +15,7 @@ class Register extends React.Component {
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
-      role: this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3,
+      role: (this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null,
       phone: "",
       name: "",
       key: "",
@@ -23,6 +23,8 @@ class Register extends React.Component {
       sendKey: false,
       imgLoadedNum: 0
     };
+    if (!this.props.location || !this.props.location.state || !this.props.location.state.type || !this.state.role)
+      return this.props.history.push('/');
     this.generalUser = `אני רוצה לשמוע תקיעת שופר קרוב לבית`;
     this.isolator = "אני רוצה לשמוע \n תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
