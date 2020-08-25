@@ -99,7 +99,7 @@ const GeneralUserPage = (props) => {
                     <div className="clickAble" onClick={openSettings}>
                         <img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
+                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "0" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
                     <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה: ` : `שלום ${name}, \n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>
