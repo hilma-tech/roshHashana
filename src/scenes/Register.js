@@ -68,7 +68,8 @@ class Register extends React.Component {
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
-      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null
+      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.meetingId ? this.props.location.state.meetingInfo.meetingId : this.props.location.state.meetingInfo.id : null
+      if (this.state.role == 3 && !meetingId) return this.props.history.push('/');
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
