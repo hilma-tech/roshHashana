@@ -348,10 +348,13 @@ module.exports = function (Isolated) {
                 SELECT
                     isolatedUser.name AS "name",
                     isolatedUser.username AS "phone",
-                    isolatedUser.id AS "id"
+                    isolatedUser.id AS "id",
+                    isolated.id AS "idIsolated",
+                    RoleMapping.roleId AS "role" 
                 FROM isolated
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
-                WHERE blowerMeetingId = ${id};
+                    LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
+                    WHERE blowerMeetingId = ${id};     
             `
             );
             if (err) cb(err);
@@ -364,6 +367,24 @@ module.exports = function (Isolated) {
     Isolated.remoteMethod('getParticipantsMeeting', {
         http: { verb: 'POST' },
         accepts: [{ arg: 'id', type: 'number', require: true }],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    Isolated.deleteConectionToMeeting = function (id, cb) {
+        (async () => {
+            let [err, res] = await to(Isolated.upsertWithWhere({ id}, { blowerMeetingId: null, meeting_time: null }));
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('deleteConectionToMeeting', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'id', type: 'number' }
+        ],
         returns: { arg: 'res', type: 'object', root: true }
     });
 }
