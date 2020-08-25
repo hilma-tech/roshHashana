@@ -14,6 +14,7 @@ import SBSideInfo from '../components/sb_side_info';
 
 import './mainPages/MainPage.scss';
 import './sb.scss'
+import { useParams } from 'react-router';
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -63,7 +64,7 @@ const SBHomePage = (props) => {
         }
         fetching = false
     }
-    const click = () => {
+    const handlePrint = () => {
         document.scrollTop = 0
         window.print()
     }
@@ -77,8 +78,8 @@ const SBHomePage = (props) => {
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute} /> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
-                        <div id="print-btn" style={{ position: "absolute", right: 0, top: 0 }} onClick={click} >click</div>
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap location={props.location} history={props.history} />}
+                        {/* <div id="print-btn" style={{ position: "absolute", right: 0, top: 0 }} onClick={handlePrint} >click</div> */}
                     </>
                     :
                     /* USER IS NOT CONFIRMED */

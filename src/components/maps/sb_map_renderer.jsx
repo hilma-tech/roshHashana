@@ -44,11 +44,23 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
+        console.log("rendreer []");
+        let p = new URLSearchParams(props.location.search).get("p")
+        if (p == "t") {
+            handlePrint()
+            window.history.replaceState({}, document.title, "/");
+        }
+    }, [])
+    useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
             setData();
         }
-    }, [data.myMLocs])
 
+    }, [data.myMLocs])
+    const handlePrint = () => {
+        document.scrollTop = 0
+        window.print()
+    }
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
@@ -169,7 +181,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
-
     return (
         <GoogleMap
             defaultZoom={18} //!change back to 18
