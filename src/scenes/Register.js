@@ -17,7 +17,11 @@ class Register extends React.Component {
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
+<<<<<<< HEAD
       role: this.props.location.state ? (this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3) : null,
+=======
+      role: (this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null,
+>>>>>>> 16c2c942318a07b24f365297e6bfe41f4ff7da47
       phone: "",
       name: "",
       key: "",
@@ -25,6 +29,8 @@ class Register extends React.Component {
       sendKey: false,
       imgLoadedNum: 0
     };
+    if (!this.props.location || !this.props.location.state || !this.props.location.state.type || !this.state.role)
+      return this.props.history.push('/');
     this.generalUser = `אני רוצה לשמוע תקיעת שופר קרוב לבית`;
     this.isolator = "אני רוצה לשמוע \n תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
@@ -72,7 +78,8 @@ class Register extends React.Component {
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
-      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id ? this.props.location.state.meetingInfo.id : this.props.location.state.meetingInfo.meetingId : null
+      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.meetingId ? this.props.location.state.meetingInfo.meetingId : this.props.location.state.meetingInfo.id : null
+      if (this.state.role == 3 && !meetingId) return this.props.history.push('/');
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
@@ -168,8 +175,13 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
+<<<<<<< HEAD
         <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "6%" : "45%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
         {this.props.location && this.props.location.state && this.props.location.state.type === 'blower' ?
+=======
+        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        {this.props.location.state.type === 'blower' ?
+>>>>>>> 16c2c942318a07b24f365297e6bfe41f4ff7da47
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
           this.props.location && this.props.location.state && this.props.location.state.type === 'isolator' ?
