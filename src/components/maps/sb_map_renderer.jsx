@@ -172,7 +172,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     return (
         <GoogleMap
-            defaultZoom={16} //!change back to 20
+            defaultZoom={18} //!change back to 18
             defaultOptions={mapOptions}
             center={props.center}
             onClick={closeSideMeetingsList}

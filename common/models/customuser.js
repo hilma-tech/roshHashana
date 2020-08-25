@@ -19,13 +19,14 @@ module.exports = function (CustomUser) {
     const SHOFAR_BLOWER_ROLE = 2
 
     CustomUser.createUser = async (name, phone, role) => {
-
+        //creates key and/or created user (with no data)
+        //this function is called on Register's submit and on 'שלח קוד מחדש'
         let resKey = await CustomUser.app.models.keys.createKey();
         console.log(resKey);
         try {
             let ResFindUser = await CustomUser.findOne({ where: { username: phone } })
 
-            if (!ResFindUser) {
+            if (!ResFindUser && role) {
                 //sign up
                 if ((role == 1 && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
                     //need to block the function
@@ -43,6 +44,7 @@ module.exports = function (CustomUser) {
                     "principalId": ResCustom.id,
                     "roleId": role
                 }
+                console.log('RoleMapping.create: ', roleMapping);
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
@@ -53,8 +55,8 @@ module.exports = function (CustomUser) {
                 if (ResFindUser && ResFindUser.keyId) {
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId);
                 }
-
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
+
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 }
@@ -94,8 +96,9 @@ module.exports = function (CustomUser) {
                                     RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            if (resRole.roleId != role && !resUser.address) {
-                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                            if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
+                                                console.log(`RoleMapping.updateAll: where { principalId: resUser.id(=${resUser.id}) } , { roleId: role(=${role}) }`);
+                                                RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
                                                         CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
@@ -585,8 +588,7 @@ module.exports = function (CustomUser) {
                     meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
 
-                await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
-                //TODO: להודיע למבודדים שבוטלה להם הפגישה
+                await CustomUser.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { blowerMeetingId: null, meeting_time: null });
                 await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
 
             }
@@ -594,6 +596,7 @@ module.exports = function (CustomUser) {
                 //general user
                 await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
             }
+            await CustomUser.app.models.RoleMapping.destroyAll({ principalId: userId });
             await CustomUser.destroyById(userId);
             return { res: 'SUCCESS' };
 
@@ -803,7 +806,7 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
-            if (!userDataRes[0] || !userDataRes[0].confirm) return cb(true)
+            if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
             let userData = userDataRes[0]
 
             //! check that number of meetings in not at max
