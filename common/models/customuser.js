@@ -22,7 +22,7 @@ module.exports = function (CustomUser) {
         try {
             let ResFindUser = await CustomUser.findOne({ where: { username: phone } })
 
-            if (!ResFindUser) {
+            if (!ResFindUser && role) {
 
                 let user = {
                     name: name,
@@ -575,6 +575,7 @@ module.exports = function (CustomUser) {
                 //general user
                 await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
             }
+            await CustomUser.app.models.RoleMapping.destroyAll({ principalId: userId });
             await CustomUser.destroyById(userId);
             return { res: 'SUCCESS' };
 
