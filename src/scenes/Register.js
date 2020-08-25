@@ -155,7 +155,7 @@ class Register extends React.Component {
   }
 
   render() {
-
+    if (!this.props.location || !this.props.location.state) this.props.history.push("/");
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
@@ -165,10 +165,10 @@ class Register extends React.Component {
         }
         {/* <div className="allDataRegisterPage"> */}
         <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location.state.type === 'blower' ?
+        {(this.props.location && this.props.location.state && this.props.location.state.type === 'blower') ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
-          this.props.location.state.type === 'isolator' ?
+          (this.props.location && this.props.location.state && this.props.location.state.type === 'isolator') ?
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhoneisolator"}`} >{this.isolator}</div>
             :
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
