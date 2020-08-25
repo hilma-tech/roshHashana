@@ -1,10 +1,15 @@
 @media print {
   @page {
     background-color: transparent !important;
-    size: A4 auto !important;
-    // size: 210mm 297mm !important;
-    margin: 5mm 5mm 5mm 5mm !important; /* change the margins as you want them to be. */
+    // size: landscape !important;
+    margin: 5mm 5mm 5mm 5mm !important;
   }
+
+  .gmnoprint {
+    //class from google, not sure what does
+    display: none !important;
+  }
+
   * {
     -webkit-print-color-adjust: exact !important;
   }
@@ -37,12 +42,48 @@
       justify-content: center !important;
       align-items: center !important;
       font-size: 2rem;
+      position: absolute !important;
+      // top: 0 !important;
     }
     #sb-map-container {
       margin: auto 0 !important;
       position: absolute !important;
       top: 50% !important;
       transform: translate(0, -50%) !important;
+    }
+  }
+  #sb-route-list-top,
+  .sb-overmap-container,
+  #print-btn {
+    display: none !important;
+  }
+  #sb-side-list-container {
+    padding: 5% !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    // align-items: center !important;
+    font-size: 2rem !important;
+    .meeting-in-route-info-container {
+        box-shadow: 0px 3px 6px #00000029 !important;
+        // border: 1px solid #00000029 !important;
+      .meeting-in-route-img {
+        width: 50px !important;
+        height: 50px !important;
+      }
+      .meeting-in-route-comments {
+        font-size: 1.5rem !important;
+      }
+    }
+  }
+  #sb-map-container {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    & * {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
     }
   }
 }

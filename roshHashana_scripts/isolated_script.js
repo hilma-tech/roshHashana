@@ -14,9 +14,10 @@ LEFT JOIN CustomUser blowerUser ON blowerUser.id=blowerMeetingId
 LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
 WHERE isolated.public_meeting=0`
 
+const useQuery = require('./query_excecute')
+
 const { sendMsg } = require('../server/sendSms/SendSms');
 const moment = require('moment');
-const useQuery = require('./query_excecute')
 
 useQuery(q, (err, isolated) => {
     if (err) throw err;
@@ -24,8 +25,8 @@ useQuery(q, (err, isolated) => {
         date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
         msg = isolater.blowerName ?
             `שלום ${isolater.name}\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""}\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}\nשעת תקיעה משוערת ${date}\nבריאות טובה\nשנה טובה ומתוקה!`
-            : `שלום ${isolater.name}, טרם נמצא לך תוקע, צוות האתר על זה (;`
-        // sendMsg(isolater.phoneNumber, msg)
+            : `שלום ${isolater.name}, טרם נמצא לך תוקע, צוות "יום תרועה" על זה (;`
+        sendMsg(isolater.phoneNumber, msg)
         console.log(`-> \ncalling send msg to _isolater_ with: phoneNumber:${isolater.phoneNumber}, msg: ${msg}\n<-\n`);
     }
 })
