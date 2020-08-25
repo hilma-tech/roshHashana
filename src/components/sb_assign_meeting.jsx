@@ -265,7 +265,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
             </div>
 
-            <div style={{ margin: isBrowser ? "20% 0" : "2% 0" }} className="sb-assign-content-container">
+            <div style={{ margin: isBrowser ? "10% 0" : "2% 0" }} className="sb-assign-content-container">
                 <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
                 {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>

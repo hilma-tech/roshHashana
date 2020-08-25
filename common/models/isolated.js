@@ -23,6 +23,7 @@ module.exports = function (Isolated) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
+        //socket.io event for isolated
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
