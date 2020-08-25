@@ -122,6 +122,7 @@ export default class IsolatedForm extends Component {
 
                         <form onSubmit={this.saveIsolatedDetails} onKeyPress={this.handleKeyPress} style={{ marginTop: "1.8rem" }} >
 
+                            <div id="comment">* נא לרשום את הכתובת המלאה</div>
                             <FormSearchBoxGenerator uId={"form-search-input-isolated"} onAddressChange={this.setAddress} />
                             <div className="err-msg">{this.state.addressErr}</div>
                             <input value={this.state.comments} onChange={this.handleCommentsChange} autoComplete={'off'} id="isolated-comments" type="text" placeholder="הערות נוספות למציאת המיקום" maxLength={254} />
