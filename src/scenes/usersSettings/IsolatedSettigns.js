@@ -153,7 +153,7 @@ const IsolatedSettings = (props) => {
             },
                 (res) => {
                     if (res)
-                        props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+                        props.history.push('/', { name: name, address: (Array.isArray(address) && address[0]) || originalVals.address });
                 })
         }
     }

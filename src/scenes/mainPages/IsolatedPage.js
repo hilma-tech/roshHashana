@@ -46,7 +46,7 @@ const IsolatedPage = (props) => {
     //cancel the request and delete the user
     const cancelRequest = () => {
         if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש',block: true});
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
             return;
         }
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
@@ -82,10 +82,10 @@ const IsolatedPage = (props) => {
                         <>
                             <div> אנחנו שמחים לבשר, שמצאנו בעל תוקע שיגיע עד אליך למפגש תקיעת שופר. אלו הפרטים:</div>
                             <div className="meeting-info">
-                                <div className="blower-name info-container"><img className="icon" src='/icons/blueShofar.svg' /><div>{`בעל תוקע: ${blowerName}`}</div></div>
-                                <div className="meeting-address info-container"><img className="icon" src='/icons/location.svg' /><div>{address + ', ' + comment}</div></div>
+                                <div className="blower-name info-container"><img className="icon" src='/icons/blueShofar.svg' alt="" /><div>{`בעל תוקע: ${blowerName}`}</div></div>
+                                <div className="meeting-address info-container"><img className="icon" src='/icons/location.svg' alt="" /><div>{address + ', ' + comment}</div></div>
                                 <div className="meeting-time info-container">
-                                    <img className="icon" src='/icons/blueClock.svg' />
+                                    <img alt="" className="icon" src='/icons/blueClock.svg' />
                                     <div>
                                         <div>{`בשעה ${meetingTime}`}</div>
                                         <div className="msg">הודעה סופית על זמן התקיעה תשלח ביום חמישי, כ"ח באלול 17.9</div>
@@ -99,7 +99,7 @@ const IsolatedPage = (props) => {
                             <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
                             <div>לכתובת:</div>
                             <div style={{ marginBottom: isBrowser ? '5%' : '0%' }} >
-                                <div id="address-info" style={{ marginBottom:  '0%' }}>{address}</div>
+                                <div id="address-info" style={{ marginBottom: '0%' }}>{address}</div>
                                 {comment && comment.length ? <div style={{ marginTop: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
                             </div>
                         </>
