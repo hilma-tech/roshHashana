@@ -144,7 +144,9 @@
             "property": [
                 "count",
                 "countAllVolunteers",
-                "getShofarBlowersForAdmin"
+                "getShofarBlowersForAdmin",
+                "confirmShofarBlower",
+                "deleteShofarBlowerAdmin"
             ]
         }
     ]

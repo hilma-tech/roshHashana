@@ -199,7 +199,7 @@ module.exports = function (Isolated) {
                 }
 
 
-                const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address 
+                const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address, cu.comments
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                     LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  

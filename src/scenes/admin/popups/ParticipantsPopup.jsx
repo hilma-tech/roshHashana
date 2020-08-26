@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import { AdminMainContext } from './ctx/AdminMainContext';
+import { AdminMainContext } from '../ctx/AdminMainContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ParticipantsTable from './tables/ParticipantsTable';
-import Search from './Search';
-import './styles/participantsPopUp.scss'
+import ParticipantsTable from '../tables/ParticipantsTable';
+import Search from '../Search';
+import '../styles/popup.scss'
 
-const ParticipantsPopUp = (props) => {
+const ParticipantsPopup = (props) => {
 
     const { isOpenParticipantsPopUp, setOpenParticipantsPopUp, participantsPublicMeeting } = useContext(AdminMainContext)
 
@@ -21,7 +21,7 @@ const ParticipantsPopUp = (props) => {
     }
 
     return (
-        <div>
+        <div className='participantsPopup'>
             <Dialog open={isOpenParticipantsPopUp} aria-labelledby="reset-modal">
                 <FontAwesomeIcon icon={['fas', 'times']} className="timesPopUp" color='#489FB5' onClick={() => { setOpenParticipantsPopUp(false) }} />
                 <div style={{ padding: '0 3vw 2vh', textAlign: "center", fontFamily: "Heebo", width: '55vw', height: "75vh" }}>
@@ -43,4 +43,4 @@ const ParticipantsPopUp = (props) => {
     );
 }
 
-export default ParticipantsPopUp;
+export default ParticipantsPopup;

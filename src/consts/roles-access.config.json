@@ -8,7 +8,7 @@
         ],
         "defaultHomePage": "SBHomePage"
     },
-    "GENERALUSER": { 
+    "GENERALUSER": {
         "comps": [
             "GeneralUserSettings",
             "AdminLogin"
@@ -29,7 +29,8 @@
             "AdminHome",
             "BlastsPage",
             "IsolatedTable",
-            "ShofarBlowersTable"
+            "ShofarBlowersTable",
+            "BlowerFormAdmin"
         ],
         "deafaultHomePage": "AdminHome"
     }

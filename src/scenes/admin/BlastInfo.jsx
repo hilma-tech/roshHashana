@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import ParticipantsPopUp from "./ParticipantsPopUp"
+import ParticipantsPopup from "./popups/ParticipantsPopup"
 import { getTime, getParticipantsMeeting, deletePublicMeeting } from './fetch_and_utils';
 import './styles/blastInfo.scss'
 
@@ -90,7 +90,7 @@ const BlastInfo = (props) => {
                     </div>
                 </div>}
             </div>
-            <ParticipantsPopUp />
+            <ParticipantsPopup />
 
         </div >
     );
