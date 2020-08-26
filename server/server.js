@@ -42,7 +42,23 @@ boot(app, __dirname, function (err) {
 
   if (require.main === module) {
 
-    app.start();
+    // OPTIONS for socket: you can add { transports: ["websocket", "xhr-polling"] };
+    // this means you'll be using websocket instead of polling (recommended);
+    // NOTE you need to have the same transports in the client too;
+    const options = { transports: ["websocket", "xhr-polling"] }; // ! Not required !
+    // you can read more about the options here: https://socket.io/docs/server-api/
+
+    // Here we need to add the Socket to our server, like so: require('socket.io')(SERVER, OPTIONS);
+    // in loopback's case the SERVER is app.start();
+    const io = require("@hilma/socket.io-server").default(
+      app.start(),
+      options
+    );
+
+    // now here we can do the usual io.on('connection' socket => { ... });
+
+    // setting this means that you can use the io instance anywhere you use app;
+    app.io = io;
 
   }
 });

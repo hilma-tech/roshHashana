@@ -26,7 +26,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings,
+        setMyMeetings, 
+        isPrint, setIsPrint,
+        totalLength
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -44,11 +46,30 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
+        if(totalLength == null) return
+        let p
+        try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
+        if (p !== "t") return
+        window.onafterprint = (event) => {
+            window.history.replaceState({}, document.title, "/");
+            setIsPrint(false);
+        };
+        setIsPrint(true);
+    }, [totalLength])
+    useEffect(() => {
+        if (isPrint) { handlePrint() }
+    }, [isPrint])
+
+    useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
             setData();
         }
-    }, [data.myMLocs])
 
+    }, [data.myMLocs])
+    const handlePrint = () => {
+        document.scrollTop = 0
+        window.print()
+    }
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
@@ -169,10 +190,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
-
     return (
         <GoogleMap
-            defaultZoom={16} //!change back to 20
+            defaultZoom={18} //!change back to 18
             defaultOptions={mapOptions}
             center={props.center}
             onClick={closeSideMeetingsList}

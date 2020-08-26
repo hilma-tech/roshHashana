@@ -1,20 +1,28 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
-import { getTime, deletePublicMeeting } from '../fetch_and_utils';
+import { deleteConectionToMeeting } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
 
 
 const ParticipantsTable = (props) => {
-    const { loadingBlastsPub, participantsPublicMeeting } = useContext(AdminMainContext)
+    const { loadingBlastsPub, participantsPublicMeeting, setParticipantsPublicMeeting } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
     const th = [['name', 'שם'], ['phone', 'טלפון'], ['delete', '']]
 
 
 
-    const handleTrashClick = (id) => {
+    const handleTrashClick = (id, index) => {
         (async () => {
+            await deleteConectionToMeeting(id, (err, res) => {
+                console.log(err, res)
+                if (!err) {
+                    let newParticipantsPublicMeeting = [...participantsPublicMeeting]
+                    newParticipantsPublicMeeting.splice(index, 1)
+                    setParticipantsPublicMeeting(newParticipantsPublicMeeting)
+                }
+            })
 
         })()
     }
@@ -22,11 +30,12 @@ const ParticipantsTable = (props) => {
     useEffect(() => {
 
         if (participantsPublicMeeting) {
-            setTr(participantsPublicMeeting.map(participant => {
+            console.log(participantsPublicMeeting)
+            setTr(participantsPublicMeeting.map((participant, index) => {
                 return [
                     participant.name,
                     participant.phone,
-                    <FontAwesomeIcon className="pointer" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(participant.id) }} />
+                    participant.role !==1 &&<FontAwesomeIcon className="pointer trash" icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(participant.idIsolated, index) }} />
                 ]
             }))
         }

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Fragment, useContext } from 'react';
+import React, { useEffect, useState, Fragment, useContext } from 'react';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
@@ -287,7 +287,7 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">כמה פעמים תוכל לתקוע?</div>
                     <input id="blowingTimes" type="number" value={vals.can_blow_x_times || ""} maxLength={2} onChange={(e) => setValues(e.target.value, 'can_blow_x_times')} disabled={disableEdit} />
-                    <div className="err-msg">{errs && errs.can_blow_x_times || ""}</div>
+                    <div className="err-msg">{(errs && errs.can_blow_x_times) || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">שעת יציאה</div>
                     <ThemeProvider theme={materialTheme}>

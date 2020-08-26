@@ -1,8 +1,8 @@
 import React, { useEffect, useContext } from 'react';
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
 
 import { MainContext } from '../ctx/MainContext';
 import { SBContext } from '../ctx/shofar_blower_context';
-
 import Auth from '../modules/auth/Auth';
 
 import ShofarBlowerMap from '../components/maps/shofar_blower_map'
@@ -11,6 +11,8 @@ import GeneralAlert from '../components/modals/general_alert'
 import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBNotConfirmed from '../components/sb_not_confirmed';
 import SBSideInfo from '../components/sb_side_info';
+
+import { isBrowser } from 'react-device-detect';
 
 import './mainPages/MainPage.scss';
 import './sb.scss'
@@ -25,9 +27,17 @@ const SBHomePage = (props) => {
         setMyMeetings, setMeetingsReqs,
         isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
+    // const socket = useSocket();
 
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
+
+    useJoinLeave("isolated-events", (err) => {
+        if (err) console.log("failed to join room");
+    })
+    useOn("newIsolator", (req) => {
+        addNewReq(req)
+    });
 
     useEffect(() => {
         (async () => {
@@ -41,7 +51,18 @@ const SBHomePage = (props) => {
         })();
     }, []);
 
-
+    const addNewReq = (newReq) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+        // no update on genMapData
+    }
+    const removeReq = (reqToRemove) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+    }
+    const updateReqData = (newReqData) => {
+        setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
+            reqs.map((req) => req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req)
+        )
+    }
 
     const fetchAndSetData = async () => {
         fetching = true
@@ -63,7 +84,6 @@ const SBHomePage = (props) => {
         }
         fetching = false
     }
-
     return (
         <div className="sb-homepage-container">
             {
@@ -73,7 +93,7 @@ const SBHomePage = (props) => {
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute} /> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap location={props.location} history={props.history} />}
                     </>
                     :
                     /* USER IS NOT CONFIRMED */

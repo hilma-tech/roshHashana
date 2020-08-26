@@ -1,12 +1,15 @@
+body {
+  -webkit-text-size-adjust: none !important;
+}
 .App {
   text-align: center;
 }
 
-*{
+* {
   box-sizing: border-box !important;
 }
 
-.pointer{
+.pointer {
   cursor: pointer;
 }
 
@@ -76,6 +79,6 @@
   }
 }
 
-.bold{
+.bold {
   font-weight: bold;
 }

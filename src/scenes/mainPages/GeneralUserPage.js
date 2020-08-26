@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 import moment from "moment"
-import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
 import { CONSTS } from '../../consts/const_messages';
 import { checkDateBlock } from '../../fetch_and_utils';
+import './MainPage.scss';
+
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
@@ -22,37 +23,33 @@ const GeneralUserPage = (props) => {
                 openGenAlert({ text: "כבר נרשמת לתקיעה ציבורית, אינך יכול להירשם לתקיעה נוספת", isPopup: { okayText: "סגור" } })
                 sessionStorage.setItem("dontShowPopup", true)
             }
-            if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
-                if (props.location.state.name) {
-                    setName(props.location.state.name);
+            if (!userInfo) {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                }, true);
+                if (err || !res) {
+                    openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
                 }
-                if (props.location.state.meetingInfo) {
-                    setShofarBlowerName(props.location.state.meetingInfo.blowerName);
-                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments ? props.location.state.meetingInfo.comments : ''}`);
-                    setTime(`${props.location.state.meetingInfo.start_time ? moment(props.location.state.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
-                }
-            } else {
-                if (!userInfo) {
-                    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
-                        headers: { Accept: "application/json", "Content-Type": "application/json" },
-                    }, true);
-                    if (err || !res) {
-                        openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
-                    }
-                    else {
+                else {
+                    if (res === "NO_MEETING_DELETE_USER") {
+                        openGenAlert({ text: "בעל התוקע של פגישה זו מחק את הפגישה, אם ברצונך להשתתף בפגישה נוספת תוכל לעשות זאת במפה הכללית כמשתמש חדש", isPopup: { okayText: "הבנתי, התנתק" } }, () => {
+                            Auth.logout()
+                        })
+                        return;
+                    } else {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
                         setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`);
                         setTime(`${res.meetingInfo.start_time ? moment(res.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
-                } else {
-                    setName(userInfo.name);
-                    if (userInfo.meetingInfo) {
-                        setShofarBlowerName(userInfo.meetingInfo.blowerName);
-                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
-                        setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
-                    }
+                }
+            } else {
+                setName(userInfo.name);
+                if (userInfo.meetingInfo) {
+                    setShofarBlowerName(userInfo.meetingInfo.blowerName);
+                    setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
+                    setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                 }
             }
         })()
@@ -105,7 +102,7 @@ const GeneralUserPage = (props) => {
                     <div className="clickAble" onClick={openSettings}>
                         <img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
+                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "0" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
                     <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה: ` : `שלום ${name}, \n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>

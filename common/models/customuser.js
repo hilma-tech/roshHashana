@@ -19,13 +19,14 @@ module.exports = function (CustomUser) {
     const SHOFAR_BLOWER_ROLE = 2
 
     CustomUser.createUser = async (name, phone, role) => {
-
+        //creates key and/or created user (with no data)
+        //this function is called on Register's submit and on 'שלח קוד מחדש'
         let resKey = await CustomUser.app.models.keys.createKey();
         console.log(resKey);
         try {
             let ResFindUser = await CustomUser.findOne({ where: { username: phone } })
 
-            if (!ResFindUser) {
+            if (!ResFindUser && role) {
                 //sign up
                 if ((role == 1 && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
                     //need to block the function
@@ -43,6 +44,7 @@ module.exports = function (CustomUser) {
                     "principalId": ResCustom.id,
                     "roleId": role
                 }
+                console.log('RoleMapping.create: ', roleMapping);
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
@@ -53,8 +55,8 @@ module.exports = function (CustomUser) {
                 if (ResFindUser && ResFindUser.keyId) {
                     let ResDeleteKey = await CustomUser.app.models.keys.destroyById(ResFindUser.keyId);
                 }
-
                 let ResUpdateUser = await CustomUser.updateAll({ username: phone }, { keyId: resKey.id });
+
                 if (process.env.REACT_APP_IS_PRODUCTION === "true") {
                     sendMsg.sendMsg(phone, `${msgText} ${name}, ${msgText2} ${resKey.key}`)
                 }
@@ -69,6 +71,7 @@ module.exports = function (CustomUser) {
     }
 
     CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
+        if (role == 3 && !meetingId || isNaN(Number(meetingId))) return cb(null, "LOG_OUT")
         const { RoleMapping } = CustomUser.app.models;
         CustomUser.app.models.keys.findOne({ where: { key } }, (err1, resKey) => {
             if (err1) {
@@ -94,8 +97,9 @@ module.exports = function (CustomUser) {
                                     RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
                                         if (err4) console.log("Err4", err4);
                                         if (resRole) {
-                                            if (resRole.roleId != role && !resUser.address) {
-                                                RoleMapping.updateAll({ where: { principalId: resUser.id } }, { roleId: role }, (err5, resNewRole) => {
+                                            if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
+                                                console.log(`RoleMapping.updateAll: where { principalId: resUser.id(=${resUser.id}) } , { roleId: role(=${role}) }`);
+                                                RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
                                                     if (err5) console.log("Err5", err5);
                                                     if (resNewRole) {
                                                         CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
@@ -330,6 +334,8 @@ module.exports = function (CustomUser) {
                 const genUserQ = `SELECT
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
+                        shofar_blower_pub.lng,
+                        shofar_blower_pub.lat,
                         shofar_blower_pub.start_time,
                         CustomUser.name AS blowerName
                     FROM 
@@ -339,12 +345,16 @@ module.exports = function (CustomUser) {
                     WHERE
                         isolated.userIsolatedId = ${userId}`
                 let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
-                if (errUserData) {
-                    console.log("errUserData", errUserData)
+                if (errUserData || !resUserData || !resUserData[0] || !resUserData[0].address || !resUserData[0].lng || !resUserData[0].lat || !resUserData[0].blowerName || !resUserData[0].start_time) {
+                    console.log("got errUserData, or not enough data in resUserData, deleting this general user. errUserData:", errUserData);
+                    CustomUser.deleteUser(options) //yes, we are deleting him
+                    return 'NO_MEETING_DELETE_USER' //telling user about this and need to then log him out
                 }
                 if (resUserData) {
                     userInfo.meetingInfo = {
                         address: resUserData[0].address,
+                        lng: resUserData[0].lng,
+                        lat: resUserData[0].lat,
                         comments: resUserData[0].comments,
                         start_time: resUserData[0].start_time,
                         blowerName: resUserData[0].blowerName
@@ -409,8 +419,8 @@ module.exports = function (CustomUser) {
             if (role === 1) {
                 //isolated
                 let pubMeetId = null;
+                let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-
                 //if the user changed his address and he has a public meeting
                 if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
@@ -427,10 +437,10 @@ module.exports = function (CustomUser) {
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                            meetingChanged = true;
                         }
                     }
                 }
-
                 else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
@@ -444,29 +454,28 @@ module.exports = function (CustomUser) {
 
                     if (Object.keys(meetData).length) {
                         pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                        meetingChanged = true;
                     }
                 }
                 else {
-
                     //the user is changing from public to private
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
+                        meetingChanged = true;
                     }
                 }
-
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
                 }
+                if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
-
-
             }
             else if (role === 2) {
                 //shofar blower
@@ -568,7 +577,7 @@ module.exports = function (CustomUser) {
                 let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(CustomUser,
                     `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
                          from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
-                         where (blowerId = 10) 
+                         where (blowerId = ${userId}) 
                          group by shofar_blower_pub.id `);
                 if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
                     let meetingsToUpdate = [], meetingsToDelete = [];
@@ -585,8 +594,7 @@ module.exports = function (CustomUser) {
                     meetingsToDelete.length > 0 && await CustomUser.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
 
-                await CustomUser.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
-                //TODO: להודיע למבודדים שבוטלה להם הפגישה
+                await CustomUser.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { blowerMeetingId: null, meeting_time: null });
                 await CustomUser.app.models.ShofarBlower.destroyAll({ "userBlowerId": userId });
 
             }
@@ -594,6 +602,7 @@ module.exports = function (CustomUser) {
                 //general user
                 await CustomUser.app.models.Isolated.destroyAll({ "userIsolatedId": userId });
             }
+            await CustomUser.app.models.RoleMapping.destroyAll({ principalId: userId });
             await CustomUser.destroyById(userId);
             return { res: 'SUCCESS' };
 
@@ -803,7 +812,7 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
-            if (!userDataRes[0] || !userDataRes[0].confirm) return cb(true)
+            if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
             let userData = userDataRes[0]
 
             //! check that number of meetings in not at max
@@ -945,12 +954,8 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
-            // find phone number of isolater
-            console.log(meetingObj);
-            console.log('assignRes: ', assignRes);
+            // find namd and phone number of isolater
             const findIsolatedQ = `select name, username from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
-            console.log('findIsolatedQ: ', findIsolatedQ);
-
             return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }

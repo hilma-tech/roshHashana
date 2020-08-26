@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
@@ -84,7 +84,6 @@ const MapComp = (props) => {
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            {console.log('privateMeet: ', privateMeet)}
                             {props.blower ? null : <div>לא ניתן להצטרף לתקיעה זו</div>}
                         </div>
                     }
@@ -154,7 +153,7 @@ const MapComp = (props) => {
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>}
+            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img alt=""src='/icons/goUp.svg' /></div>}
         </div>
     );
 }
@@ -205,7 +204,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo}  /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

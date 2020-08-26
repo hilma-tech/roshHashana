@@ -234,41 +234,41 @@ module.exports = function (ShofarBlower) {
 
     ShofarBlower.deleteShofarBlowerAdmin = function (id, cb) {
         (async () => {
-            try {
-                let userData = await ShofarBlower.findById(id, { fields: { userBlowerId: true } });
-                const userId = userData.userBlowerId;
+            // try {
+            //     let userData = await ShofarBlower.findById(id, { fields: { userBlowerId: true } });
+            //     const userId = userData.userBlowerId;
 
-                let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(ShofarBlower,
-                    `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
-                         from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
-                         where (blowerId = ${userId}) 
-                         group by shofar_blower_pub.id `);
-                if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
-                    let meetingsToUpdate = [], meetingsToDelete = [];
+            //     let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(ShofarBlower,
+            //         `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
+            //              from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
+            //              where (blowerId = ${userId}) 
+            //              group by shofar_blower_pub.id `);
+            //     if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
+            //         let meetingsToUpdate = [], meetingsToDelete = [];
 
-                    //sort all public meetings according to delete or update
-                    for (let i in resPublicMeeting) {
-                        const meet = resPublicMeeting[i];
-                        if (meet.participantsNum > 0) meetingsToUpdate.push(meet.meetingId);
-                        else meetingsToDelete.push(meet.meetingId);
-                    }
-                    //change blower id in the meeting to null
-                    meetingsToUpdate.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.updateAll({ id: { inq: meetingsToUpdate } }, { blowerId: null });
-                    //delete the meeting
-                    meetingsToDelete.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
-                }
-                await ShofarBlower.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
-                //TODO: להודיע למבודדים שבוטלה להם הפגישה
-                await ShofarBlower.destroyById(id);
+            //         //sort all public meetings according to delete or update
+            //         for (let i in resPublicMeeting) {
+            //             const meet = resPublicMeeting[i];
+            //             if (meet.participantsNum > 0) meetingsToUpdate.push(meet.meetingId);
+            //             else meetingsToDelete.push(meet.meetingId);
+            //         }
+            //         //change blower id in the meeting to null
+            //         meetingsToUpdate.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.updateAll({ id: { inq: meetingsToUpdate } }, { blowerId: null });
+            //         //delete the meeting
+            //         meetingsToDelete.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
+            //     }
+            //     await ShofarBlower.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+            //     //TODO: להודיע למבודדים שבוטלה להם הפגישה
+            //     await ShofarBlower.destroyById(id);
 
-                await ShofarBlower.app.models.CustomUser.destroyById(userId);
+            //     await ShofarBlower.app.models.CustomUser.destroyById(userId);
 
-                return cb(null, 'SUCCESS');
+            //     return cb(null, 'SUCCESS');
 
-            } catch (error) {
-                console.log(error);
-                return cb(error);
-            }
+            // } catch (error) {
+            //     console.log(error);
+            //     return cb(error);
+            // }
         })()
     }
 

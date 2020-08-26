@@ -36,7 +36,7 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
-export default class IsolatedForm extends Component {
+export default class BlowerForm extends Component {
     static contextType = MainContext
     constructor(props) {
         super(props);
@@ -286,7 +286,7 @@ export default class IsolatedForm extends Component {
 
                         {/* address inputs */}
                         <div className="title">מה הכתובת ממנה אתה יוצא?</div>
-                        <div id="comment">נא לרשום את הכתובת המלאה</div>
+                        <div id="comment">* נא לרשום את הכתובת המלאה</div>
                         <FormSearchBoxGenerator onAddressChange={this.handleAddressChange} uId='form-search-input-1' />
                         <div className="err-msg ">{this.state.addressErr}</div>
 

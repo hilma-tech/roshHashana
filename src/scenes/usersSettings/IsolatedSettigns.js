@@ -60,7 +60,7 @@ const IsolatedSettings = (props) => {
     }
     const updateIsolatedInfo = async (fromX = false) => {
         if (!fromX && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים',block: true });
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים', block: true });
             return;
         }
 
@@ -150,7 +150,7 @@ const IsolatedSettings = (props) => {
             },
                 (res) => {
                     if (res)
-                        props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
+                        props.history.push('/', { name: name, address: (Array.isArray(address) && address[0]) || originalVals.address });
                 })
         }
         if (err) {

@@ -32,6 +32,7 @@ const ShofarBlowerMap = (props) => {
         setAssignMeetingInfo,
         startTimes,
         setIsInRoute,
+        isPrint,
     } = useContext(SBContext)
 
 
@@ -230,8 +231,9 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
+        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`} id="sb-map-container">
             <SBMapComponent
+                location={props.location}
                 changeCenter={setCenter}
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 

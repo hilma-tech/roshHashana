@@ -38,7 +38,7 @@ const SBNotConfirmed = (props) => {
                 <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container">
                     <div id="thank-you-msg">תודה על הרשמתך.</div>
-                    <div>בזמן הקרוב נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
+                    <div>לקראת כ' אלול נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
                     <div>בברכה,<br></br>צוות יום תרועה.</div>
                     {!disableEdit ? <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%', marginTop: isBrowser ? '10%' : '5%' }} className="clickAble">לביטול הרשמתך</div> : null}
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
