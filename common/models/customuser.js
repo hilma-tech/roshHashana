@@ -334,6 +334,8 @@ module.exports = function (CustomUser) {
                 const genUserQ = ` SELECT
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
+                        shofar_blower_pub.lng,
+                        shofar_blower_pub.lat,
                         shofar_blower_pub.start_time,
                         CustomUser.name AS blowerName
                     FROM 
@@ -343,12 +345,16 @@ module.exports = function (CustomUser) {
                     WHERE
                         isolated.userIsolatedId = ${userId}`
                 let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
-                if (errUserData) {
-                    console.log("errUserData", errUserData)
+                if (errUserData || !resUserData || !resUserData[0] || !resUserData[0].address || !resUserData[0].lng || !resUserData[0].lat || !resUserData[0].blowerName || !resUserData[0].start_time) {
+                    console.log("got errUserData, or not enough data in resUserData, deleting this general user. errUserData:", errUserData);
+                    CustomUser.deleteUser(options) //yes, we are deleting him
+                    return 'NO_MEETING_DELETE_USER' //telling user about this and need to then log him out
                 }
                 if (resUserData) {
                     userInfo.meetingInfo = {
                         address: resUserData[0].address,
+                        lng: resUserData[0].lng,
+                        lat: resUserData[0].lat,
                         comments: resUserData[0].comments,
                         start_time: resUserData[0].start_time,
                         blowerName: resUserData[0].blowerName
@@ -415,7 +421,6 @@ module.exports = function (CustomUser) {
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-
                 //if the user changed his address and he has a public meeting
                 if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
@@ -436,7 +441,6 @@ module.exports = function (CustomUser) {
                         }
                     }
                 }
-
                 else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
@@ -462,7 +466,6 @@ module.exports = function (CustomUser) {
                         meetingChanged = true;
                     }
                 }
-
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
@@ -473,8 +476,6 @@ module.exports = function (CustomUser) {
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
-
-
             }
             else if (role === 2) {
                 //shofar blower
@@ -953,12 +954,8 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
-            // find phone number of isolater
-            console.log(meetingObj);
-            console.log('assignRes: ', assignRes);
+            // find namd and phone number of isolater
             const findIsolatedQ = `select name, username from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
-            console.log('findIsolatedQ: ', findIsolatedQ);
-
             return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }

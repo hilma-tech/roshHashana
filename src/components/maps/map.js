@@ -84,7 +84,6 @@ const MapComp = (props) => {
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            {console.log('privateMeet: ', privateMeet)}
                             {props.blower ? null : <div>לא ניתן להצטרף לתקיעה זו</div>}
                         </div>
                     }

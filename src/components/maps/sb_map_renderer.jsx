@@ -26,7 +26,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const {
         userData,
         setStartTimes, startTimes,
-        setMyMeetings, isPrint, setIsPrint
+        setMyMeetings, 
+        isPrint, setIsPrint,
+        totalLength
     } = useContext(SBContext)
 
     const [routePath, setRoutePath] = useState(null)
@@ -44,20 +46,20 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
-        let p = new URLSearchParams(props.location.search).get("p")
-        if (p == "t") {
-            // window.onafterprint = (event) => {
-            //     window.history.replaceState({}, document.title, "/");
-            //     setIsPrint(false);
-            // };
-            setIsPrint(true);
-        }
-    }, [])
+        if(totalLength == null) return
+        let p
+        try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
+        if (p !== "t") return
+        window.onafterprint = (event) => {
+            window.history.replaceState({}, document.title, "/");
+            setIsPrint(false);
+        };
+        setIsPrint(true);
+    }, [totalLength])
     useEffect(() => {
-        if (isPrint) {
-            handlePrint()
-        }
+        if (isPrint) { handlePrint() }
     }, [isPrint])
+
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
             setData();
