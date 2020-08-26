@@ -46,16 +46,16 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     useEffect(() => {
         let p = new URLSearchParams(props.location.search).get("p")
         if (p == "t") {
+            window.onafterprint = (event) => {
+                window.history.replaceState({}, document.title, "/");
+                setIsPrint(false);
+            };
             setIsPrint(true);
         }
     }, [])
     useEffect(() => {
         if (isPrint) {
             handlePrint()
-            window.onafterprint = (event) => {
-                window.history.replaceState({}, document.title, "/");
-                setIsPrint(false);
-            };
         }
     }, [isPrint])
     useEffect(() => {
