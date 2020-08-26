@@ -414,12 +414,17 @@ module.exports = function (CustomUser) {
             }
 
             if (Object.keys(userData).length) {
-                let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+                let resCustomUser
+                try {
+                    resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+                } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
             }
+            //end update Custom User table
             if (role === 1) {
-                //isolated
+                //isolator
                 let pubMeetId = null;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
+                console.log('isolatedInfo: ', isolatedInfo);
                 //if the user changed his address and he has a public meeting
                 if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;

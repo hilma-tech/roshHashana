@@ -60,7 +60,7 @@ const IsolatedSettings = (props) => {
     }
     const updateIsolatedInfo = async (fromX = false) => {
         if (!fromX && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים',block: true });
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים', block: true });
             return;
         }
 
@@ -139,7 +139,10 @@ const IsolatedSettings = (props) => {
             method: "PUT",
             body: JSON.stringify({ "data": updateData })
         }, true);
-        if (res) {
+        if (err || !res) {
+            openGenAlert({ text: err && err.error && err.error.message === "PHONE_EXISTS" ? "מספר הטלפון בשימוש" : "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
+        }
+        else {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
                 return;
@@ -152,9 +155,6 @@ const IsolatedSettings = (props) => {
                     if (res)
                         props.history.push('/', { name: name, address: Array.isArray(address) && address[0] || originalVals.address });
                 })
-        }
-        if (err) {
-            openGenAlert({ text: "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
         }
     }
 
