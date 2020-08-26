@@ -344,10 +344,39 @@
     }
 }
 .print-style {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    z-index: 5;
+    position: unset !important;
+    overflow: visible !important;
+    height: 100% !important;
+    width: 100% !important;
+    * {
+        -webkit-print-color-adjust: exact !important;
+    }
+    .sb-side-list-title {
+        font-size: 30px !important;
+    }
+    .under-title {
+        font-size: 28px !important;
+    }
+    .info-msg {
+        display: none !important;
+    }
+    .sb-list {
+        .meeting-in-route {
+            .meeting-in-route-img-container {
+                width: 40px !important;
+                height: 40px !important;
+            }
+        }
+        .meeting-in-route-info-container {
+            font-size: 26px !important;
+            img {
+                width: 50px !important;
+            }
+            .meeting-in-route-comments {
+                font-size: 24px !important;
+            }
+        }
+    }
 }
 
 .sb-assign-container {
@@ -558,7 +587,7 @@
 }
 
 .print-map-style {
-    display: none;
+    display: none !important;
     & * {
         display: none;
     }
