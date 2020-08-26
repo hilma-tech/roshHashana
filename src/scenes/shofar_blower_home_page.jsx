@@ -1,8 +1,8 @@
 import React, { useEffect, useContext } from 'react';
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
 
 import { MainContext } from '../ctx/MainContext';
 import { SBContext } from '../ctx/shofar_blower_context';
-
 import Auth from '../modules/auth/Auth';
 
 import ShofarBlowerMap from '../components/maps/shofar_blower_map'
@@ -12,9 +12,10 @@ import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBNotConfirmed from '../components/sb_not_confirmed';
 import SBSideInfo from '../components/sb_side_info';
 
+import { isBrowser } from 'react-device-detect';
+
 import './mainPages/MainPage.scss';
 import './sb.scss'
-import { useParams } from 'react-router';
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -26,10 +27,23 @@ const SBHomePage = (props) => {
         setMyMeetings, setMeetingsReqs,
         isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
+    // const socket = useSocket();
 
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
 
+    useJoinLeave("isolated-events", (err) => {
+        if (err) console.log("failed to join room");
+        console.log("joined room isolated-events");
+    })
+    useOn("newIsolater", (req) => {
+        console.log('newIsolater: on');
+        addNewReq(req)
+    });
+    useOn("removeIsolater", (req) => { // no emit on server
+        console.log('removeIsolater: on');
+        removeReq(req)
+    });
     useEffect(() => {
         (async () => {
             if (!fetching && (
@@ -42,7 +56,17 @@ const SBHomePage = (props) => {
         })();
     }, []);
 
-
+    const addNewReq = (newReq) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+    }
+    const removeReq = (reqToRemove) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+    }
+    const updateReqData = (newReqData) => {
+        setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
+            reqs.map((req) => req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req)
+        )
+    }
 
     const fetchAndSetData = async () => {
         fetching = true

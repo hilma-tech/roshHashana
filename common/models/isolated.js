@@ -24,66 +24,68 @@ module.exports = function (Isolated) {
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
         //socket.io event for isolated
-        if (options.accessToken && options.accessToken.userId) {
-            try {
-                let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
-                if (!isolatedInfo) {
-                    let pubMeetId = null;
-                    if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
-                    if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
+        if (!options.accessToken || !options.accessToken.userId) {
+            throw true
+        }
+        try {
+            let isolatedInfo = await Isolated.findOne({ where: { "userIsolatedId": options.accessToken.userId } });
+            if (!isolatedInfo) {
+                let pubMeetId = null;
+                if (!Array.isArray(data.address) || data.address.length !== 2) { console.log("ADDRESS NOT VALID"); return { ok: false, err: "כתובת אינה תקינה" } }
+                if (!data.address[0] || data.address[0] === "NOT_A_VALID_ADDRESS" || typeof data.address[1] !== "object" || !data.address[1].lng || !data.address[1].lat) { console.log("ADDRESS NOT VALID"); return { ok: false, err: 'נא לבחור מיקום מהרשימה הנפתחת' } }
 
-                    data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
+                data.address[0] = data.address[0].substring(0, 398) // shouldn't be more than 400 
 
-                    let city;
-                    let addressArr = data.address && data.address[0]
-                    if (typeof addressArr === "string" && addressArr.length) {
-                        addressArr = addressArr.split(", ")
-                        city = Isolated.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1) || addressArr[addressArr.length - 1];
-                    }
-
-
-                    //create public meeting
-                    if (data.public_meeting) {
-                        let meetData = [{
-                            "address": data.address,
-                            "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
-                            "start_time": null,
-                            city
-                        }]
-                        pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
-                    }
-
-                    let objToIsolated = {
-                        "userIsolatedId": options.accessToken.userId,
-                        "public_phone": data.public_phone,
-                        "public_meeting": data.public_meeting,
-                        "blowerMeetingId": pubMeetId
-                    },
-                        objToCU = {
-                            "address": data.address[0],
-                            "lng": data.address[1].lng,
-                            "lat": data.address[1].lat,
-                            "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
-                            city
-                        };
-
-
-                    let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
-
-                    if (resRole.roleId === ISOLATED_ROLE) {
-
-                        let resIsolated = await Isolated.create(objToIsolated);
-                        let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
-                        return { ok: true };
-                    } else {
-                        return { ok: false, err: "No permissions" };
-                    }
+                let city;
+                let addressArr = data.address && data.address[0]
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    city = Isolated.app.models.CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1) || addressArr[addressArr.length - 1];
                 }
-            } catch (error) {
-                console.log("Can`t do create new isolated", error);
-                throw error;
 
+
+                //create public meeting
+                if (data.public_meeting) {
+                    let meetData = [{
+                        "address": data.address,
+                        "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
+                        "start_time": null,
+                        city
+                    }]
+                    pubMeetId = await Isolated.app.models.shofarBlowerPub.createNewPubMeeting(meetData, null, options);
+                }
+
+                let objToIsolated = {
+                    "userIsolatedId": options.accessToken.userId,
+                    "public_phone": data.public_phone,
+                    "public_meeting": data.public_meeting,
+                    "blowerMeetingId": pubMeetId
+                },
+                    objToCU = {
+                        "address": data.address[0],
+                        "lng": data.address[1].lng,
+                        "lat": data.address[1].lat,
+                        "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
+                        city
+                    };
+
+
+                let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
+
+                if (resRole.roleId == ISOLATED_ROLE) {
+                    let resIsolated = await Isolated.create(objToIsolated);
+                    let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
+                    console.log('objToCU and to emit (newIsolater): ', objToCU);
+                    Isolated.app.io.to('isolated-events').emit('newIsolater', objToCU) //todo edit obj to socket
+                    //emit new-isolater event in isolater-events room
+                    return { ok: true };
+                } else {
+                    return { ok: false, err: "No permissions" };
+                }
             }
+        } catch (error) {
+            console.log("Can`t create new isolated", error);
+            throw error;
         }
     }
 
@@ -373,7 +375,7 @@ module.exports = function (Isolated) {
 
     Isolated.deleteConectionToMeeting = function (id, cb) {
         (async () => {
-            let [err, res] = await to(Isolated.upsertWithWhere({ id}, { blowerMeetingId: null, meeting_time: null }));
+            let [err, res] = await to(Isolated.upsertWithWhere({ id }, { blowerMeetingId: null, meeting_time: null }));
             if (err) cb(err);
             if (res) {
                 return cb(null, res);
