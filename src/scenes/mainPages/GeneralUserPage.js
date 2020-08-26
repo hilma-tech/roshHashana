@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { isBrowser } from "react-device-detect";
 import moment from "moment"
-import './MainPage.scss';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
-import { CONSTS } from '../../consts/const_messages';
-import { checkDateBlock } from '../../fetch_and_utils';
+import './MainPage.scss';
+
 const GeneralUserPage = (props) => {
     const { userInfo, setUserInfo, showAlert, openGenAlert } = useContext(MainContext)
     const [openMap, setOpenMap] = useState(false);
@@ -105,7 +104,7 @@ const GeneralUserPage = (props) => {
                     <div className="clickAble" onClick={openSettings}>
                         <img alt="settings" src="/icons/settings.svg" /></div>
                 </div>
-                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "3.5rem" : "4rem" }}>
+                <div className="content-container containerContent containerGeneralUser" style={{ top: isBrowser ? "0" : "4rem" }}>
                     <img alt="group-orange" className="group-orange" src='/icons/group-orange.svg' />
                     <div className="content"  >{!isBrowser ? `שלום ${name}, \nשמחים שהצטרפת\nלתקיעת שופר בציבור\nאלו הם פרטי מפגש התקיעה: ` : `שלום ${name}, \n הצטרפת לתקיעה ציבורית`}</div>
                     <div className="meetingDetailsContainer" style={{ height: isBrowser ? "12rem" : "15rem", marginBottom: isBrowser ? "1%" : "20%" }}>

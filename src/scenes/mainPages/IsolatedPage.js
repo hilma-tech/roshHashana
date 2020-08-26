@@ -46,7 +46,7 @@ const IsolatedPage = (props) => {
     //cancel the request and delete the user
     const cancelRequest = () => {
         if (checkDateBlock('DATE_TO_BLOCK_ISOLATED')) {
-            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש',block: true});
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש', block: true });
             return;
         }
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, async (continuE) => {
@@ -78,33 +78,14 @@ const IsolatedPage = (props) => {
                 <div className="settings clickAble" onClick={openSettings}><img alt="" src="/icons/settings.svg" /></div>
                 <div className="content-container" style={{ overflowY: isBrowser ? "none" : "scroll" }}>
                     <div>{`שלום ${name}`}</div>
-                    {(blowerMeetingId && blowerName) ?
-                        <>
-                            <div> אנחנו שמחים לבשר, שמצאנו בעל תוקע שיגיע עד אליך למפגש תקיעת שופר. אלו הפרטים:</div>
-                            <div className="meeting-info">
-                                <div className="blower-name info-container"><img className="icon" src='/icons/blueShofar.svg' /><div>{`בעל תוקע: ${blowerName}`}</div></div>
-                                <div className="meeting-address info-container"><img className="icon" src='/icons/location.svg' /><div>{address + ', ' + comment}</div></div>
-                                <div className="meeting-time info-container">
-                                    <img className="icon" src='/icons/blueClock.svg' />
-                                    <div>
-                                        <div>{`בשעה ${meetingTime}`}</div>
-                                        <div className="msg">הודעה סופית על זמן התקיעה תשלח ביום חמישי, כ"ח באלול 17.9</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                        :
-                        <>
-                            <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
-                            <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
-                            <div>לכתובת:</div>
-                            <div style={{ marginBottom: isBrowser ? '15%' : '0%' }} >
-                                <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
-                                {comment && comment.length ? <div style={{ marginTop: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
-                            </div>
-                        </>
-                    }
-                    {!disableEdit ? <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div> : null}
+                    <div id="thank-you-msg">ותודה על התעניינותך בתקיעת שופר.</div>
+                    <div>אנו מחפשים עבורך בעל תוקע שיגיע עד אליך</div>
+                    <div>לכתובת:</div>
+                    <div style={{ marginBottom: isBrowser ? '5%' : '0%' }} >
+                        <div id="address-info" style={{ marginBottom: isBrowser ? '0%' : '0%' }}>{address}</div>
+                        {comment && comment.length ? <div style={{ marginTop: isBrowser ? '2%' : '0%' }}>{comment}</div> : null}
+                    </div>
+                    <div id="cancel-request" onClick={cancelRequest} style={{ marginBottom: isBrowser ? '0%' : '5%' }} className="clickAble">לביטול בקשה לאיתור בעל תוקע</div>
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                         <img alt="" src='/images/map.svg' />

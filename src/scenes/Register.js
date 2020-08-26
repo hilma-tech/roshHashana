@@ -3,21 +3,23 @@ import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { isBrowser } from "react-device-detect";
-import { CONSTS } from '../consts/const_messages';
-import { MainContext } from '../ctx/MainContext';
-import GeneralAlert from '../components/modals/general_alert';
+import { MainContext } from '../ctx/MainContext'
+import { CONSTS } from '../const_messages'
+
+import GeneralAlert from '../components/modals/general_alert'
+
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
-  static contextType = MainContext;
+  static contextType = MainContext
   constructor(props) {
     super(props);
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
-      role: this.props.location.state ? (this.props.location.state.type === 'blower' ? 2 : this.props.location.state.type === 'isolator' ? 1 : 3) : null,
+      role: (this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null,
       phone: "",
       name: "",
       key: "",
@@ -25,6 +27,8 @@ class Register extends React.Component {
       sendKey: false,
       imgLoadedNum: 0
     };
+    if (!this.props.location || !this.props.location.state || !this.props.location.state.type || !this.state.role)
+      return this.props.history.push('/');
     this.generalUser = `אני רוצה לשמוע תקיעת שופר קרוב לבית`;
     this.isolator = "אני רוצה לשמוע \n תקיעת שופר";
     this.blower = "אני רוצה לתקוע בשופר";
@@ -57,6 +61,7 @@ class Register extends React.Component {
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res) {
         if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
@@ -72,16 +77,21 @@ class Register extends React.Component {
     }
     if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
-      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.id : null
+      let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.meetingId ? this.props.location.state.meetingInfo.meetingId : this.props.location.state.meetingInfo.id : null
+      if (this.state.role == 3 && !meetingId) return this.props.history.push('/');
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
       });
       if (err) {
         console.log("ERR", err);
+        this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
       }
       if (res && res.ok) {
         switch (res.ok) {
+          case "LOG_OUT":
+            this.props.history.push('/')
+            break;
           case "err key":
             this.setState({ alart: errKey })
             break;
@@ -159,9 +169,7 @@ class Register extends React.Component {
   }
 
   render() {
-    const { showAlert } = this.context;
-    if (!this.props.location || !this.props.location.state) this.props.history.push("/")
-
+    if (!this.props.location || !this.props.location.state) this.props.history.push("/");
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
@@ -170,11 +178,11 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
-        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '67vw', marginTop: isBrowser ? "6%" : "45%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
-        {this.props.location && this.props.location.state && this.props.location.state.type === 'blower' ?
+        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        {(this.props.location && this.props.location.state && this.props.location.state.type === 'blower') ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :
-          this.props.location && this.props.location.state && this.props.location.state.type === 'isolator' ?
+          (this.props.location && this.props.location.state && this.props.location.state.type === 'isolator') ?
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhoneisolator"}`} >{this.isolator}</div>
             :
             <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.generalUser}</div>
@@ -204,7 +212,8 @@ class Register extends React.Component {
               </div>
             </div></>}
         {/* </div> */}
-        {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+        {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
+
       </div>
     );
   }
