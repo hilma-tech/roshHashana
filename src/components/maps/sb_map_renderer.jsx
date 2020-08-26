@@ -44,7 +44,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     useEffect(() => {
-        console.log("rendreer []");
         let p = new URLSearchParams(props.location.search).get("p")
         if (p == "t") {
             setIsPrint(true);
