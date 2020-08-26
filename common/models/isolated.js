@@ -71,30 +71,15 @@ module.exports = function (Isolated) {
 
 
                 let resRole = await Isolated.app.models.RoleMapping.findOne({ where: { principalId: options.accessToken.userId } });
-                `isolated.id AS "meetingId", 
-                isolated.meeting_time AS "startTime", 
-                CustomUser.address, v
-                CustomUser.lng, v
-                CustomUser.lat, v
-                CustomUser.comments, v
-                CustomUser.name,
-                IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
-                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" `
+
                 if (resRole.roleId == ISOLATED_ROLE) {
                     let resIsolated = await Isolated.create(objToIsolated);
+                    console.log('resIsolated: ', resIsolated); //if !public_meeting, then meetingId for socket is id from here
+                    //else if public_meeting, have var pubMeetId
                     let resCU = await Isolated.app.models.CustomUser.updateAll({ id: options.accessToken.userId }, objToCU);
-                    let objToSocketEvent = {
-                        "meetingId": null,
-                        "startTime": null,
-                        "address": data.address[0],
-                        "lng": data.address[1].lng,
-                        "lat": data.address[1].lat,
-                        "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
-                        "isPublicMeeting": data.public_meeting
-                    }
-                    console.log('objToSocketEvent and to emit (newIsolater): ', objToSocketEvent);
-                    Isolated.app.io.to('isolated-events').emit('newIsolater', objToSocketEvent) //todo edit obj to socket
+
                     //emit new-isolater event in isolater-events room
+                    await Isolated.emitNewIsolator(data, data.public_meeting ? pubMeetId : resIsolated.id, options.accessToken.userId)
                     return { ok: true };
                 } else {
                     return { ok: false, err: "No permissions" };
@@ -106,6 +91,24 @@ module.exports = function (Isolated) {
         }
     }
 
+    Isolated.emitNewIsolator = async (data, meetingId, userId) => {
+        //get name and phone:
+        let [errU, resU] = await executeMySqlQuery(Isolated, `SELECT name, IF(${data.public_phone}, username, NULL) AS "phone" FROM CustomUser WHERE id = ${userId}`)
+        if (errU || !resU || !resU[0] || !resU[0].name) return;
+        let objToSocketEvent = {
+            "meetingId": meetingId,
+            "startTime": null,
+            "address": data.address[0],
+            "lng": data.address[1].lng,
+            "lat": data.address[1].lat,
+            "comments": (data.comments && data.comments.length < 255) ? data.comments : '',
+            "isPublicMeeting": data.public_meeting,
+            "name": resU[0].name,
+            "phone": resU[0].phone
+        }
+        console.log('isolated-events;newIsolator emit: ');
+        Isolated.app.io.to('isolated-events').emit('newIsolator', objToSocketEvent)
+    }
 
     Isolated.remoteMethod('InsertDataIsolated', {
         http: { verb: 'post' },

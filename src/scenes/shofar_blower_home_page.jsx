@@ -34,16 +34,11 @@ const SBHomePage = (props) => {
 
     useJoinLeave("isolated-events", (err) => {
         if (err) console.log("failed to join room");
-        console.log("joined room isolated-events");
     })
-    useOn("newIsolater", (req) => {
-        console.log('newIsolater: on');
+    useOn("newIsolator", (req) => {
         addNewReq(req)
     });
-    useOn("removeIsolater", (req) => { // no emit on server
-        console.log('removeIsolater: on');
-        removeReq(req)
-    });
+
     useEffect(() => {
         (async () => {
             if (!fetching && (
@@ -58,6 +53,7 @@ const SBHomePage = (props) => {
 
     const addNewReq = (newReq) => {
         setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+        // no update on genMapData
     }
     const removeReq = (reqToRemove) => {
         setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])

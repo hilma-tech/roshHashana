@@ -197,40 +197,43 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
 
 
-    const deleteMeeting = async () => {
+    const deleteMeeting = () => {
         if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
             return;
         }
 
-        let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ meetToDelete: assignMeetingInfo })
-        });
-        if (err || !res) { //open alert of something went wrong
-            openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
-        }
-        if (res) {
-            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
-                return;
-            }
-            openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-            setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
-            setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
-
-            if (genMapMeetings) {
-                if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
-                    setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+        openGenAlert({ text: `האם את/ה בטוח/ה שברצונך למחוק פגישה זו ממסלולך? ${assignMeetingInfo && assignMeetingInfo.signedCount ? `ישנם ${assignMeetingInfo.signedCount} המחובר/ים לפגישה` : ""}`, isPopup: { okayText: "מחק", cancelText: "בטל, השאר את התקיעה" } },
+            async del => {
+                if (!del) return;
+                let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    method: "POST",
+                    body: JSON.stringify({ meetToDelete: assignMeetingInfo })
+                });
+                if (err || !res) { //open alert of something went wrong
+                    openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })
                 }
-                else if (Array.isArray(genMapMeetings.privateMeetings)) {
-                    setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
-                }
-            }
+                if (res) {
+                    if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                        openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
+                        return;
+                    }
+                    openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
+                    setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
+                    setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
 
-            handleAssignment('close');
-        }
+                    if (genMapMeetings) {
+                        if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                        }
+                        else if (Array.isArray(genMapMeetings.privateMeetings)) {
+                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                        }
+                    }
+                    handleAssignment('close');
+                }
+            })
     }
 
     let iconSrc;
