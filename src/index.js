@@ -23,7 +23,6 @@ const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
 library.add(fas)
 
 //ReactDOM.render(<App />, document.getElementById('root'));
-console.log('uri: ', `https://${process.env.REACT_APP_SOCKET_IO_URI}`);
 ReactDOM.render(
     <StylesProvider jss={jss}>
         <SocketProvider
