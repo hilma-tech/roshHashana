@@ -36,7 +36,7 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
-export default class IsolatedForm extends Component {
+export default class BlowerForm extends Component {
     static contextType = MainContext
     constructor(props) {
         super(props);
