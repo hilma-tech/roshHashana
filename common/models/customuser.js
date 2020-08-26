@@ -413,6 +413,7 @@ module.exports = function (CustomUser) {
             if (role === 1) {
                 //isolated
                 let pubMeetId = null;
+                let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
 
                 //if the user changed his address and he has a public meeting
@@ -431,6 +432,7 @@ module.exports = function (CustomUser) {
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                            meetingChanged = true;
                         }
                     }
                 }
@@ -448,15 +450,16 @@ module.exports = function (CustomUser) {
 
                     if (Object.keys(meetData).length) {
                         pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                        meetingChanged = true;
                     }
                 }
                 else {
-
                     //the user is changing from public to private
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
+                        meetingChanged = true;
                     }
                 }
 
@@ -466,6 +469,7 @@ module.exports = function (CustomUser) {
                     public_meeting: data.public_meeting,
                     blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
                 }
+                if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
