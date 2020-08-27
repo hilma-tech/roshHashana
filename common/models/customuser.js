@@ -6,6 +6,7 @@ const randomstring = require("randomstring");
 let sendMsg = require('../../server/sendSms/SendSms.js');
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
+const handleIsolatorUpdateInfo = require('../../server/common/socket/isolatedInfoUpdates');
 const to = require('../../server/common/to');
 const { default: Axios } = require('axios');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
@@ -421,6 +422,7 @@ module.exports = function (CustomUser) {
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
+
                 //if the user changed his address and he has a public meeting
                 if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
@@ -441,7 +443,7 @@ module.exports = function (CustomUser) {
                         }
                     }
                 }
-                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
+                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
                     else {
@@ -476,6 +478,9 @@ module.exports = function (CustomUser) {
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
+
+                handleIsolatorUpdateInfo(data, isolatedInfo, pubMeetId); //socket
+
             }
             else if (role === 2) {
                 //shofar blower
