@@ -449,6 +449,7 @@
             cursor: default;
             @include input();
             width: 100%;
+            overflow-y: auto;
         }
         .no-value-text {
             color: grey;

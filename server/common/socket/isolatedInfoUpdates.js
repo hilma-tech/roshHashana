@@ -22,7 +22,7 @@ class IsolatorInfoUpdateSocket {
     }
     handleIsolatorUpdateInfo = async (newData) => {
         if (newData) this.newData = newData
-        console.log('handleIsolatorUpdateInfo: ', "newData", this.newData, "currData", this.currData, "newMeetingId", this.newMeetingId);
+        console.log('handleIsolatorUpdateInfo: \n', "newData", this.newData, "currData", this.currData, "newMeetingId", this.newMeetingId);
         if (this.newData.address || this.newData.comments || this.newData.name || this.newData.username || this.newData.public_phone) { //change in: address|comments|name|username|public_phone
             if (!this.newData.public_meeting && (this.currData.public_meeting == 0 || this.currData.public_meeting === false)) { //is private meeting (public_meeting hasn't changed)
                 if (!this.currData.blowerMeetingId) {//public_meeting=0, blowerMeetingId=null ,אין בעל תוקע לפגישה הפרטית
@@ -73,7 +73,7 @@ class IsolatorInfoUpdateSocket {
             }
         }
         if (this.newData.address) {
-            if (this.currData.public_meeting && (this.newData.public_meeting !== false || this.newData.public_meeting != 0)) { // public
+            if ((this.currData.public_meeting === true || this.currData.public_meeting == 1) && (this.newData.public_meeting === true || this.newData.public_meeting == 1)) { // public
                 if (!await this.publicHasBlower(this.currData.blowerMeetingId)) {//אין לו בעל תוקע
                     this.updateReqForAllShofarBlowers();
                     return
@@ -105,7 +105,8 @@ class IsolatorInfoUpdateSocket {
                         "lng": this.newData.lng || this.currData.UserToIsolated().lng,
                         "lat": this.newData.lat || this.currData.UserToIsolated().lat,
                         "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated().comments,
-                        "isPublicMeeting": this.newData.public_meeting === null || this.newData.public_meeting === undefined ? this.currData.public_meeting : this.newData.public_meeting,
+                        "isPublicMeeting": 1,
+                        "oldIsPublicMeeting": 0,
                         "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated().name,
                         "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
                     }
@@ -125,7 +126,8 @@ class IsolatorInfoUpdateSocket {
                         "lng": this.newData.lng || this.currData.UserToIsolated().lng,
                         "lat": this.newData.lat || this.currData.UserToIsolated().lat,
                         "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated().comments,
-                        "isPublicMeeting": this.newData.public_meeting === null || this.newData.public_meeting === undefined ? this.currData.public_meeting : this.newData.public_meeting,
+                        "isPublicMeeting": 0,
+                        "oldIsPublicMeeting": 1,
                         "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated().name,
                         "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
                     }
@@ -144,13 +146,13 @@ class IsolatorInfoUpdateSocket {
         let objToSocketEvent = {
             "meetingId": this.currData.blowerMeetingId, // when meeting id did not change! (no change of private to private and vice versa)
             "startTime": this.currData.meeting_time,
-            "address": this.newData.address || this.currData.UserToIsolated.address,
-            "lng": this.newData.lng || this.currData.UserToIsolated.lng,
-            "lat": this.newData.lat || this.currData.UserToIsolated.lat,
-            "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated.comments,
+            "address": this.newData.address || this.currData.UserToIsolated().address,
+            "lng": this.newData.lng || this.currData.UserToIsolated().lng,
+            "lat": this.newData.lat || this.currData.UserToIsolated().lat,
+            "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated().comments,
             "isPublicMeeting": this.newData.public_meeting === null || this.newData.public_meeting === undefined ? this.currData.public_meeting : this.newData.public_meeting,
-            "name": this.newData.name || this.currData.UserToIsolated.name,
-            "phone": this.newData.username || this.currData.UserToIsolated.username
+            "name": this.newData.name || this.currData.UserToIsolated().name,
+            "phone": this.newData.username || this.currData.UserToIsolated().username
         }
         console.log("emit modifyIsolatorInfo in room isolated-events ", objToSocketEvent);
         this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
@@ -161,13 +163,13 @@ class IsolatorInfoUpdateSocket {
         let objToSocketEvent = {
             "meetingId": this.currData.blowerMeetingId,
             "startTime": this.currData.start_time,
-            "address": this.currData.UserToIsolated.address,
-            "lng": this.currData.UserToIsolated.lng,
-            "lat": this.currData.UserToIsolated.lat,
-            "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated.comments,
+            "address": this.currData.UserToIsolated().address,
+            "lng": this.currData.UserToIsolated().lng,
+            "lat": this.currData.UserToIsolated().lat,
+            "comments": (this.newData.comments && this.newData.comments.length < 255) ? this.newData.comments : this.currData.UserToIsolated().comments,
             "isPublicMeeting": this.newData.public_meeting === null || this.newData.public_meeting === undefined ? this.currData.public_meeting : this.newData.public_meeting,
-            "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated.name,
-            "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated.username
+            "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated().name,
+            "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
         }
         this.Modal.app.io.to('isolated-events').emit('newIsolator', objToSocketEvent)
     }

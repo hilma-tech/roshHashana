@@ -65,10 +65,20 @@ const SBHomePage = (props) => {
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
-                if (newReqData.oldMeetingId) {
-                    return req.meetingId == newReqData.oldMeetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req
-                } else {
-                    return req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req
+                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null) {
+                    return (req.meetingId == newReqData.oldMeetingId
+                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
+                }
+                else if (newReqData.oldMeetingId !== null) {
+                    return (req.meetingId == newReqData.oldMeetingId
+                        && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
+                }
+                else if (newReqData.oldIsPublicMeeting !== null) {
+                    return (req.meetingId == newReqData.meetingId
+                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
+                }
+                else {
+                    return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
 
             })
