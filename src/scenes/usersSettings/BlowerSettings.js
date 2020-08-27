@@ -217,13 +217,16 @@ const IsolatedSettings = (props) => {
 
         setErrs({}); //all
 
-        //update isolated details
+        //update blower details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "PUT",
             body: JSON.stringify({ data: updateData })
         }, true);
-        if (res) {
+        if (err || !res) {
+            openGenAlert({ text: err && err.error && err.error.message === "PHONE_EXISTS" ? "מספר הטלפון בשימוש" : "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
+        }
+        else {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
                 setVals(originalVals)
@@ -237,9 +240,6 @@ const IsolatedSettings = (props) => {
                     if (res)
                         props.history.goBack();
                 })
-        }
-        if (err) {
-            openGenAlert({ text: "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
         }
     }
 

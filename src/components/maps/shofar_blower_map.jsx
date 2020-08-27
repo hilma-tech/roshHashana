@@ -9,7 +9,7 @@ import { MainContext } from '../../ctx/MainContext';
 
 import { SBMapComponent } from './sb_map_renderer'
 
-import { dateWTimeFormatChange, splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
+import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
