@@ -8,7 +8,7 @@
     flex-direction: column;
     justify-content: center;
     padding: 10% 0% 5% 0%;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     text-align: right;
     position: absolute;
     top: 0;
@@ -63,12 +63,36 @@
             line-height: normal;
             margin-bottom: 1.5rem;
         }
+
+        .meeting-info {
+            color: black;
+            .info-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: flex-start;
+                width: 100%;
+                margin-top: 5%;
+                font-size: 1.3rem;
+                div {
+                    white-space: pre-line;
+                }
+                img {
+                    margin-left: 10%;
+                    margin-top: 3%;
+                }
+            }
+            .msg {
+                font-size: 1.3rem;
+                margin-top: 3%;
+            }
+        }
     }
     .group-orange {
         width: 3.5rem;
     }
     .icon {
-        width: 2rem;
+        width: 1.5rem;
     }
 
     .meetingDetailsContainer {

@@ -1,29 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
+import { CONSTS } from '../../consts/const_messages';
 import './map.scss';
 import moment from 'moment'
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
-const israelCoords = [
-    { lat: 32.863532, lng: 35.889902 },
-    { lat: 33.458826, lng: 35.881345 },
-    { lat: 33.107715, lng: 35.144508 },
-    { lat: 31.296718, lng: 34.180102 },
-    { lat: 29.486869, lng: 34.881321 },
-    { lat: 29.551662, lng: 34.984779 },
-];
 
-var mapOptions = {
-    fullscreenControl: false,
-    zoomControl: false,
-    streetViewControl: false,
-    mapTypeControl: false,
-    disableDefaultUI: true,
-    clickableIcons: false
-};
 
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
@@ -49,7 +34,7 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -99,7 +84,8 @@ const MapComp = (props) => {
                         location: { lat, lng },
                         info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
                             <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
-                            <div>לא ניתן להצטרף לתקיעה זו</div></div>
+                            {props.blower ? null : <div>לא ניתן להצטרף לתקיעה זו</div>}
+                        </div>
                     }
                     setAllLocations(allLocations => Array.isArray(allLocations) ? [...allLocations, newLocObj] : [newLocObj])
                 }
@@ -111,7 +97,7 @@ const MapComp = (props) => {
             if (!pub.address) return
             const comments = pub.commennts ? pub.commennts : ' '
             const address = pub.address + ' ' + comments;
-            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
+            const date = pub.start_time ? moment(pub.start_time).format("HH:mm") : 'טרם נקבעה שעה';
             const lat = parseFloat(pub.lat), lng = parseFloat(pub.lng);
             setSelfLocation(selfLocation => {
                 if (props.publicMap || (lat !== selfLocation.lat && lng !== selfLocation.lng)) {
@@ -162,12 +148,12 @@ const MapComp = (props) => {
                 allLocations={allLocations}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-                loadingElement={<img alt="" className="loader" src='/images/loader.svg' />}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
+                loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img src='/icons/goUp.svg' /></div>}
+            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img alt=""src='/icons/goUp.svg' /></div>}
         </div>
     );
 }
@@ -179,9 +165,9 @@ export default MapComp;
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
 
-    let options = mapOptions;
+    let options = CONSTS.MAP_OPTIONS;
     var israelPolygon = new window.google.maps.Polygon({
-        paths: israelCoords,
+        paths: CONSTS.ISRAEL_COORDS,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -218,7 +204,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} isolated={props.isolated} /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo}  /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

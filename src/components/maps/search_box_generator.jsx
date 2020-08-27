@@ -32,7 +32,7 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className }) => {
+export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className, disabled }) => {
     const autoCompleteInput = useRef()
     useEffect(() => {
         if (window.google && window.google.maps) { init(); return; }
@@ -42,7 +42,7 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
         script.async = true;
         script.defer = true;
         script.id = "mapScript";
-        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}&callback=init`
+        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&callback=init`
         document.head.appendChild(script);
 
         return () => {
@@ -98,6 +98,7 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
     return (
         <div className="form-search-input-container">
             <input
+                disabled={disabled ? disabled : false}
                 deafault={defaultValue}
                 ref={autoCompleteInput}
                 defaultValue={defaultValue}

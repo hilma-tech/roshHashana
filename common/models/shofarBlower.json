@@ -74,7 +74,7 @@
                 "dataScale": 0,
                 "nullable": "Y"
             }
-        }, 
+        },
         "can_blow_x_times": {
             "type": "Number",
             "required": false,
@@ -132,7 +132,20 @@
             "principalType": "ROLE",
             "principalId": "SHOFARBLOWER",
             "permission": "ALLOW",
-            "property": "InsertDataShofarBlower"
+            "property": [
+                "InsertDataShofarBlower",
+                "deleteMeeting"
+            ]
+        },
+        {
+            "principalType": "ROLE",
+            "principalId": "ADMIN",
+            "permission": "ALLOW",
+            "property": [
+                "count",
+                "countAllVolunteers",
+                "getShofarBlowersForAdmin"
+            ]
         }
     ]
 }

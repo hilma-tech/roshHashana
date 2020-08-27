@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { deleteUser } from '../fetch_and_utils';
+import loadable from '@loadable/component';
+
+import { deleteUser, checkDateBlock } from '../fetch_and_utils';
 
 import { isBrowser } from "react-device-detect";
 
-import Map from './maps/map';
 import '../components/maps/map.scss';
 import { useContext } from 'react';
 import { MainContext } from '../ctx/MainContext';
 
+const Map = loadable(() => import('./maps/map'));
 
 
 const SBNotConfirmed = (props) => {
@@ -20,14 +22,15 @@ const SBNotConfirmed = (props) => {
     }
     const cancelVolunteering = () => {
         openGenAlert({ text: "האם את/ה בטוח/ה שברצונך לבטל את הבקשה?", isPopup: { okayText: "כן", cancelText: "לא" } }, (continuE) => {
-            if (!continuE) return
+            if (!continuE) return;
             deleteUser((error) => {
                 if (error) props.openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
-            })  
+            }, 'DATE_TO_BLOCK_BLOWER')
         })
 
     }
 
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
 
     return (
         <>
@@ -37,7 +40,7 @@ const SBNotConfirmed = (props) => {
                     <div id="thank-you-msg">תודה על הרשמתך.</div>
                     <div>לקראת כ' אלול נתקשר אליך על מנת לאמת פרטים ולהדריך לגבי הצעדים הבאים.</div>
                     <div>בברכה,<br></br>צוות יום תרועה.</div>
-                    <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%', marginTop: isBrowser ? '10%' : '5%' }} className="clickAble">לביטול הרשמתך</div>
+                    {!disableEdit ? <div id="cancel-request" onClick={cancelVolunteering} style={{ marginBottom: isBrowser ? '0%' : '20%', marginTop: isBrowser ? '10%' : '5%' }} className="clickAble">לביטול הרשמתך</div> : null}
                     {!isBrowser && <div id="see-map" className="clickAble" onClick={closeOrOpenMap}>
                         צפייה במפה
                                 <img alt="" src='/images/map.svg' />

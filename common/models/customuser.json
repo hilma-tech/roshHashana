@@ -106,7 +106,7 @@
         "dataScale": null,
         "nullable": "Y"
       }
-  },
+    },
     "lng": "string",
     "lat": "string",
     "mainImageId": "number"
@@ -172,7 +172,9 @@
       "permission": "ALLOW",
       "property": [
         "mapInfoSB",
-        "assignSB"
+        "assignSB",
+        "updateMaxDurationAndAssign",
+        "updateMaxRouteLengthAndAssign"
       ]
     },
     {

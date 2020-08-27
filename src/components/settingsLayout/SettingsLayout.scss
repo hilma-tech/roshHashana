@@ -9,7 +9,7 @@
     background-color: $grey-bg;
     color: $turquoise;
     overflow-y: scroll;
-    &::-webkit-scrollbar{
+    &::-webkit-scrollbar {
         display: none;
     }
     #close {
@@ -37,10 +37,17 @@
         margin-right: 2%;
         margin-bottom: 3%;
     }
-        #public-place-container{
-        color:black !important;
+    // #about {
+    //     font-size: 1.5rem;
+    //     text-decoration: underline;
+    //     margin-top: 10%;
+    //     margin-right: 2%;
+    //     margin-bottom: 3%;
+    // }
+    #public-place-container {
+        color: black !important;
         .MuiInput-underline:after {
-           border-bottom: none;
-        }  
-}
+            border-bottom: none;
+        }
+    }
 }

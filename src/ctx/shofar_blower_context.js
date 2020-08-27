@@ -14,12 +14,21 @@ export const SBProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [myMeetings, setMyMeetings] = useState(null);
     const [meetingsReqs, setMeetingsReqs] = useState(null);
+    const [isPrint, setIsPrint] = useState(false);
 
     const [assignMeetingInfo, setAssignMeetingInfo] = useState(null)
     const [assigns, setAssigns] = useState(null)
     const [startTimes, setStartTimes] = useState(null)
     const [totalTime, setTotalTime] = useState(null)
     const [totalLength, setTotalLength] = useState(null)
+    const [isInRoute, setIsInRoute] = useState(false)
+
+    const [genMapMeetings, setGenMapMeetings] = useState(null)
+
+    const getLengthFromPrevStop = (meetingId, isPublicMeeting) => {
+        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == meetingId && st.isPublicMeeting == isPublicMeeting))
+        return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות").split("min").join("דקה") : st.duration.text) : null //google sometimes returns in english
+    }
 
     const getTotalTime = () => {
         if (!Array.isArray(myMeetings) || !myMeetings.length) return null;
@@ -38,71 +47,23 @@ export const SBProvider = ({ children }) => {
         if (Array.isArray(myMeetings) && myMeetings.length) setTotalTime(getTotalTime())
     }, [startTimes, myMeetings])
 
-
-    useEffect(() => {
-        if (assigns && Array.isArray(assigns) && assigns.length && startTimes && typeof startTimes === "object") {
-
-            const toAssign = []
-
-            for (let i in assigns) {
-                for (let j in startTimes) {
-                    if (assigns[i].meetingId == startTimes[j].meetingId) {
-                        toAssign.push({ meetingId: assigns[i].meetingId, isPublicMeeting: assigns[i].isPublicMeeting, startTime: startTimes[j].startTime })
-                    }
-                }
-            }
-
-            if (!assigning && toAssign && toAssign.length) {
-                assigning = true
-                assignSB(toAssign, (error, res) => {
-                    setAssigns(null);
-                    assigning = false
-                    if (error || !res) openGenAlert({ text: error })
-                    else if (Array.isArray(res)) {
-                        let success = true
-                        for (let i in res) {
-                            if (!res[i] || !res[i].success) {
-                                openGenAlert({ text: "חלק מהשיבוצים נכשלו" })
-                                success = false
-                                break;
-                            }
-                        }
-                        if (success) {
-                            openGenAlert({ text: "שובצת בהצלחה" })
-                        }
-                    }
-                    else openGenAlert({ text: "שובצת בהצלחה" })
-                })
-            }
-        }
-    }, [assigns, startTimes])
-
-
-    const closeAlert = () => { setShowAlert(false) }
-    const openGenAlert = (obj, popupCb = () => { }) => {
-        if (typeof obj !== "object" || Array.isArray(obj)) return;
-        clearTimeout(alertTO)
-        const alertObj = { text: obj.text, warning: obj.warning || false, noTimeout: obj.noTimeout || false }
-        if (obj.isPopup) alertObj.isPopup = { ...obj.isPopup, popupCb, closeSelf: () => { setShowAlert(false) } }
-        setShowAlert(alertObj)
-        if (!obj.isPopup && !obj.noTimeout) alertTO = setTimeout(closeAlert, 5000)
-    }
-
-
-
-    const ctxValue =  {
+    const ctxValue = window.sbctx = {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,
+        genMapMeetings, setGenMapMeetings,
         assigns, setAssigns,
         startTimes, setStartTimes,
+        isInRoute, setIsInRoute,
         totalTime, totalLength,
+        getLengthFromPrevStop,
+        isPrint, setIsPrint
     }
 
     return <SBContext.Provider value={ctxValue} >
         <>
             {children}
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </>
     </SBContext.Provider>
 }

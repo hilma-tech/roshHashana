@@ -1,8 +1,8 @@
 import React, { useEffect, useContext } from 'react';
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
 
 import { MainContext } from '../ctx/MainContext';
 import { SBContext } from '../ctx/shofar_blower_context';
-
 import Auth from '../modules/auth/Auth';
 
 import ShofarBlowerMap from '../components/maps/shofar_blower_map'
@@ -12,6 +12,8 @@ import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBNotConfirmed from '../components/sb_not_confirmed';
 import SBSideInfo from '../components/sb_side_info';
 
+import { isBrowser } from 'react-device-detect';
+
 import './mainPages/MainPage.scss';
 import './sb.scss'
 
@@ -20,13 +22,26 @@ const SBHomePage = (props) => {
 
     const { showAlert, openGenAlert } = useContext(MainContext)
     const {
-        userData, setUserData, 
+        userData, setUserData,
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
+        isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
+    // const socket = useSocket();
 
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
+
+    useJoinLeave("isolated-events", (err) => {
+        if (err) console.log("failed to join room");
+    })
+    useOn("newIsolator", (req) => {
+        addNewReq(req)
+    });
+    useOn('modifyIsolatorInfo', (newReq) => {
+        console.log('s: newReq: ', newReq);
+        updateReqData(newReq)
+    })
 
     useEffect(() => {
         (async () => {
@@ -40,7 +55,25 @@ const SBHomePage = (props) => {
         })();
     }, []);
 
+    const addNewReq = (newReq) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+        // no update on genMapData
+    }
+    const removeReq = (reqToRemove) => {
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+    }
+    const updateReqData = (newReqData) => {
+        setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
+            reqs.map((req) => {
+                if (newReqData.oldMeetingId) {
+                    return req.meetingId == newReqData.oldMeetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req
+                } else {
+                    return req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req
+                }
 
+            })
+        )
+    }
 
     const fetchAndSetData = async () => {
         fetching = true
@@ -48,7 +81,7 @@ const SBHomePage = (props) => {
         if (err || !mapContent) {
             const error = err === "NO_INTERNET" ? "אין חיבור לאינטרנט, לא ניתן לטעון את המידע" : (err.error && err.error.status === "401" ? false : "אירעה שגיאה, נא נסו שנית מאוחר יותר")
             error && openGenAlert({ text: error })
-            console.log("error getting sb map content ", err);
+            // console.log("error getting sb map content ", err);
         }
         if (mapContent === "NO_ADDRESS") {
             Auth.logout()
@@ -58,29 +91,27 @@ const SBHomePage = (props) => {
             //sort my routes by startTime, where closest (lowest) is first
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)
             if (!userData || (Array.isArray(userData) && !userData.length)) setUserData(mapContent.userData[0])
-            //if got .length == limit, call again -- and on SET need to check if already is data and then add and not set
+            //if got .length == limit, call again -- and on SET need to check if already have some data and then add and not set
         }
         fetching = false
     }
-
-
     return (
         <div className="sb-homepage-container">
             {
-                !userData && !meetingsReqs && !myMeetings ? <img alt="" className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
+                !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
                         {/* ALL THINGS FOR MAP PAGE */}
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting /> : null}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute} /> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
 
-                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap history={props.history} />}
+                        {assignMeetingInfo && typeof assignMeetingInfo === "object" && onMobile ? null : <ShofarBlowerMap location={props.location} history={props.history} />}
                     </>
                     :
                     /* USER IS NOT CONFIRMED */
                     <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
                 )
             }
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </div>
     );
 }

@@ -69,10 +69,11 @@ const AddPublicPlace = (props) => {
 
     return (
         <div id="public-place-container">
-            {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => props.removePubPlace(props.index)} />}
+            {props.removePubPlace && !props.inSettings && <img alt="" className="close-icon clickAble" src="/icons/close.svg" onClick={() => !props.disabled && props.removePubPlace(props.index)} />}
             {/* address inputs  */}
-            <FormSearchBoxGenerator uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={Array.isArray(address) && address[0] ? address[0] : address} className="address" />
+            <FormSearchBoxGenerator disabled={props.disabled} uId={'publicPlaces-form-search-input-' + props.index} second onAddressChange={updateAddress} defaultValue={Array.isArray(address) && address[0] ? address[0] : address} className="address" />
             <input
+                disabled={props.disabled ? props.disabled : false}
                 maxLength={254}
                 autoComplete={'off'}
                 id="place-description"
@@ -88,6 +89,7 @@ const AddPublicPlace = (props) => {
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                     <Fragment>
                         <TimePicker
+                            disabled={props.disabled ? props.disabled : false}
                             placeholder="שעה"
                             ampm={false}
                             value={chosenTime}
@@ -97,12 +99,12 @@ const AddPublicPlace = (props) => {
                     </Fragment>
                 </MuiPickersUtilsProvider>
             </ThemeProvider>
-            {props.removePubPlace && props.inSettings &&
+            {(props.removePubPlace && props.inSettings && !props.disabled) ?
                 <div className="clickAble"
                     style={{ textDecoration: "underline" }}
-                    onClick={() => props.removePubPlace(props.index)} >
+                    onClick={() => !props.disabled && props.removePubPlace(props.index)} >
                     הסר תקיעה זו מהמסלול שלי ומהמאגר
-                </div>}
+                </div> : null}
         </div>
     );
 

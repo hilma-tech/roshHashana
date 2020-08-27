@@ -1,5 +1,18 @@
 'use strict';
+const CONSTS = require('../../server/common/consts/consts');
+const checkDateBlock = require('../../server/common/checkDateBlock');
 const to = require('../../server/common/to');
+
+const executeMySqlQuery = async (Model, query) =>
+    await to(new Promise((resolve, reject) => {
+        Model.dataSource.connector.query(query, (err, res) => {
+            if (err) {
+                reject(err);
+                return
+            }
+            resolve(res);
+        });
+    }));
 
 module.exports = function (ShofarBlower) {
     const SHOFAR_BLOWER_ROLE = 2
@@ -12,6 +25,11 @@ module.exports = function (ShofarBlower) {
     //         "comments": null
     //     }
     ShofarBlower.InsertDataShofarBlower = async (data, options) => {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
+
         if (options.accessToken && options.accessToken.userId) {
             try {
                 let blowerInfo = await ShofarBlower.findOne({ where: { "userBlowerId": options.accessToken.userId } });
@@ -63,8 +81,54 @@ module.exports = function (ShofarBlower) {
         }
     }
 
+    //delete meeting from blower meetings
+    ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+            //block the function
+            return CONSTS.CURRENTLY_BLOCKED_ERR;
+        }
+        if (options.accessToken && options.accessToken.userId) {
+            try {
+                const { userId } = options.accessToken;
+                const { meetingId } = meetToDelete;
+                if (meetToDelete.isPublicMeeting) {
+                    let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
+                    if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
+                        //only delete the connection between the blower and the meeting
+                        await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0, start_time: null });
+                    }
+                    else await ShofarBlower.app.models.shofarBlowerPub.destroyById(meetingId); //there are no participants in this meeting, delete this meeting
+                }
+                else {
+                    //private meeting -> change blowerMeetingId to null -> 
+                    //only delete the connection between the blower and the meeting
+                    await ShofarBlower.app.models.Isolated.upsertWithWhere({ and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, { blowerMeetingId: null, meeting_time: null });
+                }
+                return true;
+            } catch (error) {
+                throw error;
+                //return false
+            }
+        }
+        else return false;
+    }
 
 
+    ShofarBlower.countAllVolunteers = function (cb) {
+        (async () => {
+            let [err, res] = await to(ShofarBlower.count());
+            if (err) cb(err);
+            if (res) {
+                return cb(null, res);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('countAllVolunteers', {
+        http: { verb: 'post' },
+        accepts: [],
+        returns: { arg: 'res', type: 'number', root: true }
+    });
 
     ShofarBlower.remoteMethod('InsertDataShofarBlower', {
         http: { verb: 'post' },
@@ -75,5 +139,64 @@ module.exports = function (ShofarBlower) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
+    ShofarBlower.remoteMethod('deleteMeeting', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'meetToDelete', type: 'object' },
+            { arg: 'options', type: 'object', http: "optionsFromRequest" }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 
+    ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
+        (async () => {
+            try {
+                let where = ''
+                const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
+                    (SELECT COUNT(*) 
+                    FROM shofar_blower_pub
+                    WHERE blowerId = cu.id
+                    )+(
+                    SELECT COUNT(*)
+                    FROM isolated
+                    WHERE public_meeting = 0 AND blowerMeetingId = cu.id
+                    ) 
+                ) AS blastsNum
+                FROM shofar_blower as sb 
+                    LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
+                ORDER BY cu.name
+                LIMIT 0, 20`
+
+                const countQ = `SELECT COUNT(*) as resNum
+                FROM shofar_blower 
+                LEFT JOIN CustomUser cu ON shofar_blower.userBlowerId = cu.id
+                ${where}`
+
+                let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerQ);
+                if (shofarBlowerErr || !shofarBlowerRes) {
+                    console.log('get shofarBlower admin request error : ', shofarBlowerErr);
+                    throw shofarBlowerErr
+                }
+                let [countErr, countRes] = await executeMySqlQuery(ShofarBlower, countQ);
+                if (countErr || !countRes) {
+                    console.log('get shofarBlower admin request error : ', countErr);
+                    throw countErr
+                }
+
+                return cb(null, { shofarBlowers: shofarBlowerRes, resNum: countRes[0].resNum })
+            }
+            catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('getShofarBlowersForAdmin', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'object' },
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 }

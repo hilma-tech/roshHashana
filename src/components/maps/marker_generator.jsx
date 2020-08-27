@@ -42,7 +42,7 @@ export default MarkerGenerator;
 
 
 
-export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
+export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType }) => {
     /**
      * icon: overrides props.type
      * location
@@ -59,7 +59,7 @@ export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
     let lngNum = Number(location.lng)
     if (isNaN(latNum) || isNaN(lngNum)) return null
 
-    let iconUrl = (iconType === PRIVATE_MEETING) ? '/icons/single-blue.svg' : '/icons/group-orange.svg';
+    let iconUrl = iconUrlProps || ((iconType === PRIVATE_MEETING) ? '/icons/single-blue.svg' : '/icons/group-orange.svg')
 
     const icon = markerIcon || {
         url: iconUrl,
@@ -72,7 +72,7 @@ export const SBMarkerGenerator = ({ location, info, markerIcon, iconType }) => {
         <Marker
             icon={icon}
             onClick={closeOrOpenInfoWindow}
-            position={{ lat: latNum, lng: lngNum }}>
+            position={new window.google.maps.LatLng(latNum, lngNum)}>
             {info && isInfoWindowOpen ? <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow> : null}
         </Marker>
     );

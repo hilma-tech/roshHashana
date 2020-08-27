@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Geocode from "react-geocode";
 
+import moment from 'moment'
+import Auth from '../../modules/auth/Auth'
+
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
 
 import { SBMapComponent } from './sb_map_renderer'
 
-import { dateWTimeFormatChange } from '../../fetch_and_utils';
+import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
@@ -23,37 +26,40 @@ const ShofarBlowerMap = (props) => {
     const { openGenAlert } = useContext(MainContext)
 
     const {
-        userData, 
+        userData,
         myMeetings, meetingsReqs,
+        genMapMeetings, setGenMapMeetings,
         setAssignMeetingInfo,
-        startTimes } = useContext(SBContext)
+        startTimes,
+        setIsInRoute,
+        isPrint,
+    } = useContext(SBContext)
 
 
+    const [center, setCenter] = useState({});
 
     const [userOriginLoc, setUserOriginLoc] = useState(null)
+    const [allGenLocations, setAllGenLocations] = useState(null)
 
     const [allMapData, setAllMapData] = useState(null)
     const [err, setErr] = useState(false)
 
-    const [center, setCenter] = useState({});
 
     // const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
 
-
+    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
-        {meetingData && meetingData.name && assign ? <div className="pub-shofar-blower-name-container">{meetingData.name}</div> : (meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{meetingData.name}</div></div> : null)}
-        {meetingData && meetingData.address ? <div className="pub-address-container">{meetingData.address}</div> : null}
-        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
-        {meetingData && meetingData.comments ? <div className="pub-address-container" >{meetingData.comments}</div> : null}
-        {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
+        {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}
+        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
+        {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
         <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
-        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{meetingData.address}</div></div> : null}
-        {meetingData && meetingData.comments ? <div>{meetingData.comments}</div> : null}
-        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? dateWTimeFormatChange(meetingData.startTime).join(" ") : "---"}</div></div>
+        {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address) + `${meetingData.comments ? ", " + meetingData.comments : ""}`}</div></div> : null}
+        <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
         {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
-        {assign ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
+        {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
 
 
@@ -95,6 +101,26 @@ const ShofarBlowerMap = (props) => {
         }
     }, [myMeetings, meetingsReqs])
 
+    useEffect(() => {
+        handleSetAllGenMapData(genMapMeetings)
+    }, [genMapMeetings])
+
+
+    const fetchAllGenLocations = async () => {
+        let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${true}`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" }
+        }, true);
+
+        if (err) {
+            openGenAlert({ text: "קרתה בעיה בהבאת המידע, נא נסו שנית מאוחר יותר" })
+            return;
+        }
+        if (mapContent) {
+            setGenMapMeetings(mapContent)
+            handleSetAllGenMapData(mapContent)
+        }
+    }
+
 
     const handleSetAllMapData = () => {
         // layout for map renderer
@@ -106,24 +132,83 @@ const ShofarBlowerMap = (props) => {
                     info: meetReq.isPublicMeeting ? publicLocInfo(meetReq, true) : privateLocInfo(meetReq, true)
                 }
             })
+        let myRouteCnt = 0;
+        const userStartTime = new Date(userData.startTime).getTime()
+        const userEndTime = userStartTime + userData.maxRouteDuration;
+        let myStartT
+        let meetingStartTime
+        let isConstMeeting
+        let locObj = {}
         let myMeetingsLocs = !Array.isArray(myMeetings) ? []
-            : myMeetings.map(myMeeting => {
-                let myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
-                return {
-                    iconType: myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING,
+            : myMeetings.map((myMeeting, i) => {
+                myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
+                meetingStartTime = new Date(myMeeting.startTime).getTime()
+                isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
+                if (!isConstMeeting) { myRouteCnt++ }
+                locObj = {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
-                    startTime: myStartT && myStartT.startTime || myMeeting.startTime,
+                    startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
+                    isPublicMeeting: myMeeting.isPublicMeeting,
                     constMeeting: myMeeting.constMeeting,
                     info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
                 }
+                isConstMeeting ?
+                    locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
+                    locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
+                return locObj;
             })
 
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
     }
 
+    const handleSetAllGenMapData = (mapContent) => {
+        if (!mapContent || !mapContent.privateMeetings) return;
+        const priMeetLocs = []
+        let privateMeet;
+        for (let i in mapContent.privateMeetings) { // isolated location (private meetings)
+            privateMeet = mapContent.privateMeetings[i]
+            const lat = Number(privateMeet.lat), lng = Number(privateMeet.lng);
+            priMeetLocs.push({
+                type: PRIVATE_MEETING,
+                location: { lat, lng },
+                info: <div id="info-window-container"><div className="info-window-header">תקיעה פרטית</div>
+                    <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{privateMeet.blowerName}</div></div>
+                </div>
+            })
+        }
+
+        if (!mapContent || !mapContent.publicMeetings) return;
+        const pubMeetLocs = []
+        let pubMeet;
+        let lat, lng, date
+        for (let i in mapContent.publicMeetings) { // isolated location (private meetings)
+            pubMeet = mapContent.publicMeetings[i]
+            lat = Number(pubMeet.lat)
+            lng = Number(pubMeet.lng);
+            date = pubMeet.start_time ? moment(pubMeet.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה';
+            pubMeetLocs.push({
+                type: SHOFAR_BLOWING_PUBLIC,
+                location: { lat, lng },
+                info: <div id="info-window-container">
+                    <div className="info-window-header">תקיעה ציבורית</div>
+                    <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{pubMeet.blowerName}</div></div>
+                    <div className="pub-address-container">
+                        <img alt="" src={'/icons/address.svg'} />
+                        <div style={{ textAlign: "right" }}>
+                            {`${pubMeet.address} ${pubMeet.comments || pubMeet.commennts || ""}`}
+                        </div>
+                    </div>
+                    <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
+                </div>
+            })
+        }
+        setAllGenLocations({ priMeetLocs, pubMeetLocs })
+    }
+
+
     const getLngLatOfLocation = async (address) => {
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
+        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND_SECOND);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { console.log(`error getting geoCode of ${address}: `, error); return; }
@@ -134,22 +219,31 @@ const ShofarBlowerMap = (props) => {
 
 
     const handleAssign = (meetingInfo) => {
-        setAssignMeetingInfo(meetingInfo)
+        setAssignMeetingInfo(meetingInfo);
+        setIsInRoute(false)
+    }
+
+    const handleMapChanged = (needGenInfo) => {
+        if (needGenInfo && !allGenLocations) {
+            fetchAllGenLocations()
+        }
     }
 
 
-
     return (
-        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
+        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`} id="sb-map-container">
             <SBMapComponent
+                location={props.location}
                 changeCenter={setCenter}
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
                 err={err}
                 data={allMapData}
                 history={props.history}
+                allGenLocations={allGenLocations}
+                handleMapChanged={handleMapChanged}
 
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}

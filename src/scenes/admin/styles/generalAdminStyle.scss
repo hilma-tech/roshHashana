@@ -1,0 +1,72 @@
+.inputContainer
+{
+    position: relative; 
+    width: 100%;
+
+    input {
+        width: 100%;
+        font-size: 2.3vh;
+        padding: 0.5vh 1.5vw;
+        color: #747474;
+        outline: none;
+        background: none;
+        border: 0.5px solid #444444;;
+    }
+
+    .inputIcon{
+        position: absolute;
+        color: #747474c5;
+        font-size: 2.5vh;
+        left: 1.5vw;
+        top: 1.3vh;
+    }
+}
+
+.orangeTitle {
+    font-size: 2.7vh;
+    color: #FDA42A;
+    font-weight: 600;
+    text-align: right;
+    margin: 3.5vh 0 2vh 0;
+}
+
+.blueSubTitle, .orangeSubTitle{
+    font-size: 2vh;
+    font-weight: 500;
+    text-align: right;
+}
+
+.blueSubTitle{
+    color: #156879;   
+}
+
+.orangeSubTitle{
+    color: #FDA42A;  
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.orangeBorderBottom{
+    border-bottom: #FDA42A solid 0.5px;
+}
+
+.resultNum{
+    flex-grow: 1;
+    text-align: end;
+}
+
+.statusNavContainer {
+   display: flex;
+   margin: 3vh 0 1vh 0;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.isolatedsContainer{
+    height: 100vh;
+    background: #F3F3F3 0% 0% no-repeat padding-box;
+}

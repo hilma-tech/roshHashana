@@ -1,9 +1,16 @@
+body {
+  -webkit-text-size-adjust: none !important;
+}
 .App {
   text-align: center;
 }
 
-*{
+* {
   box-sizing: border-box !important;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .App-logo {
@@ -70,4 +77,8 @@
   100% {
     opacity: 0;
   }
+}
+
+.bold {
+  font-weight: bold;
 }

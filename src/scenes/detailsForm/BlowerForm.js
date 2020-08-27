@@ -1,19 +1,19 @@
 import React, { Fragment, Component } from 'react';
+import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
+import { updateSBDetails, checkDateBlock } from '../../fetch_and_utils';
+import GeneralAlert from '../../components/modals/general_alert';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { BrowserView, isBrowser } from "react-device-detect";
+import { CONSTS } from '../../consts/const_messages';
 import { ThemeProvider } from "@material-ui/styles";
+import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
-import MomentUtils from '@date-io/moment';
 import Auth from '../../modules/auth/Auth';
+import MomentUtils from '@date-io/moment';
 import './detailsForm.scss';
-import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
-import { updateSBDetails } from '../../fetch_and_utils';
-import { CONSTS } from '../../const_messages';
-import { MainContext } from '../../ctx/MainContext';
-import GeneralAlert from '../../components/modals/general_alert';
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -36,10 +36,8 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
-export default class IsolatedForm extends Component {
-
+export default class BlowerForm extends Component {
     static contextType = MainContext
-
     constructor(props) {
         super(props);
         this.state = {
@@ -57,10 +55,18 @@ export default class IsolatedForm extends Component {
 
     componentDidMount() {
         (async () => {
+            const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
             let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
             }, true);
-            if (res && res.address) {
+            if (disableEdit) {
+                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true, isPopup: { okayText: "הבנתי" } }, () => {
+                    this.props.history.push('/');
+                    return;
+                });
+                return;
+            }
+            if ((res && res.address)) {
                 this.props.history.push('/');
                 return;
             }
@@ -113,7 +119,7 @@ export default class IsolatedForm extends Component {
             publicPlaces.push({ id: this.state.publicPlaces.length });
             this.setState({ publicPlaces });
         }
-        else this.setState({ publicMeetErr: 'לא ניתן להוסיף עוד תקיעות ציבוריות ' });
+        else this.setState({ publicMeetErr: 'מועד התקיעה מתקרב, לא ניתן להוסיף עוד תקיעות ציבוריות ' });
     }
 
     //remove the public meeting
@@ -173,6 +179,11 @@ export default class IsolatedForm extends Component {
     //save all shofar blower details including public places
     saveShofarBlowerDetails = async (e) => {
         e.preventDefault();
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר להכניס פרטים חדשים', block: true });
+            return;
+        }
+
         const formChilds = e.target.children;
 
         if (!formChilds[1].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
@@ -205,6 +216,7 @@ export default class IsolatedForm extends Component {
         let startTime = new Date(this.state.chosenTime);
         startTime.setFullYear(2020, 8, 20);
 
+
         let success = await this.checkForMissingDataInPublicPlaces();
         if (!success) {
             return;
@@ -221,7 +233,11 @@ export default class IsolatedForm extends Component {
         updateSBDetails(blowerDetails, (error) => {
             if (!error) {
                 this.props.history.push('/')
-            } else {
+            }
+            else if (error === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר לעדכן את הפרטים' });
+            }
+            else {
                 this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
             }
         })
@@ -229,7 +245,7 @@ export default class IsolatedForm extends Component {
 
     render() {
         const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
-
+        const { showAlert } = this.context;
         // var input = document.getElementById('locationTextField');
         // var autocomplete = new google.maps.places.Autocomplete(input);
 
@@ -291,7 +307,7 @@ export default class IsolatedForm extends Component {
                             <div className="public-meeting-options">
                                 {this.state.publicPlaces && this.state.publicPlaces.map((place, index) => {
                                     return <AddPublicPlace
-                                        key={place.id}
+                                        key={"k" + place.id}
                                         removePubPlace={this.removePubPlace}
                                         index={index}
                                         format={format}
@@ -318,8 +334,7 @@ export default class IsolatedForm extends Component {
                 <BrowserView style={{ position: 'absolute', left: '0', width: '60%', height: '100%', top: '0' }}>
                     <img id="shofar-img" alt="" src="/icons/shofar.png" />
                 </BrowserView>
-
-                {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
+                {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
             </div>
         );
     }

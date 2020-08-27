@@ -35,6 +35,15 @@ CREATE TABLE `ACL` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `ACL`
+--
+
+LOCK TABLES `ACL` WRITE;
+/*!40000 ALTER TABLE `ACL` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ACL` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `AccessToken`
 --
 
@@ -50,6 +59,16 @@ CREATE TABLE `AccessToken` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `AccessToken`
+--
+
+LOCK TABLES `AccessToken` WRITE;
+/*!40000 ALTER TABLE `AccessToken` DISABLE KEYS */;
+INSERT INTO `AccessToken` VALUES ('6bEGGD5Ss8L3ZwuXoiIrhWsz4b8Vf3z0UBi1D7awiARnrBSovcZYOeEZ4oVary2g',18000,'2020-08-16 14:52:12',24,NULL),('768IGyH77nUwlK8etH3fK7ZLcWpQlF4FkAjOEHUR4KVT8TAG3wyVzgIUbXOg3HRq',18000,'2020-08-16 14:51:12',24,NULL),('nid7b0FrJFa63Yeei7Cql8QTO4EajOc88nsMli5cMmGkeCZRIpWRMx6Nb4lLY2gh',18000,'2020-08-16 13:52:15',24,NULL);
+/*!40000 ALTER TABLE `AccessToken` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `CustomUser`
@@ -76,8 +95,21 @@ CREATE TABLE `CustomUser` (
   `lng` varchar(255) DEFAULT NULL,
   `lat` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `CustomUser`
+--
+
+LOCK TABLES `CustomUser` WRITE;
+/*!40000 ALTER TABLE `CustomUser` DISABLE KEYS */;
+INSERT INTO `CustomUser` VALUES (24,NULL,'maayanthebestadmin','maayan',NULL,NULL,'$2a$10$QrQVMVwGtVcnyTiF5w2t0uam0b2cZ/.zKJi3oXCaJFxg2dFXGSZd.',NULL,'admin@gmail.com',NULL,'ea7f0759e4ae1df6d3a34bbee3bfe4254796f0e50c160fdd741f9dba7cb5b0faab0f1c0073924978a8cdf9b6e488300ec7755d54dd2dc160643c14e93112e4ac',NULL,NULL,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `CustomUser` ENABLE KEYS */;
+UNLOCK TABLES;
+
+create FULLTEXT index user_name_ftsix ON CustomUser(name);
+create FULLTEXT index user_address_ftsix ON CustomUser(address);
 
 --
 -- Table structure for table `Files`
@@ -100,6 +132,15 @@ CREATE TABLE `Files` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Files`
+--
+
+LOCK TABLES `Files` WRITE;
+/*!40000 ALTER TABLE `Files` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Files` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Images`
 --
 
@@ -120,6 +161,15 @@ CREATE TABLE `Images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Images`
+--
+
+LOCK TABLES `Images` WRITE;
+/*!40000 ALTER TABLE `Images` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Images` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Notification`
 --
 
@@ -134,6 +184,15 @@ CREATE TABLE `Notification` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Notification`
+--
+
+LOCK TABLES `Notification` WRITE;
+/*!40000 ALTER TABLE `Notification` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Notification` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `NotificationsMap`
@@ -157,6 +216,15 @@ CREATE TABLE `NotificationsMap` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `NotificationsMap`
+--
+
+LOCK TABLES `NotificationsMap` WRITE;
+/*!40000 ALTER TABLE `NotificationsMap` DISABLE KEYS */;
+/*!40000 ALTER TABLE `NotificationsMap` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Role`
 --
 
@@ -171,14 +239,19 @@ CREATE TABLE `Role` (
   `modified` datetime DEFAULT NULL,
   `roleKey` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Role`
+--
 
 LOCK TABLES `Role` WRITE;
 /*!40000 ALTER TABLE `Role` DISABLE KEYS */;
-INSERT INTO `Role` VALUES (1,'ISOLATED',NULL,NULL,NULL,'miremerijfgivn238svnsdfsdf'),(2,'SHOFARBLOWER',NULL,NULL,NULL,'gmrkipgm$2300femkFSFKeo375'),(3,'GENERALUSER',NULL,NULL,NULL,'spf%#kfpoFFAa2234adAA244asZZv');
+INSERT INTO `Role` VALUES (1,'ISOLATED',NULL,NULL,NULL,'miremerijfgivn238svnsdfsdf'),(2,'SHOFARBLOWER',NULL,NULL,NULL,'gmrkipgm$2300femkFSFKeo375'),(3,'GENERALUSER',NULL,NULL,NULL,'spf%#kfpoFFAa2234adAA244asZZv'),(4,'ADMIN',NULL,NULL,NULL,'dsfdsgfest4e534fdfsdkfdsfsfewr4');
 /*!40000 ALTER TABLE `Role` ENABLE KEYS */;
 UNLOCK TABLES;
+
 --
 -- Table structure for table `RoleMapping`
 --
@@ -193,8 +266,18 @@ CREATE TABLE `RoleMapping` (
   `roleId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `principalId` (`principalId`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `RoleMapping`
+--
+
+LOCK TABLES `RoleMapping` WRITE;
+/*!40000 ALTER TABLE `RoleMapping` DISABLE KEYS */;
+INSERT INTO `RoleMapping` VALUES (24,'USER','24',4);
+/*!40000 ALTER TABLE `RoleMapping` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Schools`
@@ -211,6 +294,15 @@ CREATE TABLE `Schools` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Schools`
+--
+
+LOCK TABLES `Schools` WRITE;
+/*!40000 ALTER TABLE `Schools` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Schools` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `SchoolsGames`
@@ -232,6 +324,15 @@ CREATE TABLE `SchoolsGames` (
   CONSTRAINT `SchoolsGames_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `SchoolsGames`
+--
+
+LOCK TABLES `SchoolsGames` WRITE;
+/*!40000 ALTER TABLE `SchoolsGames` DISABLE KEYS */;
+/*!40000 ALTER TABLE `SchoolsGames` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `User`
@@ -258,6 +359,15 @@ CREATE TABLE `User` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `User`
+--
+
+LOCK TABLES `User` WRITE;
+/*!40000 ALTER TABLE `User` DISABLE KEYS */;
+/*!40000 ALTER TABLE `User` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `games`
 --
 
@@ -281,6 +391,15 @@ CREATE TABLE `games` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `games`
+--
+
+LOCK TABLES `games` WRITE;
+/*!40000 ALTER TABLE `games` DISABLE KEYS */;
+/*!40000 ALTER TABLE `games` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `isolated`
 --
 
@@ -299,6 +418,15 @@ CREATE TABLE `isolated` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `isolated`
+--
+
+LOCK TABLES `isolated` WRITE;
+/*!40000 ALTER TABLE `isolated` DISABLE KEYS */;
+/*!40000 ALTER TABLE `isolated` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `keys`
 --
 
@@ -312,6 +440,15 @@ CREATE TABLE `keys` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `keys`
+--
+
+LOCK TABLES `keys` WRITE;
+/*!40000 ALTER TABLE `keys` DISABLE KEYS */;
+/*!40000 ALTER TABLE `keys` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `records_permissions`
@@ -332,6 +469,15 @@ CREATE TABLE `records_permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `records_permissions`
+--
+
+LOCK TABLES `records_permissions` WRITE;
+/*!40000 ALTER TABLE `records_permissions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `records_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `shofar_blower`
 --
 
@@ -348,6 +494,15 @@ CREATE TABLE `shofar_blower` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `shofar_blower`
+--
+
+LOCK TABLES `shofar_blower` WRITE;
+/*!40000 ALTER TABLE `shofar_blower` DISABLE KEYS */;
+/*!40000 ALTER TABLE `shofar_blower` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `shofar_blower_pub`
@@ -371,6 +526,15 @@ CREATE TABLE `shofar_blower_pub` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `shofar_blower_pub`
+--
+
+LOCK TABLES `shofar_blower_pub` WRITE;
+/*!40000 ALTER TABLE `shofar_blower_pub` DISABLE KEYS */;
+/*!40000 ALTER TABLE `shofar_blower_pub` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users_archive`
 --
 
@@ -386,6 +550,15 @@ CREATE TABLE `users_archive` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users_archive`
+--
+
+LOCK TABLES `users_archive` WRITE;
+/*!40000 ALTER TABLE `users_archive` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users_archive` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -396,4 +569,4 @@ CREATE TABLE `users_archive` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-03 15:45:51
+-- Dump completed on 2020-08-16 17:58:08

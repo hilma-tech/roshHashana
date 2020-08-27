@@ -1,0 +1,87 @@
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;900&display=swap");
+$grey: #eeeeee;
+$background: #f6f6f6;
+$dark-grey: #707070;
+$orange: #fda42a;
+$dark-turquise: #156879;
+$light-blue: #489fb5;
+$Heebo: "Heebo", sans-serif;
+
+.admin-header {
+    background-color: $grey;
+    display: flex;
+    place-content: space-between;
+    font-family: $Heebo;
+    padding: 2vh 4vw;
+}
+
+.general-numbers {
+    display: flex;
+    span {
+        display: flex;
+        align-items: center;
+        line-height: 1;
+        text-align: right;
+    }
+}
+.iconNav {
+    height: 5.6vh;
+}
+.black-font {
+    font-weight: 900;
+    font-size: 4vh;
+}
+
+.header-detail {
+    font-size: 1.7vh;
+    width: 6vw;
+    margin-right: 0.7vw;
+}
+
+.hamburger {
+    color: $dark-grey;
+    font-size: larger;
+}
+
+.admin-sidebar {
+    position: absolute;
+    width: 33vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    z-index: 10;
+
+    background-color: $background;
+    color: $dark-grey;
+}
+
+.menueIcon {
+    font-size: 4vh;
+    // margin-top: 1vh;
+    margin-left: 2vw;
+}
+
+.close-icon {
+    width: 1.75rem;
+    top: 4vh;
+    right: 4vh;
+    position: absolute;
+}
+
+
+.dark-turq {
+    color: $dark-turquise;
+    border-left: 1px solid gainsboro;
+    border-right: 1px solid gainsboro;
+    padding-right: 0.7vw;
+    padding-left: 0.7vw;
+}
+
+.light-blue {
+    color: $light-blue;
+    margin-right: 0.7vw;
+}
+
+.orange {
+    color: $orange;
+}

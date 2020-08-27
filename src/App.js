@@ -1,35 +1,25 @@
 import React, { Component, useEffect, Suspense, useState } from 'react';
 import './App.scss';
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
-import Auth from "./modules/auth/Auth";
-import Login from "./modules/auth/Login";
 import Home from './scenes/Home';
-import Samples from './modules/samples/Samples';
 import { PrivateRoute, MultipleRoute } from './modules/auth/PrivateRoute';
 import { HomeRoute } from './modules/auth/PrivateRoute';
 import loadable from '@loadable/component';
-import ResetPassword from './modules/auth/client/components/ResetPassword';
-import SBHomePage from './scenes/shofar_blower_home_page';
 import { SBProvider } from './ctx/shofar_blower_context';
 import { MainProvider } from './ctx/MainContext';
-
 import "./consts/generalStyles.scss"
 
-
-// import SimpleUserHome from "./scenes/Home";
 const IsolatedForm = loadable(() => import('./scenes/detailsForm/IsolatedForm'));
 const BlowerForm = loadable(() => import('./scenes/detailsForm/BlowerForm'));
 const IsolatedMainPage = loadable(() => import('./scenes/mainPages/IsolatedPage'));
 const GeneralUserPage = loadable(() => import('./scenes/mainPages/GeneralUserPage'));
-
+const SBHomePage = loadable(() => import('./scenes/shofar_blower_home_page'));
 const IsolatedSettings = loadable(() => import('./scenes/usersSettings/IsolatedSettigns'));
 const GeneralUserSettings = loadable(() => import('./scenes/usersSettings/GeneralUserSettings'));
 const BlowerSettings = loadable(() => import('./scenes/usersSettings/BlowerSettings'));
-
-// const DashboardMain = loadable(() => import('./modules/dashboard/dashboard-main'));
-const SimpleUserHome = loadable(() => import('./scenes/Home'));
 const Register = loadable(() => import('./scenes/Register'));
 
+const AdminRouter = loadable(() => import('./scenes/admin/AdminRouter.jsx'))
 
 let alertTO = null;
 
@@ -77,6 +67,8 @@ const App = (props) => {
                             <Route path="/register" compName="Register" component={(props) => <Register {...props} />} />
                             <MultipleRoute path="/settings" comps={{ 'IsolatedSettings': IsolatedSettings, 'BlowerSettings': BlowerSettings, 'GeneralUserSettings': GeneralUserSettings }} />
                             <MultipleRoute path="/addDetails" comps={{ 'IsolatedDetailsForm': IsolatedForm, 'BlowerDetailsForm': BlowerForm }} />
+                            {/* תוסיפו ראוטים רק מעליי */}
+                            <Route path="/" component={(props) => <AdminRouter {...props} />} />
                         </Switch>
                     </MainProvider>
                 </div>
@@ -85,5 +77,4 @@ const App = (props) => {
     );
 }
 
-//export default inject('ExampleStore')(observer(App));
 export default App;

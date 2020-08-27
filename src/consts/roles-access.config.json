@@ -8,9 +8,10 @@
         ],
         "defaultHomePage": "SBHomePage"
     },
-    "GENERALUSER": {
+    "GENERALUSER": { 
         "comps": [
-            "GeneralUserSettings"
+            "GeneralUserSettings",
+            "AdminLogin"
         ],
         "defaultHomePage": "GeneralUserPage"
     },
@@ -21,5 +22,15 @@
             "IsolatedSettings"
         ],
         "defaultHomePage": "IsolatedHome"
+    },
+    "ADMIN": {
+        "comps": [
+            "AdminLogin",
+            "AdminHome",
+            "BlastsPage",
+            "IsolatedTable",
+            "ShofarBlowersTable"
+        ],
+        "deafaultHomePage": "AdminHome"
     }
 }
