@@ -3,7 +3,7 @@ let mysql = require('mysql');
 const query = `SELECT CustomUser.name , CustomUser.username AS 'phoneNumber', RoleMapping.roleId 
              FROM CustomUser 
                 LEFT JOIN RoleMapping ON RoleMapping.principalId = CustomUser.id 
-             WHERE RoleMapping.roleId=1 OR RoleMapping.roleId =2;
+             WHERE RoleMapping.roleId=1 OR RoleMapping.roleId =2 AND CustomUser.address IS NULL;
 `
 let con = mysql.createConnection({
     host: "localhost",
