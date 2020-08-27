@@ -29,7 +29,7 @@ const Home = (props) => {
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/SynagogueOrg.png" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
                 </div>
-                <div className="content-container" >
+                <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '5%' }} >
 
                     <img alt="" style={{ width: isBrowser ? '21vw' : '55vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
                     <div className="d-lg-none d-md-none text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
@@ -44,7 +44,7 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '4vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
                     </>
                         : <>
@@ -52,6 +52,7 @@ const Home = (props) => {
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
                     <div id="shivuki-credit">{'תוכן שיווקי: אפרת שפירא www.my-idea.co.il'}</div>
+                    <div id='contact-us'>לפניות ובקשות נוספות ניתן ליצור קשר במייל shofar2all@gmail.com</div>
                 </div>
             </div>
             {openMap && <Map publicMap closeMap={() => setOpenMap(false)} history={props.history} />}
