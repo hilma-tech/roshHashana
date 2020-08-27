@@ -147,7 +147,7 @@ const ShofarBlowerMap = (props) => {
                 if (!isConstMeeting) { myRouteCnt++ }
                 locObj = {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
-                    startTime: myStartT && myStartT.startTime || myMeeting.startTime,
+                    startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
                     isPublicMeeting: myMeeting.isPublicMeeting,
                     constMeeting: myMeeting.constMeeting,

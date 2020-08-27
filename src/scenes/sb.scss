@@ -348,6 +348,9 @@
     overflow: visible !important;
     height: 100% !important;
     width: 100% !important;
+    #sb-route-list-top {
+        display: none !important;
+    }
     * {
         -webkit-print-color-adjust: exact !important;
     }
@@ -589,6 +592,9 @@
 .print-map-style {
     display: none !important;
     & * {
-        display: none;
+        display: none !important;
     }
+    // .sb-overmap-container .sb-overmap-container-mobile {
+    //     display: none;
+    // }
 }
