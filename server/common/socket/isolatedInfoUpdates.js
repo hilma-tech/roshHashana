@@ -37,6 +37,7 @@ class IsolatorInfoUpdateSocket {
                         "name": this.newData.name || this.currData.UserToIsolated().name,
                         "phone": this.newData.username || this.currData.UserToIsolated().username
                     }
+                    console.log('1111')
                     console.log("emit modifyIsolatorInfo in room isolated-events ", objToSocketEvent);
                     this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
                     return
@@ -68,12 +69,15 @@ class IsolatorInfoUpdateSocket {
                         "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
                     }
                     console.log('objToSocketEvent1', objToSocketEvent)
+                    console.log('2222')
                     this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
                 }
             }
         }
-        if (this.newData.address) {
-            if (this.currData.public_meeting && (this.newData.public_meeting !== false || this.newData.public_meeting != 0)) { // public
+        if (this.newData.address) { //address has changed
+            console.log(this.newData.public_meeting, 'new data')
+            console.log(this.currData.public_meeting, 'this.currData')
+            if (this.currData.public_meeting && (this.newData.public_meeting !== false || this.newData.public_meeting !== 0)) { // public
                 if (!await this.publicHasBlower(this.currData.blowerMeetingId)) {//אין לו בעל תוקע
                     this.updateReqForAllShofarBlowers();
                     return
@@ -90,6 +94,7 @@ class IsolatorInfoUpdateSocket {
                             "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated.name,
                             "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated.username
                         }
+                    console.log('4444')
                         this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
                         return
                     }
@@ -109,6 +114,8 @@ class IsolatorInfoUpdateSocket {
                         "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated().name,
                         "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
                     }
+                    console.log('555')
+
                     console.log('pri to pub (address) emit modifyIsolatorInfo for room isolated-events: ', objToSocketEvent);
                     this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
                     return;
@@ -129,6 +136,8 @@ class IsolatorInfoUpdateSocket {
                         "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated().name,
                         "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated().username
                     }
+                    console.log('666')
+
                     console.log('pub to pri (address) emit modifyIsolatorInfo for room isolated-events: ', objToSocketEvent);
                     this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
                 }
@@ -152,6 +161,8 @@ class IsolatorInfoUpdateSocket {
             "name": this.newData.name || this.currData.UserToIsolated.name,
             "phone": this.newData.username || this.currData.UserToIsolated.username
         }
+        console.log('777')
+
         console.log("emit modifyIsolatorInfo in room isolated-events ", objToSocketEvent);
         this.Modal.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent)
     }
@@ -169,6 +180,8 @@ class IsolatorInfoUpdateSocket {
             "name": this.newData.name ? this.newData.name : this.currData.UserToIsolated.name,
             "phone": this.newData.username ? this.newData.username : this.currData.UserToIsolated.username
         }
+        console.log('888')
+
         this.Modal.app.io.to('isolated-events').emit('newIsolator', objToSocketEvent)
     }
 

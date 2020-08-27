@@ -63,6 +63,7 @@ const SBHomePage = (props) => {
         setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
     }
     const updateReqData = (newReqData) => {
+        console.log('myMeetings before', meetingsReqs)
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
                 if (newReqData.oldMeetingId) {
@@ -73,6 +74,8 @@ const SBHomePage = (props) => {
 
             })
         )
+        console.log('myMeetings after', meetingsReqs)
+
     }
 
     const fetchAndSetData = async () => {
