@@ -429,12 +429,10 @@ module.exports = function (CustomUser) {
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
                 let currInfo = isolatedInfo;
                 currInfo.UserInfo = resCustomUser;
-                // console.log('currInfo: ', currInfo)
-                // console.log('isolatedInfo: ', isolatedInfo);
                 isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
 
                 //if the user changed his address and he has a public meeting
-                if ((data.public_meeting && (data.public_meeting == undefined || data.public_meeting == null) && isolatedInfo.public_meeting) && data.address) {
+                if (((data.public_meeting == undefined || data.public_meeting == null) && isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
@@ -484,13 +482,14 @@ module.exports = function (CustomUser) {
                         meetingChanged = true;
                     }
                 }
+                console.log('pubMeetId', pubMeetId)
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
-                // console.log('newIsoData: ', newIsoData);
+                console.log('newIsoDataaaaaaa', newIsoData)
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
