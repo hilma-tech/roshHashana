@@ -38,6 +38,10 @@ const SBHomePage = (props) => {
     useOn("newIsolator", (req) => {
         addNewReq(req)
     });
+    useOn('modifyIsolatorInfo', (newReq) => {
+        console.log('s: newReq: ', newReq);
+        updateReqData(newReq)
+    })
 
     useEffect(() => {
         (async () => {
@@ -60,7 +64,24 @@ const SBHomePage = (props) => {
     }
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
-            reqs.map((req) => req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting ? newReqData : req)
+            reqs.map((req) => {
+                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null) {
+                    return (req.meetingId == newReqData.oldMeetingId
+                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
+                }
+                else if (newReqData.oldMeetingId !== null) {
+                    return (req.meetingId == newReqData.oldMeetingId
+                        && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
+                }
+                else if (newReqData.oldIsPublicMeeting !== null) {
+                    return (req.meetingId == newReqData.meetingId
+                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
+                }
+                else {
+                    return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
+                }
+
+            })
         )
     }
 

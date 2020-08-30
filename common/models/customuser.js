@@ -6,6 +6,7 @@ const randomstring = require("randomstring");
 let sendMsg = require('../../server/sendSms/SendSms.js');
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
+const IsolatorInfoUpdateSocket = require('../../server/common/socket/isolatedInfoUpdates');
 const to = require('../../server/common/to');
 const { default: Axios } = require('axios');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
@@ -297,7 +298,7 @@ module.exports = function (CustomUser) {
                 if (isolated.blowerMeetingId) {
                     if (!isolated.public_meeting) { // isoalted with private meeting
                         let blowerName = await CustomUser.findOne({ where: { id: isolated.blowerMeetingId }, fields: { name: true } });
-                        userInfo.blowerName = blowerName.name;
+                        userInfo.blowerName = blowerName && blowerName.name;
                     }
                     else { // isolated with public meeting
                         let meetingInfo = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { id: isolated.blowerMeetingId }, include: ["blowerPublic"] });
@@ -414,19 +415,30 @@ module.exports = function (CustomUser) {
             }
 
             if (Object.keys(userData).length) {
-                let resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+                let resCustomUser
+                try {
+                    resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+                } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
             }
+            //end update Custom User table
             if (role === 1) {
-                //isolated
+                let isolatedUpdateSocket = new IsolatorInfoUpdateSocket(CustomUser)
+                //isolator
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
+                console.log('isolatedInfo: ', isolatedInfo);
+                isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
+
                 //if the user changed his address and he has a public meeting
                 if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
-                    if (canEditPubMeeting) pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
+                    if (canEditPubMeeting) {
+                        pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
+                        isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
+                    }
                     //we can not update the meeting so create a new meeting with the new address
                     else {
                         let meetData = {}
@@ -437,11 +449,12 @@ module.exports = function (CustomUser) {
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                            isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
                             meetingChanged = true;
                         }
                     }
                 }
-                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {
+                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
                     else {
@@ -454,6 +467,7 @@ module.exports = function (CustomUser) {
 
                     if (Object.keys(meetData).length) {
                         pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                        isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
                         meetingChanged = true;
                     }
                 }
@@ -463,6 +477,7 @@ module.exports = function (CustomUser) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
+                        pubMeetId = null;
                         meetingChanged = true;
                     }
                 }
@@ -470,12 +485,22 @@ module.exports = function (CustomUser) {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
-                    blowerMeetingId: (pubMeetId && typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId
+                    blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
+                console.log('newIsoData: ', newIsoData);
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
                 }
+                try {
+                    if (Array.isArray(data.address) && data.address[1] && data.address[1].lng && data.address[1].lat) {
+                        data.lng = data.address[1].lng
+                        data.lat = data.address[1].lat
+                        data.address = data.address[0]
+                    }
+                    await isolatedUpdateSocket.handleIsolatorUpdateInfo(data); //socket
+                } catch (e) { console.log("socket error ", e); }
+
             }
             else if (role === 2) {
                 //shofar blower

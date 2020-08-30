@@ -37,15 +37,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      #shivuki-credit {
-         margin-top: 2%;
+      #shivuki-credit,
+      #contact-us {
+         margin-top: 1%;
          float: left;
-         color: black;
-         filter: drop-shadow(20px 4px 6px white);
+         font-weight: bold;
+         color: white;
+         text-shadow: 1px 0.5px #f7f7f75e;
       }
    }
    #text1 {
-      font-size: 5vh;
+      font-size: 4vh;
       margin-top: 1%;
       font-weight: bold;
    }
@@ -68,7 +70,7 @@
    .browserButtonForRegister {
       margin-top: 3%;
       .browserRegisterIsolator {
-         padding: 2% 3%;
+         padding: 2% 8%;
          font-size: 3vh;
          font-weight: bold;
          background-color: #ffa62b;
@@ -78,7 +80,7 @@
       }
       .browserRegisterBlower {
          margin: 0 2vw;
-         padding: 2% 6%;
+         padding: 2% 10%;
          color: white;
          border: none;
          font-size: 3vh;

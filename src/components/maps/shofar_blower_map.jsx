@@ -9,7 +9,7 @@ import { MainContext } from '../../ctx/MainContext';
 
 import { SBMapComponent } from './sb_map_renderer'
 
-import { dateWTimeFormatChange, splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
+import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
@@ -147,7 +147,7 @@ const ShofarBlowerMap = (props) => {
                 if (!isConstMeeting) { myRouteCnt++ }
                 locObj = {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
-                    startTime: myStartT && myStartT.startTime || myMeeting.startTime,
+                    startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
                     isPublicMeeting: myMeeting.isPublicMeeting,
                     constMeeting: myMeeting.constMeeting,

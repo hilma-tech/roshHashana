@@ -255,14 +255,14 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
             <div id="assign-x-btn-cont" style={{ margin: isBrowser ? "6% 0" : "3% 0" }} >
-                <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
+                <img alt="" src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
             </div>
 
             <div className="assign-title-container" style={{ marginBottom: isBrowser ? "6%" : "3%", marginTop: isBrowser ? "3%" : "3%" }} >
                 <div id="assign-title" style={{ marginBottom: isBrowser ? "10%" : "5%" }} className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
-                    <img id="assign-icon" src={iconSrc} />
+                    <img alt="" id="assign-icon" src={iconSrc} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
