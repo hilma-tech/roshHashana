@@ -146,7 +146,8 @@
                 "countAllVolunteers",
                 "getShofarBlowersForAdmin",
                 "confirmShofarBlower",
-                "deleteShofarBlowerAdmin"
+                "deleteShofarBlowerAdmin",
+                "InsertDataShofarBlowerAdmin"
             ]
         }
     ]
