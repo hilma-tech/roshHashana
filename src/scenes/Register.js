@@ -150,7 +150,6 @@ class Register extends React.Component {
       if (err) {
         console.log("ERR", err);
         this.context.openGenAlert({ text: err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
-
       }
       if (res) {
         this.setState({ sendKey: true })

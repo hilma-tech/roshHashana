@@ -66,7 +66,7 @@ const IsolatedPage = function (props) {
                 <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                 <div style={{ display: 'flex' }}>
                     <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
-                    <div style={{ margin: '0 2vw' }}></div>
+                    <div style={{ margin: '0 1vw' }}></div>
                     <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                 </div>
                 <div className='statusNavContainer'>

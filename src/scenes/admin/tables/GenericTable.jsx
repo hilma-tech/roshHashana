@@ -23,14 +23,12 @@ const GenericTable = (props) => {
     }, [props.tr])
 
     const prevPageClicked = () => {
-        console.log("prev")
         if (1 === page) return
         props.prevPage()
         setPage(prev => prev--)
     }
 
     const nextPageClicked = () => {
-        console.log("nextPage")
         if (Math.ceil(props.resaultsNum / props.columnNum) === page) return
         props.nextPage()
         setPage(prev => prev++)
@@ -41,7 +39,7 @@ const GenericTable = (props) => {
             <table className="allTableStyle">
                 <thead>
                     {props.th ? <tr className="tableHead">
-                        {props.th.map((i, index) => <th key={index}>{i[1]}</th>)}
+                        {props.th.map((i, index) => i ? <th key={index}>{i[1]}</th> : null)}
                     </tr> : null}
                 </thead>
                 <tbody>
@@ -65,7 +63,7 @@ const GenericTable = (props) => {
 
                             tr.map((td, i) =>
                                 <tr key={i} className="tableBodyStyle">
-                                    {td.map((j, index) => <td key={index} className={props.th ? props.th[index][0] : ''}>{j}</td>)}
+                                    {td.map((j, index) => <td key={index} className={props.th ? props.th[index] && props.th[index][0] : ''}>{j}</td>)}
                                 </tr>
                             )
                         )
@@ -75,8 +73,8 @@ const GenericTable = (props) => {
             {props.navigation &&
                 <div>
                     <div className='tableNavigation'>
-                        <FontAwesomeIcon icon={['fas', "chevron-right"]} className={'navArrow' + (Math.ceil(props.resaultsNum / props.columnNum) === page ? ' disabledNavArrow' : '')} onClick={prevPageClicked}  />
-                        <div>עמוד {page} מתוך {Math.ceil(props.resaultsNum / props.columnNum)}</div>
+                        <FontAwesomeIcon icon={['fas', "chevron-right"]} className={'navArrow' + ((Math.ceil(props.resaultsNum / props.columnNum) === 0 ? 1 : Math.ceil(props.resaultsNum / props.columnNum)) === page ? ' disabledNavArrow' : '')} onClick={prevPageClicked} />
+                        <div>עמוד {page} מתוך {Math.ceil(props.resaultsNum / props.columnNum) === 0 ? 1 : Math.ceil(props.resaultsNum / props.columnNum)}</div>
                         <FontAwesomeIcon icon={['fas', "chevron-left"]} className={'navArrow' + (page === 1 ? ' disabledNavArrow' : '')} onClick={nextPageClicked} />
                     </div>
                 </div>

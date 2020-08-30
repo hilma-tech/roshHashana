@@ -48,8 +48,8 @@ const SideNavBar = (props) => {
         <SwipeableDrawer
             anchor="right"
             open={isOpenSideBar}
-        // onClose={props.toggleDrawer(false)}
-        // onOpen={props.toggleDrawer(true)}
+            onClose={() => { }}
+            onOpen={() => { }}
         >
             <div
                 className="outerSidebarContainer"

@@ -62,14 +62,14 @@ const BlastsPage = (props) => {
 
 
     return (
-        <div >
+        <div>
             <TopNavBar />
             <div className="BlastsPage">
                 <div className="width75">
                     <div className="textHead bold">תקיעות</div>
                     <div style={{ display: 'flex' }}>
-                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם תוקע' />
-                        <div style={{ margin: '0 2vw' }}></div>
+                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                        <div style={{ margin: '0 1vw' }}></div>
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
                     {/* <div className="overallNum">{pubMeetingsNum} תוצאות</div> */}

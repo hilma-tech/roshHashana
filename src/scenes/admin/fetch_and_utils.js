@@ -141,6 +141,21 @@ export const getParticipantsMeeting = async (id, cb = () => { }) => {
     }
 }
 
+export const setConfirmShofarBlower = async (id, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/confirmShofarBlower`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
 export const deleteConectionToMeeting = async (id, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/deleteConectionToMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -153,5 +168,20 @@ export const deleteConectionToMeeting = async (id, cb = () => { }) => {
     }
     else {
         return cb(null, res)
+    }
+}
+
+export const deleteShofarBlower = async (id, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteShofarBlowerAdmin`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, true)
     }
 }

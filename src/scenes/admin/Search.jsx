@@ -25,13 +25,12 @@ const Search = (props) => {
         else delayTime = setTimeout(() => props.onSearch(searchValue), 300)
     }, [searchValue])
 
-    // call
 
     return (
         <div className='inputContainer'>
             <input
                 placeholder={props.placeholder}
-                value={searchValue || ''}
+                value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
             />
             {!searchValue || searchValue.length === 0 ?

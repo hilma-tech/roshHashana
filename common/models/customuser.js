@@ -332,7 +332,7 @@ module.exports = function (CustomUser) {
             }
             else {
                 //general user
-                const genUserQ = ` SELECT
+                const genUserQ = `SELECT
                         shofar_blower_pub.address,
                         shofar_blower_pub.comments,
                         shofar_blower_pub.lng,

@@ -76,7 +76,8 @@
                 }
             }
         }
-        input[type="text"],
+        input[type="text"], 
+        input[type="tel"],
         .autocompleteInput,
         input[type="number"] {
             @include input();
@@ -345,4 +346,8 @@ div#isolated-form-container.change-color {
     #isolated-form-container .form-container {
         padding-top: 5%;
     }
+}
+
+.MuiInput-underline:after{
+    border-bottom: none !important;
 }
