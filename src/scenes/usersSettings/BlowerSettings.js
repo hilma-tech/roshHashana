@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Fragment, useContext } from 'react';
+import React, { useEffect, useState, Fragment, useContext } from 'react';
 import { FormSearchBoxGenerator } from '../../components/maps/search_box_generator';
 import SettingsLayout from '../../components/settingsLayout/SettingsLayout';
 import AddPublicPlace from '../../components/addPublicPlace/AddPublicPlace';
@@ -217,13 +217,16 @@ const IsolatedSettings = (props) => {
 
         setErrs({}); //all
 
-        //update isolated details
+        //update blower details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "PUT",
             body: JSON.stringify({ data: updateData })
         }, true);
-        if (res) {
+        if (err || !res) {
+            openGenAlert({ text: err && err.error && err.error.message === "PHONE_EXISTS" ? "מספר הטלפון בשימוש" : "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
+        }
+        else {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
                 setVals(originalVals)
@@ -237,9 +240,6 @@ const IsolatedSettings = (props) => {
                     if (res)
                         props.history.goBack();
                 })
-        }
-        if (err) {
-            openGenAlert({ text: "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
         }
     }
 
@@ -287,7 +287,7 @@ const IsolatedSettings = (props) => {
 
                     <div className="header">כמה פעמים תוכל לתקוע?</div>
                     <input id="blowingTimes" type="number" value={vals.can_blow_x_times || ""} maxLength={2} onChange={(e) => setValues(e.target.value, 'can_blow_x_times')} disabled={disableEdit} />
-                    <div className="err-msg">{errs && errs.can_blow_x_times || ""}</div>
+                    <div className="err-msg">{(errs && errs.can_blow_x_times) || ""}</div>
 
                     <div style={{ marginTop: "5%" }} className="header">שעת יציאה</div>
                     <ThemeProvider theme={materialTheme}>

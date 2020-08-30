@@ -3,17 +3,15 @@ import React from 'react';
 import Auth from "../modules/auth/Auth";
 import './Register.scss';
 import { isBrowser } from "react-device-detect";
-import { MainContext } from '../ctx/MainContext'
-import { CONSTS } from '../const_messages'
-
-import GeneralAlert from '../components/modals/general_alert'
-
+import { CONSTS } from '../consts/const_messages';
+import { MainContext } from '../ctx/MainContext';
+import GeneralAlert from '../components/modals/general_alert';
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
 
 class Register extends React.Component {
-  static contextType = MainContext
+  static contextType = MainContext;
   constructor(props) {
     super(props);
     this.state = {
@@ -115,13 +113,11 @@ class Register extends React.Component {
 
             break;
           case "isolated with new public meeting":
-            //TODO להודיע לו שהוא נרשם 
             this.props.history.push('/', { meetingInfo: this.props.location.state.meetingInfo, name: res.data.name });
 
 
             break;
           case "isolated with public meeting":
-            //TODO להכניס אותו שוב לאיפה שהוא נירשם
             this.props.history.push('/', { meetingInfo: res.data.meetingInfo, name: res.data.name });
 
 
@@ -169,7 +165,9 @@ class Register extends React.Component {
   }
 
   render() {
-    if (!this.props.location || !this.props.location.state) this.props.history.push("/");
+    const { showAlert } = this.context;
+    if (!this.props.location || !this.props.location.state) this.props.history.push("/")
+
     return (
       <div className={`${isBrowser ? "browserRegisterPage" : "mobileRegisterPage"} fade-in`} style={{ display: this.state.imgLoadedNum !== 0 ? 'block' : 'none' }}  >
         {this.state.status === "start" ?
@@ -212,8 +210,7 @@ class Register extends React.Component {
               </div>
             </div></>}
         {/* </div> */}
-        {this.context.showAlert && this.context.showAlert.text ? <GeneralAlert text={this.context.showAlert.text} warning={this.context.showAlert.warning} isPopup={this.context.showAlert.isPopup} noTimeout={this.context.showAlert.noTimeout} /> : null}
-
+        {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
       </div>
     );
   }

@@ -5,6 +5,8 @@ import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import { MainContext } from '../../ctx/MainContext';
 import GeneralAlert from '../../components/modals/general_alert'
+import { CONSTS } from '../../consts/const_messages';
+import { checkDateBlock } from '../../fetch_and_utils';
 import './MainPage.scss';
 
 const GeneralUserPage = (props) => {
@@ -21,37 +23,33 @@ const GeneralUserPage = (props) => {
                 openGenAlert({ text: "כבר נרשמת לתקיעה ציבורית, אינך יכול להירשם לתקיעה נוספת", isPopup: { okayText: "סגור" } })
                 sessionStorage.setItem("dontShowPopup", true)
             }
-            if (props.location && props.location.state && props.location.state.name && props.location.state.meetingInfo) {
-                if (props.location.state.name) {
-                    setName(props.location.state.name);
+            if (!userInfo) {
+                let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                }, true);
+                if (err || !res) {
+                    openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
                 }
-                if (props.location.state.meetingInfo) {
-                    setShofarBlowerName(props.location.state.meetingInfo.blowerName);
-                    setAddress(`${props.location.state.meetingInfo.address}, ${props.location.state.meetingInfo.comments ? props.location.state.meetingInfo.comments : ''}`);
-                    setTime(`${props.location.state.meetingInfo.start_time ? moment(props.location.state.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
-                }
-            } else {
-                if (!userInfo) {
-                    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getUserInfo`, {
-                        headers: { Accept: "application/json", "Content-Type": "application/json" },
-                    }, true);
-                    if (err || !res) {
-                        openGenAlert({ text: err === "NO_INTERNET" ? "אינך מחובר לאינטרנט, לא ניתן להציג את המידע כרגע" : "אירעה שגיאה, נא נסו שנית מאוחר יותר" })
-                    }
-                    else {
+                else {
+                    if (res === "NO_MEETING_DELETE_USER") {
+                        openGenAlert({ text: "בעל התוקע של פגישה זו מחק את הפגישה, אם ברצונך להשתתף בפגישה נוספת תוכל לעשות זאת במפה הכללית כמשתמש חדש", isPopup: { okayText: "הבנתי, התנתק" } }, () => {
+                            Auth.logout()
+                        })
+                        return;
+                    } else {
                         setUserInfo(res)
                         setName(res.name);
                         setShofarBlowerName(res.meetingInfo.blowerName);
                         setAddress(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`);
                         setTime(`${res.meetingInfo.start_time ? moment(res.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                     }
-                } else {
-                    setName(userInfo.name);
-                    if (userInfo.meetingInfo) {
-                        setShofarBlowerName(userInfo.meetingInfo.blowerName);
-                        setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
-                        setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
-                    }
+                }
+            } else {
+                setName(userInfo.name);
+                if (userInfo.meetingInfo) {
+                    setShofarBlowerName(userInfo.meetingInfo.blowerName);
+                    setAddress(`${userInfo.meetingInfo.address}, ${userInfo.meetingInfo.comments ? userInfo.meetingInfo.comments : ''}`);
+                    setTime(`${userInfo.meetingInfo.start_time ? moment(userInfo.meetingInfo.start_time).format("HH:mm") : 'לא נקבעה עדיין שעה'}`);
                 }
             }
         })()

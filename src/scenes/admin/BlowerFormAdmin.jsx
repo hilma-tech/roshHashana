@@ -232,22 +232,24 @@ export default class BlowerFormAdmin extends Component {
         }, true);
         if (duErr || !cuRes) {
             return duErr === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר"
-        } else {
-            this.props.history.goBack()
         }
 
+        blowerDetails.userId = cuRes.id
         //update shofar blower details
-        updateSBDetails(blowerDetails, (error) => {
-            if (!error) {
-                this.props.history.push('/')
-            }
-            else if (error === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר לעדכן את הפרטים' });
-            }
-            else {
-                this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
-            }
-        })
+        let [res, error] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlowerAdmin`, {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ data: blowerDetails })
+        }, true);
+        if (!error) {
+            this.props.history.goBack()
+        }
+        else if (error === CONSTS.CURRENTLY_BLOCKED_ERR) {
+            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר לעדכן את הפרטים' });
+        }
+        else {
+            this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
+        }
     }
 
     render() {

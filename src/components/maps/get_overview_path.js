@@ -14,7 +14,7 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
         console.log("no_stops_or_destination", origin, stops);
         return [true];
     }
-    const travelMode = google.maps && google.maps.TravelMode && google.maps.TravelMode.WALKING || 'WALKING'
+    const travelMode = (google.maps && google.maps.TravelMode && google.maps.TravelMode.WALKING) || 'WALKING'
     try {
         origin = { lng: Number(origin.lng), lat: Number(origin.lat) }
     }
@@ -48,7 +48,7 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
             waypoints,
             destination: destination,
             optimizeWaypoints: false,
-            language:"iw"
+            language: "iw"
         }, (result, status) => {
             if (status !== google.maps.DirectionsStatus.OK) {
                 resolve(["אירעה שגיאה בטעינת המפה, עמכם הסליחה"])

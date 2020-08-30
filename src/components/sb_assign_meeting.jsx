@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { isBrowser } from 'react-device-detect';
 
 import moment from 'moment'
@@ -139,8 +139,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //format
         let newTT = data.newTotalTime;
         try {
-            newTT = moment(Number(data.newTotalTime)).format("mm.ss")
-        } catch (e) { newTT = Number(data.newTotalTime) / 60000 }
+            newTT = Number(newTT) / 60000
+            let newTTSplit = newTT.toString().split(".")
+            newTT = `${newTTSplit[0]}.${newTTSplit[1].substring(0, 2).padEnd(2, 0)}`
+        } catch (e) { newTT = Number(newTT) / 60000 }
 
         let maxDur = data.maxRouteDuration
         try {
@@ -195,40 +197,43 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
 
 
-    const deleteMeeting = async () => {
+    const deleteMeeting = () => {
         if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה", block: true });
             return;
         }
 
-        let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ meetToDelete: assignMeetingInfo })
-        });
-        if (err || !res) { //open alert of something went wrong
-            openGenAlert({ text: "אירעה שגיאהת אנא נסו שנית מאוחר יותר" })
-        }
-        if (res) {
-            if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
-                return;
-            }
-            openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-            setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
-            setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
-
-            if (genMapMeetings) {
-                if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
-                    setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+        openGenAlert({ text: `האם את/ה בטוח/ה שברצונך למחוק פגישה זו ממסלולך? ${assignMeetingInfo && assignMeetingInfo.signedCount ? `ישנם ${assignMeetingInfo.signedCount} המחובר/ים לפגישה` : ""}`, isPopup: { okayText: "מחק", cancelText: "בטל, השאר את התקיעה" } },
+            async del => {
+                if (!del) return;
+                let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    method: "POST",
+                    body: JSON.stringify({ meetToDelete: assignMeetingInfo })
+                });
+                if (err || !res) { //open alert of something went wrong
+                    openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })
                 }
-                else if (Array.isArray(genMapMeetings.privateMeetings)) {
-                    setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
-                }
-            }
+                if (res) {
+                    if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                        openGenAlert({ text: "מועד התקיעה מתקרב, לא ניתן יותר למחוק את הפגישה" })
+                        return;
+                    }
+                    openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
+                    setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
+                    setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
 
-            handleAssignment('close');
-        }
+                    if (genMapMeetings) {
+                        if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
+                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                        }
+                        else if (Array.isArray(genMapMeetings.privateMeetings)) {
+                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
+                        }
+                    }
+                    handleAssignment('close');
+                }
+            })
     }
 
     let iconSrc;
@@ -250,20 +255,20 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         <div className={`${isBrowser ? "sb-assign-container" : "sb-assign-mobile-container"} ${openAssign ? "open-animation" : "close-animation"}`} id="sb-assign-container" >
 
             <div id="assign-x-btn-cont" style={{ margin: isBrowser ? "6% 0" : "3% 0" }} >
-                <img src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
+                <img alt="" src="/icons/close.svg" id="assign-x-btn" onClick={() => { handleAssignment("close") }} />
             </div>
 
             <div className="assign-title-container" style={{ marginBottom: isBrowser ? "6%" : "3%", marginTop: isBrowser ? "3%" : "3%" }} >
                 <div id="assign-title" style={{ marginBottom: isBrowser ? "10%" : "5%" }} className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
 
                 <div id="assign-icon-and-text-cont" className="width100" >
-                    <img id="assign-icon" src={iconSrc} />
+                    <img alt="" id="assign-icon" src={iconSrc} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
             </div>
 
-            <div style={{ margin: isBrowser ? "20% 0" : "2% 0" }} className="sb-assign-content-container">
+            <div style={{ margin: isBrowser ? "10% 0" : "2% 0" }} className="sb-assign-content-container">
                 <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
                 {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>

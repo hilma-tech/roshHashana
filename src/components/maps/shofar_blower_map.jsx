@@ -9,7 +9,7 @@ import { MainContext } from '../../ctx/MainContext';
 
 import { SBMapComponent } from './sb_map_renderer'
 
-import { dateWTimeFormatChange, splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
+import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
 
 
@@ -32,6 +32,7 @@ const ShofarBlowerMap = (props) => {
         setAssignMeetingInfo,
         startTimes,
         setIsInRoute,
+        isPrint,
     } = useContext(SBContext)
 
 
@@ -146,7 +147,7 @@ const ShofarBlowerMap = (props) => {
                 if (!isConstMeeting) { myRouteCnt++ }
                 locObj = {
                     location: { lat: myMeeting.lat, lng: myMeeting.lng },
-                    startTime: myStartT && myStartT.startTime || myMeeting.startTime,
+                    startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
                     meetingId: myMeeting.meetingId,
                     isPublicMeeting: myMeeting.isPublicMeeting,
                     constMeeting: myMeeting.constMeeting,
@@ -230,8 +231,9 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"}`} id="sb-map-container">
+        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`} id="sb-map-container">
             <SBMapComponent
+                location={props.location}
                 changeCenter={setCenter}
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
