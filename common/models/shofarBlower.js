@@ -154,11 +154,19 @@ module.exports = function (ShofarBlower) {
                 let where = ''
 
                 if (filter.confirm) {
-                    where = 'WHERE sb.confirm = 1'
+                    where = 'WHERE (sb.confirm = 1)'
                 }
                 else {
-                    where = 'WHERE sb.confirm = 0'
+                    where = 'WHERE (sb.confirm = 0)'
                 }
+
+                if (filter.address && filter.address.length > 0) {
+                    where += ` AND (MATCH(cu.address) AGAINST ('${filter.address}')) `
+                }
+                if (filter.name && filter.name.length > 0) {
+                    where += ` AND (MATCH(cu.name) AGAINST ('${filter.name}'))`
+                }
+
                 const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
                     (SELECT COUNT(*) 
                     FROM shofar_blower_pub
@@ -174,7 +182,7 @@ module.exports = function (ShofarBlower) {
                 ${where}
                 ORDER BY cu.name
                 LIMIT 0, 20`
-
+                
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM shofar_blower AS sb
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id

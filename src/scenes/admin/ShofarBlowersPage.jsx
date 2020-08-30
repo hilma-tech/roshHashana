@@ -15,10 +15,7 @@ const ShofarBlowerPage = function (props) {
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
-        (async () => {
-            setLoading(true)
-            getShofarBlowers()
-        })()
+        getShofarBlowers()
     }, [])
 
     const getShofarBlowers = function (filter = {}, limit = { start: 0, end: 10 }) {
@@ -26,6 +23,7 @@ const ShofarBlowerPage = function (props) {
             if (!filter) filter = {}
             if (status === 0) filter.confirm = false
             else if (status === 1) filter.confirm = true
+            setLoading(true)
             await fetchShofarBlowers(limit, filter, (err, res) => {
                 setLoading(false)
                 if (!err) {
