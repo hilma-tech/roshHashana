@@ -363,6 +363,66 @@ module.exports = function (Isolated) {
         returns: { arg: 'res', type: 'number', root: true }
     });
 
+
+    Isolated.getPrivateMeetings = function (limit, filter, cb) {
+        (async () => {
+
+            let where = 'WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1'
+            if (filter.address && filter.address.length > 0) {
+                where += ` AND MATCH(isolatedUser.address) AGAINST ('"${filter.address}"')`
+            }
+            if (filter.name && filter.name.length > 0) {
+                where += ` AND MATCH(isolatedUser.name) AGAINST ('"${filter.name}"')`
+                // where += ` OR MATCH(blowerUser.name) AGAINST ('"${filter.address}"')`
+            }
+
+            let [err, res] = await executeMySqlQuery(Isolated,
+                `SELECT 
+                isolatedUser.name AS "isolatedName",
+                isolatedUser.username AS "isolatedphone", 
+                isolatedUser.address,
+                isolatedUser.comments,
+                blowerUser.name AS "blowerName",
+                blowerUser.username AS "blowerPhone",
+                isolated.id AS "id",
+                isolated.meeting_time AS "start_time" 
+            FROM isolated 
+                LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                ${where}
+                LIMIT ${limit.start}, ${limit.end}`
+            );
+            if (err) cb(err);
+            if (res) {
+                let [err1, res1] = await executeMySqlQuery(Isolated,
+                    `SELECT COUNT(*) as resNum                    
+                    FROM isolated
+                    LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                    ${where}`
+                );
+                if (err1) cb(err1);
+                if (res1) {
+                    return cb(null,
+                        {
+                            privateMeetings: res,
+                            num: res1[0].resNum
+                        });
+                }
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getPrivateMeetings', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'object' },
+        ], returns: { arg: 'res', type: 'number', root: true }
+    });
+
     Isolated.getParticipantsMeeting = function (id, cb) {
         (async () => {
             let [err, res] = await executeMySqlQuery(Isolated,

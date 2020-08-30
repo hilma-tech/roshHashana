@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import ParticipantsPopup from "./popups/ParticipantsPopup"
-import { getTime, getParticipantsMeeting, deletePublicMeeting } from './fetch_and_utils';
+import { getTime, getParticipantsMeeting, deletePublicMeeting, deleteConectionToMeeting } from './fetch_and_utils';
 import './styles/blastInfo.scss'
 
 
@@ -12,7 +12,10 @@ const BlastInfo = (props) => {
 
     const handleTrashClick = (id) => {
         (async () => {
-            await deletePublicMeeting(id, (err, res) => {
+            // await deletePublicMeeting(id, (err, res) => {
+            //     console.log(err, res)
+            // })
+            await deleteConectionToMeeting(id, (err, res) => {
                 console.log(err, res)
             })
         })()
@@ -81,9 +84,9 @@ const BlastInfo = (props) => {
                         <div className="bottomToList pointer" onClick={() => { handleParticipantsClick(blastInfo.id) }}>רשימת המשתתפים</div>
                     </div>
                 </div>}
-                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer" onClick={() => { handleTrashClick(blastInfo.id) }}>
+                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer deleteMeeting" onClick={() => { handleTrashClick(blastInfo.id) }}>
                     <div className="width25" style={{ fontSize: "1.7vh" }}>
-                        <FontAwesomeIcon icon={['fas', 'trash']} color='#156879' />
+                        <FontAwesomeIcon icon={['fas', 'trash']} />
                     </div>
                     <div className="width75">
                         <div className="info">מחק מפגש תקיעה בשופר</div>

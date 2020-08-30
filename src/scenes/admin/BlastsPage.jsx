@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import { fetchBlastsPub } from './fetch_and_utils';
-import BlastsTable from './tables/BlastsTable';
+import { fetchBlastsPub, fetchBlastsPrivate } from './fetch_and_utils';
+import BlastsPubTable from './tables/BlastsPubTable';
+import BlastsPrivateTable from './tables/BlastsPrivateTable';
 import BlastInfo from "./BlastInfo"
 import TopNavBar from "./TopNavBar"
 import Search from './Search';
@@ -12,8 +13,9 @@ let status = 0
 
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, pubMeetingsNum } = useContext(AdminMainContext)
+    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, privateMeetingsNum, pubMeetingsNum, setPrivateMeetingsNum, setBlastsPrivate, setLoadingBlastsPrivate } = useContext(AdminMainContext)
     const [filters, setFilters] = useState(null)
+    const [isPublic, setPublic] = useState(true)
 
     const getBlastsPub = function (filter = {}, limit = { start: 0, end: 10 }) {
         (async () => {
@@ -30,12 +32,28 @@ const BlastsPage = (props) => {
         })()
     }
 
+    const getBlastsPrivate = function (filter = {}, limit = { start: 0, end: 10 }) {
+        (async () => {
+            if (!filter) filter = {}
+            setLoadingBlastsPrivate(true)
+            await fetchBlastsPrivate(limit, filter, (err, res) => {
+                console.log("!!!!", err, res)
+                setLoadingBlastsPrivate(false)
+                if (!err) {
+                    setBlastsPrivate(res.privateMeetings)
+                    setPrivateMeetingsNum(res.num)
+                }
+            })
+        })()
+    }
+
     const onSearchName = function (value) {
         setFilters(pervFilters => {
             if (!pervFilters) pervFilters = {}
             pervFilters.name = value
             return pervFilters
         })
+        getBlastsPrivate(filters)
         getBlastsPub(filters)
     }
 
@@ -45,19 +63,19 @@ const BlastsPage = (props) => {
             pervFilters.address = value
             return pervFilters
         })
+        getBlastsPrivate(filters)
         getBlastsPub(filters)
     }
 
     useEffect(() => {
         (async () => {
             getBlastsPub()
+            getBlastsPrivate()
         })()
     }, [])
 
-    const statusCliked = function (s) {
-        if (status === s) return
-        status = s
-        // getIsolateds(filters)
+    const statusCliked = function (val) {
+        setPublic(val)
     }
 
 
@@ -72,14 +90,13 @@ const BlastsPage = (props) => {
                         <div style={{ margin: '0 1vw' }}></div>
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
-                    {/* <div className="overallNum">{pubMeetingsNum} תוצאות</div> */}
                     <div className='statusNavContainer'>
-                        <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
+                        <div className={'orangeSubTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
                         <div style={{ width: '3.5vw' }}></div>
-                        <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
-                        <div className='blueSubTitle resultNum bold'>{`סה"כ ${pubMeetingsNum} תוצאות`}</div>
+                        <div className={'orangeSubTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
+                        <div className='blueSubTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
                     </div>
-                    <BlastsTable />
+                    {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable />}
                 </div>
                 {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}
             </div>
