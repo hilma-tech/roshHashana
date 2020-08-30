@@ -67,8 +67,16 @@ module.exports = function (shofarBlowerPub) {
         else return false;
     }
 
-    shofarBlowerPub.getPublicMeetings = function (limit, cb) {
+    shofarBlowerPub.getPublicMeetings = function (limit, filter, cb) {
         (async () => {
+            let where = 'WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1'
+            if (filter.address && filter.address.length > 0) {
+                where += ` AND MATCH(shofar_blower_pub.address) AGAINST ('${filter.address}')`
+            }
+            if (filter.name && filter.name.length > 0) {
+                where += ` AND MATCH(blowerUser.name) AGAINST ('${filter.name}')`
+            }
+
             //get all public meetings
             let [errPublic, resPublic] = await executeMySqlQuery(shofarBlowerPub,
                 `SELECT
@@ -81,7 +89,7 @@ module.exports = function (shofarBlowerPub) {
                 FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1
+                ${where}
                 LIMIT ${limit.start}, ${limit.end}`); //confirm change
 
             if (errPublic) cb(errPublic);
@@ -109,7 +117,8 @@ module.exports = function (shofarBlowerPub) {
     shofarBlowerPub.remoteMethod('getPublicMeetings', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' }
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });

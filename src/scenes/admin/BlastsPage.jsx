@@ -8,32 +8,18 @@ import Search from './Search';
 import BlastInfoPrev from "./BlastInfoPrev"
 import './styles/blastsPage.scss'
 
+let status = 0
+
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, pubMeetingsNum  } = useContext(AdminMainContext)
+    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, pubMeetingsNum } = useContext(AdminMainContext)
+    const [filters, setFilters] = useState(null)
 
-    const onSearchName = (value) => {
-        // setFilters(pervFilters => {
-        //     if (!pervFilters) pervFilters = {}
-        //     pervFilters.name = value
-        //     return pervFilters
-        // })
-        // getIsolateds(filters)
-    }
-
-    const onSearchAddress = (value) => {
-        // setFilters(pervFilters => {
-        //     if (!pervFilters) pervFilters = {}
-        //     pervFilters.address = value
-        //     return pervFilters
-        // })
-        // getIsolateds(filters)
-    }
-
-    useEffect(() => {
+    const getBlastsPub = function (filter = {}, limit = { start: 0, end: 10 }) {
         (async () => {
+            if (!filter) filter = {}
             setLoadingBlastsPub(true)
-            await fetchBlastsPub({ start: 0, end: 10 }, '', (err, res) => {
+            await fetchBlastsPub(limit, filter, (err, res) => {
                 console.log(err, res)
                 setLoadingBlastsPub(false)
                 if (!err) {
@@ -42,7 +28,37 @@ const BlastsPage = (props) => {
                 }
             })
         })()
+    }
+
+    const onSearchName = function (value) {
+        setFilters(pervFilters => {
+            if (!pervFilters) pervFilters = {}
+            pervFilters.name = value
+            return pervFilters
+        })
+        getBlastsPub(filters)
+    }
+
+    const onSearchAddress = (value) => {
+        setFilters(pervFilters => {
+            if (!pervFilters) pervFilters = {}
+            pervFilters.address = value
+            return pervFilters
+        })
+        getBlastsPub(filters)
+    }
+
+    useEffect(() => {
+        (async () => {
+            getBlastsPub()
+        })()
     }, [])
+
+    const statusCliked = function (s) {
+        if (status === s) return
+        status = s
+        // getIsolateds(filters)
+    }
 
 
     return (
@@ -52,11 +68,17 @@ const BlastsPage = (props) => {
                 <div className="width75">
                     <div className="textHead bold">תקיעות</div>
                     <div style={{ display: 'flex' }}>
-                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם תוקע' />
                         <div style={{ margin: '0 2vw' }}></div>
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
-                    <div className="overallNum">{pubMeetingsNum} תוצאות</div>
+                    {/* <div className="overallNum">{pubMeetingsNum} תוצאות</div> */}
+                    <div className='statusNavContainer'>
+                        <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
+                        <div style={{ width: '3.5vw' }}></div>
+                        <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
+                        <div className='blueSubTitle resultNum bold'>{`סה"כ ${pubMeetingsNum} תוצאות`}</div>
+                    </div>
                     <BlastsTable />
                 </div>
                 {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}
