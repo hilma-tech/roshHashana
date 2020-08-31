@@ -316,7 +316,9 @@ module.exports = function (Isolated) {
             let [err, res] = await executeMySqlQuery(Isolated,
                 `SELECT COUNT(*) as resNum
                 FROM isolated
-                WHERE isolated.blowerMeetingId IS NULL;`);
+                    LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
+                WHERE (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NULL) 
+                    OR (isolated.public_meeting = 1 AND sbp.blowerId IS NULL)`);
             if (err) cb(err);
             if (res) {
                 return cb(null, res);
@@ -335,21 +337,18 @@ module.exports = function (Isolated) {
         (async () => {
             let [err, res] = await executeMySqlQuery(Isolated.app.models.shofarBlowerPub,
                 `SELECT  (	
-                    (
-                    SELECT COUNT(*) as resNum
+                    (SELECT COUNT(*) as resNum
                     FROM shofar_blower_pub
-                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
-                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                        LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                        LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                     WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1
                     )+(
                     SELECT COUNT(*)                     
                     FROM isolated
-                    WHERE 
-                    isolated.blowerMeetingId IS NOT NULL
-                    AND isolated.public_meeting = 0
-                    )
-                    ) 
-                    AS resNum;`);
+                    WHERE isolated.blowerMeetingId IS NOT NULL
+                        AND isolated.public_meeting = 0)
+                ) 
+                AS resNum`);
             if (err) cb(err);
             if (res) {
                 return cb(null, res[0].resNum);

@@ -77,7 +77,7 @@ export const deleteIsolated = async (id, cb = () => { }) => {
     }, true);
 
     if (err || !res) {
-        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נסו שנית מאוחר יותר")
     }
     else {
         return cb(null, true)
@@ -91,7 +91,7 @@ export const getNumVolunteers = async (cb = () => { }) => {
     }, true);
 
     if (err || !res) {
-        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נסו שנית מאוחר יותר")
     }
     else {
         return cb(null, res)
@@ -183,5 +183,20 @@ export const deleteShofarBlower = async (id, cb = () => { }) => {
     }
     else {
         return cb(null, true)
+    }
+}
+
+export const fetchShofarBlowersForMap = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/getShofarBlowersForMap`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({})
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
     }
 }

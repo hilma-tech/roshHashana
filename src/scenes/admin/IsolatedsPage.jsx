@@ -4,7 +4,6 @@ import { fetchIsolateds } from './fetch_and_utils';
 import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
-import './styles/generalAdminStyle.scss'
 
 let status = 0
 

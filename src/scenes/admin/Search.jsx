@@ -1,6 +1,5 @@
 import React, { useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import './styles/generalAdminStyle.scss'
 import { useState } from 'react';
 
 let delayTime = null

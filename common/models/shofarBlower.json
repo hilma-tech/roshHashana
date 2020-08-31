@@ -147,7 +147,8 @@
                 "getShofarBlowersForAdmin",
                 "confirmShofarBlower",
                 "deleteShofarBlowerAdmin",
-                "InsertDataShofarBlowerAdmin"
+                "InsertDataShofarBlowerAdmin",
+                "getShofarBlowersForMap"
             ]
         }
     ]

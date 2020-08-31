@@ -182,7 +182,7 @@ module.exports = function (ShofarBlower) {
                 ${where}
                 ORDER BY cu.name
                 LIMIT 0, 20`
-                
+
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM shofar_blower AS sb
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
@@ -343,6 +343,32 @@ module.exports = function (ShofarBlower) {
             { arg: 'data', type: 'object' },
             { arg: 'options', type: 'object', http: "optionsFromRequest" }
         ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    ShofarBlower.getShofarBlowersForMap = function (cb) {
+        (async () => {
+            try {
+                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng 
+                FROM shofar_blower AS sb 
+                LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
+                WHERE sb.confirm = 1
+                `
+                let [shofarBlowersErr, shofarBlowersRes] = await executeMySqlQuery(ShofarBlower, shofarBlowersQ);
+                if (shofarBlowersErr || !shofarBlowersRes) {
+                    console.log('get shofarBlower admin request error : ', shofarBlowersErr);
+                    throw shofarBlowerErr
+                }
+                return cb(null, shofarBlowersRes)
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('getShofarBlowersForMap', {
+        http: { verb: 'POST' },
+        accepts: [],
         returns: { arg: 'res', type: 'object', root: true }
     });
 }
