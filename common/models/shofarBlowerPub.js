@@ -71,10 +71,10 @@ module.exports = function (shofarBlowerPub) {
         (async () => {
             let where = 'WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1'
             if (filter.address && filter.address.length > 0) {
-                where += ` AND MATCH(shofar_blower_pub.address) AGAINST ('${filter.address}')`
+                where += ` AND MATCH(shofar_blower_pub.address) AGAINST ('"${filter.address}"')`
             }
             if (filter.name && filter.name.length > 0) {
-                where += ` AND MATCH(blowerUser.name) AGAINST ('${filter.name}')`
+                where += ` AND MATCH(blowerUser.name) AGAINST ('"${filter.name}"')`
             }
 
             //get all public meetings
@@ -100,7 +100,7 @@ module.exports = function (shofarBlowerPub) {
                     FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                    WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1`
+                    ${where}`
                 );
                 if (err) cb(err);
                 if (res) {

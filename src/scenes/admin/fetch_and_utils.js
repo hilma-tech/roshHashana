@@ -49,6 +49,20 @@ export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
     }
 }
 
+export const fetchBlastsPrivate = async (limit, filter = '', cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getPrivateMeetings`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ limit, filter })
+    }, true);
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
 export const getTime = (datatime) => {
     let date = new Date(datatime)
     return `${date.getHours()}:${date.getMinutes()}`

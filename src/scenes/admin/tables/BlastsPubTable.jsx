@@ -6,7 +6,7 @@ import GenericTable from './GenericTable'
 import '../styles/table.scss'
 
 
-const BlastsTable = (props) => {
+const BlastsPubTable = (props) => {
     const { loadingBlastsPub, blastsPub, setBlastInfo, pubMeetingsNum } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
@@ -32,7 +32,7 @@ const BlastsTable = (props) => {
                 "ציבורית",
                 blast.address,
                 getTime(blast.start_time),
-                <FontAwesomeIcon className="pointer" style={{ fontSize: "1.7vh" }} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
+                <FontAwesomeIcon className="pointer" style={{ fontSize: "1.7vh", textAlign: "left !important" }} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
                 // <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
 
             ]
@@ -47,4 +47,4 @@ const BlastsTable = (props) => {
     );
 }
 
-export default BlastsTable
+export default BlastsPubTable
