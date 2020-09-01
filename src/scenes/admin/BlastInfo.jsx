@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import ParticipantsPopUp from "./ParticipantsPopUp"
-import { getTime, getParticipantsMeeting, deletePublicMeeting } from './fetch_and_utils';
+import ParticipantsPopup from "./popups/ParticipantsPopup"
+import { getTime, getParticipantsMeeting, deletePublicMeeting, deleteConectionToMeeting } from './fetch_and_utils';
 import './styles/blastInfo.scss'
 
 
@@ -10,18 +10,21 @@ const BlastInfo = (props) => {
 
     const { blastInfo, setOpenParticipantsPopUp, setParticipantsPublicMeeting } = useContext(AdminMainContext)
 
-    const handleTrashClick = (id) => {
-        (async () => {
-            await deletePublicMeeting(id, (err, res) => {
-                console.log(err, res)
-            })
-        })()
-    }
+    // const handleTrashClick = (id) => {
+    //     (async () => {
+    //         // await deletePublicMeeting(id, (err, res) => {
+    //         //     console.log(err, res)
+    //         // })
+    //         await deleteConectionToMeeting(id, (err, res) => {
+    //             console.log(err, res)
+    //         })
+    //     })()
+    // }
 
-    const handleParticipantsClick = (id) => {
+    const handleParticipantsClick = (id, limit = { start: 0, end: 10 }, filter = {}) => {
         (async () => {
             setOpenParticipantsPopUp(true)
-            await getParticipantsMeeting(id, (err, res) => {
+            await getParticipantsMeeting(id, limit, filter, (err, res) => {
                 if (res) {
                     setParticipantsPublicMeeting(res)
                 }
@@ -81,16 +84,16 @@ const BlastInfo = (props) => {
                         <div className="bottomToList pointer" onClick={() => { handleParticipantsClick(blastInfo.id) }}>רשימת המשתתפים</div>
                     </div>
                 </div>}
-                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer" onClick={() => { handleTrashClick(blastInfo.id) }}>
+                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer deleteMeeting" onClick={() => { props.handleTrashClick(blastInfo.id, blastInfo.index) }}>
                     <div className="width25" style={{ fontSize: "1.7vh" }}>
-                        <FontAwesomeIcon icon={['fas', 'trash']} color='#156879' />
+                        <FontAwesomeIcon icon={['fas', 'trash']} />
                     </div>
                     <div className="width75">
                         <div className="info">מחק מפגש תקיעה בשופר</div>
                     </div>
                 </div>}
             </div>
-            <ParticipantsPopUp />
+            <ParticipantsPopup />
 
         </div >
     );

@@ -49,6 +49,20 @@ export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
     }
 }
 
+export const fetchBlastsPrivate = async (limit, filter = '', cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getPrivateMeetings`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ limit, filter })
+    }, true);
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
 export const getTime = (datatime) => {
     let date = new Date(datatime)
     return `${date.getHours()}:${date.getMinutes()}`
@@ -77,21 +91,22 @@ export const deleteIsolated = async (id, cb = () => { }) => {
     }, true);
 
     if (err || !res) {
-        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נסו שנית מאוחר יותר")
     }
     else {
         return cb(null, true)
     }
 }
 
-export const getNumVolunteers = async (cb = () => { }) => {
+export const getNumVolunteers = async (confirm, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/countAllVolunteers`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
+        body: JSON.stringify({ confirm })
     }, true);
 
     if (err || !res) {
-        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נסו שנית מאוחר יותר")
     }
     else {
         return cb(null, res)
@@ -126,8 +141,24 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
     }
 }
 
-export const getParticipantsMeeting = async (id, cb = () => { }) => {
+export const getParticipantsMeeting = async (id, limit, filter = '', cb = () => { }) => {
+    console.log(id, limit, filter)
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id, limit, filter })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const setConfirmShofarBlower = async (id, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/confirmShofarBlower`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify({ id })
@@ -150,6 +181,36 @@ export const deleteConectionToMeeting = async (id, cb = () => { }) => {
 
     if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const deleteShofarBlower = async (id, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteShofarBlowerAdmin`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id })
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, true)
+    }
+}
+
+export const fetchShofarBlowersForMap = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/getShofarBlowersForMap`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({})
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
     }
     else {
         return cb(null, res)

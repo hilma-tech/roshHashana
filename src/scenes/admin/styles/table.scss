@@ -1,4 +1,5 @@
-.textStyle, input::placeholder {
+.textStyle,
+input::placeholder {
     color: #A3A6B4;
 }
 
@@ -22,7 +23,7 @@ thead th {
 
 .allTableStyle {
     width: 100%;
-    color: #747474;
+    color: #A3A6B4;
     border-radius: 5px 5px 0 0;
     border-collapse: separate;
     border-spacing: 0 1vh;
@@ -49,7 +50,8 @@ thead th {
     padding-left: 5vw;
 }
 
-.tableBodyStyle td:first-child, .tableHead th:first-child {
+.tableBodyStyle td:first-child,
+.tableHead th:first-child {
     padding-right: 5vw;
 }
 
@@ -58,8 +60,9 @@ thead th {
 // }
 
 .noRes {
-    padding: 5vh;
+    padding: 3vh;
     text-align: center;
+    background-color: white;
 }
 
 .spinner-border {
@@ -83,7 +86,7 @@ thead th {
 }
 
 .navArrowDisabled {
-    color: #74747480;
+    color: #747474;
     cursor: unset;
 }
 
@@ -92,19 +95,25 @@ thead th {
     cursor: unset;
 }
 
-.tableIcons{
+.tableIcons {
     width: 4vw;
 }
 
-.circleCheckBox{
+.circleCheckBox {
     width: 2vh;
     height: 2vh;
     border-radius: 50%;
     border: 0.5px #707070 solid;
+    margin-left: 1vw;
+}
+
+.checkedCircle {
+    color: #FDA42A;
+    font-size: 2vh;
     margin-left: 2vw;
 }
 
-.confrim{
+.confrim {
     width: 2vw;
     padding-right: 4vw !important;
 }

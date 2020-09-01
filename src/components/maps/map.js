@@ -26,6 +26,7 @@ const MapComp = (props) => {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
             if (mapContent) {
+                console.log(mapContent)
                 setMapInfo(mapContent);
             }
         })();

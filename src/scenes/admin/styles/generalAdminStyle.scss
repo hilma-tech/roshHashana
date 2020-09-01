@@ -1,6 +1,5 @@
-.inputContainer
-{
-    position: relative; 
+.inputContainer {
+    position: relative;
     width: 100%;
 
     input {
@@ -10,10 +9,10 @@
         color: #747474;
         outline: none;
         background: none;
-        border: 0.5px solid #444444;;
+        border: 0.5px solid #444444;
     }
 
-    .inputIcon{
+    .inputIcon {
         position: absolute;
         color: #747474c5;
         font-size: 2.5vh;
@@ -30,43 +29,74 @@
     margin: 3.5vh 0 2vh 0;
 }
 
-.blueSubTitle, .orangeSubTitle{
+.blueSubTitle,
+.orangeSubTitle {
     font-size: 2vh;
     font-weight: 500;
     text-align: right;
 }
 
-.blueSubTitle{
-    color: #156879;   
+.blueSubTitle {
+    color: #156879;
 }
 
-.orangeSubTitle{
-    color: #FDA42A;  
+.orangeSubTitle {
+    color: #FDA42A;
+}
+
+.turquoiseText {
+    color: #156879 !important;
 }
 
 .bold {
     font-weight: 600;
 }
 
-.orangeBorderBottom{
+.orangeBorderBottom {
     border-bottom: #FDA42A solid 0.5px;
 }
 
-.resultNum{
+.resultNum {
     flex-grow: 1;
     text-align: end;
 }
 
 .statusNavContainer {
-   display: flex;
-   margin: 3vh 0 1vh 0;
+    display: flex;
+    margin: 3vh 0 1vh 0;
 }
 
-.pointer{
+.pointer {
     cursor: pointer;
 }
 
-.isolatedsContainer{
+.tooltipContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-left: 1.5vw;
+}
+
+.myTooltip {
+    display: none;
+}
+
+.tooltipContainer:hover {
+    .myTooltip {
+        position: absolute;
+        color: #747474;
+        box-shadow: 0px 3px 6px #00000029;
+        background-color: white;
+        border-radius: 7px;
+        border: #747474 solid 1px;
+        margin-top: 3vh;
+        padding: 1vh 1vw;
+        z-index: 2;
+        display: flex;
+    }
+}
+
+.isolatedsContainer {
     height: 100vh;
     background: #F3F3F3 0% 0% no-repeat padding-box;
 }

@@ -1,0 +1,61 @@
+.deletePopup, .participantsPopup, .confirmShofarBlower {
+
+    .MuiDialogContent-root {
+        padding: 3vh 2vw !important;
+        overflow-y: hidden !important;
+    }
+    
+    .MuiBackdrop-root {
+        background-color: hsla(0,0%,85.1%,.49) !important;
+    }
+
+    .saveBtn {
+        background: #FFA62B;
+        color: white;
+        border-radius: 7px;
+        font-size: 2.5vh;
+        margin-left: 10px;
+        width: fit-content;
+        padding: 0 2vw;
+        height: 5vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .x {
+        font-size: 2vh;
+        color: #A3A6B4;
+        position: absolute;
+        right: 0;
+        margin: 3vh;
+    }
+}
+
+.participantsPopup {
+    .MuiDialog-paperWidthSm {
+        background-color: #eeeeee !important;
+        max-width: 95vw !important;
+    }
+
+    .participantList {
+        text-align: right;
+        color: #489fb5;
+        font-size: 3.5vh;
+        margin-top: 1.7vh;
+    }
+    
+    .timesPopUp {
+        font-size: 4vh;
+        margin: 2vh 2vw;
+    }
+    .results {
+        color: #156879;
+        font-size: 2vh;
+        text-align: right;
+    }
+    
+    .delete {
+        text-align: left !important;
+    }
+}
