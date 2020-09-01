@@ -21,7 +21,6 @@ export const AdminMainProvider = ({ children }) => {
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
 
-
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
         loading, setLoading,

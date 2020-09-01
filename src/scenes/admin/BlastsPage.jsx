@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import { fetchBlastsPub, fetchBlastsPrivate } from './fetch_and_utils';
+import { fetchBlastsPub, fetchBlastsPrivate, deleteConectionToMeeting } from './fetch_and_utils';
 import BlastsPubTable from './tables/BlastsPubTable';
 import BlastsPrivateTable from './tables/BlastsPrivateTable';
 import BlastInfo from "./BlastInfo"
@@ -9,11 +9,9 @@ import Search from './Search';
 import BlastInfoPrev from "./BlastInfoPrev"
 import './styles/blastsPage.scss'
 
-let status = 0
-
 const BlastsPage = (props) => {
 
-    const { setLoadingBlastsPub, setBlastsPub, blastInfo, setPubMeetingsNum, privateMeetingsNum, pubMeetingsNum, setPrivateMeetingsNum, setBlastsPrivate, setLoadingBlastsPrivate } = useContext(AdminMainContext)
+    const { blastsNum, setBlastsNum, blastsPrivate, setLoadingBlastsPub, setBlastsPub, setBlastInfo, blastInfo, setPubMeetingsNum, privateMeetingsNum, pubMeetingsNum, setPrivateMeetingsNum, setBlastsPrivate, setLoadingBlastsPrivate } = useContext(AdminMainContext)
     const [filters, setFilters] = useState(null)
     const [isPublic, setPublic] = useState(true)
 
@@ -67,6 +65,23 @@ const BlastsPage = (props) => {
         getBlastsPub(filters)
     }
 
+    const handleTrashClick = (id, index) => {
+        (async () => {
+            await deleteConectionToMeeting(id, (err, res) => {
+                if (err) {
+                    console.log("err in deleteConectionToMeeting", err)
+                    return
+                }
+                let newblastsPrivate = [...blastsPrivate]
+                newblastsPrivate.splice(index, 1)
+                setBlastsPrivate(newblastsPrivate)
+                setBlastInfo(null)
+                setPrivateMeetingsNum(privateMeetingsNum - 1)
+                setBlastsNum(blastsNum - 1)
+            })
+        })()
+    }
+
     useEffect(() => {
         (async () => {
             getBlastsPub()
@@ -76,6 +91,7 @@ const BlastsPage = (props) => {
 
     const statusCliked = function (val) {
         setPublic(val)
+        setBlastInfo(null)
     }
 
 
@@ -96,9 +112,9 @@ const BlastsPage = (props) => {
                         <div className={'orangeSubTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
                         <div className='blueSubTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
                     </div>
-                    {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable />}
+                    {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable handleTrashClick={handleTrashClick} />}
                 </div>
-                {blastInfo ? <BlastInfo /> : <BlastInfoPrev />}
+                {blastInfo ? <BlastInfo handleTrashClick={handleTrashClick} /> : <BlastInfoPrev />}
             </div>
         </div>
     );

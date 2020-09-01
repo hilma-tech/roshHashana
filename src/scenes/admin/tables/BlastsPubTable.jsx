@@ -10,7 +10,7 @@ const BlastsPubTable = (props) => {
     const { loadingBlastsPub, blastsPub, setBlastInfo, pubMeetingsNum } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
 
-    const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info tableIcons', '']]
+    const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info infoPub tableIcons', '']]
 
     const handleInfoClick = (blast) => {
         blast.type = "ציבורית"
