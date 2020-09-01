@@ -65,19 +65,24 @@ const SBHomePage = (props) => {
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
-                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null) {
+                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null && newReqData.oldMeetingId !== undefined && newReqData.oldIsPublicMeeting !== undefined) {
+                    console.log('1')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
-                else if (newReqData.oldMeetingId !== null) {
+                else if (newReqData.oldMeetingId !== null && newReqData.oldMeetingId !== undefined) {
+                    console.log('2')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
-                else if (newReqData.oldIsPublicMeeting !== null) {
+                else if (newReqData.oldIsPublicMeeting !== null && newReqData.oldIsPublicMeeting !== undefined) {
+                    console.log('3')
                     return (req.meetingId == newReqData.meetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
                 else {
+                    console.log('old req', req)
+                    console.log('new req', newReqData);
                     return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
 
