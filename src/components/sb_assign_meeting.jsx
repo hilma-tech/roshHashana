@@ -14,7 +14,7 @@ const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, 
 
 const SBAssignMeeting = ({ history, inRoute }) => {
 
-    const { openGenAlert } = useContext(MainContext)
+    const { openGenAlert, openGenAlertSync } = useContext(MainContext)
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
@@ -108,30 +108,31 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         else openGenAlert({ text: assign_error })
     }
 
-    const handleMaxRouteLength = (n) => {
-        let text = `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
-        openGenAlert({ text, isPopup: { okayText: "עדכן את מספר התקיעות שלי", cancelText: "סגור" } },
-            updateRouteLength => {
-                if (!updateRouteLength) {
+    const handleMaxRouteLength = async (n) => {
+        if (isNaN(Number(n))) return
+        let text = `שים לב, לאחר השיבוץ מספר התקיעות שלך יעמוד על ${Number(n) + 1} תקיעות`;
+        // `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
+        let updateRouteLength = await openGenAlertSync({ text, isPopup: { okayText: "מתאים לי", cancelText: "בטל" } })
+        console.log('res: ', updateRouteLength);
+        if (!updateRouteLength) {
+            return;
+        }
+        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+            openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
+            return;
+        }
+        updateMaxRouteLengthAndAssign(assignMeetingInfo,
+            (error, res) => {
+                if (error || !res) {
+                    console.log('updateMaxDurationAndAssign err: ', error);
+                    openGenAlert({ text: typeof error === "string" ? error : assign_error })
                     return;
                 }
-                if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
-                    openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true })
+                else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
+                    openGenAlert({ text: res, block: true })
                     return;
                 }
-                updateMaxRouteLengthAndAssign(assignMeetingInfo,
-                    (error, res) => {
-                        if (error || !res) {
-                            console.log('updateMaxDurationAndAssign err: ', error);
-                            openGenAlert({ text: typeof error === "string" ? error : assign_error })
-                            return;
-                        }
-                        else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                            openGenAlert({ text: res, block: true })
-                            return;
-                        }
-                        checkAssignResForError(res)
-                    })
+                checkAssignResForError(res)
             })
     }
 
