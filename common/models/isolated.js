@@ -472,4 +472,32 @@ module.exports = function (Isolated) {
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
+
+    Isolated.getIsolatedsWithoutMeetingForMap = function (cb) {
+        (async () => {
+            try {
+                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng 
+                FROM isolated
+                LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
+                LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
+                WHERE (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NULL) 
+                    OR (isolated.public_meeting = 1 AND sbp.blowerId IS NULL)`
+                
+                let [isolatedsErr, isolatedsRes] = await executeMySqlQuery(Isolated, isolatedsQ);
+                if (isolatedsErr || !isolatedsRes) {
+                    console.log('get Isolated admin request error : ', isolatedsErr);
+                    throw isolatedErr
+                }
+                return cb(null, isolatedsRes)
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('getIsolatedsWithoutMeetingForMap', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 }

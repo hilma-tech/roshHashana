@@ -186,6 +186,14 @@
         "updateUserInfo",
         "deleteUser"
       ]
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "ADMIN",
+      "permission": "ALLOW",
+      "property": [
+        "getAllAdminBlastsForMap"
+      ]
     }
   ],
   "methods": {}

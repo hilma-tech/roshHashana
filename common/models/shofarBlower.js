@@ -300,7 +300,8 @@ module.exports = function (ShofarBlower) {
                     "userBlowerId": userId,
                     "can_blow_x_times": data.can_blow_x_times,
                     "volunteering_start_time": data.volunteering_start_time,
-                    "volunteering_max_time": data.volunteering_max_time
+                    "volunteering_max_time": data.volunteering_max_time,
+                    "confirm": true
                 },
                     objToCU = {
                         "address": data.address[0],
@@ -343,8 +344,8 @@ module.exports = function (ShofarBlower) {
                 const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng 
                 FROM shofar_blower AS sb 
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
-                WHERE sb.confirm = 1
-                `
+                WHERE sb.confirm = 1`
+                
                 let [shofarBlowersErr, shofarBlowersRes] = await executeMySqlQuery(ShofarBlower, shofarBlowersQ);
                 if (shofarBlowersErr || !shofarBlowersRes) {
                     console.log('get shofarBlower admin request error : ', shofarBlowersErr);

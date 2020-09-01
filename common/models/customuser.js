@@ -1078,5 +1078,57 @@ module.exports = function (CustomUser) {
 
     }
 
+
+
+
+
+    CustomUser.getAllAdminBlastsForMap = function (cb) {
+        (async () => {
+            try {
+                const blastsQ = `(SELECT
+                    isolatedUser.address AS address,
+                    isolatedUser.lat AS lat,
+                    isolatedUser.lng AS lng,
+                    blowerUser.name AS blowerName,
+                    false AS publicMeeting,
+                    isolated.id AS id
+                FROM isolated 
+                    LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1)
+          
+            UNION 
+          
+                (SELECT
+                    shofar_blower_pub.address AS address,
+                    shofar_blower_pub.lat AS lat,
+                    shofar_blower_pub.lng AS lng,
+                    blowerUser.name AS blowerName,
+                    true AS publicMeeting,
+                    shofar_blower_pub.id AS id
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1)`
+                
+                let [blastsErr, blastsRes] = await executeMySqlQuery(CustomUser, blastsQ);
+                if (blastsErr || !blastsRes) {
+                    console.log('get Isolated admin request error : ', blastsErr);
+                    throw isolatedErr
+                }
+                return cb(null, blastsRes)
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    CustomUser.remoteMethod('getAllAdminBlastsForMap', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
 };
 

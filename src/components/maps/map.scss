@@ -1,19 +1,23 @@
 @import "../../consts/consts.scss";
+
 .map-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
+
     #info-window-container {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        font-family: 'Assistant',sans-serif !important;
+        font-family: 'Assistant', sans-serif !important;
+
         div {
             font-size: 0.8rem;
             text-align: right;
         }
+
         .info-window-header {
             color: $turquoise;
             font-size: 1.1rem;
@@ -21,6 +25,7 @@
             margin-bottom: 4%;
             text-align: right;
         }
+
         .pub-shofar-blower-name-container,
         .pub-address-container,
         .pub-start-time-container {
@@ -31,6 +36,7 @@
             justify-content: flex-start;
             margin-bottom: 4%;
             width: 100%;
+
             img {
                 width: 1.2em;
                 height: 1.2em;
@@ -38,16 +44,20 @@
                 align-self: flex-start;
                 margin-top: 1%;
             }
+
             div {
                 font-size: 1rem;
             }
-            .pub-shofar-blower-name{
-             font-weight: bold;
+
+            .pub-shofar-blower-name {
+                font-weight: bold;
             }
         }
+
         .notes {
             margin-bottom: 4%;
         }
+
         .join-button {
             cursor: pointer;
             background-color: $orange;
@@ -70,6 +80,7 @@
         top: 2%;
         left: 50%;
         transform: translate(-50%, -50%);
+
         #search-input {
             margin-top: 6%;
             box-sizing: border-box;
@@ -83,6 +94,7 @@
             outline: none;
             text-overflow: ellipsis;
         }
+
         #search-icon {
             position: absolute;
             left: 7%;
@@ -91,6 +103,7 @@
             transform: translate(-50%, -50%);
         }
     }
+
     .gm-style-iw.gm-style-iw-c {
         border-radius: 2px;
     }
@@ -100,11 +113,13 @@
         left: 0 !important;
         width: fit-content !important;
         height: fit-content !important;
+
         img {
             width: 1.2rem !important;
             height: 1.2rem !important;
         }
     }
+
     .close-map,
     .close-map-mobile {
         position: fixed;
@@ -114,9 +129,11 @@
         width: 2.5rem;
         height: 2.5rem;
     }
-    .close-map-mobile{
+
+    .close-map-mobile {
         bottom: 15%;
     }
+
     // .close-map:hover {
     //     animation-name: hover;
     //     animation-duration: 0.5s;
@@ -125,8 +142,43 @@
         0% {
             bottom: 15%;
         }
+
         100% {
             bottom: 17%;
+        }
+    }
+}
+
+
+.mapNavContainer {
+    position: absolute;
+    top: 12vh;
+    display: flex;
+    align-items: center;
+    width: 100vw;
+    padding: 0 4vw;
+
+    .inputContainer {
+        background-color: #ffffffc4;
+
+        input {
+            border: #7070708e solid 0.5px;
+        }
+
+        .inputIcon {
+            color: #7070708e;
+        }
+    }
+
+    .mapIconContainer {
+        .textInHover {
+            display: none;
+        }
+    }
+
+    .mapIconContainer:hover {
+        .textInHover {
+            display: none;
         }
     }
 }
