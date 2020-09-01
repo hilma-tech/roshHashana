@@ -11,6 +11,7 @@ import { SBMapComponent } from './sb_map_renderer'
 
 import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
+import { adminGetSBRoute } from '../../scenes/admin/fetch_and_utils';
 
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -25,15 +26,28 @@ const ShofarBlowerMap = (props) => {
 
     const { openGenAlert } = useContext(MainContext)
 
-    const {
-        userData,
+    const sbctx = useContext(SBContext)
+    let userData,
         myMeetings, meetingsReqs,
         genMapMeetings, setGenMapMeetings,
         setAssignMeetingInfo,
         startTimes,
         setIsInRoute,
-        isPrint,
-    } = useContext(SBContext)
+        isPrint
+
+    if (sbctx && typeof sbctx === "object") {
+        userData = sbctx.userData;
+        myMeetings = sbctx.myMeetings;
+        meetingsReqs = sbctx.meetingsReqs;
+        genMapMeetings = sbctx.genMapMeetings;
+        setGenMapMeetings = sbctx.setGenMapMeetings;
+        setAssignMeetingInfo = sbctx.setAssignMeetingInfo;
+        startTimes = sbctx.startTimes;
+        setIsInRoute = sbctx.setIsInRoute;
+        isPrint = sbctx.isPrint;
+    }
+
+    let isAdmin = props.admin
 
 
     const [center, setCenter] = useState({});
@@ -44,10 +58,9 @@ const ShofarBlowerMap = (props) => {
     const [allMapData, setAllMapData] = useState(null)
     const [err, setErr] = useState(false)
 
-
-    // const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
-
     const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
+
+
     const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
         {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}
@@ -64,6 +77,10 @@ const ShofarBlowerMap = (props) => {
 
 
     useEffect(() => {
+        if (isAdmin) {
+            adminUseEffect()
+            return;
+        }
         (async () => {
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 let newCenter;
@@ -85,6 +102,11 @@ const ShofarBlowerMap = (props) => {
             }
         })();
     }, [userData])
+
+    const adminUseEffect = () => {
+        props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id &&
+            adminGetSBRoute(props.selectedSB.id)
+    }
 
     useEffect(() => {
         if (userOriginLoc && typeof userOriginLoc === "object") { //have userData and userOriginLoc, need location of reqs and route
@@ -231,7 +253,7 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`} id="sb-map-container">
+        <div className={`map-container ${isAdmin ? "sb-map-container-admin" : `${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`}`} id="sb-map-container">
             <SBMapComponent
                 location={props.location}
                 changeCenter={setCenter}

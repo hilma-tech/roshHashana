@@ -1068,6 +1068,44 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
+    CustomUser.adminGetSBRoute = function (options, sbId, cb) {
+        if (!options || !options.accessToken || !options.accessToken.userId) {
+            return cb(true)
+        }
+
+        (async () => {
+            const myRouteQ = `
+        SELECT * FROM (
+            SELECT false AS isPublicMeeting, CustomUser.address, false AS constMeeting,
+                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, meeting_time AS "startTime" 
+            FROM isolated 
+                JOIN CustomUser ON userIsolatedId = CustomUser.id 
+            WHERE public_meeting = 0 
+                AND blowerMeetingId = ${sbId}
+            
+            UNION
+            
+            SELECT true AS isPublicMeeting, shofar_blower_pub.address, shofar_blower_pub.constMeeting AS constMeeting, NULL AS isolatedPhone, start_time AS "startTime" 
+            FROM isolated 
+                JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+            WHERE public_meeting = 1
+                AND shofar_blower_pub.blowerId = ${sbId}
+        ) a
+        ORDER BY startTime
+        `
+
+            let [errRoute, resRoute] = await executeMySqlQuery(CustomUser, myRouteQ)
+            if (errRoute || !resRoute) { console.log("errRoute || !resRoute for myRouteQ", errRoute || !resRoute); return cb(true) }
+            console.log('resRoute: ', resRoute);
+        })()
+    }
+
+    CustomUser.remoteMethod('adminGetSBRoute', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "sbId", type: "number" }],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    })
+
 
     const sqlForScripts = () => {
         const sbQ = `select name, username from CustomUser left join RoleMapping on CustomUser.id = RoleMapping.principalId where roleId = ${SHOFAR_BLOWER_ROLE}`

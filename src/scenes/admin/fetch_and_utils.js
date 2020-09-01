@@ -215,3 +215,18 @@ export const fetchShofarBlowersForMap = async (cb = () => { }) => {
         return cb(null, res)
     }
 }
+
+export const adminGetSBRoute = async (sbId) => {
+    return new Promise(async (resolve, reject) => {
+        let [err, res] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ sbId })
+        }, true);
+        if (err || !res) {
+            resolve([true])
+            return;
+        }
+        resolve([null, res])
+    });
+}

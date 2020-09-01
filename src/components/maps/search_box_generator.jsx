@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { CONSTS } from '../../consts/const_messages';
 
 export const SBSearchBoxGenerator = (props) => {
 
@@ -10,8 +11,8 @@ export const SBSearchBoxGenerator = (props) => {
             let place = autocomplete.getPlace();
             if (place.geometry) props.changeCenter(place.geometry.location);
             // else if (!place.geometry && place.name) {
-                //find the lat and lng of the place
-                // props.findLocationCoords(place.name);
+            //find the lat and lng of the place
+            // props.findLocationCoords(place.name);
             // }
             else return;
         })
@@ -32,11 +33,18 @@ export const SBSearchBoxGenerator = (props) => {
 
 
 
-export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className, disabled }) => {
-    const autoCompleteInput = useRef()
+export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, className, disabled, redirectOfFailure }) => {
     useEffect(() => {
         if (window.google && window.google.maps) { init(); return; }
-        //so we have window.google
+        let scripts = document.head.getElementsByTagName("script");
+        let scriptSource
+        for (let i = scripts.length - 1; i >= 0; i--) {
+            scriptSource = scripts[i].getAttribute('src');
+            if (scriptSource.includes("maps.googleapis")) {
+                return
+            }
+        }
+        //so we have window.google:
         window.init = init
         const script = document.createElement('script')
         script.async = true;
@@ -52,17 +60,9 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
     }, []);
 
     const init = () => {
-        const israelCoords = [
-            { lat: 32.863532, lng: 35.889902 },
-            { lat: 33.458826, lng: 35.881345 },
-            { lat: 33.107715, lng: 35.144508 },
-            { lat: 31.296718, lng: 34.180102 },
-            { lat: 29.486869, lng: 34.881321 },
-            { lat: 29.551662, lng: 34.984779 },
-        ];
 
         const israelPolygon = new window.google.maps.Polygon({
-            paths: israelCoords,
+            paths: CONSTS.ISRAEL_COORDS,
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
             strokeWeight: 2,
@@ -85,7 +85,6 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
         const input = document.getElementById(uId);
         if (!input) return;
         let autocomplete = new window.google.maps.places.Autocomplete(input, options);
-        // autocomplete.setComponentRestrictions({ "country": "il" });
         autocomplete.addListener("place_changed", () => { handlePlaceChange(autocomplete) })
     }
 
@@ -100,7 +99,6 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
             <input
                 disabled={disabled ? disabled : false}
                 deafault={defaultValue}
-                ref={autoCompleteInput}
                 defaultValue={defaultValue}
                 autoComplete={'off'}
                 id={uId}

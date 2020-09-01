@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
+import { MainContext } from '../../../ctx/MainContext';
 import { setConfirmShofarBlower, deleteShofarBlower } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
 import DeletePopup from '../popups/DeletePopup';
@@ -9,9 +10,13 @@ const whereToDelete = { id: -1, index: -1 }
 
 const ShofarBlowerTable = (props) => {
     const { loading, shofarBlowers, setShofarBlowers } = useContext(AdminMainContext)
+    const { openGenAlert } = useContext(MainContext)
     const [tr, setTr] = useState(null)
     const [confirmArr, setConfirmArr] = useState([])
     const [showDeletePopup, setShowDeletePopup] = useState(false)
+
+    let setSelectedSB = props.setSelectedSB
+    let selectedSB = props.selectedSB
 
     const th = [shofarBlowers && shofarBlowers.length ? ['confrim', ''] : null, ['name', 'שם'], ['phone', 'פלאפון'], ['address', 'נקודת יציאה'], ['blastsNum', 'תקיעות בשופר'], ['maxTime', 'זמן מקסימלי'], ['road tableIcons', ''], ['edit tableIcons', ''], ['delete tableIcons', '']]
 
@@ -20,8 +25,8 @@ const ShofarBlowerTable = (props) => {
         if (shofarBlowers) setTr(shofarBlowers.map((shofarBlower, index) => {
             return [
                 props.status === 0 ?
-                    !confirmArr.includes(index) ?
-                        <div className='circleCheckBox pointer' onClick={() => confirmClicked(index)}></div> :
+                    !confirmArr.includes(shofarBlower.id) ?
+                        <div className='circleCheckBox pointer' onClick={() => confirmClicked(shofarBlower.id)}></div> :
                         <FontAwesomeIcon icon={['fas', 'check-circle']} className='checkedCircle' />
                     : null,
                 shofarBlower.name,
@@ -29,31 +34,38 @@ const ShofarBlowerTable = (props) => {
                 shofarBlower.address,
                 shofarBlower.blastsNum,
                 shofarBlower.volunteering_max_time + " דק'",
-                props.status === 0 ? null : <img src='/icons/way.svg' alt='way' className='pointer' onClick={handleRoadClick} style={{ height: '2.5vh' }} />,
+                props.status === 0 ? null : <img src='/icons/way.svg' alt='way' className='pointer' onClick={() => { handleRouteClick(shofarBlower) }} style={{ height: '2.5vh' }} />,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'pen']} color='#A5A4BF' onClick={handleEditClick} />,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(shofarBlower.id, index)} />
             ]
         }))
     }, [shofarBlowers, confirmArr])
 
-    const confirmClicked = (index) => {
-        setConfirmArr(prev => [...prev, index])
+    const confirmClicked = (id) => {
+        setConfirmArr(prev => [...prev, id])
 
         setTimeout(() => {
-            setConfirmArr(prev => {
-                prev.splice(prev.indexOf(index), 1)
-                return [...prev]
-            })
-            setConfirmShofarBlower(shofarBlowers[index].id, (err) => {
+            let indexToConfirm = shofarBlowers.findIndex(i => i.id == id)
+            let sbToConfirm = shofarBlowers.find(i => i.id == id)
+            if ((!indexToConfirm && indexToConfirm != 0) || (!sbToConfirm)) return;
+            setConfirmShofarBlower(sbToConfirm.id, (err) => {
                 if (!err) setShofarBlowers(prev => {
-                    prev.splice(index, 1)
+                    prev.splice(indexToConfirm, 1)
                     return [...prev]
                 })
+                props.setResultNum(n => Number(n) - 1)
+                setConfirmArr(prev => {
+                    prev.splice(prev.indexOf(id), 1)
+                    return [...prev]
+                })
+                openGenAlert({ text: "אושר בהצלחה", block: true })
             })
         }, 1000)
     }
 
-    const handleRoadClick = (e) => {
+    const handleRouteClick = (sb) => {
+        console.log('handleRouteClick');
+        setSelectedSB(sb)
 
     }
 

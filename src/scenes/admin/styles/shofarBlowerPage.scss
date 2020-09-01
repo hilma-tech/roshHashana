@@ -1,3 +1,5 @@
+@import "../../../consts/consts";
+
 .bluePlusContainer {
     min-width: max-content;
     color: white;
@@ -13,4 +15,10 @@
 
 .bluePlusContainer div {
     margin-right: 0.5vw;
+}
+
+.sb-map-container-admin{
+    width: 60% ;
+    height: 90% ;
+    position: relative;
 }
