@@ -53,9 +53,13 @@ const IsolatedTable = (props) => {
         })()
     }
 
+    const setPage = (page) => {
+        props.getIsolateds(null, (page - 1) * 7)
+    }
+
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} prevPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={props.resultNum} />
 
             {showDeletePopup &&
                 <DeletePopup

@@ -201,8 +201,16 @@ module.exports = function (Isolated) {
 
 
 
+
+
+
+
+
+
+
     //admin 
-    Isolated.getIsolatedsForAdmin = function (limit, filter, cb) {
+
+    Isolated.getIsolatedsForAdmin = function (startRow, filter, cb) {
         (async () => {
             try {
                 let where = ''
@@ -227,7 +235,7 @@ module.exports = function (Isolated) {
                     LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 ${where}
                 ORDER BY cu.name
-                LIMIT 0, 20`
+                LIMIT ${startRow}, 7`
 
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM isolated 
@@ -263,7 +271,7 @@ module.exports = function (Isolated) {
     Isolated.remoteMethod('getIsolatedsForAdmin', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
@@ -363,7 +371,7 @@ module.exports = function (Isolated) {
     });
 
 
-    Isolated.getPrivateMeetings = function (limit, filter, cb) {
+    Isolated.getPrivateMeetings = function (startRow, filter, cb) {
         (async () => {
 
             let where = 'WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1'
@@ -390,7 +398,7 @@ module.exports = function (Isolated) {
                 LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
                 LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                 ${where}
-                LIMIT ${limit.start}, ${limit.end}`
+                LIMIT ${startRow}, 7`
             );
             if (err) cb(err);
             if (res) {
@@ -417,12 +425,12 @@ module.exports = function (Isolated) {
     Isolated.remoteMethod('getPrivateMeetings', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ], returns: { arg: 'res', type: 'number', root: true }
     });
 
-    Isolated.getParticipantsMeeting = function (id, limit, filter, cb) {
+    Isolated.getParticipantsMeeting = function (id, startRow, filter, cb) {
         (async () => {
             let where = `WHERE blowerMeetingId = ${id}`
 
@@ -442,7 +450,7 @@ module.exports = function (Isolated) {
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
                     LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
                 ${where}
-                LIMIT ${limit.start}, ${limit.end};
+                LIMIT ${startRow}, 7;
             `
             );
             if (err) cb(err);
@@ -456,7 +464,7 @@ module.exports = function (Isolated) {
         http: { verb: 'POST' },
         accepts: [
             { arg: 'id', type: 'number', require: true },
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }

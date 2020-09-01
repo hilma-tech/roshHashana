@@ -139,7 +139,7 @@ module.exports = function (ShofarBlower) {
 
     //admin
 
-    ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
+    ShofarBlower.getShofarBlowersForAdmin = function (startRow, filter, cb) {
         (async () => {
             try {
                 let where = ''
@@ -172,7 +172,7 @@ module.exports = function (ShofarBlower) {
                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
                 ${where}
                 ORDER BY cu.name
-                LIMIT 0, 20`
+                LIMIT ${startRow}, 7`
 
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM shofar_blower AS sb
@@ -201,7 +201,7 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.remoteMethod('getShofarBlowersForAdmin', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }

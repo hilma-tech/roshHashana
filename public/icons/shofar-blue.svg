@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="55" height="55" viewBox="0 0 55 55">
     <defs>
         <style>.a{fill:#156879;}.b,.e{fill:none;}.b{stroke:#fff;stroke-linejoin:bevel;stroke-width:0.5px;}.c{fill:#fff;}.d{stroke:none;}.f{filter:url(#c);}.g{filter:url(#a);}</style>
-        <filter id="a" x="0" y="0" width="55" height="55" filterUnits="userSpaceOnUse">
+        <!-- <filter id="a" x="0" y="0" width="55" height="55" filterUnits="userSpaceOnUse">
             <feOffset dy="5" input="SourceAlpha" />
             <feGaussianBlur stdDeviation="3" result="b" />
             <feFlood flood-opacity="0.161" />
             <feComposite operator="in" in2="b" />
             <feComposite in="SourceGraphic" />
-        </filter>
+        </filter> -->
         <filter id="c" x="1" y="1" width="53" height="53" filterUnits="userSpaceOnUse">
             <feOffset dy="5" input="SourceAlpha" />
             <feGaussianBlur stdDeviation="3" result="d" />
