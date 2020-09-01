@@ -477,19 +477,22 @@ module.exports = function (CustomUser) {
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                        let publicMeeting = await shofarBlowerPub.findOne({ where: { id: meetingId } });
+                        console.log(publicMeeting, 'public meeting id')
+                        isolatedUpdateSocket.setPublicMeetBlowerId((publicMeeting && publicMeeting.blowerId) ? publicMeeting.blowerId : false);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         pubMeetId = null;
                         meetingChanged = true;
                     }
                 }
-                console.log('pubMeetId', pubMeetId)
+                // console.log('pubMeetId', pubMeetId)
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
-                console.log('newIsoDataaaaaaa', newIsoData)
+                // console.log('newIsoDataaaaaaa', newIsoData)
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
