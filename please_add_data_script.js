@@ -8,7 +8,7 @@ const usersWithNoDataQuery = `SELECT CustomUser.name , CustomUser.username AS 'p
 let con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "z10mz10m",
+    password: "CarmelBot1010",
     database: "roshHashana"
 });
 
