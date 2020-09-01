@@ -4,7 +4,25 @@ import { SBContext } from '../ctx/shofar_blower_context'
 
 const SBAllMeetingsList = ({ mobile }) => {
 
-    let { meetingsReqs, setAssignMeetingInfo } = useContext(SBContext)
+    let { meetingsReqs, setAssignMeetingInfo, userData } = useContext(SBContext)
+    var distance = function (lat1, lng1, lat2, lng2) {
+        var radlat1 = Math.PI * lat1 / 180;
+        var radlat2 = Math.PI * lat2 / 180;
+        var theta = lng1 - lng2;
+        var radtheta = Math.PI * theta / 180;
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        dist = Math.acos(dist);
+        dist = dist * 180 / Math.PI;
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;
+        return dist;
+    };
+    let meetingsReqsTemp = meetingsReqs.sort((reqA, reqB) => {
+        let origLat = userData.lat,
+            origLong = userData.lng;
+
+        return distance(origLat, origLong, reqA.lat, reqA.lng) - distance(origLat, origLong, reqB.lat, reqB.lng);
+    })
 
     const handleAssign = (m) => {
         setAssignMeetingInfo(m)
@@ -15,7 +33,7 @@ const SBAllMeetingsList = ({ mobile }) => {
             <div className="sb-side-list-title" >
                 מחפשים בסביבתך
             </div>
-            {Array.isArray(meetingsReqs) && meetingsReqs.length ? meetingsReqs.map((m, i) => {
+            {Array.isArray(meetingsReqsTemp) && meetingsReqsTemp.length ? meetingsReqsTemp.map((m, i) => {
                 return <div className="open-meeting-in-list" key={"sb-meetings-list-" + i} >
                     <div className="open-meeting-in-list-info">
                         <div className="open-meeting-in-list-title" >{m.isPublicMeeting ? "קריאה ציבורית" : m.name}</div>
