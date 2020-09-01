@@ -12,6 +12,17 @@ export const MainProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState(null);
 
     const closeAlert = () => { setShowAlert(false) }
+    const openGenAlertSync = async (obj) => {
+        if (typeof obj !== "object" || Array.isArray(obj)) return;
+        clearTimeout(alertTO)
+        return await new Promise((resolve, reject) => {
+            const popupCb = res => { resolve(res) }
+            const alertObj = { text: obj.text, warning: obj.warning || false, block: obj.block || false, noTimeout: obj.noTimeout || false }
+            if (obj.isPopup) alertObj.isPopup = { ...obj.isPopup, popupCb, closeSelf: () => { setShowAlert(false) } }
+            setShowAlert(alertObj)
+            if (!obj.isPopup && !obj.noTimeout) alertTO = setTimeout(closeAlert, 5000)
+        })
+    }
     const openGenAlert = (obj, popupCb = () => { }) => {
         if (typeof obj !== "object" || Array.isArray(obj)) return;
         clearTimeout(alertTO)
@@ -22,7 +33,7 @@ export const MainProvider = ({ children }) => {
     }
 
     const ctxValue = {
-        openGenAlert, showAlert,
+        openGenAlertSync, openGenAlert, showAlert,
         userInfo, setUserInfo
     }
 

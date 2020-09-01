@@ -422,8 +422,14 @@ module.exports = function (Isolated) {
         ], returns: { arg: 'res', type: 'number', root: true }
     });
 
-    Isolated.getParticipantsMeeting = function (id, cb) {
+    Isolated.getParticipantsMeeting = function (id, limit, filter, cb) {
         (async () => {
+            let where = `WHERE blowerMeetingId = ${id}`
+
+            if (filter.name && filter.name.length > 0) {
+                where += ` AND MATCH(isolatedUser.name) AGAINST ('"${filter.name}"')`
+            }
+
             let [err, res] = await executeMySqlQuery(Isolated,
                 `
                 SELECT
@@ -435,7 +441,8 @@ module.exports = function (Isolated) {
                 FROM isolated
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
                     LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
-                    WHERE blowerMeetingId = ${id};     
+                ${where}
+                LIMIT ${limit.start}, ${limit.end};
             `
             );
             if (err) cb(err);

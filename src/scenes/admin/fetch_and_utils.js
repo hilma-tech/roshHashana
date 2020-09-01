@@ -142,6 +142,7 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
 }
 
 export const getParticipantsMeeting = async (id, limit, filter = '', cb = () => { }) => {
+    console.log(id, limit, filter)
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
