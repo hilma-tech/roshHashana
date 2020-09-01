@@ -310,8 +310,8 @@ export default class IsolatedForm extends Component {
                         </div>
 
                         <div className="err-msg ">{this.state.errorMsg}</div>
-                        <div className="comment">נתקלת בבעיה? שלח לנו מייל shofar2all@gmail.com</div>
                         <input type="submit" className="increase-padding" value="שמור" />
+                        <div className="comment mail">נתקלת בבעיה? שלח לנו מייל shofar2all@gmail.com</div>
                     </form>
                 </div>
 
