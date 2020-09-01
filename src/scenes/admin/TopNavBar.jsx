@@ -13,7 +13,7 @@ const TopNavBar = (props) => {
     useEffect(() => {
         (async () => {
             if (!blowersNum || blowersNum === 0) {
-                await getNumVolunteers((err, res) => {
+                await getNumVolunteers(true, (err, res) => {
                     if (!err) setBlowerNum(res)
                 })
             }

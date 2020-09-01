@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import '../styles/popup.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import '../styles/popup.scss'
 
 const DeletePopup = (props) => {
 

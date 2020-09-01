@@ -98,10 +98,11 @@ export const deleteIsolated = async (id, cb = () => { }) => {
     }
 }
 
-export const getNumVolunteers = async (cb = () => { }) => {
+export const getNumVolunteers = async (confirm, cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/countAllVolunteers`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
+        body: JSON.stringify({ confirm })
     }, true);
 
     if (err || !res) {

@@ -3,7 +3,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-map
 // import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
-import './map.scss';
+// import './map.scss';
 import { fetchShofarBlowersForMap } from '../../scenes/admin/fetch_and_utils';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -35,18 +35,17 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     const zoomPlace = (place) => {
         setCenter(place);
-        setZoom(20)
+        setZoom(18)
     }
 
-    const zoomOut = () => {
-        setCenter(CONSTS.JERUSALEM_POSITION);
-        setZoom(10)
-    }
+    // const zoomOut = () => {
+    //     setCenter(CONSTS.JERUSALEM_POSITION);
+    //     setZoom(10)
+    // }
 
     const fetchShofarBlowers = () => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
-                console.log(res)
                 setShofarBlowers(res)
             }
         })
@@ -88,6 +87,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     return <GoogleMap
         zoom={zoom}
+        onZoomChanged={(num) => setZoom(num)}
         center={center}
         defaultOptions={options}
 

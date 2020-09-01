@@ -113,23 +113,6 @@ module.exports = function (ShofarBlower) {
         }
     }
 
-
-    ShofarBlower.countAllVolunteers = function (cb) {
-        (async () => {
-            let [err, res] = await to(ShofarBlower.count());
-            if (err) cb(err);
-            if (res) {
-                return cb(null, res);
-            }
-        })()
-    }
-
-    ShofarBlower.remoteMethod('countAllVolunteers', {
-        http: { verb: 'post' },
-        accepts: [],
-        returns: { arg: 'res', type: 'number', root: true }
-    });
-
     ShofarBlower.remoteMethod('InsertDataShofarBlower', {
         http: { verb: 'post' },
         accepts: [
@@ -147,6 +130,14 @@ module.exports = function (ShofarBlower) {
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
+
+
+
+
+
+
+
+    //admin
 
     ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
         (async () => {
@@ -370,5 +361,29 @@ module.exports = function (ShofarBlower) {
         http: { verb: 'POST' },
         accepts: [],
         returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
+
+    ShofarBlower.countAllVolunteers = function (confirm, cb) {
+        (async () => {
+            try {
+                const countQ = `SELECT COUNT(*) AS num FROM shofar_blower AS sb  WHERE sb.confirm = ${confirm || 0}`
+                let [countErr, countRes] = await executeMySqlQuery(ShofarBlower, countQ);
+                if (countErr || !countRes) {
+                    console.log('get shofarBlower admin request error : ', countErr);
+                    throw shofarBlowerErr
+                }
+                return cb(null, countRes[0].num)
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('countAllVolunteers', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'confirm', type: 'boolean' }],
+        returns: { arg: 'res', type: 'number', root: true }
     });
 }
