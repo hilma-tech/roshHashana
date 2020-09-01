@@ -6,18 +6,34 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ParticipantsTable from '../tables/ParticipantsTable';
 import Search from '../Search';
 import '../styles/popup.scss'
+import { getParticipantsMeeting } from '../fetch_and_utils';
 
 const ParticipantsPopup = (props) => {
 
-    const { isOpenParticipantsPopUp, setOpenParticipantsPopUp, participantsPublicMeeting } = useContext(AdminMainContext)
+    const { isOpenParticipantsPopUp, setOpenParticipantsPopUp, participantsPublicMeeting, setParticipantsPublicMeeting } = useContext(AdminMainContext)
+    const [filters, setFilters] = useState(null)
 
     const onSearchName = (value) => {
-        // setFilters(pervFilters => {
-        //     if (!pervFilters) pervFilters = {}
-        //     pervFilters.name = value
-        //     return pervFilters
-        // })
-        // getIsolateds(filters)
+        setFilters(pervFilters => {
+            if (!pervFilters) pervFilters = {}
+            pervFilters.name = value
+            return pervFilters
+        })
+        getParticipants(filters)
+    }
+
+    const getParticipants = function (id , filter = {}, limit = { start: 0, end: 10 }) {
+        (async () => {
+            if (!filter) filter = {}
+            // setLoadingBlastsPub(true)
+            await getParticipantsMeeting(id ,limit, filter, (err, res) => {
+                console.log(err, res)
+                // setLoadingBlastsPub(false)
+                if (!err) {
+                    setParticipantsPublicMeeting(res)
+                }
+            })
+        })()
     }
 
     return (
@@ -30,11 +46,11 @@ const ParticipantsPopup = (props) => {
                 <div style={{ padding: '1vh 5vw 2vh 5vw', textAlign: "center", fontFamily: "Heebo", width: '55vw', height: "75vh" }}>
                     <DialogContent className="p-0" >
                         <div >
-                                <div className="mb-3">
-                                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
-                                </div>
-                                {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
-                                <ParticipantsTable />
+                            <div className="mb-3">
+                                <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                            </div>
+                            {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
+                            <ParticipantsTable />
                         </div>
                     </DialogContent>
                 </div>

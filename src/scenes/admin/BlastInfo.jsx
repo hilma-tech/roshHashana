@@ -10,16 +10,16 @@ const BlastInfo = (props) => {
 
     const { blastInfo, setOpenParticipantsPopUp, setParticipantsPublicMeeting } = useContext(AdminMainContext)
 
-    const handleTrashClick = (id) => {
-        (async () => {
-            // await deletePublicMeeting(id, (err, res) => {
-            //     console.log(err, res)
-            // })
-            await deleteConectionToMeeting(id, (err, res) => {
-                console.log(err, res)
-            })
-        })()
-    }
+    // const handleTrashClick = (id) => {
+    //     (async () => {
+    //         // await deletePublicMeeting(id, (err, res) => {
+    //         //     console.log(err, res)
+    //         // })
+    //         await deleteConectionToMeeting(id, (err, res) => {
+    //             console.log(err, res)
+    //         })
+    //     })()
+    // }
 
     const handleParticipantsClick = (id) => {
         (async () => {
@@ -84,7 +84,7 @@ const BlastInfo = (props) => {
                         <div className="bottomToList pointer" onClick={() => { handleParticipantsClick(blastInfo.id) }}>רשימת המשתתפים</div>
                     </div>
                 </div>}
-                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer deleteMeeting" onClick={() => { handleTrashClick(blastInfo.id) }}>
+                {blastInfo.type !== "ציבורית" && <div className="flexRow delete pointer deleteMeeting" onClick={() => { props.handleTrashClick(blastInfo.id, blastInfo.index) }}>
                     <div className="width25" style={{ fontSize: "1.7vh" }}>
                         <FontAwesomeIcon icon={['fas', 'trash']} />
                     </div>

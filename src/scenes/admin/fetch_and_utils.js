@@ -140,11 +140,11 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
     }
 }
 
-export const getParticipantsMeeting = async (id, cb = () => { }) => {
+export const getParticipantsMeeting = async (id, limit, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id, limit, filter })
     }, true);
 
     if (err || !res) {

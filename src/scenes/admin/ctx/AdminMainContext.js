@@ -20,7 +20,6 @@ export const AdminMainProvider = ({ children }) => {
     const [privateMeetingsNum, setPrivateMeetingsNum] = useState(false);
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
 
-
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
         loading, setLoading,
@@ -37,7 +36,7 @@ export const AdminMainProvider = ({ children }) => {
         participantsPublicMeeting, setParticipantsPublicMeeting,
         privateMeetingsNum, setPrivateMeetingsNum,
         blastsPrivate, setBlastsPrivate,
-        loadingBlastsPrivate, setLoadingBlastsPrivate
+        loadingBlastsPrivate, setLoadingBlastsPrivate,
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

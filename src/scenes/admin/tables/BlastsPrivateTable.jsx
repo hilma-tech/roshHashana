@@ -12,29 +12,22 @@ const BlastsPrivateTable = (props) => {
 
     const th = [['name', 'בעל התוקע'], ['nameOfIsolated', 'שם המבודד'], ['type', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info tableIcons', ''], ['delete tableIcons', '']]
 
-    const handleInfoClick = (blast) => {
+    const handleInfoClick = (blast, index) => {
         blast.type = "פרטית"
+        blast.index = index
         setBlastInfo(blast)
     }
 
-    const handleTrashClick = (id) => {
-        (async () => {
-            await deleteConectionToMeeting(id, (err, res) => {
-                console.log(err, res)
-            })
-        })()
-    }
-
     useEffect(() => {
-        if (blastsPrivate) setTr(blastsPrivate.map(blast => {
+        if (blastsPrivate) setTr(blastsPrivate.map((blast, index) => {
             return [
                 blast.blowerName,
                 blast.isolatedName,
                 "פרטית",
                 blast.address,
                 getTime(blast.start_time),
-                <FontAwesomeIcon className="pointer" style={{ fontSize: "1.7vh", textAlign: "left !important" }} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast) }} />,
-                <FontAwesomeIcon className="pointer" style={{fontSize:"1.7vh"}} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(blast.id) }} />
+                <FontAwesomeIcon className="pointer" style={{ fontSize: "1.7vh", textAlign: "left !important" }} icon={['fas', 'info-circle']} color='#156879' onClick={() => { handleInfoClick(blast, index) }} />,
+                <FontAwesomeIcon className="pointer" style={{ fontSize: "1.7vh" }} icon={['fas', 'trash']} color='#156879' onClick={() => { props.handleTrashClick(blast.id, index) }} />
 
             ]
         }))

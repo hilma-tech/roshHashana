@@ -372,7 +372,7 @@ module.exports = function (Isolated) {
             }
             if (filter.name && filter.name.length > 0) {
                 where += ` AND MATCH(isolatedUser.name) AGAINST ('"${filter.name}"')`
-                // where += ` OR MATCH(blowerUser.name) AGAINST ('"${filter.address}"')`
+                where += ` OR MATCH(blowerUser.name) AGAINST ('"${filter.name}"')`
             }
 
             let [err, res] = await executeMySqlQuery(Isolated,
@@ -382,7 +382,7 @@ module.exports = function (Isolated) {
                 isolatedUser.address,
                 isolatedUser.comments,
                 blowerUser.name AS "blowerName",
-                blowerUser.username AS "blowerPhone",
+                blowerUser.username AS "phone",
                 isolated.id AS "id",
                 isolated.meeting_time AS "start_time" 
             FROM isolated 
@@ -447,7 +447,11 @@ module.exports = function (Isolated) {
 
     Isolated.remoteMethod('getParticipantsMeeting', {
         http: { verb: 'POST' },
-        accepts: [{ arg: 'id', type: 'number', require: true }],
+        accepts: [
+            { arg: 'id', type: 'number', require: true },
+            { arg: 'limit', type: 'object' },
+            { arg: 'filter', type: 'object' },
+        ],
         returns: { arg: 'res', type: 'object', root: true }
     });
 
