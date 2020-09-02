@@ -414,8 +414,8 @@ module.exports = function (CustomUser) {
                 }
             }
 
+            let resCustomUser
             if (Object.keys(userData).length) {
-                let resCustomUser
                 try {
                     resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
@@ -427,11 +427,12 @@ module.exports = function (CustomUser) {
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-                console.log('isolatedInfo: ', isolatedInfo);
+                let currInfo = isolatedInfo;
+                currInfo.UserInfo = resCustomUser;
                 isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
 
                 //if the user changed his address and he has a public meeting
-                if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
+                if (((data.public_meeting == undefined || data.public_meeting == null) && isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
@@ -454,7 +455,7 @@ module.exports = function (CustomUser) {
                         }
                     }
                 }
-                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
+                else if ((data.public_meeting == 1 || data.public_meeting == true) && isolatedInfo && (isolatedInfo.public_meeting == 0 || isolatedInfo.public_meeting == false)) {//changed to public meeting from private
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
                     else {
@@ -471,23 +472,27 @@ module.exports = function (CustomUser) {
                         meetingChanged = true;
                     }
                 }
-                else {
+                else /*if ((data.public_meeting == 0 || data.public_meeting == false) && isolatedInfo && isolatedInfo.public_meeting)*/ {
                     //the user is changing from public to private
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
+                        let publicMeeting = await shofarBlowerPub.findOne({ where: { id: meetingId } });
+                        console.log(publicMeeting, 'public meeting id')
+                        isolatedUpdateSocket.setPublicMeetBlowerId((publicMeeting && publicMeeting.blowerId) ? publicMeeting.blowerId : false);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         pubMeetId = null;
                         meetingChanged = true;
                     }
                 }
+                // console.log('pubMeetId', pubMeetId)
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
-                console.log('newIsoData: ', newIsoData);
+                // console.log('newIsoDataaaaaaa', newIsoData)
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
@@ -1076,20 +1081,35 @@ module.exports = function (CustomUser) {
         (async () => {
             const myRouteQ = `
         SELECT * FROM (
-            SELECT false AS isPublicMeeting, CustomUser.address, false AS constMeeting,
-                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, meeting_time AS "startTime" 
+            SELECT 
+                FALSE AS isPublicMeeting, 
+                isolated.id AS "meetingId",
+                CustomUser.address, 
+                CustomUser.lng, CustomUser.lat, 
+                false AS constMeeting,
+                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, 
+                meeting_time AS "startTime"
             FROM isolated 
                 JOIN CustomUser ON userIsolatedId = CustomUser.id 
+                JOIN shofar_blower ON isolated.blowerMeetingId = shofar_blower.id
             WHERE public_meeting = 0 
                 AND blowerMeetingId = ${sbId}
-            
-            UNION
-            
-            SELECT true AS isPublicMeeting, shofar_blower_pub.address, shofar_blower_pub.constMeeting AS constMeeting, NULL AS isolatedPhone, start_time AS "startTime" 
-            FROM isolated 
-                JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
-            WHERE public_meeting = 1
-                AND shofar_blower_pub.blowerId = ${sbId}
+                
+                UNION
+                
+            SELECT 
+                TRUE AS isPublicMeeting, 
+                shofar_blower_pub.id AS "meetingId", 
+                shofar_blower_pub.address, 
+                shofar_blower_pub.lng, shofar_blower_pub.lat, 
+                shofar_blower_pub.constMeeting AS constMeeting, 
+                NULL AS isolatedPhone, 
+                start_time AS "startTime" 
+            FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerCU ON blowerCU.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerCU.id = shofar_blower.userBlowerId 
+            WHERE shofar_blower.confirm = 1
+                AND shofar_blower.id = ${sbId}
         ) a
         ORDER BY startTime
         `
@@ -1097,6 +1117,7 @@ module.exports = function (CustomUser) {
             let [errRoute, resRoute] = await executeMySqlQuery(CustomUser, myRouteQ)
             if (errRoute || !resRoute) { console.log("errRoute || !resRoute for myRouteQ", errRoute || !resRoute); return cb(true) }
             console.log('resRoute: ', resRoute);
+            return cb(null, resRoute)
         })()
     }
 
@@ -1115,6 +1136,58 @@ module.exports = function (CustomUser) {
         const privateMeetings = `select isolated.id meetingId, public_meeting isPublicMeeting , meeting_time meetingTime , blower.name blowerName from isolated left join CustomUser blower on blower.id = blowerMeetingId where public_meeting = 0`
 
     }
+
+
+
+
+
+    CustomUser.getAllAdminBlastsForMap = function (cb) {
+        (async () => {
+            try {
+                const blastsQ = `(SELECT
+                    isolatedUser.address AS address,
+                    isolatedUser.lat AS lat,
+                    isolatedUser.lng AS lng,
+                    blowerUser.name AS blowerName,
+                    false AS publicMeeting,
+                    isolated.id AS id
+                FROM isolated 
+                    LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1)
+          
+            UNION 
+          
+                (SELECT
+                    shofar_blower_pub.address AS address,
+                    shofar_blower_pub.lat AS lat,
+                    shofar_blower_pub.lng AS lng,
+                    blowerUser.name AS blowerName,
+                    true AS publicMeeting,
+                    shofar_blower_pub.id AS id
+                FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1)`
+
+                let [blastsErr, blastsRes] = await executeMySqlQuery(CustomUser, blastsQ);
+                if (blastsErr || !blastsRes) {
+                    console.log('get Isolated admin request error : ', blastsErr);
+                    throw isolatedErr
+                }
+                return cb(null, blastsRes)
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    CustomUser.remoteMethod('getAllAdminBlastsForMap', {
+        http: { verb: 'POST' },
+        accepts: [],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
 
 };
 

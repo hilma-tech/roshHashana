@@ -20,6 +20,8 @@ export const AdminMainProvider = ({ children }) => {
     const [privateMeetingsNum, setPrivateMeetingsNum] = useState(false);
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
+    //single shofar blower page
+    const [selectedSB, setSelectedSB] = useState(null)
 
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
@@ -38,7 +40,8 @@ export const AdminMainProvider = ({ children }) => {
         privateMeetingsNum, setPrivateMeetingsNum,
         blastsPrivate, setBlastsPrivate,
         loadingBlastsPrivate, setLoadingBlastsPrivate,
-        showConfirmPopup, setShowConfirmPopup
+        showConfirmPopup, setShowConfirmPopup,
+        selectedSB, setSelectedSB,
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

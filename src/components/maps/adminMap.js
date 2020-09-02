@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
-// import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
 // import './map.scss';
 import { fetchShofarBlowersForMap } from '../../scenes/admin/fetch_and_utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -93,13 +93,17 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     >
         <div className='mapNavContainer'>
-            <div id="inputContainer" >
+            <div className="inputContainer" >
                 <input
                     id="search-input"
                     type="text"
                     placeholder="חיפוש"
                 />
-                <img id="inputIcon" alt="" src="/icons/search.svg" />
+                <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
+            </div>
+            <div className={'mapIconContainer' + ' mapIconSelected'}>
+                <img src='icons/single-orange.svg' alt=''/>
+                <div className='textInHover'>מחפשים</div>
             </div>
         </div>
         {shofarBlowers.map((shofarBlower, index) =>

@@ -10,23 +10,24 @@ import { getParticipantsMeeting } from '../fetch_and_utils';
 
 const ParticipantsPopup = (props) => {
 
-    const { isOpenParticipantsPopUp, setOpenParticipantsPopUp, participantsPublicMeeting, setParticipantsPublicMeeting } = useContext(AdminMainContext)
+    const { blastInfo, isOpenParticipantsPopUp, setOpenParticipantsPopUp, participantsPublicMeeting, setParticipantsPublicMeeting } = useContext(AdminMainContext)
     const [filters, setFilters] = useState(null)
 
-    const onSearchName = (value) => {
+    const onSearchName = function (value) {
         setFilters(pervFilters => {
             if (!pervFilters) pervFilters = {}
             pervFilters.name = value
             return pervFilters
         })
-        getParticipants(filters)
+
+        getParticipants(blastInfo.id, filters)
     }
 
-    const getParticipants = function (id , filter = {}, limit = { start: 0, end: 10 }) {
+    const getParticipants = function (id, filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             // setLoadingBlastsPub(true)
-            await getParticipantsMeeting(id ,limit, filter, (err, res) => {
+            await getParticipantsMeeting(id, startRow, filter, (err, res) => {
                 console.log(err, res)
                 // setLoadingBlastsPub(false)
                 if (!err) {

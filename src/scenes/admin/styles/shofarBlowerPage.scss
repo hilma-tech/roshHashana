@@ -1,4 +1,4 @@
-@import "../../../consts/consts";
+@import "../admin_consts.scss";
 
 .bluePlusContainer {
     min-width: max-content;
@@ -12,13 +12,46 @@
     display: flex;
     align-items: center;
 }
-
 .bluePlusContainer div {
     margin-right: 0.5vw;
 }
 
-.sb-map-container-admin{
-    width: 60% ;
-    height: 90% ;
-    position: relative;
+.single-shofar-blower-page {
+    #top {
+        height: 10vh;
+        background-color: $dark-turquise;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        #title {
+            color: white;
+            font-size: 2rem;
+        }
+        #x-btn {
+            color: white;
+            height: 100%;
+        }
+    }
+    #map-and-info {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        #info {
+            display: flex;
+            flex-direction: column;
+            width: 40vw;
+            height: 90vh;
+            background-color: $grey;
+        }
+    }
+    .sb-map-container-admin {
+        width: 60vw;
+        height: 90vh;
+        position: relative;
+        & > div {
+            height: 100% !important;
+        }
+    }
 }

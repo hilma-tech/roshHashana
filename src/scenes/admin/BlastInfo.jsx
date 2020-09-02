@@ -21,10 +21,10 @@ const BlastInfo = (props) => {
     //     })()
     // }
 
-    const handleParticipantsClick = (id) => {
+    const handleParticipantsClick = (id, startRow = 0, filter = {}) => {
         (async () => {
             setOpenParticipantsPopUp(true)
-            await getParticipantsMeeting(id, (err, res) => {
+            await getParticipantsMeeting(id, startRow, filter, (err, res) => {
                 if (res) {
                     setParticipantsPublicMeeting(res)
                 }

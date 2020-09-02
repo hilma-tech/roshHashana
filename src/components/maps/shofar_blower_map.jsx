@@ -77,11 +77,11 @@ const ShofarBlowerMap = (props) => {
 
 
     useEffect(() => {
-        if (isAdmin) {
-            adminUseEffect()
-            return;
-        }
         (async () => {
+            if (isAdmin) {
+                adminUseEffect()
+                return;
+            }
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 let newCenter;
                 let latNum = Number(userData.lat)
@@ -103,9 +103,58 @@ const ShofarBlowerMap = (props) => {
         })();
     }, [userData])
 
-    const adminUseEffect = () => {
-        props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id &&
-            adminGetSBRoute(props.selectedSB.id)
+    const adminUseEffect = async () => {
+        if (props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id) {
+            let [errAdminRoute, resAdminRoute] = await adminGetSBRoute(props.selectedSB.id)
+            if (errAdminRoute || !resAdminRoute) {
+                console.log('setErr');
+                setErr(true)
+            }
+            console.log('resAdminRoute: ', resAdminRoute);
+            let myRouteCnt = 0;
+            const userStartTime = new Date(props.selectedSB.startTime).getTime()
+            const userEndTime = userStartTime + props.selectedSB.maxRouteDuration;
+            let myStartT
+            let meetingStartTime
+            let isConstMeeting
+            let locObj = {}
+            let myMeetingsLocs = !Array.isArray(resAdminRoute) ? []
+                : resAdminRoute.map((myMeeting, i) => {
+                    myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
+                    meetingStartTime = new Date(myMeeting.startTime).getTime()
+                    isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
+                    if (!isConstMeeting) { myRouteCnt++ }
+                    locObj = {
+                        location: { lat: myMeeting.lat, lng: myMeeting.lng },
+                        startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
+                        meetingId: myMeeting.meetingId,
+                        isPublicMeeting: myMeeting.isPublicMeeting,
+                        constMeeting: myMeeting.constMeeting,
+                        info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
+                    }
+                    isConstMeeting ?
+                        locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
+                        locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
+                    return locObj;
+                })
+
+            let newCenter;
+            let latNum = Number(props.selectedSB.lat)
+            let lngNum = Number(props.selectedSB.lng)
+            if (isNaN(latNum) || isNaN(lngNum)) {
+                // we don't have user's origin start point location (lng, lat) from db
+                if (typeof props.selectedSB.address === "string") {
+                    // but we have his address, so find lngLat
+                    newCenter = await getLngLatOfLocation(props.selectedSB.address)
+                }
+                else openGenAlert({ text: "קרתה בעיה באיתור מקום יציאתך" })
+            }
+            else {
+                newCenter = { lat: latNum, lng: lngNum };
+            }
+            if (newCenter !== center) setCenter(newCenter)
+            setAllMapData({ myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } })
+        }
     }
 
     useEffect(() => {
@@ -260,6 +309,8 @@ const ShofarBlowerMap = (props) => {
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
                 err={err}
+                isAdmin={isAdmin}
+                selectedSB={props.selectedSB}
                 data={allMapData}
                 history={props.history}
                 allGenLocations={allGenLocations}

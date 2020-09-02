@@ -64,9 +64,7 @@ const ShofarBlowerTable = (props) => {
     }
 
     const handleRouteClick = (sb) => {
-        console.log('handleRouteClick');
         setSelectedSB(sb)
-
     }
 
     const handleEditClick = (e) => {
@@ -93,9 +91,13 @@ const ShofarBlowerTable = (props) => {
         })()
     }
 
+    const setPage = (page) => {
+        props.getShofarBlowers(null, (page - 1) * 7)
+    }
+
     return (
         <div className='shofarBlowerTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={7} resaultsNum={props.resultNum} />
 
             {showDeletePopup &&
                 <DeletePopup

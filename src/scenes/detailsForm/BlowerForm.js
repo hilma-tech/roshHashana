@@ -184,22 +184,22 @@ export default class BlowerForm extends Component {
             return;
         }
 
-        const formChilds = e.target.children;
+        // const formChilds = e.target.children;
 
-        if (!formChilds[1].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
+        if (/*!formChilds[1].value ||*/ !this.state.chosenTime || !this.state.address || !this.state.address.length) {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
         else this.setState({ errorMsg: '' });
 
-        if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
-            this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
-            return;
-        }
-        else if (formChilds[1].value < 1) {
-            this.setState({ numOfBlowErr: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
-            return;
-        } else this.setState({ numOfBlowErr: '' });
+        // if (formChilds[1].value > 20 || formChilds[1].value.length > 2) { // check can_blow_x_times value
+        //     this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
+        //     return;
+        // }
+        // else if (formChilds[1].value < 1) {
+        //     this.setState({ numOfBlowErr: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
+        //     return;
+        // } else this.setState({ numOfBlowErr: '' });
 
         // check address
         const { address } = this.state
@@ -222,7 +222,7 @@ export default class BlowerForm extends Component {
             return;
         }
         let blowerDetails = {
-            "can_blow_x_times": formChilds[1].value,
+            "can_blow_x_times": 5,
             "volunteering_start_time": startTime,
             "volunteering_max_time": Math.abs(this.state.walkTime),//endTime,
             "address": this.state.address,
@@ -258,14 +258,14 @@ export default class BlowerForm extends Component {
                     <div className="msg-txt header"> {`שלום ${name}, `}</div>
                     <div className="msg-txt header">תודה על הנכונות לעזור!</div>
                     <div className="msg-txt header h2">כמה שאלות, ונמשיך לקביעת המפגש</div>
-
+                    <div className="comment note">*ניתן תמיד לשנות את פרטיך בהגדרות האתר בהמשך</div>
 
                     <form onSubmit={this.saveShofarBlowerDetails} onKeyPress={this.handleKeyPress}>
 
                         {/* shofar blowing times input */}
-                        <div className="title">כמה פעמים תהיה מוכן לקיים תקיעת שופר באזורך?</div>
+                        {/* <div className="title">כמה פעמים תהיה מוכן לקיים תקיעת שופר באזורך?</div>
                         <input type="number" />
-                        <div className="err-msg ">{this.state.numOfBlowErr}</div>
+                        <div className="err-msg ">{this.state.numOfBlowErr}</div> */}
 
                         {/* start time input */}
                         <div className="title">באיזה שעה אתה מתכנן לצאת למסלול תקיעות שופר?</div>
@@ -274,7 +274,7 @@ export default class BlowerForm extends Component {
                             <MuiPickersUtilsProvider utils={MomentUtils}>
                                 <Fragment>
                                     <TimePicker
-                                        placeholder="שעה"
+                                        placeholder="רשום שעה משוערת שבה תוכל לצאת"
                                         ampm={false}
                                         value={this.state.chosenTime}
                                         onChange={this.changeChosenTime}
@@ -328,6 +328,7 @@ export default class BlowerForm extends Component {
 
                         <div className="err-msg ">{this.state.errorMsg}</div>
                         <input type="submit" className="increase-padding" value="שמור" />
+                        <div className="comment mail">נתקלת בבעיה? שלח לנו מייל shofar2all@gmail.com</div>
                     </form>
                 </div>
 

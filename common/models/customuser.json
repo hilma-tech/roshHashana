@@ -192,7 +192,8 @@
       "principalId": "ADMIN",
       "permission": "ALLOW",
       "property": [
-        "adminGetSBRoute"
+        "adminGetSBRoute",
+        "getAllAdminBlastsForMap"
       ]
     }
   ],

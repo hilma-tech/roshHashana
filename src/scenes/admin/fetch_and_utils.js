@@ -1,12 +1,12 @@
 import Auth from '../../modules/auth/Auth'
 import { CONSTS } from '../../consts/const_messages'
 
-export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
+export const fetchIsolateds = async (startRow, filter = {}, cb = () => { }) => {
     if (!filter) filter = {}
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getIsolatedsForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (typeof cb === "function") {
         if (err || !res) {
@@ -18,12 +18,12 @@ export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
     }
 }
 
-export const fetchShofarBlowers = async (limit, filter = {}, cb = () => { }) => {
+export const fetchShofarBlowers = async (startRow, filter = {}, cb = () => { }) => {
     if (!filter) filter = {}
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/getShofarBlowersForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (typeof cb === "function") {
         if (err || !res) {
@@ -35,11 +35,11 @@ export const fetchShofarBlowers = async (limit, filter = {}, cb = () => { }) => 
     }
 }
 
-export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
+export const fetchBlastsPub = async (startRow, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowerPubs/getPublicMeetings`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
@@ -49,11 +49,11 @@ export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
     }
 }
 
-export const fetchBlastsPrivate = async (limit, filter = '', cb = () => { }) => {
+export const fetchBlastsPrivate = async (startRow, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getPrivateMeetings`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
@@ -141,11 +141,12 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
     }
 }
 
-export const getParticipantsMeeting = async (id, limit, filter = '', cb = () => { }) => {
+export const getParticipantsMeeting = async (id, startRow, filter = '', cb = () => { }) => {
+    console.log(id, startRow, filter)
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ id, limit, filter })
+        body: JSON.stringify({ id, startRow, filter })
     }, true);
 
     if (err || !res) {
@@ -217,14 +218,12 @@ export const fetchShofarBlowersForMap = async (cb = () => { }) => {
 }
 
 export const adminGetSBRoute = async (sbId) => {
-    return new Promise(async (resolve, reject) => {
-        let [err, res] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ sbId })
-        }, true);
+    let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId })
+    }, true);
+    return new Promise((resolve, reject) => {
         if (err || !res) {
-            resolve([true])
+            resolve([true, null])
             return;
         }
         resolve([null, res])

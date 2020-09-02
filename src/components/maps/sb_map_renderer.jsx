@@ -19,17 +19,25 @@ import { updateMyStartTime, checkDateBlock } from '../../fetch_and_utils';
 import { logE } from '../../handlers/consoleLogHandler'
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
-    const { err, data } = props
-    if (err) return null;
+    const { err, data, isAdmin, selectedSB } = props
+    if (err) return <div className="loader">{typeof err === "string" ? err : "אירעה שגיאה, נא נסו שנית מאוחר יותר"}</div>;
     if (!data) return <img alt="נטען..." className="loader" src='/images/loader.svg' />
     const { openGenAlert } = useContext(MainContext)
-    const {
-        userData,
+    const sbctx = useContext(SBContext)
+    let userData,
         setStartTimes, startTimes,
-        setMyMeetings, 
+        setMyMeetings,
         isPrint, setIsPrint,
         totalLength
-    } = useContext(SBContext)
+    if (sbctx && typeof sbctx === "object") {
+        userData = sbctx.userData;
+        setStartTimes = sbctx.setStartTimes;
+        startTimes = sbctx.startTimes;
+        setMyMeetings = sbctx.setMyMeetings;
+        setIsPrint = sbctx.setIsPrint;
+        totalLength = sbctx.totalLength;
+    }
+
 
     const [routePath, setRoutePath] = useState(null)
     const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
@@ -38,15 +46,15 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
 
     const userLocationIcon = {
-        url: '/icons/sb_origin.svg',
-        scaledSize: new window.google.maps.Size(80, 80),
+        url: isAdmin ? "/icons/single-blue.svg" : '/icons/sb_origin.svg',
+        scaledSize: isAdmin ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(80, 80),
         // origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(50, 50),
+        anchor: isAdmin ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
 
     useEffect(() => {
-        if(totalLength == null) return
+        if (totalLength == null) return
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
@@ -73,8 +81,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
-        const userStartTime = new Date(userData.startTime).getTime()
-        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const userStartTime = isAdmin ? selectedSB.startTime : new Date(userData.startTime).getTime()
+        const userEndTime = isAdmin ? (userStartTime + selectedSB.volunteering_max_time) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfter = [];
@@ -101,28 +109,31 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
-            let newStartTimes = res.startTimes;
-            if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-            const getMyNewST = (mId, isPub) => {
-                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
-                if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
-                return false
-            }
-            const meetingsToUpdateST = [];
-            for (let m of routeStops) { //loop current stops and their start times
-                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
-                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
-            }
-            if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                if (!checkDateBlock('DATE_TO_BLOCK_BLOWER')) updateMyStartTime(meetingsToUpdateST, (error => {
-                    if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
-                }))
-                setMyMeetings(meets => meets.map(m => {
-                    let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
-                    if (!newMMStartTime) return m
-                    return { ...m, startTime: newMMStartTime.startTime }
-                }))
+
+            if (!isAdmin) {
+                let newStartTimes = res.startTimes;
+                if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
+                const getMyNewST = (mId, isPub) => {
+                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
+                    if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
+                    return false
+                }
+                const meetingsToUpdateST = [];
+                for (let m of routeStops) { //loop current stops and their start times
+                    let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
+                    if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                        meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
+                }
+                if (meetingsToUpdateST && meetingsToUpdateST.length) {
+                    if (!checkDateBlock('DATE_TO_BLOCK_BLOWER')) updateMyStartTime(meetingsToUpdateST, (error => {
+                        if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
+                    }))
+                    setMyMeetings(meets => meets.map(m => {
+                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                        if (!newMMStartTime) return m
+                        return { ...m, startTime: newMMStartTime.startTime }
+                    }))
+                }
             }
             setRoutePath(res.overviewPath)
         }
