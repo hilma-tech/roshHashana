@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import GeneralAlert from '../components/modals/general_alert';
 
 
 export const MainContext = React.createContext()
@@ -39,5 +40,6 @@ export const MainProvider = ({ children }) => {
 
     return <MainContext.Provider value={ctxValue} >
         {children}
+        {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
     </MainContext.Provider>
 }

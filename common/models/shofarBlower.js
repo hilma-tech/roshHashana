@@ -158,17 +158,18 @@ module.exports = function (ShofarBlower) {
                     where += ` AND (MATCH(cu.name) AGAINST ('${filter.name}'))`
                 }
 
-                const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
-                    (SELECT COUNT(*) 
-                    FROM shofar_blower_pub
-                    WHERE blowerId = cu.id
-                    )+(
-                    SELECT COUNT(*)
-                    FROM isolated
-                    WHERE public_meeting = 0 AND blowerMeetingId = cu.id
-                    ) 
-                ) AS blastsNum
-                FROM shofar_blower as sb 
+                const shofarBlowerQ = `
+                SELECT 
+                    sb.id, 
+                    sb.volunteering_max_time,
+                    sb.volunteering_start_time AS "startTime", 
+                    cu.name,
+                    cu.username,
+                    cu.address,
+                    cu.lng,
+                    cu.lat,
+                    ((SELECT COUNT(*) FROM shofar_blower_pub WHERE blowerId = cu.id)+(SELECT COUNT(*) FROM isolated WHERE public_meeting = 0 AND blowerMeetingId = cu.id)) AS blastsNum
+                FROM shofar_blower AS sb 
                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
                 ${where}
                 ORDER BY cu.name

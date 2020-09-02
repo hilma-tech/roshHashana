@@ -12,14 +12,16 @@ export const AdminMainProvider = ({ children }) => {
     const [loadingBlastsPrivate, setLoadingBlastsPrivate] = useState(false)
     const [blastInfo, setBlastInfo] = useState(null)
     const [isOpenParticipantsPopUp, setOpenParticipantsPopUp] = useState(false)
-    const [blowersNum, setBlowerNum] = useState(0);
-    const [isolatedNum, setIsolatedNum] = useState(0);
-    const [blastsNum, setBlastsNum] = useState(0);
+    const [blowersNum, setBlowerNum] = useState(0); //nav bar
+    const [isolatedNum, setIsolatedNum] = useState(0); //nav bar
+    const [blastsNum, setBlastsNum] = useState(0); //nav bar
     const [isOpenSideBar, setOpenSideBar] = useState(false);
     const [pubMeetingsNum, setPubMeetingsNum] = useState(false);
     const [privateMeetingsNum, setPrivateMeetingsNum] = useState(false);
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
+    //single shofar blower page
+    const [selectedSB, setSelectedSB] = useState(null)
 
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
@@ -38,7 +40,8 @@ export const AdminMainProvider = ({ children }) => {
         privateMeetingsNum, setPrivateMeetingsNum,
         blastsPrivate, setBlastsPrivate,
         loadingBlastsPrivate, setLoadingBlastsPrivate,
-        showConfirmPopup, setShowConfirmPopup
+        showConfirmPopup, setShowConfirmPopup,
+        selectedSB, setSelectedSB,
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

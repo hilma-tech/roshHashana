@@ -7,16 +7,25 @@ import TopNavBar from './TopNavBar';
 import Search from './Search';
 import './styles/shofarBlowerPage.scss'
 
-let status = 0
+let status = 1
 
 const ShofarBlowerPage = function (props) {
-    const { setLoading, setShofarBlowers } = useContext(AdminMainContext)
+    const { selectedSB, setSelectedSB, setLoading, setShofarBlowers } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
         getShofarBlowers()
     }, [])
+
+    useEffect(() => {
+        if (selectedSB && props.location.pathname === "/shofar-blowers") {
+            props.history.push("/shofar-blower")
+            console.log('selectedSB: ', selectedSB);
+        } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
+            props.history.push("/shofar-blowers")
+        }
+    }, [selectedSB])
 
     const getShofarBlowers = function (filter = filters, startRow = 0) {
         (async () => {
@@ -57,7 +66,7 @@ const ShofarBlowerPage = function (props) {
     }
 
     return (
-        <div className='isolatedsContainer'>
+        <div className="isolatedsContainer" >
             <TopNavBar />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מתנדבים לתקוע בשופר</div>
@@ -76,7 +85,7 @@ const ShofarBlowerPage = function (props) {
                     <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מתנדבים</div>
                     <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <ShofarBlowerTable resultNum={resultNum} status={status} getShofarBlowers={getShofarBlowers} />
+                <ShofarBlowerTable selectedSB={selectedSB} setSelectedSB={setSelectedSB} setResultNum={setResultNum} resultNum={resultNum} status={status} />
             </div>
         </div>
     );

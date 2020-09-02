@@ -217,6 +217,18 @@ export const fetchShofarBlowersForMap = async (cb = () => { }) => {
     }
 }
 
+export const adminGetSBRoute = async (sbId) => {
+    let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId })
+    }, true);
+    return new Promise((resolve, reject) => {
+        if (err || !res) {
+            resolve([true, null])
+            return;
+        }
+        resolve([null, res])
+    });
+}
 export const fetchBlastsForMap = async (cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getAllAdminBlastsForMap`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },

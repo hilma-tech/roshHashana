@@ -1073,6 +1073,60 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
+    CustomUser.adminGetSBRoute = function (options, sbId, cb) {
+        if (!options || !options.accessToken || !options.accessToken.userId) {
+            return cb(true)
+        }
+
+        (async () => {
+            const myRouteQ = `
+        SELECT * FROM (
+            SELECT 
+                FALSE AS isPublicMeeting, 
+                isolated.id AS "meetingId",
+                CustomUser.address, 
+                CustomUser.lng, CustomUser.lat, 
+                false AS constMeeting,
+                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, 
+                meeting_time AS "startTime"
+            FROM isolated 
+                JOIN CustomUser ON userIsolatedId = CustomUser.id 
+                JOIN shofar_blower ON isolated.blowerMeetingId = shofar_blower.id
+            WHERE public_meeting = 0 
+                AND blowerMeetingId = ${sbId}
+                
+                UNION
+                
+            SELECT 
+                TRUE AS isPublicMeeting, 
+                shofar_blower_pub.id AS "meetingId", 
+                shofar_blower_pub.address, 
+                shofar_blower_pub.lng, shofar_blower_pub.lat, 
+                shofar_blower_pub.constMeeting AS constMeeting, 
+                NULL AS isolatedPhone, 
+                start_time AS "startTime" 
+            FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerCU ON blowerCU.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerCU.id = shofar_blower.userBlowerId 
+            WHERE shofar_blower.confirm = 1
+                AND shofar_blower.id = ${sbId}
+        ) a
+        ORDER BY startTime
+        `
+
+            let [errRoute, resRoute] = await executeMySqlQuery(CustomUser, myRouteQ)
+            if (errRoute || !resRoute) { console.log("errRoute || !resRoute for myRouteQ", errRoute || !resRoute); return cb(true) }
+            console.log('resRoute: ', resRoute);
+            return cb(null, resRoute)
+        })()
+    }
+
+    CustomUser.remoteMethod('adminGetSBRoute', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "sbId", type: "number" }],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    })
+
 
     const sqlForScripts = () => {
         const sbQ = `select name, username from CustomUser left join RoleMapping on CustomUser.id = RoleMapping.principalId where roleId = ${SHOFAR_BLOWER_ROLE}`
@@ -1116,7 +1170,7 @@ module.exports = function (CustomUser) {
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                 WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1)`
-                
+
                 let [blastsErr, blastsRes] = await executeMySqlQuery(CustomUser, blastsQ);
                 if (blastsErr || !blastsRes) {
                     console.log('get Isolated admin request error : ', blastsErr);
