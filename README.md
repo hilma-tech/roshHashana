@@ -30,6 +30,8 @@
     CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
     GRANT ALL Privileges ON roshHashana.* TO 'newuser'@'localhost' WITH GRANT OPTION;
 
+8. to enable socket.io you will need to add a variable to .env file called REACT_APP_SOCKET_IO_URI with the value of http://localhost:8080
+
 
 
 while working on the project, NOTICE: to identify a specific meeting, you will need meetingId _and_ isPublicMeeting (with those two as your identifiers, u can find the specific meeting in db - isolated or shofar_blower_pub) 

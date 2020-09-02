@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
 export const AdminMainContext = React.createContext()
 
@@ -20,8 +20,21 @@ export const AdminMainProvider = ({ children }) => {
     const [privateMeetingsNum, setPrivateMeetingsNum] = useState(false);
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
-    //single shofar blower page
+    //single shofar blower page:(3)
     const [selectedSB, setSelectedSB] = useState(null)
+    const [startTimes, setStartTimes] = useState(null)
+    const [totalLength, setTotalLength] = useState(null)
+
+    useEffect(() => {
+        if (startTimes) setTotalLength(getTotalLength())
+    }, [startTimes])
+
+
+    const getTotalLength = () => {
+        if (!startTimes) return null;
+        return startTimes.reduce((accumulator, t) => accumulator + t.distance.value, 0);
+    }
+
 
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
@@ -42,6 +55,7 @@ export const AdminMainProvider = ({ children }) => {
         loadingBlastsPrivate, setLoadingBlastsPrivate,
         showConfirmPopup, setShowConfirmPopup,
         selectedSB, setSelectedSB,
+        startTimes, setStartTimes, totalLength,
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

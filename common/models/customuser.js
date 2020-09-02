@@ -812,7 +812,6 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.assignSB = function (options, meetingObj, cb) {
-
         console.log('assignSB: ');
         (async () => {
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {

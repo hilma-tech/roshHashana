@@ -163,6 +163,7 @@ module.exports = function (ShofarBlower) {
                     sb.id, 
                     sb.volunteering_max_time,
                     sb.volunteering_start_time AS "startTime", 
+                    sb.can_blow_x_times,
                     cu.name,
                     cu.username,
                     cu.address,

@@ -3,6 +3,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Polyline } from "react-google-m
 
 import { SBContext } from '../../ctx/shofar_blower_context';
 import { MainContext } from '../../ctx/MainContext';
+import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 
 import MarkerGenerator, { SBMarkerGenerator } from './marker_generator';
 import { SBSearchBoxGenerator } from './search_box_generator'
@@ -14,7 +15,7 @@ import { isBrowser } from "react-device-detect";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SBAllMeetingsList from '../sb_all_meetings_list';
-import { updateMyStartTime, checkDateBlock } from '../../fetch_and_utils';
+import { updateMyStartTime, checkDateBlock, assignSB } from '../../fetch_and_utils';
 
 import { logE } from '../../handlers/consoleLogHandler'
 
@@ -24,6 +25,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     if (!data) return <img alt="נטען..." className="loader" src='/images/loader.svg' />
     const { openGenAlert } = useContext(MainContext)
     const sbctx = useContext(SBContext)
+    const adminctx = useContext(AdminMainContext)
     let userData,
         setStartTimes, startTimes,
         setMyMeetings,
@@ -36,14 +38,19 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setMyMeetings = sbctx.setMyMeetings;
         setIsPrint = sbctx.setIsPrint;
         totalLength = sbctx.totalLength;
+    } else if (adminctx && typeof adminctx === "object") {
+        startTimes = adminctx.startTimes
+        setStartTimes = adminctx.setStartTimes
     }
 
-
-    const [routePath, setRoutePath] = useState(null)
-    const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
-    const [genMap, setGenMap] = useState(false)
-    const [showMeetingsList, setShowMeetingsList] = useState(false)
-    const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
+    const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
+        ? <div id="info-window-container">
+            <div className="info-window-title bold turquoiseText">בעל תוקע</div>
+            <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
+            <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
+            <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{selectedSB.username}</div></div>
+        </div>
+        : null
 
     const userLocationIcon = {
         url: isAdmin ? "/icons/single-blue.svg" : '/icons/sb_origin.svg',
@@ -52,6 +59,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         anchor: isAdmin ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
+
+
+    const [routePath, setRoutePath] = useState(null)
+    const [b4OrAfterRoutePath, setB4OrAfterRoutePath] = useState(null)
+    const [genMap, setGenMap] = useState(false)
+    const [showMeetingsList, setShowMeetingsList] = useState(false)
+    const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
 
     useEffect(() => {
         if (totalLength == null) return
@@ -81,8 +95,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
-        const userStartTime = isAdmin ? selectedSB.startTime : new Date(userData.startTime).getTime()
-        const userEndTime = isAdmin ? (userStartTime + selectedSB.volunteering_max_time) : (userStartTime + userData.maxRouteDuration);
+        const userStartTime = isAdmin ? new Date(selectedSB.startTime).getTime() : new Date(userData.startTime).getTime()
+        const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfter = [];
@@ -100,7 +114,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     constStopsAfter.push(data.myMLocs[i])
                 }
             }
-            else routeStops.push(data.myMLocs[i])
+            else {
+                routeStops.push(data.myMLocs[i])
+            }
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
@@ -109,9 +125,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
+            let newStartTimes = res.startTimes;
 
-            if (!isAdmin) {
-                let newStartTimes = res.startTimes;
+            if (isAdmin) {
+                if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes) //when assigning values to setStartTimes and to startTimes, I take it from the right context (admin or sb)
+            } else {
                 if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
                 const getMyNewST = (mId, isPub) => {
                     let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
@@ -222,27 +240,28 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     />
             }
             {/* user location */}
-            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} /> {/* might need to disable when genMap is on */}
+            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} /> {/* might need to disable when genMap is on */}
 
-            <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
-                {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
-                <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
-                    <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
-                </div>
-                {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
-                    :
-                    <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
-                        <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
-                        <div className="list-switch-text">הצג מחפשים ברשימה</div>
-                    </div>}
-                {showMeetingsList ?
-                    <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
-                        <SBAllMeetingsList />
+            {isAdmin ? null :
+                <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
+                    {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
+                    <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
+                        <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
                     </div>
-                    : null
-                }
-            </div>
-
+                    {isBrowser ? <SBSearchBoxGenerator changeCenter={props.changeCenter} center={props.center} />
+                        :
+                        <div className={`list-switch-container-mobile clickAble`} onClick={() => { setShowMeetingsList(true); setShowMeetingsListAni(true) }} >
+                            <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
+                            <div className="list-switch-text">הצג מחפשים ברשימה</div>
+                        </div>}
+                    {showMeetingsList ?
+                        <div className={`sb-side-list-content-mobile ${showMeetingsListAni ? "open-side-list" : "close-side-list"}`} >
+                            <SBAllMeetingsList />
+                        </div>
+                        : null
+                    }
+                </div>
+            }
         </GoogleMap>
     );
 }));
