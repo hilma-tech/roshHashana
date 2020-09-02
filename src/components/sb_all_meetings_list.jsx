@@ -5,12 +5,12 @@ import { SBContext } from '../ctx/shofar_blower_context'
 const SBAllMeetingsList = ({ mobile }) => {
 
     let { meetingsReqs, setAssignMeetingInfo, userData } = useContext(SBContext)
-    var distance = function (lat1, lng1, lat2, lng2) {
-        var radlat1 = Math.PI * lat1 / 180;
-        var radlat2 = Math.PI * lat2 / 180;
-        var theta = lng1 - lng2;
-        var radtheta = Math.PI * theta / 180;
-        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    const distance = (lat1, lng1, lat2, lng2) => {
+        let radlat1 = Math.PI * lat1 / 180;
+        let radlat2 = Math.PI * lat2 / 180;
+        let theta = lng1 - lng2;
+        let radtheta = Math.PI * theta / 180;
+        let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
         dist = Math.acos(dist);
         dist = dist * 180 / Math.PI;
         dist = dist * 60 * 1.1515;

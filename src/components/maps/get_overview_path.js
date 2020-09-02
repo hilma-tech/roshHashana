@@ -4,7 +4,7 @@ import { CONSTS } from '../../consts/const_messages'
 
 export const getOverviewPath = async (google, origin, stops, extraData) => {
 
-    /**
+    /** props:
     * origin: { lng: double, lat: double }
     * stops: [ { location: {} }, { location:{} } ]
     * extraData: { startTime, userData } 

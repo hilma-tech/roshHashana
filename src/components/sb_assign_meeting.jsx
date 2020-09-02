@@ -7,7 +7,7 @@ import { SBContext } from '../ctx/shofar_blower_context';
 import { MainContext } from '../ctx/MainContext';
 
 import Auth from '../modules/auth/Auth';
-import { assignSB, dateWTimeFormatChange, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign, checkDateBlock } from '../fetch_and_utils';
+import { assignSB, updateMaxDurationAndAssign, updateMaxRouteLengthAndAssign, checkDateBlock } from '../fetch_and_utils';
 import { CONSTS } from '../consts/const_messages';
 
 const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, עמכם הסליחה"
@@ -124,7 +124,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         updateMaxRouteLengthAndAssign(assignMeetingInfo,
             (error, res) => {
                 if (error || !res) {
-                    console.log('updateMaxDurationAndAssign err: ', error);
                     openGenAlert({ text: typeof error === "string" ? error : assign_error })
                     return;
                 }
