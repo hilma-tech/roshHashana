@@ -3,7 +3,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-map
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
 // import './map.scss';
-import { fetchShofarBlowersForMap } from '../../scenes/admin/fetch_and_utils';
+import { fetchShofarBlowersForMap, fetchBlastsForMap, fetchIsolatedForMap } from '../../scenes/admin/fetch_and_utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -13,6 +13,8 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [center, setCenter] = useState(CONSTS.JERUSALEM_POSITION);
     const [zoom, setZoom] = useState(10);
     const [shofarBlowers, setShofarBlowers] = useState([])
+    const [blasts, setBlasts] = useState([])
+    const [isolateds, setIsolateds] = useState([])
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -31,6 +33,8 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
 
         fetchShofarBlowers()
+        fetchBlasts()
+        fetchIsolateds()
     }, []);
 
     const zoomPlace = (place) => {
@@ -47,6 +51,22 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
+            }
+        })
+    }
+
+    const fetchBlasts = () => {
+        fetchBlastsForMap((err, res) => {
+            if (!err) {
+                setBlasts(res)
+            }
+        })
+    }
+
+    const fetchIsolateds = () => {
+        fetchIsolatedForMap((err, res) => {
+            if (!err) {
+                setIsolateds(res)
             }
         })
     }
@@ -102,7 +122,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
             </div>
             <div className={'mapIconContainer' + ' mapIconSelected'}>
-                <img src='icons/single-orange.svg' alt=''/>
+                <img src='icons/single-orange.svg' alt='' />
                 <div className='textInHover'>מחפשים</div>
             </div>
         </div>
@@ -111,14 +131,44 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 key={index}
                 options={{
                     icon: {
-                        url: 'icons/single-blue.svg',
-                        scaledSize: { width: 35, height: 35 },
-                        anchor: { x: 17.5, y: 17.5 }
+                        url: 'icons/shofar-blue.svg',
+                        scaledSize: { width: 30, height: 30 },
+                        anchor: { x: 15, y: 15 }
                     }
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
                 onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
+            />
+        )}
+        {blasts.map((blast, index) =>
+            <Marker
+                key={index}
+                options={{
+                    icon: {
+                        url: 'icons/group.svg',
+                        scaledSize: { width: 30, height: 30 },
+                        anchor: { x: 15, y: 15 }
+                    }
+                }}
+                position={{ lat: Number(blast.lat), lng: Number(blast.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
+            />
+        )}
+        {isolateds.map((isolated, index) =>
+            <Marker
+                key={index}
+                options={{
+                    icon: {
+                        url: 'icons/singleOrange.svg',
+                        scaledSize: { width: 30, height: 30 },
+                        anchor: { x: 15, y: 15 }
+                    }
+                }}
+                position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }) }}
             />
         )}
     </GoogleMap>
