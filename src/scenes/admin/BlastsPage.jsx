@@ -106,10 +106,10 @@ const BlastsPage = (props) => {
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
                     <div className='statusNavContainer'>
-                        <div className={'orangeSubTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
+                        <div className={'orangeText subTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
                         <div style={{ width: '3.5vw' }}></div>
-                        <div className={'orangeSubTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
-                        <div className='blueSubTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
+                        <div className={'orangeText subTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
+                        <div className='blueText subTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
                     </div>
                     {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable handleTrashClick={handleTrashClick} />}
                 </div>

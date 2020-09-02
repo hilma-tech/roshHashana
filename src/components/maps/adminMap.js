@@ -16,6 +16,10 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [blasts, setBlasts] = useState([])
     const [isolateds, setIsolateds] = useState([])
 
+    const [showShofarBlowers, setShowShofarBlowers] = useState(false)
+    const [showBlasts, setShowBlasts] = useState(false)
+    const [showIsolateds, setShowIsolateds] = useState(false)
+
     useEffect(() => {
         const input = document.getElementById('search-input');
         let autocomplete = new window.google.maps.places.Autocomplete(input);
@@ -31,15 +35,11 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
             else return;
         })
-
-        fetchShofarBlowers()
-        fetchBlasts()
-        fetchIsolateds()
     }, []);
 
     const zoomPlace = (place) => {
-        setCenter(place);
         setZoom(18)
+        setCenter(place);
     }
 
     // const zoomOut = () => {
@@ -47,7 +47,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     //     setZoom(10)
     // }
 
-    const fetchShofarBlowers = () => {
+    const showShofarBlowersMarkers = () => {
+        setShowShofarBlowers(prev => !prev)
+        if (shofarBlowers.length > 0) return
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
@@ -55,7 +57,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
     }
 
-    const fetchBlasts = () => {
+    const showBlastsMarkers = () => {
+        setShowBlasts(prev => !prev)
+        if (blasts.length > 0) return
         fetchBlastsForMap((err, res) => {
             if (!err) {
                 setBlasts(res)
@@ -63,7 +67,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
     }
 
-    const fetchIsolateds = () => {
+    const showIsolatedsMarkers = () => {
+        setShowIsolateds(prev => !prev)
+        if (isolateds.length > 0) return
         fetchIsolatedForMap((err, res) => {
             if (!err) {
                 setIsolateds(res)
@@ -121,19 +127,27 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 />
                 <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
             </div>
-            <div className={'mapIconContainer' + ' mapIconSelected'}>
-                <img src='icons/single-orange.svg' alt='' />
+            <div className={'mapIconContainer blueText pointer' + (showShofarBlowers ? ' mapIconSelected' : '')} onClick={showShofarBlowersMarkers}>
+                <img src='icons/shofar-blue.svg' alt='' />
+                <div className='textInHover'>בעלי תקיעה</div>
+            </div>
+            <div className={'mapIconContainer lightblueText pointer' + (showBlasts ? ' mapIconSelected' : '')} onClick={showBlastsMarkers}>
+                <img src='icons/group.svg' alt='' />
+                <div className='textInHover'>תקיעות</div>
+            </div>
+            <div className={'mapIconContainer orangeText pointer' + (showIsolateds ? ' mapIconSelected' : '')} onClick={showIsolatedsMarkers}>
+                <img src='icons/singleOrange.svg' alt='' />
                 <div className='textInHover'>מחפשים</div>
             </div>
         </div>
-        {shofarBlowers.map((shofarBlower, index) =>
+        {showShofarBlowers && shofarBlowers.map((shofarBlower, index) =>
             <Marker
                 key={index}
                 options={{
                     icon: {
                         url: 'icons/shofar-blue.svg',
-                        scaledSize: { width: 30, height: 30 },
-                        anchor: { x: 15, y: 15 }
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
                     }
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
@@ -141,14 +155,14 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
             />
         )}
-        {blasts.map((blast, index) =>
+        {showBlasts && blasts.map((blast, index) =>
             <Marker
                 key={index}
                 options={{
                     icon: {
                         url: 'icons/group.svg',
-                        scaledSize: { width: 30, height: 30 },
-                        anchor: { x: 15, y: 15 }
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
                     }
                 }}
                 position={{ lat: Number(blast.lat), lng: Number(blast.lng) }}
@@ -156,14 +170,14 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
             />
         )}
-        {isolateds.map((isolated, index) =>
+        {showIsolateds && isolateds.map((isolated, index) =>
             <Marker
                 key={index}
                 options={{
                     icon: {
                         url: 'icons/singleOrange.svg',
-                        scaledSize: { width: 30, height: 30 },
-                        anchor: { x: 15, y: 15 }
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
                     }
                 }}
                 position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}

@@ -71,10 +71,10 @@ const ShofarBlowerPage = function (props) {
                     </div>
                 </div>
                 <div className='statusNavContainer'>
-                    <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>ממתינים לאישור</div>
+                    <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>ממתינים לאישור</div>
                     <div style={{ width: '3.5vw' }}></div>
-                    <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מתנדבים</div>
-                    <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
+                    <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מתנדבים</div>
+                    <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
                 <ShofarBlowerTable resultNum={resultNum} status={status} getShofarBlowers={getShofarBlowers} />
             </div>

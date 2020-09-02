@@ -13,11 +13,11 @@
     }
 
     .inputIcon {
+        height: 100%;
         position: absolute;
         color: #747474c5;
         font-size: 2.5vh;
         left: 1.5vw;
-        top: 1.3vh;
     }
 }
 
@@ -29,23 +29,22 @@
     margin: 3.5vh 0 2vh 0;
 }
 
-.blueSubTitle,
-.orangeSubTitle {
+.subTitle {
     font-size: 2vh;
     font-weight: 500;
     text-align: right;
 }
 
-.blueSubTitle {
-    color: #156879;
-}
-
-.orangeSubTitle {
-    color: #FDA42A;
-}
-
-.turquoiseText {
+.blueText {
     color: #156879 !important;
+}
+
+.orangeText {
+    color: #FDA42A !important;
+}
+
+.lightblueText {
+    color: #82C0CC !important;
 }
 
 .bold {
