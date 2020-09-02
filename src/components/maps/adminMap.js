@@ -3,7 +3,7 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-map
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
 // import './map.scss';
-import { fetchShofarBlowersForMap } from '../../scenes/admin/fetch_and_utils';
+import { fetchShofarBlowersForMap, fetchBlastsForMap } from '../../scenes/admin/fetch_and_utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -13,6 +13,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [center, setCenter] = useState(CONSTS.JERUSALEM_POSITION);
     const [zoom, setZoom] = useState(10);
     const [shofarBlowers, setShofarBlowers] = useState([])
+    const [blasts, setBlasts] = useState([])
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -31,6 +32,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
 
         fetchShofarBlowers()
+        fetchBlasts()
     }, []);
 
     const zoomPlace = (place) => {
@@ -47,6 +49,14 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
+            }
+        })
+    }
+
+    const fetchBlasts = () => {
+        fetchBlastsForMap((err, res) => {
+            if (!err) {
+                setBlasts(res)
             }
         })
     }
@@ -102,11 +112,26 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
             </div>
             <div className={'mapIconContainer' + ' mapIconSelected'}>
-                <img src='icons/single-orange.svg' alt=''/>
+                <img src='icons/single-orange.svg' alt='' />
                 <div className='textInHover'>מחפשים</div>
             </div>
         </div>
         {shofarBlowers.map((shofarBlower, index) =>
+            <Marker
+                key={index}
+                options={{
+                    icon: {
+                        url: 'icons/shofar-blue.svg',
+                        scaledSize: { width: 25, height: 55 },
+                        anchor: { x: 12.5, y: 12.5 }
+                    }
+                }}
+                position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
+            />
+        )}
+        {blasts.map((blast, index) =>
             <Marker
                 key={index}
                 options={{
@@ -116,9 +141,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                         anchor: { x: 17.5, y: 17.5 }
                     }
                 }}
-                position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
+                position={{ lat: Number(blast.lat), lng: Number(blast.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
+                onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
             />
         )}
     </GoogleMap>

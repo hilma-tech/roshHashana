@@ -216,3 +216,18 @@ export const fetchShofarBlowersForMap = async (cb = () => { }) => {
         return cb(null, res)
     }
 }
+
+export const fetchBlastsForMap = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getAllAdminBlastsForMap`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({})
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
