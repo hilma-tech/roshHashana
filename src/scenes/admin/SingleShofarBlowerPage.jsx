@@ -23,9 +23,11 @@ const SingleShofarBlowerPage = (props) => {
             </div>
             <div id='map-and-info'>
                 <div id="info">
-                    <FontAwesomeIcon icon="info-circle" />
-                    <div>{selectedSB.name}</div>
-                    <div>{selectedSB.username}</div>
+                    <div>
+                        <FontAwesomeIcon icon="info-circle" />
+                        <div>{selectedSB.name}</div>
+                        <div>{selectedSB.username}</div>
+                    </div>
                     <div>{`משך הליכה כולל: ${ttlength}`}</div>
                 </div>
                 {!selectedSB || selectedSB === null ? null : <ShofarBlowerMap admin selectedSB={selectedSB} />}
