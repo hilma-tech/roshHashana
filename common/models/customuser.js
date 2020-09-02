@@ -716,7 +716,8 @@ module.exports = function (CustomUser) {
                                 CustomUser.name, 
                                 CustomUser.address, 
                                 CustomUser.lng,
-                                CustomUser.lat 
+                                CustomUser.lat,
+                                CustomUser.username
                             FROM shofar_blower 
                                 LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
                             WHERE CustomUser.id = ${userId}`
