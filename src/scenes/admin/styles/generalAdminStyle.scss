@@ -99,3 +99,27 @@
     height: 100vh;
     background: #F3F3F3 0% 0% no-repeat padding-box;
 }
+
+.loading-spiner{
+    width: 5vh;
+    height: 5vh;
+    border-radius: 50%;
+    border-top: solid 3px #747474;
+    border-right: solid 3px #747474;
+    border-bottom: solid 3px #747474;
+    border-left: solid 3px #ffffff;
+    animation-name: spin;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear; 
+    margin: auto;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}

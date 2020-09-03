@@ -25,6 +25,7 @@ const AdminRouter = (props) => {
                         <PrivateRoute exact path={`/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
                         <PrivateRoute exact path={`/shofar-blower`} compName="SingleShofarBlowerPage" component={(props) => <SingleShofarBlowerPage {...props} />} />
                         <PrivateRoute exact path={`/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
+                        <PrivateRoute exact path={`/edit-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
                     </Switch>
                 </AdminMainProvider>
             </Fragment>

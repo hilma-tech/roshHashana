@@ -129,15 +129,15 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             </div>
             <div className={'mapIconContainer blueText pointer' + (showShofarBlowers ? ' mapIconSelected' : '')} onClick={showShofarBlowersMarkers}>
                 <img src='icons/shofar-blue.svg' alt='' />
-                <div className='textInHover'>בעלי תקיעה</div>
+                <div className='textInHover blueBackground bold'>בעלי תקיעה</div>
             </div>
             <div className={'mapIconContainer lightblueText pointer' + (showBlasts ? ' mapIconSelected' : '')} onClick={showBlastsMarkers}>
                 <img src='icons/group.svg' alt='' />
-                <div className='textInHover'>תקיעות</div>
+                <div className='textInHover lightblueBackground bold'>תקיעות</div>
             </div>
             <div className={'mapIconContainer orangeText pointer' + (showIsolateds ? ' mapIconSelected' : '')} onClick={showIsolatedsMarkers}>
                 <img src='icons/singleOrange.svg' alt='' />
-                <div className='textInHover'>מחפשים</div>
+                <div className='textInHover orangeBackground bold'>מחפשים</div>
             </div>
         </div>
         {showShofarBlowers && shofarBlowers.map((shofarBlower, index) =>
