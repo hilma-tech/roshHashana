@@ -49,36 +49,48 @@ const SBHomePage = (props) => {
     }, [userData]);
 
     const fn = (req) => {
-        setUserData((userData) => ({ ...userData, confirm: 1 }))
-        return
-       
+        setUserData((userData) => ({ ...userData, confirm: 1 }));
+        return;
+
     }
 
 
     useJoinLeave("isolated-events", (err) => {
         if (err) console.log("failed to join room isolated-events");
-    })
+    });
 
     useJoinLeave('blower-events', () => (err) => {
         if (err) console.log("failed to join room blower-events");
-    })
+    });
 
     useOn('newMeetingAssined', (req) => {
         setMeetingsReqs((meetingsReqs) => {
             return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.isPublicMeeting) || (req.meetingId !== meet.meetingId))
-        })
+        });
     });
 
     useOn('removeMeetingFromRoute', (req) => {
-        setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req])
+        setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req]);
     });
 
     useOn("newIsolator", (req) => {
         addNewReq(req)
-    });
+    });;
     useOn('modifyIsolatorInfo', (newReq) => {
-        updateReqData(newReq)
-    })
+        updateReqData(newReq);
+    });
+
+    useOn('removeMeeting', (req) => {
+        setMeetingsReqs((meetingsReqs) => {
+            return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.public_meeting) || (req.meetingId !== meet.meetingId))
+        });
+    });
+
+    useOn('removeMeetingWithBlower', (req) => {
+        setMyMeetings((myMeetings) => {
+            return myMeetings.filter((meet) => (meet.isPublicMeeting !== req.public_meeting) || (req.meetingId !== meet.meetingId));
+        });
+    });
 
     useEffect(() => {
         (async () => {

@@ -8,6 +8,7 @@ const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const IsolatorInfoUpdateSocket = require('../../server/common/socket/isolatedInfoUpdates');
 const blowerEvents = require('../../server/common/socket/blowerEvents');
+const isolatedEvents = require('../../server/common/socket/isolatedEvents');
 const to = require('../../server/common/to');
 const { default: Axios } = require('axios');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
@@ -668,16 +669,27 @@ module.exports = function (CustomUser) {
 
             if (role === 1) {
                 //isolated
-                let isolatedInfo = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { public_meeting: true, blowerMeetingId: true } });
+                let isolatedInfo = await CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: userId }, fields: { id: true, public_meeting: true, blowerMeetingId: true } });
                 if (isolatedInfo.public_meeting) {
                     //check the user's public meeting and see if there are other isolated registered in the meeting
                     //go to public meetings and check if the meeting has people in it or blower
                     let participantsNum = await CustomUser.app.models.Isolated.count({ and: [{ 'blowerMeetingId': isolatedInfo.blowerMeetingId }, { public_meeting: 1 }] });
                     if (participantsNum <= 1) {
+                        const pubMeet = await CustomUser.app.models.shofarBlowerPub.findById(isolatedInfo.blowerMeetingId);
                         // if not delete the meeting
                         await CustomUser.app.models.shofarBlowerPub.destroyById(isolatedInfo.blowerMeetingId);
 
+                        //call socket 
+                        if (pubMeet && pubMeet.blowerId) isolatedInfo.hasBlower = true;
+                        else isolatedInfo.hasBlower = false;
+                        isolatedInfo.meetingId = isolatedInfo.blowerMeetingId;
+                        await isolatedEvents.deleteIsolated(CustomUser, isolatedInfo);
                     }
+                }
+                else {//private meeting
+                    //call socket
+                    isolatedInfo.meetingId = isolatedInfo.id;
+                    await isolatedEvents.deleteIsolated(CustomUser, isolatedInfo);
                 }
                 //delete user info
                 await CustomUser.app.models.Isolated.destroyAll({ 'userIsolatedId': userId });
