@@ -68,7 +68,9 @@ export const getTime = (datatime) => {
     // console.log(datatime, date.getMinutes())
     let hours = date.getHours()
     let min = date.getMinutes()
-    min = date.getMinutes() === 0 ? "00" : min
+    if (min < 10) {
+        min = "0" + min
+    }
     return `${hours}:${min}`
 }
 

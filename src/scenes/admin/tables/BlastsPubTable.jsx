@@ -9,6 +9,7 @@ import '../styles/table.scss'
 const BlastsPubTable = (props) => {
     const { loadingBlastsPub, blastsPub, setBlastInfo, pubMeetingsNum } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
+    let startRow = 0
 
     const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info infoPub tableIcons', '']]
 
@@ -17,13 +18,18 @@ const BlastsPubTable = (props) => {
         setBlastInfo(blast)
     }
 
-    const handleTrashClick = (id) => {
-        (async () => {
-            await deletePublicMeeting(id, (err, res) => {
-                console.log(err, res)
-            })
-        })()
+    const setPage = (page) => {
+        props.getBlastsPub(props.filters, (page - 1) * 7)
     }
+
+
+    // const handleTrashClick = (id) => {
+    //     (async () => {
+    //         await deletePublicMeeting(id, (err, res) => {
+    //             console.log(err, res)
+    //         })
+    //     })()
+    // }
 
     useEffect(() => {
         if (blastsPub) setTr(blastsPub.map(blast => {
@@ -42,7 +48,7 @@ const BlastsPubTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={() => { }} lastPage={() => { }} rowsNum={10} resaultsNum={pubMeetingsNum} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={pubMeetingsNum} />
         </div>
     );
 }
