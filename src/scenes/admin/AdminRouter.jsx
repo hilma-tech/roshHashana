@@ -10,6 +10,7 @@ import BlastsPage from './BlastsPage.jsx' //loadable ?
 import BlowerFormAdmin from './BlowerFormAdmin' //loadable ?
 import SingleShofarBlowerPage from './SingleShofarBlowerPage'; //loadable?
 import SingleIsolatorPage from './SingleIsolatorPage' //loadable?
+import NewAdmin from './NewAdmin' //loadable?
 import './styles/generalAdminStyle.scss'
 
 const AdminRouter = (props) => {
@@ -27,6 +28,7 @@ const AdminRouter = (props) => {
                         <PrivateRoute exact path={`/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
                         <PrivateRoute exact path={`/shofar-blower`} compName="SingleShofarBlowerPage" component={(props) => <SingleShofarBlowerPage {...props} />} />
                         <PrivateRoute exact path={`/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
+                        <PrivateRoute exact path={`/jdlgtjerwitgeswteswrtwsfsd`} compName="NewAdmin" component={(props) => <NewAdmin {...props} />} />
                     </Switch>
                 </AdminMainProvider>
             </Fragment>

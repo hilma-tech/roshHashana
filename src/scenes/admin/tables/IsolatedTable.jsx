@@ -4,7 +4,6 @@ import { AdminMainContext } from '../ctx/AdminMainContext';
 import GenericTable from './GenericTable'
 import DeletePopup from '../popups/DeletePopup';
 import { deleteIsolated } from '../fetch_and_utils';
-import { select } from 'squel';
 // import '../styles/staffList.scss'
 // import Loading from '../Loading';
 

@@ -18,6 +18,10 @@ const BlastsPrivateTable = (props) => {
         setBlastInfo(blast)
     }
 
+    const setPage = (page) => {
+        props.getBlastsPrivate(props.filters, (page - 1) * 7)
+    }
+
     useEffect(() => {
         if (blastsPrivate) setTr(blastsPrivate.map((blast, index) => {
             return [
@@ -36,7 +40,7 @@ const BlastsPrivateTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPrivate} navigation={true} nextPage={() => { }} lastPage={() => { }} rowsNum={10} resaultsNum={privateMeetingsNum} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPrivate} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={privateMeetingsNum} />
         </div>
     );
 }

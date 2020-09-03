@@ -71,6 +71,41 @@ module.exports = function (CustomUser) {
         }
     }
 
+    CustomUser.createAdminUser = function (email, password, code, options, cb) {
+        (async () => {
+
+            const validateEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{1,}))$/;
+            if (!validateEmail.test(email)) return cb(null, { error: 'הדואר האלקטרוני אינו תקין' })
+
+            const validatePassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+            if (!validatePassword.test(password)) return cb(null, { error: 'הסיסמא חייבת להכיל אות קטנה, אות גדולה ומספר. עליה להיות באורך של לפחות 8 תווים.' })
+
+            if (code !== "28392") {
+                return cb(null, { error: 'קוד שגוי.' })
+            }
+
+            let [customUserErr, customUserRes] = await to(CustomUser.create({ email, password, name: 'admin' }, options));
+            if (customUserErr) {
+                if (customUserErr.message == 'The `CustomUser` instance is not valid. Details: `email` Email already exists (value: "admin@gmail.com").') {
+                    return cb(null, { error: 'המשתמש כבר קיים במערכת' })
+                }
+                return cb(null, {});
+            }
+
+            let roleMapData = {
+                principalType: "USER",
+                principalId: customUserRes.id,
+                roleId: 4 //role of admin
+            }
+            let [error, newRole] = await to(CustomUser.app.models.RoleMapping.create(roleMapData));
+            if (error) {
+                return cb(error);
+            }
+            return cb(null, {})
+        })()
+    }
+
+
     CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
         if (role == 3 && !meetingId || isNaN(Number(meetingId))) return cb(null, "LOG_OUT")
         const { RoleMapping } = CustomUser.app.models;
@@ -414,8 +449,8 @@ module.exports = function (CustomUser) {
                 }
             }
 
-            let resCustomUser
             if (Object.keys(userData).length) {
+                let resCustomUser
                 try {
                     resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
                 } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
@@ -427,12 +462,11 @@ module.exports = function (CustomUser) {
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-                let currInfo = isolatedInfo;
-                currInfo.UserInfo = resCustomUser;
+                console.log('isolatedInfo: ', isolatedInfo);
                 isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
 
                 //if the user changed his address and he has a public meeting
-                if (((data.public_meeting == undefined || data.public_meeting == null) && isolatedInfo.public_meeting) && data.address) {
+                if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
@@ -455,7 +489,7 @@ module.exports = function (CustomUser) {
                         }
                     }
                 }
-                else if ((data.public_meeting == 1 || data.public_meeting == true) && isolatedInfo && (isolatedInfo.public_meeting == 0 || isolatedInfo.public_meeting == false)) {//changed to public meeting from private
+                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
                     let meetData = {}
                     if (data.address) meetData.address = data.address;
                     else {
@@ -472,27 +506,23 @@ module.exports = function (CustomUser) {
                         meetingChanged = true;
                     }
                 }
-                else /*if ((data.public_meeting == 0 || data.public_meeting == false) && isolatedInfo && isolatedInfo.public_meeting)*/ {
+                else {
                     //the user is changing from public to private
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
-                        let publicMeeting = await shofarBlowerPub.findOne({ where: { id: meetingId } });
-                        console.log(publicMeeting, 'public meeting id')
-                        isolatedUpdateSocket.setPublicMeetBlowerId((publicMeeting && publicMeeting.blowerId) ? publicMeeting.blowerId : false);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         pubMeetId = null;
                         meetingChanged = true;
                     }
                 }
-                // console.log('pubMeetId', pubMeetId)
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
-                // console.log('newIsoDataaaaaaa', newIsoData)
+                console.log('newIsoData: ', newIsoData);
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
@@ -653,6 +683,17 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
+    CustomUser.remoteMethod('createAdminUser', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'email', type: 'string' },
+            { arg: 'password', type: 'string' },
+            { arg: 'code', type: 'string' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
     CustomUser.remoteMethod('authenticationKey', {
         http: { verb: 'get' },
         accepts: [
@@ -716,8 +757,7 @@ module.exports = function (CustomUser) {
                                 CustomUser.name, 
                                 CustomUser.address, 
                                 CustomUser.lng,
-                                CustomUser.lat,
-                                CustomUser.username
+                                CustomUser.lat 
                             FROM shofar_blower 
                                 LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
                             WHERE CustomUser.id = ${userId}`
@@ -813,6 +853,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.assignSB = function (options, meetingObj, cb) {
+
         console.log('assignSB: ');
         (async () => {
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
@@ -1073,60 +1114,6 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
-    CustomUser.adminGetSBRoute = function (options, sbId, cb) {
-        if (!options || !options.accessToken || !options.accessToken.userId) {
-            return cb(true)
-        }
-
-        (async () => {
-            const myRouteQ = `
-        SELECT * FROM (
-            SELECT 
-                FALSE AS isPublicMeeting, 
-                isolated.id AS "meetingId",
-                CustomUser.address, 
-                CustomUser.lng, CustomUser.lat, 
-                false AS constMeeting,
-                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, 
-                meeting_time AS "startTime"
-            FROM isolated 
-                JOIN CustomUser ON userIsolatedId = CustomUser.id 
-                JOIN shofar_blower ON isolated.blowerMeetingId = shofar_blower.id
-            WHERE public_meeting = 0 
-                AND blowerMeetingId = ${sbId}
-                
-                UNION
-                
-            SELECT 
-                TRUE AS isPublicMeeting, 
-                shofar_blower_pub.id AS "meetingId", 
-                shofar_blower_pub.address, 
-                shofar_blower_pub.lng, shofar_blower_pub.lat, 
-                shofar_blower_pub.constMeeting AS constMeeting, 
-                NULL AS isolatedPhone, 
-                start_time AS "startTime" 
-            FROM shofar_blower_pub
-                    LEFT JOIN CustomUser blowerCU ON blowerCU.id = shofar_blower_pub.blowerId
-                    LEFT JOIN shofar_blower ON blowerCU.id = shofar_blower.userBlowerId 
-            WHERE shofar_blower.confirm = 1
-                AND shofar_blower.id = ${sbId}
-        ) a
-        ORDER BY startTime
-        `
-
-            let [errRoute, resRoute] = await executeMySqlQuery(CustomUser, myRouteQ)
-            if (errRoute || !resRoute) { console.log("errRoute || !resRoute for myRouteQ", errRoute || !resRoute); return cb(true) }
-            console.log('resRoute: ', resRoute);
-            return cb(null, resRoute)
-        })()
-    }
-
-    CustomUser.remoteMethod('adminGetSBRoute', {
-        http: { verb: 'post' },
-        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "sbId", type: "number" }],
-        returns: { arg: 'res', type: 'boolean', root: true }
-    })
-
 
     const sqlForScripts = () => {
         const sbQ = `select name, username from CustomUser left join RoleMapping on CustomUser.id = RoleMapping.principalId where roleId = ${SHOFAR_BLOWER_ROLE}`
@@ -1136,58 +1123,6 @@ module.exports = function (CustomUser) {
         const privateMeetings = `select isolated.id meetingId, public_meeting isPublicMeeting , meeting_time meetingTime , blower.name blowerName from isolated left join CustomUser blower on blower.id = blowerMeetingId where public_meeting = 0`
 
     }
-
-
-
-
-
-    CustomUser.getAllAdminBlastsForMap = function (cb) {
-        (async () => {
-            try {
-                const blastsQ = `(SELECT
-                    isolatedUser.address AS address,
-                    isolatedUser.lat AS lat,
-                    isolatedUser.lng AS lng,
-                    blowerUser.name AS blowerName,
-                    false AS publicMeeting,
-                    isolated.id AS id
-                FROM isolated 
-                    LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
-                    LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
-                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1)
-          
-            UNION 
-          
-                (SELECT
-                    shofar_blower_pub.address AS address,
-                    shofar_blower_pub.lat AS lat,
-                    shofar_blower_pub.lng AS lng,
-                    blowerUser.name AS blowerName,
-                    true AS publicMeeting,
-                    shofar_blower_pub.id AS id
-                FROM shofar_blower_pub
-                    LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
-                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1)`
-
-                let [blastsErr, blastsRes] = await executeMySqlQuery(CustomUser, blastsQ);
-                if (blastsErr || !blastsRes) {
-                    console.log('get Isolated admin request error : ', blastsErr);
-                    throw isolatedErr
-                }
-                return cb(null, blastsRes)
-            } catch (err) {
-                cb(err);
-            }
-        })()
-    }
-
-    CustomUser.remoteMethod('getAllAdminBlastsForMap', {
-        http: { verb: 'POST' },
-        accepts: [],
-        returns: { arg: 'res', type: 'object', root: true }
-    });
 
 };
 
