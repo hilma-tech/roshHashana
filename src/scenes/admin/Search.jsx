@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 let delayTime = null
 
-/*  props: 
-        placeholder,
-        onSearch- function, gets the value of the search (called when the value of the input changes)
+/**  props: 
+        * placeholder,
+        * onSearch- function, gets the value of the search (called when the value of the input changes)
 */
 
 const Search = (props) => {

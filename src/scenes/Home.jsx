@@ -53,6 +53,7 @@ const Home = (props) => {
                     }
                     <div id="shivuki-credit">{'תוכן שיווקי: אפרת שפירא www.my-idea.co.il'}</div>
                     <div id='contact-us'>לפניות ובקשות נוספות ניתן ליצור קשר במייל shofar2all@gmail.com</div>
+                    <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
                 </div>
             </div>
             {openMap && <Map publicMap closeMap={() => setOpenMap(false)} history={props.history} />}

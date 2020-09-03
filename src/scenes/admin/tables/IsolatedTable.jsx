@@ -4,6 +4,7 @@ import { AdminMainContext } from '../ctx/AdminMainContext';
 import GenericTable from './GenericTable'
 import DeletePopup from '../popups/DeletePopup';
 import { deleteIsolated } from '../fetch_and_utils';
+import { select } from 'squel';
 // import '../styles/staffList.scss'
 // import Loading from '../Loading';
 
@@ -33,6 +34,8 @@ const IsolatedTable = (props) => {
         }))
     }, [isolateds])
 
+
+
     const handleTrashClick = (id, index) => {
         setShowDeletePopup(true)
         whereToDelete.id = id
@@ -57,9 +60,13 @@ const IsolatedTable = (props) => {
         props.getIsolateds(null, (page - 1) * 7)
     }
 
+    const handleIsolatorClick = (e, index) => {
+        typeof props.setSelectedIsolator ==="function" && props.setSelectedIsolator(isolateds[index])
+    }
+
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={props.resultNum} onRowClick={handleIsolatorClick} />
 
             {showDeletePopup &&
                 <DeletePopup

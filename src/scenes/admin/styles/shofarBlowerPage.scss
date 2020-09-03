@@ -28,6 +28,7 @@
         #title {
             color: white;
             font-size: 2rem;
+            font-family: $Heebo;
         }
         #x-btn {
             color: white;
@@ -37,88 +38,88 @@
             width: auto;
         }
     }
-    #map-and-info {
+}
+#map-and-info {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    #side-info-container {
         display: flex;
-        flex-direction: row;
-        align-content: center;
-        #side-info-container {
-            display: flex;
-            flex-direction: column;
-            align-self: flex-start;
-            width: 40vw;
-            height: 90vh;
-            background-color: $grey;
-            padding: 30px 5%;
-            #about-sb {
-                color: $dark-turquise;
-                display: flex;
-                flex-direction: row;
-                align-self: center;
-                justify-content: space-between;
-                width: 100%;
-                font-size: 1.5rem;
-                margin-bottom: 2rem;
-                #more-info-container {
-                    height: fit-content;
-                    position: relative;
-                    display: flex;
-                    justify-content: flex-end;
-                    // margin-left: 1.5vw;
-
-                    #more-info-tooltip {
-                        display: none;
-                        cursor: pointer;
-                    }
-
-                    &:hover {
-                        #more-info-tooltip {
-                            position: absolute;
-                            color: #747474;
-                            box-shadow: 0px 3px 6px #00000029;
-                            background-color: white;
-                            border-radius: 3px;
-                            margin-top: 5vh;
-                            padding: 1vh 1vw;
-                            z-index: 2;
-                            display: flex;
-                            font-size: 1rem;
-                            white-space: pre;
-                        }
-                    }
-                }
-                #name-and-phone {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                }
-            }
-            #total-length {
-                color: $light-blue;
-                margin-bottom: 2rem;
-                text-align: right;
-                font-size: 1.2rem;
-            }
-        }
-    }
-    .sb-map-container-admin {
-        width: 60vw;
-        height: 90vh;
-        position: relative;
-        & > div {
-            height: 100% !important;
-        }
-    }
-
-    .icon-on-map-locationInfo {
-        width: 1.2em;
-        height: 1.2em;
-        margin-left: 4%;
+        flex-direction: column;
         align-self: flex-start;
-        margin-top: 1%;
+        width: 40vw;
+        height: 90vh;
+        background-color: $grey;
+        padding: 30px 5%;
+        #about-sb {
+            color: $dark-turquise;
+            display: flex;
+            flex-direction: row;
+            align-self: center;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            #more-info-container {
+                height: fit-content;
+                position: relative;
+                display: flex;
+                justify-content: flex-end;
+                // margin-left: 1.5vw;
+
+                #more-info-tooltip {
+                    display: none;
+                    cursor: pointer;
+                }
+
+                &:hover {
+                    #more-info-tooltip {
+                        position: absolute;
+                        color: #747474;
+                        box-shadow: 0px 3px 6px #00000029;
+                        background-color: white;
+                        border-radius: 3px;
+                        margin-top: 5vh;
+                        padding: 1vh 1vw;
+                        z-index: 2;
+                        display: flex;
+                        font-size: 1rem;
+                        white-space: pre;
+                    }
+                }
+            }
+            #name-and-phone {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        #total-length {
+            color: $light-blue;
+            margin-bottom: 2rem;
+            text-align: right;
+            font-size: 1.2rem;
+        }
     }
-    .info-window-title {
-        font-size: 1rem !important;
+}
+.sb-map-container-admin {
+    width: 60vw;
+    height: 90vh;
+    position: relative;
+    & > div {
+        height: 100% !important;
     }
+}
+
+.icon-on-map-locationInfo {
+    width: 1.2em;
+    height: 1.2em;
+    margin-left: 4%;
+    align-self: flex-start;
+    margin-top: 1%;
+}
+.info-window-title {
+    font-size: 1rem !important;
 }
 
 //for draggable style
@@ -189,6 +190,42 @@
             img {
                 width: 2rem;
             }
+        }
+    }
+}
+
+.single-isolator-page {
+    #top {
+        height: 10vh;
+        background-color: $orange;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+        #right-side {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: row;
+            #title {
+                color: white;
+                font-size: 2rem;
+                font-family: $Heebo;
+            }
+            #x-btn {
+                color: white;
+                height: 100%;
+                margin: 0 2rem;
+                height: 2rem; //like #title font-size
+                width: auto;
+            }
+        }
+        #meeting-type {
+            color: white;
+            font-size: 2rem;
+            font-family: $Heebo;
+            margin: 0 2rem;
         }
     }
 }
