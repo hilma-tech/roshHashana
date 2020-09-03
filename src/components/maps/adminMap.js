@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
 // import './map.scss';
 import { fetchShofarBlowersForMap, fetchBlastsForMap, fetchIsolatedForMap } from '../../scenes/admin/fetch_and_utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
 const AdminMap = withScriptjs(withGoogleMap((props) => {
-
-    const [center, setCenter] = useState(CONSTS.JERUSALEM_POSITION);
-    const [zoom, setZoom] = useState(10);
+    const [center, setCenter] = useState(props.center || CONSTS.JERUSALEM_POSITION);
+    const [zoom, setZoom] = useState(props.zoom || 10);
     const [shofarBlowers, setShofarBlowers] = useState([])
     const [blasts, setBlasts] = useState([])
     const [isolateds, setIsolateds] = useState([])
@@ -19,6 +19,8 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [showShofarBlowers, setShowShofarBlowers] = useState(false)
     const [showBlasts, setShowBlasts] = useState(false)
     const [showIsolateds, setShowIsolateds] = useState(false)
+    
+    const { selectedIsolator } = useContext(AdminMainContext)
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -35,6 +37,10 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
             else return;
         })
+
+        if(selectedIsolator){
+            showShofarBlowersMarkers()            
+        }
     }, []);
 
     const zoomPlace = (place) => {
@@ -170,6 +176,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
             />
         )}
+
         {showIsolateds && isolateds.map((isolated, index) =>
             <Marker
                 key={index}
@@ -185,6 +192,20 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }) }}
             />
         )}
+         {!showIsolateds && selectedIsolator && 
+            <Marker
+                options={{
+                    icon: {
+                        url: 'icons/singleOrange.svg',
+                        scaledSize: { width: 35, height: 35 },
+                        anchor: { x: 17.5, y: 17.5 }
+                    }
+                }}
+                position={{ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }) }}
+            />
+        }
     </GoogleMap>
 }
 ));
