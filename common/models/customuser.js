@@ -421,17 +421,20 @@ module.exports = function (CustomUser) {
 
     CustomUser.updateUserInfo = async (data, options) => {
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
-        if (!options.accessToken || !options.accessToken.userId) {
-            throw true
+        if (!options.accessToken || !options.accessToken.userId) { //check if the user is connected
+            throw true;
         }
         const userId = options.accessToken.userId;
-        let role = await getUserRole(userId);
+        let role = await getUserRole(userId); //get the role of the user
         if (!role) return;
+
+        //block users according to their blocking date
         if (((role == 1 || role == 3) && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
         try {
+            //create the user data according to what the user changed
             let userData = {}
             if (data.name) userData.name = data.name
             if (data.username) userData.username = data.username
@@ -450,6 +453,7 @@ module.exports = function (CustomUser) {
                 }
             }
 
+            //if the user changed his details that are in CustomUser -> update the new details in CustomUser
             if (Object.keys(userData).length) {
                 let resCustomUser
                 try {
@@ -457,13 +461,14 @@ module.exports = function (CustomUser) {
                 } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
             }
             //end update Custom User table
+
+            //now update the other details according to the user's role
             if (role === 1) {
-                let isolatedUpdateSocket = new IsolatorInfoUpdateSocket(CustomUser)
                 //isolator
+                let isolatedUpdateSocket = new IsolatorInfoUpdateSocket(CustomUser);
                 let pubMeetId = null;
                 let meetingChanged = false;
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-                console.log('isolatedInfo: ', isolatedInfo);
                 isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
 
                 //if the user changed his address and he has a public meeting
@@ -491,7 +496,8 @@ module.exports = function (CustomUser) {
                     }
                 }
                 else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
-                    let meetData = {}
+                    let meetData = {};
+                    //update the meeting address to the isolated's address
                     if (data.address) meetData.address = data.address;
                     else {
                         const address = [isolatedInfo.UserToIsolated().address, { lat: isolatedInfo.UserToIsolated().lat, lng: isolatedInfo.UserToIsolated().lng }];
@@ -501,14 +507,14 @@ module.exports = function (CustomUser) {
                     else meetData.comments = isolatedInfo.UserToIsolated().comments;
                     if (data.start_time) meetData.start_time = data.start_time;
 
-                    if (Object.keys(meetData).length) {
+                    if (Object.keys(meetData).length) {//create new public meeting 
                         pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
                         isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
                         meetingChanged = true;
                     }
                 }
                 else {
-                    //the user is changing from public to private
+                    //the user is changing from public to private -> check if can delete the public meeting
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
@@ -519,13 +525,14 @@ module.exports = function (CustomUser) {
                         meetingChanged = true;
                     }
                 }
+
+                //the data to update in isolated table
                 let newIsoData = {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
                     blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
                 }
-                console.log('newIsoData: ', newIsoData);
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
                     let resIsolated = await Isolated.upsertWithWhere({ userIsolatedId: userId }, newIsoData);
@@ -542,7 +549,7 @@ module.exports = function (CustomUser) {
             }
             else if (role === 2) {
                 //shofar blower
-
+                //create object with blower info and update ShofarBlower table with this info
                 let newBloData = {}
                 if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
                 if (data.can_blow_x_times) newBloData.can_blow_x_times = data.can_blow_x_times
@@ -550,18 +557,16 @@ module.exports = function (CustomUser) {
                 if (Object.values(newBloData).length) {
                     let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
                 }
-                if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
-                    // update also all the public meetings
-                    const [errDeletePublicMeetings, resDeletePublicMeetings] = await to(shofarBlowerPub.destroyAll({ blowerId: userId }))
-                    if (errDeletePublicMeetings) {
-                        console.log("errDeletePublicMeetings", errDeletePublicMeetings)
-                    }
-                    else console.log("successfully deleted all public meetings (in order to create)");
 
+                //if the shofar blower added or updated public meetings -> update them
+                if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
+
+                    //filter the public meetings -> only meetings with address, and start time
                     let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
 
+                    //update or create meetings
                     let city;
-                    publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
+                    publicMeetingsArr.forEach(async (publicMeeting) => {
                         if (publicMeeting.address && publicMeeting.address[0]) {
                             let addressArr = publicMeeting.address[0]
                             if (typeof addressArr === "string" && addressArr.length) {
@@ -569,7 +574,7 @@ module.exports = function (CustomUser) {
                                 city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
                             }
                         }
-                        return {
+                        const obj = {
                             address: publicMeeting.address && publicMeeting.address[0],
                             lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
                             lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
@@ -579,14 +584,33 @@ module.exports = function (CustomUser) {
                             start_time: publicMeeting.time || publicMeeting.start_time,
                             blowerId: userId
                         }
-                    })
-                    console.log("publicMeetingsArr to create", publicMeetingsArr)
-                    const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
-                    if (errDeletePublicMeetings) {
-                        console.log("errCreatePublicMeetings", errCreatePublicMeetings)
-                    } else console.log("successfully created the publicMeetings");
+                        //update the public meeting
+                        if (publicMeeting.id) await CustomUser.app.models.shofarBlowerPub.upsertWithWhere({ id: publicMeeting.id }, obj);
+                        else await CustomUser.app.models.shofarBlowerPub.create(obj); //create new pub meeting
+                    });
+
+                    //go through all const meetings of the shofar blower and check if there is a meeting that was deleted
+                    const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                    meetings.forEach(async (meet) => {
+                        const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
+                        if (!isExist) {
+                            await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
+                            //TODO: add event and socket to general user-> to delete the user
+                        }
+                    });
                 }
 
+                if (data.address) {
+                    //if the shofar blower changed his address 
+                    //-> delete his connection to all his meetings (not constMeeting)
+
+                    //update private meetings
+                    await CustomUser.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { meeting_time: null, blowerMeetingId: null });
+
+                    //update public meetings
+                    await CustomUser.app.models.shofarBlowerPub.updateAll({ and: [{ constMeeting: 0 }, { blowerId: userId }] }, { blowerId: null, start_time: null });
+                    //TODO: add event and socket to general user-> to delete the user
+                }
             }
             else return; //general user
 

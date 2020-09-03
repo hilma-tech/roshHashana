@@ -27,11 +27,18 @@ const IsolatedSettings = (props) => {
                         headers: { Accept: "application/json", "Content-Type": "application/json" },
                     }, true);
                     if (res) {
-                        setUserInfo(res)
-                        setValues(res, setOriginalIsolatedInfo);
-                        setValues(res.name, setName);
-                        setValues(res.username, setUsername);
-                        setValues(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`, setMeetAddress);
+                        if (res === "NO_MEETING_DELETE_USER") {
+                            openGenAlert({ text: "בעל התוקע של פגישה זו מחק את הפגישה, אם ברצונך להשתתף בפגישה נוספת תוכל לעשות זאת במפה הכללית כמשתמש חדש", isPopup: { okayText: "הבנתי, התנתק" } }, () => {
+                                Auth.logout()
+                            })
+                            return;
+                        } else {
+                            setUserInfo(res)
+                            setValues(res, setOriginalIsolatedInfo);
+                            setValues(res.name, setName);
+                            setValues(res.username, setUsername);
+                            setValues(`${res.meetingInfo.address}, ${res.meetingInfo.comments ? res.meetingInfo.comments : ''}`, setMeetAddress);
+                        }
                     }
                 }
                 else {
