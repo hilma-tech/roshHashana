@@ -36,6 +36,10 @@ const MapComp = (props) => {
         if (err) console.log("failed to join room");
     });
 
+    useJoinLeave("isolated-events", (err) => {
+        if (err) console.log("failed to join room isolated-events");
+    });
+
     const handleRemoveMeeting = (req) => {
         setMapInfo((currMapInfo) => {
             let publicMeetings = currMapInfo.publicMeetings.slice();
@@ -64,6 +68,11 @@ const MapComp = (props) => {
         }
     }, []);
 
+    useOn('removeMeetingWithBlower', (req) => {
+        req.isPublicMeeting = req.public_meeting;
+        handleRemoveMeeting(req);
+    });
+
     useEffect(() => {
         socket.on('removeMeetingFromRoute', handleRemoveMeeting);
         return () => {
@@ -73,7 +82,6 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            console.log('hereee')
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
