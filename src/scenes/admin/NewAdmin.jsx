@@ -55,7 +55,7 @@ const NewAdmin = (props) => {
 
     return (
         <div>
-            <TopNavBar />
+            <TopNavBar history={props.history}  />
             <div className='newAdmin'>
                 <div className="headline bold">הוספת אדמין חדש</div>
                 <div>

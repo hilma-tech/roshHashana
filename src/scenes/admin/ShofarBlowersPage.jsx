@@ -67,7 +67,7 @@ const ShofarBlowerPage = function (props) {
 
     return (
         <div className="isolatedsContainer" >
-            <TopNavBar />
+            <TopNavBar history={props.history}  />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מתנדבים לתקוע בשופר</div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
