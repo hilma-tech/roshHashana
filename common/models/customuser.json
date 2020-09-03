@@ -186,6 +186,16 @@
         "updateUserInfo",
         "deleteUser"
       ]
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "ADMIN",
+      "permission": "ALLOW",
+      "property": [
+        "createAdminUser",
+        "adminGetSBRoute",
+        "getAllAdminBlastsForMap"
+      ]
     }
   ],
   "methods": {}

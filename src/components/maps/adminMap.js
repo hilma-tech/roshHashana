@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
-// import MarkerGenerator from './marker_generator';
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
 // import './map.scss';
-import { fetchShofarBlowersForMap } from '../../scenes/admin/fetch_and_utils';
+import { fetchShofarBlowersForMap, fetchBlastsForMap, fetchIsolatedForMap } from '../../scenes/admin/fetch_and_utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -13,6 +13,12 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [center, setCenter] = useState(CONSTS.JERUSALEM_POSITION);
     const [zoom, setZoom] = useState(10);
     const [shofarBlowers, setShofarBlowers] = useState([])
+    const [blasts, setBlasts] = useState([])
+    const [isolateds, setIsolateds] = useState([])
+
+    const [showShofarBlowers, setShowShofarBlowers] = useState(false)
+    const [showBlasts, setShowBlasts] = useState(false)
+    const [showIsolateds, setShowIsolateds] = useState(false)
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -29,13 +35,11 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
             else return;
         })
-
-        fetchShofarBlowers()
     }, []);
 
     const zoomPlace = (place) => {
-        setCenter(place);
         setZoom(18)
+        setCenter(place);
     }
 
     // const zoomOut = () => {
@@ -43,10 +47,32 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     //     setZoom(10)
     // }
 
-    const fetchShofarBlowers = () => {
+    const showShofarBlowersMarkers = () => {
+        setShowShofarBlowers(prev => !prev)
+        if (shofarBlowers.length > 0) return
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
+            }
+        })
+    }
+
+    const showBlastsMarkers = () => {
+        setShowBlasts(prev => !prev)
+        if (blasts.length > 0) return
+        fetchBlastsForMap((err, res) => {
+            if (!err) {
+                setBlasts(res)
+            }
+        })
+    }
+
+    const showIsolatedsMarkers = () => {
+        setShowIsolateds(prev => !prev)
+        if (isolateds.length > 0) return
+        fetchIsolatedForMap((err, res) => {
+            if (!err) {
+                setIsolateds(res)
             }
         })
     }
@@ -93,28 +119,70 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     >
         <div className='mapNavContainer'>
-            <div id="inputContainer" >
+            <div className="inputContainer" >
                 <input
                     id="search-input"
                     type="text"
                     placeholder="חיפוש"
                 />
-                <img id="inputIcon" alt="" src="/icons/search.svg" />
+                <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
+            </div>
+            <div className={'mapIconContainer blueText pointer' + (showShofarBlowers ? ' mapIconSelected' : '')} onClick={showShofarBlowersMarkers}>
+                <img src='icons/shofar-blue.svg' alt='' />
+                <div className='textInHover blueBackground bold'>בעלי תקיעה</div>
+            </div>
+            <div className={'mapIconContainer lightblueText pointer' + (showBlasts ? ' mapIconSelected' : '')} onClick={showBlastsMarkers}>
+                <img src='icons/group.svg' alt='' />
+                <div className='textInHover lightblueBackground bold'>תקיעות</div>
+            </div>
+            <div className={'mapIconContainer orangeText pointer' + (showIsolateds ? ' mapIconSelected' : '')} onClick={showIsolatedsMarkers}>
+                <img src='icons/singleOrange.svg' alt='' />
+                <div className='textInHover orangeBackground bold'>מחפשים</div>
             </div>
         </div>
-        {shofarBlowers.map((shofarBlower, index) =>
+        {showShofarBlowers && shofarBlowers.map((shofarBlower, index) =>
             <Marker
                 key={index}
                 options={{
                     icon: {
-                        url: 'icons/single-blue.svg',
-                        scaledSize: { width: 35, height: 35 },
-                        anchor: { x: 17.5, y: 17.5 }
+                        url: 'icons/shofar-blue.svg',
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
                     }
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
                 onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
+            />
+        )}
+        {showBlasts && blasts.map((blast, index) =>
+            <Marker
+                key={index}
+                options={{
+                    icon: {
+                        url: 'icons/group.svg',
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
+                    }
+                }}
+                position={{ lat: Number(blast.lat), lng: Number(blast.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
+            />
+        )}
+        {showIsolateds && isolateds.map((isolated, index) =>
+            <Marker
+                key={index}
+                options={{
+                    icon: {
+                        url: 'icons/singleOrange.svg',
+                        scaledSize: { width: 25, height: 25 },
+                        anchor: { x: 12.5, y: 12.5 }
+                    }
+                }}
+                position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}
+                zIndex={0}
+                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }) }}
             />
         )}
     </GoogleMap>

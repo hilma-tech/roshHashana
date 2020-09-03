@@ -8,8 +8,8 @@ import Search from './Search';
 let status = 0
 
 const IsolatedPage = function (props) {
-    const { setLoading, setIsolateds } = useContext(AdminMainContext)
-    const [filters, setFilters] = useState(null)
+    const { setLoading, setIsolateds, selectedIsolator, setSelectedIsolator } = useContext(AdminMainContext)
+    const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
@@ -19,12 +19,21 @@ const IsolatedPage = function (props) {
         })()
     }, [])
 
-    const getIsolateds = function (filter = {}, limit = { start: 0, end: 10 }) {
+    useEffect(() => {
+        if (selectedIsolator && props.location.pathname === "/searchings") {
+            props.history.push("/searcher")
+            console.log('selectedIsolator: ', selectedIsolator);
+        } else if (selectedIsolator === null && props.location.pathname === "/searcher") {
+            props.history.push("/searchings")
+        }
+    }, [selectedIsolator])
+
+    const getIsolateds = function (filter = filters, startRow = 0) {
         (async () => {
-            if (!filter) filter = {}
+            if (!filter) filter = filters
             if (status === 0) filter.haveMeeting = false
             else if (status === 1) filter.haveMeeting = true
-            await fetchIsolateds(limit, filter, (err, res) => {
+            await fetchIsolateds(startRow, filter, (err, res) => {
                 setLoading(false)
                 if (!err) {
                     setIsolateds(res.isolateds)
@@ -36,7 +45,6 @@ const IsolatedPage = function (props) {
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.name = value
             return pervFilters
         })
@@ -45,7 +53,6 @@ const IsolatedPage = function (props) {
 
     const onSearchAddress = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.address = value
             return pervFilters
         })
@@ -60,7 +67,7 @@ const IsolatedPage = function (props) {
 
     return (
         <div className='isolatedsContainer'>
-            <TopNavBar history={props.history}/>
+            <TopNavBar history={props.history} />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                 <div style={{ display: 'flex' }}>
@@ -69,12 +76,12 @@ const IsolatedPage = function (props) {
                     <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                 </div>
                 <div className='statusNavContainer'>
-                    <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
+                    <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
                     <div style={{ width: '3.5vw' }}></div>
-                    <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
-                    <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
+                    <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
+                    <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <IsolatedTable resultNum={resultNum} />
+                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} />
             </div>
         </div>
     );

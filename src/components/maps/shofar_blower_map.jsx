@@ -11,6 +11,8 @@ import { SBMapComponent } from './sb_map_renderer'
 
 import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
+import { adminGetSBRoute } from '../../scenes/admin/fetch_and_utils';
+import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -22,18 +24,35 @@ const PRIVATE_MEETING = 'private meeting';
 
 
 const ShofarBlowerMap = (props) => {
+    let isAdmin = props.admin
 
     const { openGenAlert } = useContext(MainContext)
-
-    const {
-        userData,
+    const adminctx = useContext(AdminMainContext)
+    const sbctx = useContext(SBContext)
+    let userData,
         myMeetings, meetingsReqs,
         genMapMeetings, setGenMapMeetings,
         setAssignMeetingInfo,
         startTimes,
         setIsInRoute,
-        isPrint,
-    } = useContext(SBContext)
+        isPrint
+    let meetingsOfSelectedSB, setMeetingsOfSelectedSB
+
+    if (sbctx && typeof sbctx === "object") {
+        userData = sbctx.userData;
+        myMeetings = sbctx.myMeetings;
+        meetingsReqs = sbctx.meetingsReqs;
+        genMapMeetings = sbctx.genMapMeetings;
+        setGenMapMeetings = sbctx.setGenMapMeetings;
+        setAssignMeetingInfo = sbctx.setAssignMeetingInfo;
+        startTimes = sbctx.startTimes;
+        setIsInRoute = sbctx.setIsInRoute;
+        isPrint = sbctx.isPrint;
+    }
+    if (isAdmin && adminctx) {
+        meetingsOfSelectedSB = adminctx.meetingsOfSelectedSB;
+        setMeetingsOfSelectedSB = adminctx.setMeetingsOfSelectedSB
+    }
 
 
     const [center, setCenter] = useState({});
@@ -44,27 +63,30 @@ const ShofarBlowerMap = (props) => {
     const [allMapData, setAllMapData] = useState(null)
     const [err, setErr] = useState(false)
 
-
-    // const uName = userData && typeof userData === "object" && userData.name ? userData.name : ''
-
     const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
-    const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי"}</div>
+
+
+    const privateLocInfo = (meetingData, assign = false) => (<div id="info-window-container"><div className="info-window-header">{isAdmin ? (assign ? "מחפש" : "תקיעה פרטית") : (assign ? "מחפש/ת תקיעה פרטית" : "תקיעה פרטית שלי")}</div>
         {(meetingData && meetingData.name ? <div className="pub-shofar-blower-name-container"><div className="pub-shofar-blower-name" >{meetingData.name}</div></div> : null)}
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address)}</div></div> : null}
         <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
-        <div className="info-window-header">{assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי"}</div>
+        <div className="info-window-header">{isAdmin ? (assign ? "מחפש תקיעה ציבורית" : "תקיעה ציבורית") : (assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי")}</div>
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address) + `${meetingData.comments ? ", " + meetingData.comments : ""}`}</div></div> : null}
         <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
-        {assign ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
+        {assign || isAdmin ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
 
 
     useEffect(() => {
         (async () => {
+            if (isAdmin) {
+                adminUseEffect()
+                return;
+            }
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
                 let newCenter;
                 let latNum = Number(userData.lat)
@@ -85,6 +107,52 @@ const ShofarBlowerMap = (props) => {
             }
         })();
     }, [userData])
+
+    const adminUseEffect = async () => {
+        if (props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id) {
+            let myRouteCnt = 0;
+            const userStartTime = new Date(props.selectedSB.startTime).getTime()
+            const userEndTime = userStartTime + props.selectedSB.volunteering_max_time;
+            let myStartT
+            let meetingStartTime
+            let isConstMeeting
+            let locObj = {}
+            let myMeetingsLocs = !Array.isArray(props.meetingsOfSelectedSB) ? []
+                : props.meetingsOfSelectedSB.map((myMeeting) => {
+                    myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
+                    meetingStartTime = new Date(myMeeting.startTime).getTime()
+                    isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
+                    if (!isConstMeeting) { myRouteCnt++ }
+                    locObj = {
+                        location: { lat: myMeeting.lat, lng: myMeeting.lng },
+                        startTime: (myStartT && myStartT.startTime) || myMeeting.startTime,
+                        meetingId: myMeeting.meetingId,
+                        isPublicMeeting: myMeeting.isPublicMeeting,
+                        constMeeting: myMeeting.constMeeting,
+                        info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
+                    }
+                    isConstMeeting ?
+                        locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
+                        locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
+                    return locObj;
+                })
+
+            let newCenter;
+            let latNum = Number(props.selectedSB.lat)
+            let lngNum = Number(props.selectedSB.lng)
+            if (isNaN(latNum) || isNaN(lngNum)) {// we don't have user's origin start point location (lng, lat) from db
+                if (typeof props.selectedSB.address === "string") {// but we have his address, so find lngLat
+                    newCenter = await getLngLatOfLocation(props.selectedSB.address)
+                }
+                else openGenAlert({ text: "קרתה בעיה באיתור מקום יציאתך" })
+            }
+            else {
+                newCenter = { lat: latNum, lng: lngNum };
+            }
+            if (newCenter !== center) setCenter(newCenter)
+            setAllMapData({ myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } })
+        }
+    }
 
     useEffect(() => {
         if (userOriginLoc && typeof userOriginLoc === "object") { //have userData and userOriginLoc, need location of reqs and route
@@ -231,13 +299,15 @@ const ShofarBlowerMap = (props) => {
 
 
     return (
-        <div className={`map-container ${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`} id="sb-map-container">
+        <div className={`map-container ${isAdmin ? "sb-map-container-admin" : `${isBrowser ? "sb-map-container" : "sb-map-container-mobile"} ${isPrint ? 'print-map-style' : ''}`}`} id="sb-map-container">
             <SBMapComponent
                 location={props.location}
                 changeCenter={setCenter}
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
 
                 err={err}
+                isAdmin={isAdmin}
+                selectedSB={props.selectedSB}
                 data={allMapData}
                 history={props.history}
                 allGenLocations={allGenLocations}

@@ -23,11 +23,11 @@ const ParticipantsPopup = (props) => {
         getParticipants(blastInfo.id, filters)
     }
 
-    const getParticipants = function (id, filter = {}, limit = { start: 0, end: 10 }) {
+    const getParticipants = function (id, filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             // setLoadingBlastsPub(true)
-            await getParticipantsMeeting(id, limit, filter, (err, res) => {
+            await getParticipantsMeeting(id, startRow, filter, (err, res) => {
                 console.log(err, res)
                 // setLoadingBlastsPub(false)
                 if (!err) {
@@ -51,7 +51,7 @@ const ParticipantsPopup = (props) => {
                                 <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                             </div>
                             {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
-                            <ParticipantsTable />
+                            <ParticipantsTable getParticipants={getParticipants} filters={filters}/>
                         </div>
                     </DialogContent>
                 </div>

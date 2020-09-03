@@ -27,6 +27,10 @@ const ParticipantsTable = (props) => {
         })()
     }
 
+    const setPage = (page) => {
+        props.getParticipants(props.filters, (page - 1) * 7)
+    }
+
     useEffect(() => {
 
         if (participantsPublicMeeting) {
@@ -44,7 +48,7 @@ const ParticipantsTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={false} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} nextPage={setPage} prevPage={setPage} navigation={false} />
         </div>
     );
 }

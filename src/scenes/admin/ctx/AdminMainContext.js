@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
 export const AdminMainContext = React.createContext()
 
@@ -12,14 +12,30 @@ export const AdminMainProvider = ({ children }) => {
     const [loadingBlastsPrivate, setLoadingBlastsPrivate] = useState(false)
     const [blastInfo, setBlastInfo] = useState(null)
     const [isOpenParticipantsPopUp, setOpenParticipantsPopUp] = useState(false)
-    const [blowersNum, setBlowerNum] = useState(0);
-    const [isolatedNum, setIsolatedNum] = useState(0);
-    const [blastsNum, setBlastsNum] = useState(0);
+    const [blowersNum, setBlowerNum] = useState(0); //nav bar
+    const [isolatedNum, setIsolatedNum] = useState(0); //nav bar
+    const [blastsNum, setBlastsNum] = useState(0); //nav bar
     const [isOpenSideBar, setOpenSideBar] = useState(false);
     const [pubMeetingsNum, setPubMeetingsNum] = useState(false);
     const [privateMeetingsNum, setPrivateMeetingsNum] = useState(false);
     const [participantsPublicMeeting, setParticipantsPublicMeeting] = useState(null)
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
+    //single shofar blower page:(3)
+    const [selectedSB, setSelectedSB] = useState(null)
+    const [selectedIsolator, setSelectedIsolator] = useState(null)
+    const [startTimes, setStartTimes] = useState(null)
+    const [totalLength, setTotalLength] = useState(null)
+
+    useEffect(() => {
+        if (startTimes) setTotalLength(getTotalLength())
+    }, [startTimes])
+
+
+    const getTotalLength = () => {
+        if (!startTimes) return null;
+        return startTimes.reduce((accumulator, t) => accumulator + t.distance.value, 0);
+    }
+
 
     const ctxValue = {
         pubMeetingsNum, setPubMeetingsNum,
@@ -38,7 +54,10 @@ export const AdminMainProvider = ({ children }) => {
         privateMeetingsNum, setPrivateMeetingsNum,
         blastsPrivate, setBlastsPrivate,
         loadingBlastsPrivate, setLoadingBlastsPrivate,
-        showConfirmPopup, setShowConfirmPopup
+        showConfirmPopup, setShowConfirmPopup,
+        selectedSB, setSelectedSB,
+        startTimes, setStartTimes, totalLength,
+        selectedIsolator, setSelectedIsolator,
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

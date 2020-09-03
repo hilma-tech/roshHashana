@@ -33,6 +33,8 @@ const IsolatedTable = (props) => {
         }))
     }, [isolateds])
 
+
+
     const handleTrashClick = (id, index) => {
         setShowDeletePopup(true)
         whereToDelete.id = id
@@ -53,9 +55,17 @@ const IsolatedTable = (props) => {
         })()
     }
 
+    const setPage = (page) => {
+        props.getIsolateds(null, (page - 1) * 7)
+    }
+
+    const handleIsolatorClick = (e, index) => {
+        typeof props.setSelectedIsolator ==="function" && props.setSelectedIsolator(isolateds[index])
+    }
+
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={() => { }} prevPage={() => { }} columnNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={props.resultNum} onRowClick={handleIsolatorClick} />
 
             {showDeletePopup &&
                 <DeletePopup

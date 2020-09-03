@@ -13,11 +13,11 @@
     }
 
     .inputIcon {
+        height: 100%;
         position: absolute;
         color: #747474c5;
         font-size: 2.5vh;
         left: 1.5vw;
-        top: 1.3vh;
     }
 }
 
@@ -29,23 +29,22 @@
     margin: 3.5vh 0 2vh 0;
 }
 
-.blueSubTitle,
-.orangeSubTitle {
+.subTitle {
     font-size: 2vh;
     font-weight: 500;
     text-align: right;
 }
 
-.blueSubTitle {
-    color: #156879;
-}
-
-.orangeSubTitle {
-    color: #FDA42A;
-}
-
-.turquoiseText {
+.blueText {
     color: #156879 !important;
+}
+
+.orangeText {
+    color: #FDA42A !important;
+}
+
+.lightblueText {
+    color: #82C0CC !important;
 }
 
 .bold {
@@ -99,4 +98,28 @@
 .isolatedsContainer {
     height: 100vh;
     background: #F3F3F3 0% 0% no-repeat padding-box;
+}
+
+.loading-spiner{
+    width: 5vh;
+    height: 5vh;
+    border-radius: 50%;
+    border-top: solid 3px #747474;
+    border-right: solid 3px #747474;
+    border-bottom: solid 3px #747474;
+    border-left: solid 3px #ffffff;
+    animation-name: spin;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear; 
+    margin: auto;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }

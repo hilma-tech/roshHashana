@@ -1,11 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;900&display=swap");
-$grey: #eeeeee;
-$background: #f6f6f6;
-$dark-grey: #707070;
-$orange: #fda42a;
-$dark-turquise: #156879;
-$light-blue: #489fb5;
-$Heebo: "Heebo", sans-serif;
+@import "../admin_consts.scss";
 
 .admin-header {
     background-color: $grey;
@@ -16,6 +10,7 @@ $Heebo: "Heebo", sans-serif;
 }
 
 .general-numbers {
+    cursor: default;
     display: flex;
     span {
         display: flex;
@@ -67,7 +62,6 @@ $Heebo: "Heebo", sans-serif;
     right: 4vh;
     position: absolute;
 }
-
 
 .dark-turq {
     color: $dark-turquise;

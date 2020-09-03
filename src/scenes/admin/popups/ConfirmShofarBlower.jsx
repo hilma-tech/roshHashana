@@ -12,21 +12,21 @@ const ConfirmShofarBlower = (props) => {
                 <div className='tagsPopup' style={{ textAlign: "center" }}>
                     <FontAwesomeIcon
                         icon={['fas', 'times']}
-                        className='x pointer turquoiseText'
+                        className='x pointer blueText'
                         onClick={() => { props.handleDismiss(null) }}
                     />
 
                     <DialogContent className="p-0">
-                        <div className='textStyle turquoiseText bold' style={{ margin: '3vh 4vw', fontSize: '4vh' }}>
+                        <div className='textStyle blueText bold' style={{ margin: '3vh 4vw', fontSize: '4vh' }}>
                             {props.num} מתנדבים ממתינים לאישור
                         </div>
-                        <div className="saveBtn turquoiseText bold pointer" style={{ margin: '0 auto 2vh', fontSize: '3vh', boxShadow: '#00000029 0 3px 6px' }} onClick={() => {
+                        <div className="saveBtn blueText bold pointer" style={{ margin: '0 auto 2vh', fontSize: '3vh', boxShadow: '#00000029 0 3px 6px' }} onClick={() => {
                             props.handleDismiss(false)
                             props.goTo('/shofar-blowers')
                         }}>אשר מתנדבים</div>
-                        <div className="turquoiseText pointer" onClick={() => {
+                        <div className="confirm-later-btn blueText pointer" onClick={() => {
                             props.handleDismiss(false)
-                        }}>הזכר לי מאוחר יוותר</div>
+                        }}>הזכר לי מאוחר יותר</div>
                     </DialogContent>
                 </div>
             </Dialog>

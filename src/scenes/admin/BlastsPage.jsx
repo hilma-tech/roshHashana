@@ -15,11 +15,11 @@ const BlastsPage = (props) => {
     const [filters, setFilters] = useState(null)
     const [isPublic, setPublic] = useState(true)
 
-    const getBlastsPub = function (filter = {}, limit = { start: 0, end: 10 }) {
+    const getBlastsPub = function (filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             setLoadingBlastsPub(true)
-            await fetchBlastsPub(limit, filter, (err, res) => {
+            await fetchBlastsPub(startRow, filter, (err, res) => {
                 console.log(err, res)
                 setLoadingBlastsPub(false)
                 if (!err) {
@@ -30,12 +30,11 @@ const BlastsPage = (props) => {
         })()
     }
 
-    const getBlastsPrivate = function (filter = {}, limit = { start: 0, end: 10 }) {
+    const getBlastsPrivate = function (filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             setLoadingBlastsPrivate(true)
-            await fetchBlastsPrivate(limit, filter, (err, res) => {
-                console.log("!!!!", err, res)
+            await fetchBlastsPrivate(startRow, filter, (err, res) => {
                 setLoadingBlastsPrivate(false)
                 if (!err) {
                     setBlastsPrivate(res.privateMeetings)
@@ -97,7 +96,7 @@ const BlastsPage = (props) => {
 
     return (
         <div>
-            <TopNavBar />
+            <TopNavBar history={props.history}  />
             <div className="BlastsPage">
                 <div className="width75">
                     <div className="textHead bold">תקיעות</div>
@@ -107,12 +106,16 @@ const BlastsPage = (props) => {
                         <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                     </div>
                     <div className='statusNavContainer'>
-                        <div className={'orangeSubTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
+                        <div className={'orangeText subTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
                         <div style={{ width: '3.5vw' }}></div>
-                        <div className={'orangeSubTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
-                        <div className='blueSubTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
+                        <div className={'orangeText subTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
+                        <div className='blueText subTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
                     </div>
-                    {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable handleTrashClick={handleTrashClick} />}
+                    {isPublic ?
+                        <BlastsPubTable filters={filters} getBlastsPub={getBlastsPub} />
+                        :
+                        <BlastsPrivateTable filters={filters} getBlastsPrivate={getBlastsPrivate} handleTrashClick={handleTrashClick} />
+                    }
                 </div>
                 {blastInfo ? <BlastInfo handleTrashClick={handleTrashClick} /> : <BlastInfoPrev />}
             </div>

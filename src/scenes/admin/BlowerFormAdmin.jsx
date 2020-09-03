@@ -49,6 +49,7 @@ export default class BlowerFormAdmin extends Component {
             numOfBlowErr: '',
             name: '', //the name of the shofar blower
             phone: '', //the phone of the shofar blower
+            blastsNum: '', //the number of the blasts of the shofar blower
             address: '', //the address of the shofar blower
             chosenTime: null, //the start time the shofar blower wants to start his volunteering
             openPublicMeetingOptions: false, // open or close the public meeting options form
@@ -120,6 +121,11 @@ export default class BlowerFormAdmin extends Component {
             this.setState({ phone: event.target.value })
     }
 
+    handleBlastsNumChange = (event) => {
+        if (event.target.value.length < 3 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e")
+            this.setState({ blastsNum: event.target.value })
+    }
+
     //update walk time
     handleWalkTImeChange = (event, newValue) => {
         this.setState({ walkTime: newValue });
@@ -174,7 +180,7 @@ export default class BlowerFormAdmin extends Component {
 
         const formChilds = e.target.children;
 
-        if (!this.state.name || !this.state.name.length || !this.state.phone || !this.state.phone.length || !formChilds[7].value || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
+        if (!this.state.name || !this.state.name.length || !this.state.phone || !this.state.phone.length || !this.state.blastsNum || !this.state.chosenTime || !this.state.address || !this.state.address.length) {
             this.setState({ errorMsg: 'אנא מלא את כל הפרטים' });
             return;
         }
@@ -187,11 +193,11 @@ export default class BlowerFormAdmin extends Component {
             this.setState({ phoneErr: 'מספר פלאפון לא תקין' });
             return;
         }
-        if (formChilds[7].value > 20 || formChilds[7].value.length > 2) { // check can_blow_x_times value
+        if (this.state.blastsNum > 20 || this.state.blastsNum.value.length > 2) { // check can_blow_x_times value
             this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
-        else if (formChilds[7].value < 1) {
+        else if (this.state.blastsNum < 1) {
             this.setState({ numOfBlowErr: 'יש לבצע תקיעת שופר לפחות פעם אחת' });
             return;
         } else this.setState({ numOfBlowErr: '' });
@@ -217,7 +223,7 @@ export default class BlowerFormAdmin extends Component {
             return;
         }
         let blowerDetails = {
-            "can_blow_x_times": formChilds[7].value,
+            "can_blow_x_times": this.state.blastsNum,
             "volunteering_start_time": startTime,
             "volunteering_max_time": Math.abs(this.state.walkTime),//endTime,
             "address": this.state.address,
@@ -225,7 +231,7 @@ export default class BlowerFormAdmin extends Component {
         }
         this.setState({ errorMsg: '', publicMeetErr: '', addressErr: '', numOfBlowErr: '' });
 
-        let [cuRes, duErr] = await Auth.superAuthFetch('/api/CustomUsers/createUser', {
+        let [cuRes, duErr] = await Auth.superAuthFetch('/api/CustomUsers/' + (true ? 'createUser' : 'editUser'), {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "POST",
             body: JSON.stringify({ phone: this.state.phone, name: this.state.name, role: 2 })
@@ -236,16 +242,13 @@ export default class BlowerFormAdmin extends Component {
 
         blowerDetails.userId = cuRes.id
         //update shofar blower details
-        let [res, error] = await Auth.superAuthFetch(`/api/shofarBlowers/InsertDataShofarBlowerAdmin`, {
+        let [res, error] = await Auth.superAuthFetch(`/api/shofarBlowers/` + (true ? 'InsertDataShofarBlowerAdmin' : 'editDataShofarBlowerAdmin'), {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "POST",
             body: JSON.stringify({ data: blowerDetails })
         }, true);
         if (!error) {
             this.props.history.goBack()
-        }
-        else if (error === CONSTS.CURRENTLY_BLOCKED_ERR) {
-            this.context.openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר לעדכן את הפרטים' });
         }
         else {
             this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
@@ -264,7 +267,7 @@ export default class BlowerFormAdmin extends Component {
 
                 <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                     <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={this.props.history.goBack} />
-                    <div className="msg-txt header">בעל תוקע חדש</div>
+                    <div className="msg-txt header">{true ? 'בעל תוקע חדש' : 'עריכת בעל תוקע'}</div>
 
                     <form onSubmit={this.saveShofarBlowerDetails} onKeyPress={this.handleKeyPress}>
 
@@ -280,7 +283,7 @@ export default class BlowerFormAdmin extends Component {
 
                         {/* shofar blowing times input */}
                         <div className="title">כמה פעמים יהיה מוכן לתקוע בשופר באזורו?</div>
-                        <input type="number" />
+                        <input type="number" value={this.state.blastsNum} onChange={this.handleBlastsNumChange} />
                         <div className="err-msg ">{this.state.numOfBlowErr}</div>
 
                         {/* start time input */}

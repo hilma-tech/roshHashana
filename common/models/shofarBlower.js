@@ -156,7 +156,7 @@ module.exports = function (ShofarBlower) {
 
     //admin
 
-    ShofarBlower.getShofarBlowersForAdmin = function (limit, filter, cb) {
+    ShofarBlower.getShofarBlowersForAdmin = function (startRow, filter, cb) {
         (async () => {
             try {
                 let where = ''
@@ -175,21 +175,23 @@ module.exports = function (ShofarBlower) {
                     where += ` AND (MATCH(cu.name) AGAINST ('${filter.name}'))`
                 }
 
-                const shofarBlowerQ = `SELECT sb.id, cu.name, cu.username, cu.address, sb.volunteering_max_time, (	
-                    (SELECT COUNT(*) 
-                    FROM shofar_blower_pub
-                    WHERE blowerId = cu.id
-                    )+(
-                    SELECT COUNT(*)
-                    FROM isolated
-                    WHERE public_meeting = 0 AND blowerMeetingId = cu.id
-                    ) 
-                ) AS blastsNum
-                FROM shofar_blower as sb 
+                const shofarBlowerQ = `
+                SELECT 
+                    sb.id, 
+                    sb.volunteering_max_time,
+                    sb.volunteering_start_time AS "startTime", 
+                    sb.can_blow_x_times,
+                    cu.name,
+                    cu.username,
+                    cu.address,
+                    cu.lng,
+                    cu.lat,
+                    ((SELECT COUNT(*) FROM shofar_blower_pub WHERE blowerId = cu.id)+(SELECT COUNT(*) FROM isolated WHERE public_meeting = 0 AND blowerMeetingId = cu.id)) AS blastsNum
+                FROM shofar_blower AS sb 
                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
                 ${where}
                 ORDER BY cu.name
-                LIMIT 0, 20`
+                LIMIT ${startRow}, 7`
 
                 const countQ = `SELECT COUNT(*) as resNum
                 FROM shofar_blower AS sb
@@ -218,7 +220,7 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.remoteMethod('getShofarBlowersForAdmin', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
@@ -233,6 +235,11 @@ module.exports = function (ShofarBlower) {
                     console.log('get shofarBlower admin request error : ', confirmErr);
                     throw shofarBlowerErr
                 }
+                
+                const findPhone = `select username from CustomUser,shofar_blower where shofar_blower.id = ${id} and CustomUser.id=shofar_blower.userBlowerId`
+                let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
+                let objToSocketEvent= {"id" :id};
+                ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`)
                 return cb(null, true)
             } catch (err) {
                 cb(err);
@@ -317,7 +324,8 @@ module.exports = function (ShofarBlower) {
                     "userBlowerId": userId,
                     "can_blow_x_times": data.can_blow_x_times,
                     "volunteering_start_time": data.volunteering_start_time,
-                    "volunteering_max_time": data.volunteering_max_time
+                    "volunteering_max_time": data.volunteering_max_time,
+                    "confirm": true
                 },
                     objToCU = {
                         "address": data.address[0],
@@ -357,11 +365,11 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.getShofarBlowersForMap = function (cb) {
         (async () => {
             try {
-                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng 
+                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, shofar_blower.id AS "sbId" 
                 FROM shofar_blower AS sb 
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
-                WHERE sb.confirm = 1
-                `
+                WHERE sb.confirm = 1`
+                
                 let [shofarBlowersErr, shofarBlowersRes] = await executeMySqlQuery(ShofarBlower, shofarBlowersQ);
                 if (shofarBlowersErr || !shofarBlowersRes) {
                     console.log('get shofarBlower admin request error : ', shofarBlowersErr);

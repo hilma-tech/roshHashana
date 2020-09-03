@@ -67,7 +67,7 @@ module.exports = function (shofarBlowerPub) {
         else return false;
     }
 
-    shofarBlowerPub.getPublicMeetings = function (limit, filter, cb) {
+    shofarBlowerPub.getPublicMeetings = function (startRow, filter, cb) {
         (async () => {
             let where = 'WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1'
             if (filter.address && filter.address.length > 0) {
@@ -90,7 +90,7 @@ module.exports = function (shofarBlowerPub) {
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                 ${where}
-                LIMIT ${limit.start}, ${limit.end}`); //confirm change
+                LIMIT ${startRow}, 7`); //confirm change
 
             if (errPublic) cb(errPublic);
 
@@ -117,7 +117,7 @@ module.exports = function (shofarBlowerPub) {
     shofarBlowerPub.remoteMethod('getPublicMeetings', {
         http: { verb: 'POST' },
         accepts: [
-            { arg: 'limit', type: 'object' },
+            { arg: 'startRow', type: 'number' },
             { arg: 'filter', type: 'object' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
