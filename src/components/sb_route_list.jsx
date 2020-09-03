@@ -108,7 +108,7 @@ const SBRouteList = (props) => {
     }
 
     const createItemContent = (value, index, uniqueKey) => {
-        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
+        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1 && !isAdmin) ? 'clickAble' : ''}`} onClick={() => !isAdmin && index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 {index !== CONST_MEETING ? <div className="meeting-in-route-img">
                     {index === -1 ?

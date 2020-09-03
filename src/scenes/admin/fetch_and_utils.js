@@ -239,9 +239,9 @@ export const createAdminUser = async (email, password, code, cb = () => { }) => 
     }
 }
 
-export const adminGetSBRoute = async (sbId) => {
-    let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
-        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId })
+export const adminGetSBRoute = async (sbId, withSBInfo = false) => {
+    let [res, err] = await Auth.superAuthFetch('/api/ShofarBlowers/adminGetSBRoute', {
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId, withSBInfo: withSBInfo ? true : false })
     }, true);
     return new Promise((resolve, reject) => {
         if (err || !res) {
@@ -251,6 +251,47 @@ export const adminGetSBRoute = async (sbId) => {
         resolve([null, res])
     });
 }
+
+export const adminAssignSBToIsolator = async (sb, isolator) => {
+    let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminAssignSBToIsolator', {
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sb, isolator })
+    }, true);
+    return new Promise((resolve, reject) => {
+        if (err || !res) {
+            resolve([true, null])
+            return;
+        }
+        resolve([null, res])
+    });
+}
+
+export const adminUpdateMaxDurationAndAssign = async (sb, isolator, newMaxTimeVal, cb) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateMaxDurationAndAssign`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ sb, isolator, newMaxTimeVal })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
+    }
+    else {
+        cb && typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
+    }
+}
+
+export const adminUpdateMaxRouteLengthAndAssign = (sb, isolator) =>{
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/adminUpdateMaxRouteLengthAndAssign`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ sb, isolator })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : true) //yes error
+    }
+    else
+        cb && typeof cb === "function" && cb(null, res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : res)
+}
+
 
 export const fetchBlastsForMap = async (cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getAllAdminBlastsForMap`, {

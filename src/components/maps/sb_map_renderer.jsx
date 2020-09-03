@@ -244,8 +244,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     />
             }
             {/* user location */}
-            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} /> {/* might need to disable when genMap is on */}
-
+            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} /> {/* might need to disable when genMap is on */}
+            {isAdmin && data.selectedIsolatorLoc ?
+                <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} />
+                : null
+            }
             {isAdmin ? null :
                 <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                     {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
