@@ -1,12 +1,12 @@
 import Auth from '../../modules/auth/Auth'
 import { CONSTS } from '../../consts/const_messages'
 
-export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
+export const fetchIsolateds = async (startRow, filter = {}, cb = () => { }) => {
     if (!filter) filter = {}
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getIsolatedsForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (typeof cb === "function") {
         if (err || !res) {
@@ -18,12 +18,12 @@ export const fetchIsolateds = async (limit, filter = {}, cb = () => { }) => {
     }
 }
 
-export const fetchShofarBlowers = async (limit, filter = {}, cb = () => { }) => {
+export const fetchShofarBlowers = async (startRow, filter = {}, cb = () => { }) => {
     if (!filter) filter = {}
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/getShofarBlowersForAdmin`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (typeof cb === "function") {
         if (err || !res) {
@@ -35,11 +35,11 @@ export const fetchShofarBlowers = async (limit, filter = {}, cb = () => { }) => 
     }
 }
 
-export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
+export const fetchBlastsPub = async (startRow, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowerPubs/getPublicMeetings`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
@@ -49,11 +49,11 @@ export const fetchBlastsPub = async (limit, filter = '', cb = () => { }) => {
     }
 }
 
-export const fetchBlastsPrivate = async (limit, filter = '', cb = () => { }) => {
+export const fetchBlastsPrivate = async (startRow, filter = '', cb = () => { }) => {
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getPrivateMeetings`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ limit, filter })
+        body: JSON.stringify({ startRow, filter })
     }, true);
     if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר")
@@ -145,12 +145,12 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
     }
 }
 
-export const getParticipantsMeeting = async (id, limit, filter = '', cb = () => { }) => {
-    console.log(id, limit, filter)
+export const getParticipantsMeeting = async (id, startRow, filter = '', cb = () => { }) => {
+    console.log(id, startRow, filter)
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ id, limit, filter })
+        body: JSON.stringify({ id, startRow, filter })
     }, true);
 
     if (err || !res) {
@@ -225,11 +225,54 @@ export const createAdminUser = async (email, password, code, cb = () => { }) => 
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createAdminUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
-        body: JSON.stringify({ email, password,code })
+        body: JSON.stringify({ email, password, code })
     }, true);
 
     if (err || !res) {
         console.log(err)
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const adminGetSBRoute = async (sbId) => {
+    let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminGetSBRoute', {
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId })
+    }, true);
+    return new Promise((resolve, reject) => {
+        if (err || !res) {
+            resolve([true, null])
+            return;
+        }
+        resolve([null, res])
+    });
+}
+
+export const fetchBlastsForMap = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/getAllAdminBlastsForMap`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({})
+    }, true);
+
+    if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const fetchIsolatedForMap = async (cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getIsolatedsWithoutMeetingForMap`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({})
+    }, true);
+
+    if (err || !res) {
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
     }
     else {

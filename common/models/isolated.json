@@ -166,7 +166,8 @@
                 "getNumberOfMeetings",
                 "getParticipantsMeeting",
                 "deleteConectionToMeeting",
-                "getPrivateMeetings"
+                "getPrivateMeetings",
+                "getIsolatedsWithoutMeetingForMap"
             ]
         }
     ]

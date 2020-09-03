@@ -86,9 +86,7 @@ module.exports = function (CustomUser) {
 
             let [customUserErr, customUserRes] = await to(CustomUser.create({ email, password, name: 'admin' }, options));
             if (customUserErr) {
-                console.log(customUserErr.message, customUserErr.message == 'The `CustomUser` instance is not valid. Details: `email` Email already exists (value: "admin@gmail.com").')
                 if (customUserErr.message == 'The `CustomUser` instance is not valid. Details: `email` Email already exists (value: "admin@gmail.com").') {
-                    console.log("!!!")
                     return cb(null, { error: 'המשתמש כבר קיים במערכת' })
                 }
                 return cb(null, {});

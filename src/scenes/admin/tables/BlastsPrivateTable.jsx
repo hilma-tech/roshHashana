@@ -36,7 +36,7 @@ const BlastsPrivateTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPrivate} navigation={true} nextPage={() => { }} lastPage={() => { }} columnNum={10} resaultsNum={privateMeetingsNum} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPrivate} navigation={true} nextPage={() => { }} lastPage={() => { }} rowsNum={10} resaultsNum={privateMeetingsNum} />
         </div>
     );
 }

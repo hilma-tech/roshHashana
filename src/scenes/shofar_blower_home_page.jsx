@@ -32,6 +32,29 @@ const SBHomePage = (props) => {
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
 
+    useJoinLeave("admin-blower-events", (err) => {
+        if (err) console.log("failed to join room");
+    })
+
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (userData != null) {
+            socket.on(`blower_true_confirmQ_${userData.username}`, fn);
+
+            return () => {
+                socket.off(`blower_true_confirmQ_${userData.username}`, fn);
+            };
+        }
+    }, [userData]);
+
+    const fn = (req) => {
+        setUserData((userData) => ({ ...userData, confirm: 1 }))
+        return
+       
+    }
+
+
     useJoinLeave("isolated-events", (err) => {
         if (err) console.log("failed to join room");
     })
@@ -65,19 +88,24 @@ const SBHomePage = (props) => {
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
-                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null) {
+                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null && newReqData.oldMeetingId !== undefined && newReqData.oldIsPublicMeeting !== undefined) {
+                    console.log('1')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
-                else if (newReqData.oldMeetingId !== null) {
+                else if (newReqData.oldMeetingId !== null && newReqData.oldMeetingId !== undefined) {
+                    console.log('2')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
-                else if (newReqData.oldIsPublicMeeting !== null) {
+                else if (newReqData.oldIsPublicMeeting !== null && newReqData.oldIsPublicMeeting !== undefined) {
+                    console.log('3')
                     return (req.meetingId == newReqData.meetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
                 else {
+                    console.log('old req', req)
+                    console.log('new req', newReqData);
                     return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
 
@@ -101,15 +129,21 @@ const SBHomePage = (props) => {
             //sort my routes by startTime, where closest (lowest) is first
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)
             if (!userData || (Array.isArray(userData) && !userData.length)) setUserData(mapContent.userData[0])
+
             //if got .length == limit, call again -- and on SET need to check if already have some data and then add and not set
         }
         fetching = false
     }
+
+
+
     return (
         <div className="sb-homepage-container">
+            {console.log(userData, "userData")}
             {
                 !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>
+
                         {/* ALL THINGS FOR MAP PAGE */}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? <SBAssignMeeting inRoute={isInRoute} /> : null}
                         {assignMeetingInfo && typeof assignMeetingInfo === "object" ? null : <SBSideInfo onMobile={onMobile} history={props.history} />}
@@ -121,7 +155,6 @@ const SBHomePage = (props) => {
                     <SBNotConfirmed history={props.history} onMobile={onMobile} openGenAlert={openGenAlert} />
                 )
             }
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
         </div>
     );
 }

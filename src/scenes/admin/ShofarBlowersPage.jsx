@@ -7,24 +7,33 @@ import TopNavBar from './TopNavBar';
 import Search from './Search';
 import './styles/shofarBlowerPage.scss'
 
-let status = 0
+let status = 1
 
 const ShofarBlowerPage = function (props) {
-    const { setLoading, setShofarBlowers } = useContext(AdminMainContext)
-    const [filters, setFilters] = useState(null)
+    const { selectedSB, setSelectedSB, setLoading, setShofarBlowers } = useContext(AdminMainContext)
+    const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
         getShofarBlowers()
     }, [])
 
-    const getShofarBlowers = function (filter = {}, limit = { start: 0, end: 10 }) {
+    useEffect(() => {
+        if (selectedSB && props.location.pathname === "/shofar-blowers") {
+            props.history.push("/shofar-blower")
+            console.log('selectedSB: ', selectedSB);
+        } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
+            props.history.push("/shofar-blowers")
+        }
+    }, [selectedSB])
+
+    const getShofarBlowers = function (filter = filters, startRow = 0) {
         (async () => {
-            if (!filter) filter = {}
+            if (!filter) filter = filters
             if (status === 0) filter.confirm = false
             else if (status === 1) filter.confirm = true
             setLoading(true)
-            await fetchShofarBlowers(limit, filter, (err, res) => {
+            await fetchShofarBlowers(startRow, filter, (err, res) => {
                 setLoading(false)
                 if (!err) {
                     setShofarBlowers(res.shofarBlowers)
@@ -36,7 +45,6 @@ const ShofarBlowerPage = function (props) {
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.name = value
             return pervFilters
         })
@@ -45,7 +53,6 @@ const ShofarBlowerPage = function (props) {
 
     const onSearchAddress = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.address = value
             return pervFilters
         })
@@ -59,7 +66,7 @@ const ShofarBlowerPage = function (props) {
     }
 
     return (
-        <div className='isolatedsContainer'>
+        <div className="isolatedsContainer" >
             <TopNavBar />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מתנדבים לתקוע בשופר</div>
@@ -78,7 +85,7 @@ const ShofarBlowerPage = function (props) {
                     <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מתנדבים</div>
                     <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <ShofarBlowerTable resultNum={resultNum} status={status} />
+                <ShofarBlowerTable selectedSB={selectedSB} setSelectedSB={setSelectedSB} setResultNum={setResultNum} resultNum={resultNum} status={status} />
             </div>
         </div>
     );

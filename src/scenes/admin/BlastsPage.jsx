@@ -15,11 +15,11 @@ const BlastsPage = (props) => {
     const [filters, setFilters] = useState(null)
     const [isPublic, setPublic] = useState(true)
 
-    const getBlastsPub = function (filter = {}, limit = { start: 0, end: 10 }) {
+    const getBlastsPub = function (filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             setLoadingBlastsPub(true)
-            await fetchBlastsPub(limit, filter, (err, res) => {
+            await fetchBlastsPub(startRow, filter, (err, res) => {
                 console.log(err, res)
                 setLoadingBlastsPub(false)
                 if (!err) {
@@ -30,12 +30,11 @@ const BlastsPage = (props) => {
         })()
     }
 
-    const getBlastsPrivate = function (filter = {}, limit = { start: 0, end: 10 }) {
+    const getBlastsPrivate = function (filter = {}, startRow = 0) {
         (async () => {
             if (!filter) filter = {}
             setLoadingBlastsPrivate(true)
-            await fetchBlastsPrivate(limit, filter, (err, res) => {
-                console.log("!!!!", err, res)
+            await fetchBlastsPrivate(startRow, filter, (err, res) => {
                 setLoadingBlastsPrivate(false)
                 if (!err) {
                     setBlastsPrivate(res.privateMeetings)

@@ -4,23 +4,23 @@
 //newMeetingId=null-> if created new meeting
 //אם אין lat וlng אז צריך לקבל אותם בשרת לפי הכתובת כי אם אין אותם אין צורך בsocket
 //הקוד להלך יוצא מנקודת הנחה שיש lng וlat, לכן לפני קריאה אליו בפרויקט יש לוודא שיש lng וlat
-class IsolatorInfoUpdateSocket {
+module.exports = class IsolatorInfoUpdateSocket {
     constructor(Modal) {
         this.Modal = Modal;
         this.newData = null
         this.currData = null
         this.newMeetingId = null
     }
-    setCurrIsolatedInfo = (currData) => {
+    setCurrIsolatedInfo(currData) {
         this.currData = currData
     }
-    setNewData = (newData) => {
+    setNewData(newData) {
         this.newData = newData
     }
-    setNewMeetingId = (newMeetingId) => {
+    setNewMeetingId(newMeetingId) {
         this.newMeetingId = newMeetingId
     }
-    handleIsolatorUpdateInfo = async (newData) => {
+    async handleIsolatorUpdateInfo  (newData) {
         if (newData) this.newData = newData
         console.log('handleIsolatorUpdateInfo: \n', "newData", this.newData, "currData", this.currData, "newMeetingId", this.newMeetingId);
         if (this.newData.address || this.newData.comments || this.newData.name || this.newData.username || this.newData.public_phone) { //change in: address|comments|name|username|public_phone
@@ -139,7 +139,7 @@ class IsolatorInfoUpdateSocket {
         }
     }
 
-    updateReqForAllShofarBlowers = () => {
+    updateReqForAllShofarBlowers(){
         //update req for all shofar blowers 
         console.log('newData: ', this.newData);
         console.log('currData: ', this.currData);
@@ -159,7 +159,7 @@ class IsolatorInfoUpdateSocket {
     }
 
 
-    addNewReqForAllShofarBlowers = () => {
+    addNewReqForAllShofarBlowers () {
         let objToSocketEvent = {
             "meetingId": this.currData.blowerMeetingId,
             "startTime": this.currData.start_time,
@@ -175,16 +175,16 @@ class IsolatorInfoUpdateSocket {
     }
 
 
-    hasGeneralUsersConnected = async (publicMeetingId) => {
+    async hasGeneralUsersConnected  (publicMeetingId) {
         let numOfRegistered = await this.Modal.app.models.Isolated.find({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: publicMeetingId }] } });
         return Array.isArray(numOfRegistered) ? numOfRegistered.length : false
     }
 
-    publicHasBlower = async (publicMeetingId) => { //todo לבדוק מה זה מחזיר 
+    async publicHasBlower (publicMeetingId) { //todo לבדוק מה זה מחזיר 
         return await this.Modal.app.models.shofarBlowerPub.findOne({ where: { and: [{ id: publicMeetingId }, { blowerId: null }] } });
     }
 } //end IsolatorInfoUpdateSocket class
 
-module.exports = IsolatorInfoUpdateSocket
+
 
 

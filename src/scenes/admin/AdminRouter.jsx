@@ -2,12 +2,13 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Switch, Route } from "react-router-dom";
 import { AdminMainProvider } from './ctx/AdminMainContext';
 import { PrivateRoute } from './../../modules/auth/PrivateRoute';
-import AdminHome from './AdminHome'
-import AdminLogin from './AdminLogin.jsx'
-import IsolatedsPage from './IsolatedsPage'
-import ShofarBlowersPage from './ShofarBlowersPage'
-import BlastsPage from './BlastsPage.jsx'
-import BlowerFormAdmin from './BlowerFormAdmin'
+import AdminHome from './AdminHome' //loadable ?
+import AdminLogin from './AdminLogin.jsx' //loadable ?
+import IsolatedsPage from './IsolatedsPage' //loadable ?
+import ShofarBlowersPage from './ShofarBlowersPage' //loadable ?
+import BlastsPage from './BlastsPage.jsx' //loadable ?
+import BlowerFormAdmin from './BlowerFormAdmin' //loadable ?
+import SingleShofarBlowerPage from './SingleShofarBlowerPage'; //loadable?
 import NewAdmin from './NewAdmin'
 import './styles/generalAdminStyle.scss'
 
@@ -23,6 +24,7 @@ const AdminRouter = (props) => {
                         <PrivateRoute exact path={`/home`} compName="AdminHome" component={(props) => <AdminHome {...props} />} />
                         <PrivateRoute exact path={`/searchings`} compName="IsolatedTable" component={(props) => <IsolatedsPage {...props} />} />
                         <PrivateRoute exact path={`/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
+                        <PrivateRoute exact path={`/shofar-blower`} compName="SingleShofarBlowerPage" component={(props) => <SingleShofarBlowerPage {...props} />} />
                         <PrivateRoute exact path={`/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
                         <PrivateRoute exact path={`/jdlgtjerwitgeswteswrtwsfsd`} compName="NewAdmin" component={(props) => <NewAdmin {...props} />} />
                     </Switch>

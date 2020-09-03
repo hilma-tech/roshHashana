@@ -9,7 +9,7 @@ let status = 0
 
 const IsolatedPage = function (props) {
     const { setLoading, setIsolateds } = useContext(AdminMainContext)
-    const [filters, setFilters] = useState(null)
+    const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
@@ -19,12 +19,12 @@ const IsolatedPage = function (props) {
         })()
     }, [])
 
-    const getIsolateds = function (filter = {}, limit = { start: 0, end: 10 }) {
+    const getIsolateds = function (filter = filters, startRow = 0) {
         (async () => {
-            if (!filter) filter = {}
+            if (!filter) filter = filters
             if (status === 0) filter.haveMeeting = false
             else if (status === 1) filter.haveMeeting = true
-            await fetchIsolateds(limit, filter, (err, res) => {
+            await fetchIsolateds(startRow, filter, (err, res) => {
                 setLoading(false)
                 if (!err) {
                     setIsolateds(res.isolateds)
@@ -36,7 +36,6 @@ const IsolatedPage = function (props) {
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.name = value
             return pervFilters
         })
@@ -45,7 +44,6 @@ const IsolatedPage = function (props) {
 
     const onSearchAddress = function (value) {
         setFilters(pervFilters => {
-            if (!pervFilters) pervFilters = {}
             pervFilters.address = value
             return pervFilters
         })
@@ -60,7 +58,7 @@ const IsolatedPage = function (props) {
 
     return (
         <div className='isolatedsContainer'>
-            <TopNavBar history={props.history}/>
+            <TopNavBar history={props.history} />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                 <div style={{ display: 'flex' }}>
@@ -74,7 +72,7 @@ const IsolatedPage = function (props) {
                     <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
                     <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <IsolatedTable resultNum={resultNum} />
+                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} />
             </div>
         </div>
     );
