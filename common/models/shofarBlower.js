@@ -100,7 +100,8 @@ module.exports = function (ShofarBlower) {
                 let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                 if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
                     //only delete the connection between the blower and the meeting
-                    //general users who are connected to this meeting will be deleted once they log in 
+                    //general users who are connected to this meeting will be deleted once they log in
+                    //TODO:   לעבור על כל הפגישות הציבוריות של הבעל תוקע ולמחוק את הפגישות שמחק 
                     await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0, start_time: null });
                     let isolated = await ShofarBlower.app.models.isolated.findOne({ where: { and: [{ blowerMeetingId: meetingId }, { public_meeting: 1 }] }, include: ['UserToIsolated'] });
                     if (isolated) {

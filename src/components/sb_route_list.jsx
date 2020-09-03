@@ -11,7 +11,6 @@ import { changePosition, splitJoinAddressOnIsrael, checkDateBlock } from '../fet
 
 const SBRouteList = (props) => {
     const { admin: isAdmin, selectedSB, meetingsOfSelectedSB } = props
-    console.log('meetingsOfSelectedSB: ', meetingsOfSelectedSB);
     const [myRoute, setMyRoute] = useState([]);
     const [constB4, setConstB4] = useState([]);
     const [constAfter, setConstAfter] = useState([]);

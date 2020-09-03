@@ -146,7 +146,7 @@ export default class BlowerForm extends Component {
         if (!publicPlaces || !Array.isArray(publicPlaces) || !publicPlaces.length) return true
         let updateArrInState = false;
         for (let i in publicPlaces) {
-            if (publicPlaces[i].comments && publicPlaces[i].comments.length && !/^[A-Zא-תa-z 0-9'"-]{2,}$/.test(publicPlaces[i].comments)) {
+            if (publicPlaces[i].comments && publicPlaces[i].comments.length && !/^[A-Zא-תa-z 0-9'"-]{1,}$/.test(publicPlaces[i].comments)) {
                 this.setState({ publicMeetErr: 'לא ניתן להכניס תווים מיוחדים בתיאור' });
                 return false;
             }

@@ -6,14 +6,15 @@ import GeneralAlert from '../../components/modals/general_alert';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { checkDateBlock } from '../../fetch_and_utils';
 import { CONSTS } from '../../consts/const_messages';
-import { MainContext } from '../../ctx/MainContext';
 import { ThemeProvider } from "@material-ui/styles";
+import { MainContext } from '../../ctx/MainContext';
 import { createMuiTheme } from "@material-ui/core";
 import { TimePicker } from '@material-ui/pickers';
 import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
+import { isBrowser } from 'react-device-detect';
 import './Settings.scss';
 
 const materialTheme = createMuiTheme({
@@ -39,8 +40,7 @@ const format = 'HH:mm';
 
 let publicMeetingsChanged = false;
 const IsolatedSettings = (props) => {
-
-    const { openGenAlert, showAlert } = useContext(MainContext);
+    const { openGenAlert, showAlert, openGenAlertSync } = useContext(MainContext);
     const [settingsType, setSettingsType] = useState('');
 
     const [originalVals, setOriginalVals] = useState({});
@@ -195,7 +195,7 @@ const IsolatedSettings = (props) => {
                     setErrs(errs => ({ ...errs, general: "נא לציין את שעת התקיעה" }))
                     return;
                 }
-                if (publicMeetings[i].comments && publicMeetings[i].comments.length && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(publicMeetings[i].comments)) {
+                if (publicMeetings[i].comments && publicMeetings[i].comments.length && !/^[A-Zא-תa-z0-9 '"-]{1,}$/.test(publicMeetings[i].comments)) {
                     let pms = [...publicMeetings];
                     pms[i].errMsg = 'לא ניתן להכניס תווים מיוחדים בתיאור';
                     setValues(pms, "publicMeetings")
@@ -216,6 +216,15 @@ const IsolatedSettings = (props) => {
         if (!/^[A-Zא-תa-z 0-9 '"-]{2,}$/.test(name)) { setMsgErr('השם שהזנת אינו תקין', "name"); return; }
 
         setErrs({}); //all
+
+        //the blower updated his volunteering_max_time to be smaller than it used to be
+        if (volunteering_max_time < originalVals.volunteering_max_time) {
+            openGenAlert({ text: `שים לב שהקטנת את זמן ההליכה המקסימלי. זמן זה אינו משפיע על המסלול הנוכחי. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+        }
+
+        if (can_blow_x_times < originalVals.can_blow_x_times) {//the blower updated his can_blow_x_times to be smaller than it used to be
+            sessionStorage.setItem('showAlertMaxBlowTimes', true); //update session storage to show the alert in sb_map_renderer.jsx
+        }
 
         //update blower details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {

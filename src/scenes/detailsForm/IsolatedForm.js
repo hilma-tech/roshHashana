@@ -66,7 +66,7 @@ export default class IsolatedForm extends Component {
             return;
         }
         const { address, comments, approval, publicMeeting } = this.state
-        if (comments && comments.length && !/^[A-Zא-תa-z0-9 '"-]{2,}$/.test(comments)) { this.setState({ errorMsg: 'לא ניתן להכניס תווים מיוחדים בתיאור' }); return; }
+        if (comments && comments.length && !/^[A-Zא-תa-z0-9 '"-]{1,}$/.test(comments)) { this.setState({ errorMsg: 'לא ניתן להכניס תווים מיוחדים בתיאור' }); return; }
         //cheked address
         if (!Array.isArray(address) || !address.length) {
             this.setState({ addressErr: 'אנא הכנס מיקום' });
