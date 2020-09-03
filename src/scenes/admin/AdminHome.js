@@ -5,7 +5,7 @@ import TopNavBar from "./TopNavBar"
 import './AdminHome.scss'
 import ConfirmShofarBlower from './popups/ConfirmShofarBlower';
 import { AdminMainContext } from './ctx/AdminMainContext';
-import { getNumVolunteers, getNumberOfIsolatedWithoutMeeting, getNumberOfMeetings } from './fetch_and_utils';
+import { getNumVolunteers} from './fetch_and_utils';
 
 const AdminHome = (props) => {
     const { showConfirmPopup, setShowConfirmPopup } = useContext(AdminMainContext)

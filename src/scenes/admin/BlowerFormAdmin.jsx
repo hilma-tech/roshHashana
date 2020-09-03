@@ -117,12 +117,12 @@ export default class BlowerFormAdmin extends Component {
 
     //update phone time
     handlePhoneChange = (event) => {
-        if (event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e")
+        if (event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value !== "." && event.target.value !== "-" && event.target.value !== "+" && event.target.value !== "e")
             this.setState({ phone: event.target.value })
     }
 
     handleBlastsNumChange = (event) => {
-        if (event.target.value.length < 3 && !isNaN(event.target.value) && event.target.value != "." && event.target.value != "-" && event.target.value != "+" && event.target.value != "e")
+        if (event.target.value.length < 3 && !isNaN(event.target.value) && event.target.value !== "." && event.target.value !== "-" && event.target.value !== "+" && event.target.value !== "e")
             this.setState({ blastsNum: event.target.value })
     }
 
@@ -164,7 +164,7 @@ export default class BlowerFormAdmin extends Component {
 
     handleKeyPress = (e) => {
         const key = e.charCode || e.keyCode || 0;
-        if (key == 13) {
+        if (key === 13) {
             e.preventDefault();
             return;
         }
@@ -189,7 +189,7 @@ export default class BlowerFormAdmin extends Component {
             this.setState({ nameErr: 'השם צריך להכיל אותיות בלבד' });
             return;
         }
-        if (this.state.phone.length < 10 || this.state.phone && this.state.phone[0] != 0) {
+        if (this.state.phone.length < 10 || this.state.phone && this.state.phone[0] !== 0) {
             this.setState({ phoneErr: 'מספר פלאפון לא תקין' });
             return;
         }
@@ -250,13 +250,12 @@ export default class BlowerFormAdmin extends Component {
         if (!error) {
             this.props.history.goBack()
         }
-        else {
+        else if (res){
             this.setState({ errorMsg: typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה' })
         }
     }
 
     render() {
-        const name = (this.props.location && this.props.location.state && this.props.location.state.name) ? this.props.location.state.name : '';
         const { showAlert } = this.context;
         // var input = document.getElementById('locationTextField');
         // var autocomplete = new google.maps.places.Autocomplete(input);

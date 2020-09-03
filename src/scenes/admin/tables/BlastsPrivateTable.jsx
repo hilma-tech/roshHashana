@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
-import { getTime, deleteConectionToMeeting } from '../fetch_and_utils';
+import { getTime } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
 import '../styles/table.scss'
 

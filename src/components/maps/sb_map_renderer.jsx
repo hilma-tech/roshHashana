@@ -68,7 +68,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const [showMeetingsListAni, setShowMeetingsListAni] = useState(false)
 
     useEffect(() => {
-        if (totalLength == null) return
+        if (totalLength === null) return
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
@@ -132,7 +132,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             } else {
                 if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
                 const getMyNewST = (mId, isPub) => {
-                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
+                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId === mId && st.isPublicMeeting === isPub)
                     if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                     return false
                 }
@@ -147,7 +147,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                         if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                     }))
                     setMyMeetings(meets => meets.map(m => {
-                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId === m.meetingId && mToUpdate.isPublicMeeting === m.isPublicMeeting)
                         if (!newMMStartTime) return m
                         return { ...m, startTime: newMMStartTime.startTime }
                     }))
