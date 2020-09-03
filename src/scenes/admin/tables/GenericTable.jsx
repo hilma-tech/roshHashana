@@ -50,13 +50,10 @@ const GenericTable = (props) => {
                 </thead>
                 <tbody>
                     {!tr ?
-                        props.loading ?
+                        props.loading?
                             <tr className='headLine'>
                                 <td colSpan="9" className='noRes'>
-                                    {/* loading...... */}
-                                    {/* <div className="spinner-border" role="status">
-                                        <span className="sr-only">טוען...</span>
-                                    </div> */}
+                                    <div className='loading-spiner'></div>
                                 </td>
                             </tr> :
                             <tr className='headLine'>

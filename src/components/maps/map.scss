@@ -152,16 +152,22 @@
 
 .mapNavContainer {
     position: absolute;
-    top: 12vh;
+    top: 11vh;
+    right: 5vw;
     display: flex;
     align-items: center;
-    width: 100vw;
-    padding: 0 4vw;
+    width: 90vw;
+    padding: 1.5vh 3vh;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
 
     .inputContainer {
-        background-color: #ffffffc4;
-
+        // background-color: #ffffffc4;
+        margin-left: 35vw;
+        
         input {
+            padding: 1vh 0.5vw;
             border: #7070708e solid 0.5px;
         }
 
@@ -171,14 +177,54 @@
     }
 
     .mapIconContainer {
+        margin: 0 1.5vh;
+        padding: 0.5vh;
+        border-radius: 50%;
+        position: relative;
+
+        img {
+            width: 4.5vh;
+            height: 4.5vh;
+        }
+
         .textInHover {
-            display: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            border-radius: 50%;
+            top: 0.5vh;
+            right: 0.5vh;
+            width: 4.5vh;
+            height: 4.5vh;
+            font-size: 1.1vh;
+            background-color: rgba(255, 255, 255, 0);
+            color: rgba(255, 255, 255, 0) !important;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
     }
 
     .mapIconContainer:hover {
         .textInHover {
-            display: none;
+            color: white !important;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
+
+        .blueBackground {
+            background-color: #156879 !important;
+        }
+        
+        .orangeBackground {
+            background-color: #FDA42A !important;
+        }
+        
+        .lightblueBackground {
+            background-color: #82C0CC !important;
+        }
+    }
+
+    .mapIconSelected {
+        border: solid 1px;
+
     }
 }

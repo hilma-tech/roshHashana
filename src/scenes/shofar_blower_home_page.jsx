@@ -56,13 +56,27 @@ const SBHomePage = (props) => {
 
 
     useJoinLeave("isolated-events", (err) => {
-        if (err) console.log("failed to join room");
+        if (err) console.log("failed to join room isolated-events");
     })
+
+    useJoinLeave('blower-events', () => (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
+
+    useOn('newMeetingAssined', (req) => {
+        setMeetingsReqs((meetingsReqs) => {
+            return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.isPublicMeeting) || (req.meetingId !== meet.meetingId))
+        })
+    });
+
+    useOn('removeMeetingFromRoute', (req) => {
+        setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req])
+    });
+
     useOn("newIsolator", (req) => {
         addNewReq(req)
     });
     useOn('modifyIsolatorInfo', (newReq) => {
-        console.log('s: newReq: ', newReq);
         updateReqData(newReq)
     })
 
@@ -89,23 +103,18 @@ const SBHomePage = (props) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
                 if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null && newReqData.oldMeetingId !== undefined && newReqData.oldIsPublicMeeting !== undefined) {
-                    console.log('1')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
                 else if (newReqData.oldMeetingId !== null && newReqData.oldMeetingId !== undefined) {
-                    console.log('2')
                     return (req.meetingId == newReqData.oldMeetingId
                         && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
                 else if (newReqData.oldIsPublicMeeting !== null && newReqData.oldIsPublicMeeting !== undefined) {
-                    console.log('3')
                     return (req.meetingId == newReqData.meetingId
                         && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
                 }
                 else {
-                    console.log('old req', req)
-                    console.log('new req', newReqData);
                     return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
                 }
 
@@ -139,7 +148,6 @@ const SBHomePage = (props) => {
 
     return (
         <div className="sb-homepage-container">
-            {console.log(userData, "userData")}
             {
                 !userData && !meetingsReqs && !myMeetings ? <img alt="נטען..." className="loader" src='/images/loader.svg' /> : ((userData && typeof userData === "object" && userData.confirm == 1) ?
                     <>

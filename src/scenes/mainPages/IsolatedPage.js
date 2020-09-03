@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { MainContext } from '../../ctx/MainContext';
-
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
 import { isBrowser } from "react-device-detect";
 import Auth from '../../modules/auth/Auth';
 import moment from "moment"
@@ -34,6 +34,29 @@ const IsolatedPage = (props) => {
             }
         })();
     }, []);
+
+    useJoinLeave('blower-events', () => (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
+
+    useOn('newMeetingAssined', (req) => {
+        setUserInfo((userInfo) => {
+            if (userInfo.username == req.isolatedNum) { //update only if this is the isolated's meeting
+                return { ...userInfo, blowerMeetingId: req.meetingId, blowerName: req.blowerName, meetingTime: req.meetingStartTime };
+            }
+            else return userInfo;
+        });
+    });
+
+    useOn('removeMeetingFromRoute', (req) => {
+        setUserInfo((userInfo) => {
+            if (Object.keys(req).length && req.isolatedNum == userInfo.username) {
+                //the isolated now doesnt have a meeting
+                return { ...userInfo, blowerMeetingId: null, blowerName: null, meetingTime: null };
+            }
+            else return userInfo;
+        })
+    });
 
     const closeOrOpenMap = () => {
         setOpenMap(!openMap);
