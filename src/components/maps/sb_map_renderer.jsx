@@ -119,10 +119,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            if (routeStops.length > userData.can_blow_x_times) { //changed settings of his max number of meetings, but is assigned to more
-                // שינית לאחרונה את המספר המקסימלי שלך לתקיעות בשופר, אך הינך רשום ל00 תקיעות, אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב
-                // on browser: מסלול המוצג מצד ימין
-                // (phone): מסלול המוצג בתחתית המסך
+            if (routeStops.length > userData.can_blow_x_times && JSON.parse(sessionStorage.getItem('showAlertMaxBlowTimes'))) { //changed settings of his max number of meetings, but is assigned to more
+                openGenAlert({ text: `-שינית לאחרונה את המספר המקסימלי שלך לתקיעות בשופר ל${userData.can_blow_x_times}, -אך הינך רשום ל${routeStops.length} תקיעות. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+                sessionStorage.setItem('showAlertMaxBlowTimes', false); //update session storage in order to show the alert only once
             }
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {

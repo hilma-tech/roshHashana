@@ -14,6 +14,7 @@ import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
+import { isBrowser } from 'react-device-detect';
 import './Settings.scss';
 
 const materialTheme = createMuiTheme({
@@ -216,6 +217,14 @@ const IsolatedSettings = (props) => {
 
         setErrs({}); //all
 
+        //the blower updated his volunteering_max_time to be smaller than it used to be
+        if (volunteering_max_time < originalVals.volunteering_max_time) {
+            openGenAlert({ text: `שים לב שהקטנת את זמן ההליכה המקסימלי. זמן זה אינו משפיע על המסלול הנוכחי. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+        }
+
+        if (can_blow_x_times < originalVals.can_blow_x_times) {//the blower updated his can_blow_x_times to be smaller than it used to be
+            sessionStorage.setItem('showAlertMaxBlowTimes', true); //update session storage to show the alert in sb_map_renderer.jsx
+        }
 
         //update blower details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
