@@ -32,6 +32,7 @@ const SingleIsolatorPage = (props) => {
                     center={{ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }}
                     zoom={20}
                     showNav={false}
+                    
                 />
             </div>
         )
