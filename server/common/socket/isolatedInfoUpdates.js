@@ -10,6 +10,14 @@ module.exports = class IsolatorInfoUpdateSocket {
         this.newData = null
         this.currData = null
         this.newMeetingId = null
+        this.hasGeneralUsersConnected = this.hasGeneralUsersConnected.bind(this)
+        this.publicHasBlower = this.publicHasBlower.bind(this)
+        this.setCurrIsolatedInfo = this.setCurrIsolatedInfo.bind(this)
+        this.setNewData = this.setNewData.bind(this)
+        this.setNewMeetingId = this.setNewMeetingId.bind(this)
+        this.handleIsolatorUpdateInfo = this.handleIsolatorUpdateInfo.bind(this)
+        this.addNewReqForAllShofarBlowers = this.addNewReqForAllShofarBlowers.bind(this)
+        this.updateReqForAllShofarBlowers = this.updateReqForAllShofarBlowers.bind(this)
     }
     setCurrIsolatedInfo(currData) {
         this.currData = currData
@@ -234,12 +242,12 @@ module.exports = class IsolatorInfoUpdateSocket {
     }
 
 
-    hasGeneralUsersConnected = async (publicMeetingId) => {
+    hasGeneralUsersConnected(publicMeetingId) {
         let numOfRegistered = await this.Model.app.models.Isolated.find({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: publicMeetingId }] } });
         return Array.isArray(numOfRegistered) ? numOfRegistered.length : false
     }
 
-    publicHasBlower = async (publicMeetingId) => { //todo לבדוק מה זה מחזיר 
+    publicHasBlower(publicMeetingId) { //todo לבדוק מה זה מחזיר 
         console.log('dsm', publicMeetingId)
         console.log(this.publicMeetBlowerId, 'this.publicMeetBlowerId')
         if (this.publicMeetBlowerId) return true;
