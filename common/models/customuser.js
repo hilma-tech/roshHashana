@@ -7,6 +7,7 @@ let sendMsg = require('../../server/sendSms/SendSms.js');
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const IsolatorInfoUpdateSocket = require('../../server/common/socket/isolatedInfoUpdates');
+const blowerEvents = require('../../server/common/socket/blowerEvents');
 const to = require('../../server/common/to');
 const { default: Axios } = require('axios');
 const executeMySqlQuery = async (Model, query) => await to(new Promise((resolve, reject) => { Model.dataSource.connector.query(query, (err, res) => { if (err) { reject(err); return; } resolve(res); }); }));
@@ -391,7 +392,7 @@ module.exports = function (CustomUser) {
         const userId = options.accessToken.userId;
         let role = await getUserRole(userId);
         if (!role) return;
-        if (((role == 1 || role == 3) && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+        if (((role == 1 || role == 3) && checkDateBlock('DATE_TO_BLOCK_ISOLATED')) || (role == 2 && checkDateBlock('DATE_TO_BLOCK_BLOWER'))) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
@@ -478,7 +479,6 @@ module.exports = function (CustomUser) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         let publicMeeting = await shofarBlowerPub.findOne({ where: { id: meetingId } });
-                        console.log(publicMeeting, 'public meeting id')
                         isolatedUpdateSocket.setPublicMeetBlowerId((publicMeeting && publicMeeting.blowerId) ? publicMeeting.blowerId : false);
                         if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
                         pubMeetId = null;
@@ -813,8 +813,8 @@ module.exports = function (CustomUser) {
 
     CustomUser.assignSB = function (options, meetingObj, cb) {
 
-        console.log('assignSB: ');
         (async () => {
+            console.log('assignSB: ');
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
@@ -844,7 +844,6 @@ module.exports = function (CustomUser) {
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
             if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
             let userData = userDataRes[0]
-
             //! check that number of meetings in not at max
             // then
             //! get and check newTotalTime
@@ -970,12 +969,14 @@ module.exports = function (CustomUser) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
 
+            //update:
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
             if (!newAssignMeetingObj.meetingId) return cb(true)
             try {
                 formattedStartTime = new Date(newAssignMeetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
             } catch (e) { console.log("assign: wrong time: ", newAssignMeetingObj.startTime, " ", e); return cb(true) }
+
             const blowerUpdateQ = newAssignMeetingObj.isPublicMeeting ?
                 `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${newAssignMeetingObj.meetingId} AND blowerId IS NULL`
                 : `UPDATE isolated SET blowerMeetingId = ${userId}, meeting_time = "${formattedStartTime}" WHERE id = ${newAssignMeetingObj.meetingId} AND blowerMeetingId IS NULL`
@@ -984,8 +985,25 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
-            // find namd and phone number of isolater
-            const findIsolatedQ = `select name, username from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+
+            // find name and phone number of isolater
+            const findIsolatedQ = `select isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            let [isolatedErr, isolatedRes] = await executeMySqlQuery(CustomUser, findIsolatedQ)
+            //call socket
+            let socketObj = {
+                blowerId: userId,
+                meetingStartTime: formattedStartTime,
+                meetingId: newAssignMeetingObj.meetingId,
+                isPublicMeeting: newAssignMeetingObj.isPublicMeeting,
+                address: meetingObj.address,
+                lat: meetingObj.lat,
+                lng: meetingObj.lng,
+                comments: meetingObj.comments ? meetingObj.comments : null,
+                blowerName: userData.name,
+                isolatedNum: (isolatedRes && isolatedRes[0] && isolatedRes[0].phoneNumber) ? isolatedRes[0].phoneNumber : null
+            }
+            await blowerEvents.assignMeetingSb(CustomUser, socketObj);
+
             return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }

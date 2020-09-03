@@ -33,13 +33,27 @@ const SBHomePage = (props) => {
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
 
     useJoinLeave("isolated-events", (err) => {
-        if (err) console.log("failed to join room");
+        if (err) console.log("failed to join room isolated-events");
     })
+
+    useJoinLeave('blower-events', () => (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
+
+    useOn('newMeetingAssined', (req) => {
+        setMeetingsReqs((meetingsReqs) => {
+            return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.isPublicMeeting) || (req.meetingId !== meet.meetingId))
+        })
+    });
+
+    useOn('removeMeetingFromRoute', (req) => {
+        setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req])
+    });
+
     useOn("newIsolator", (req) => {
         addNewReq(req)
     });
     useOn('modifyIsolatorInfo', (newReq) => {
-        console.log('s: newReq: ', newReq);
         updateReqData(newReq)
     })
 
