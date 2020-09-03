@@ -242,12 +242,12 @@ module.exports = class IsolatorInfoUpdateSocket {
     }
 
 
-    hasGeneralUsersConnected(publicMeetingId) {
+    async hasGeneralUsersConnected(publicMeetingId) {
         let numOfRegistered = await this.Model.app.models.Isolated.find({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: publicMeetingId }] } });
         return Array.isArray(numOfRegistered) ? numOfRegistered.length : false
     }
 
-    publicHasBlower(publicMeetingId) { //todo לבדוק מה זה מחזיר 
+    async publicHasBlower(publicMeetingId) { //todo לבדוק מה זה מחזיר 
         console.log('dsm', publicMeetingId)
         console.log(this.publicMeetBlowerId, 'this.publicMeetBlowerId')
         if (this.publicMeetBlowerId) return true;
