@@ -65,7 +65,11 @@ export const fetchBlastsPrivate = async (limit, filter = '', cb = () => { }) => 
 
 export const getTime = (datatime) => {
     let date = new Date(datatime)
-    return `${date.getHours()}:${date.getMinutes()}`
+    // console.log(datatime, date.getMinutes())
+    let hours = date.getHours()
+    let min = date.getMinutes()
+    min = date.getMinutes() === 0 ? "00" : min
+    return `${hours}:${min}`
 }
 
 export const deletePublicMeeting = async (meetingId, cb = () => { }) => {
@@ -210,6 +214,22 @@ export const fetchShofarBlowersForMap = async (cb = () => { }) => {
     }, true);
 
     if (err || !res) {
+        return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
+    }
+    else {
+        return cb(null, res)
+    }
+}
+
+export const createAdminUser = async (email, password, code, cb = () => { }) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createAdminUser`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ email, password,code })
+    }, true);
+
+    if (err || !res) {
+        console.log(err)
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
     }
     else {

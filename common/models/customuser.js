@@ -71,6 +71,43 @@ module.exports = function (CustomUser) {
         }
     }
 
+    CustomUser.createAdminUser = function (email, password, code, options, cb) {
+        (async () => {
+
+            const validateEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{1,}))$/;
+            if (!validateEmail.test(email)) return cb(null, { error: 'הדואר האלקטרוני אינו תקין' })
+
+            const validatePassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+            if (!validatePassword.test(password)) return cb(null, { error: 'הסיסמא חייבת להכיל אות קטנה, אות גדולה ומספר. עליה להיות באורך של לפחות 8 תווים.' })
+
+            if (code !== "28392") {
+                return cb(null, { error: 'קוד שגוי.' })
+            }
+
+            let [customUserErr, customUserRes] = await to(CustomUser.create({ email, password, name: 'admin' }, options));
+            if (customUserErr) {
+                console.log(customUserErr.message, customUserErr.message == 'The `CustomUser` instance is not valid. Details: `email` Email already exists (value: "admin@gmail.com").')
+                if (customUserErr.message == 'The `CustomUser` instance is not valid. Details: `email` Email already exists (value: "admin@gmail.com").') {
+                    console.log("!!!")
+                    return cb(null, { error: 'המשתמש כבר קיים במערכת' })
+                }
+                return cb(null, {});
+            }
+
+            let roleMapData = {
+                principalType: "USER",
+                principalId: customUserRes.id,
+                roleId: 4 //role of admin
+            }
+            let [error, newRole] = await to(CustomUser.app.models.RoleMapping.create(roleMapData));
+            if (error) {
+                return cb(error);
+            }
+            return cb(null, {})
+        })()
+    }
+
+
     CustomUser.authenticationKey = (key, meetingId, role, options, res, cb) => {
         if (role == 3 && !meetingId || isNaN(Number(meetingId))) return cb(null, "LOG_OUT")
         const { RoleMapping } = CustomUser.app.models;
@@ -644,6 +681,17 @@ module.exports = function (CustomUser) {
             { arg: 'name', type: 'string' },
             { arg: 'phone', type: 'string' },
             { arg: 'role', type: 'number' }
+        ],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    CustomUser.remoteMethod('createAdminUser', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'email', type: 'string' },
+            { arg: 'password', type: 'string' },
+            { arg: 'code', type: 'string' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });

@@ -8,6 +8,7 @@ import IsolatedsPage from './IsolatedsPage'
 import ShofarBlowersPage from './ShofarBlowersPage'
 import BlastsPage from './BlastsPage.jsx'
 import BlowerFormAdmin from './BlowerFormAdmin'
+import NewAdmin from './NewAdmin'
 import './styles/generalAdminStyle.scss'
 
 const AdminRouter = (props) => {
@@ -23,6 +24,7 @@ const AdminRouter = (props) => {
                         <PrivateRoute exact path={`/searchings`} compName="IsolatedTable" component={(props) => <IsolatedsPage {...props} />} />
                         <PrivateRoute exact path={`/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
                         <PrivateRoute exact path={`/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
+                        <PrivateRoute exact path={`/jdlgtjerwitgeswteswrtwsfsd`} compName="NewAdmin" component={(props) => <NewAdmin {...props} />} />
                     </Switch>
                 </AdminMainProvider>
             </Fragment>
