@@ -107,7 +107,7 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, 'publicMeetings')
     }
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
             setValues(e.target.value, "username");
         }
     }
@@ -175,7 +175,7 @@ const IsolatedSettings = (props) => {
             setErrs(errs => ({ ...errs, can_blow_x_times: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' }));
             return;
         }
-        if (username && (username[0] != 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
+        if (username && (username[0] !== 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
         if (address) {
             if (!Array.isArray(address) || !address.length) {
                 openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })

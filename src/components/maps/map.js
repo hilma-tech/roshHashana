@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
-import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
 import { CONSTS } from '../../consts/const_messages';
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
@@ -25,6 +25,7 @@ const MapComp = (props) => {
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
+            if (err){console.log(err)}
             if (mapContent) {
                 setMapInfo(mapContent);
             }
@@ -45,11 +46,11 @@ const MapComp = (props) => {
             let publicMeetings = currMapInfo.publicMeetings.slice();
             let privateMeetings = currMapInfo.privateMeetings.slice();
             if (req.isPublicMeeting) {//public meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
                 publicMeetings.splice(index, 1);
             }
             else {//private meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
                 privateMeetings.splice(index, 1);
             }
             setAllLocations((allLoc) => {
