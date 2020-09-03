@@ -57,7 +57,7 @@ const IsolatedSettings = (props) => {
     }
 
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
             setValues(e.target.value, setUsername);
         }
     }
@@ -108,7 +108,7 @@ const IsolatedSettings = (props) => {
             return;
         }
 
-        if (usernameVal && (usernameVal[0] != 0 || usernameVal.length !== 10)) {
+        if (usernameVal && (usernameVal[0] !== 0 || usernameVal.length !== 10)) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
             setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
             return;
@@ -127,6 +127,12 @@ const IsolatedSettings = (props) => {
             openGenAlert({ text: err && err.error && err.error.message === "PHONE_EXISTS" ? "מספר הטלפון בשימוש" : "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
         }
         if (res) {
+            if (res === 'NO_MEETING_DELETE_USER') {
+                openGenAlert({ text: "בעל התוקע של פגישה זו מחק את הפגישה, אם ברצונך להשתתף בפגישה נוספת תוכל לעשות זאת במפה הכללית כמשתמש חדש", isPopup: { okayText: "הבנתי, התנתק" } }, () => {
+                    Auth.logout()
+                });
+            }
+
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
                 openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את הפרטים' });
                 return;

@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { SBContext } from '../ctx/shofar_blower_context';
-import { AdminMainContext } from '../scenes/admin/ctx/AdminMainContext';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
@@ -132,7 +131,7 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex == newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
+        if (oldIndex === newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);

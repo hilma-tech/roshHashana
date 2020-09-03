@@ -453,6 +453,29 @@ module.exports = function (CustomUser) {
                 }
             }
 
+            //check if the general user doesn't have information -> delete user
+            if (role === 3) {
+                const genUserQ = `SELECT
+                shofar_blower_pub.address,
+                shofar_blower_pub.comments,
+                shofar_blower_pub.lng,
+                shofar_blower_pub.lat,
+                shofar_blower_pub.start_time,
+                CustomUser.name AS blowerName
+            FROM 
+                isolated
+                RIGHT JOIN shofar_blower_pub ON isolated.blowerMeetingId = shofar_blower_pub.id
+                INNER JOIN CustomUser  ON shofar_blower_pub.blowerId = CustomUser.id
+            WHERE
+                isolated.userIsolatedId = ${userId}`
+                let [errUserData, resUserData] = await executeMySqlQuery(CustomUser, genUserQ)
+                if (errUserData || !resUserData || !resUserData[0] || !resUserData[0].address || !resUserData[0].lng || !resUserData[0].lat || !resUserData[0].blowerName || !resUserData[0].start_time) {
+                    console.log("got errUserData, or not enough data in resUserData, deleting this general user. errUserData:", errUserData);
+                    CustomUser.deleteUser(options) //yes, we are deleting him
+                    return 'NO_MEETING_DELETE_USER' //telling user about this and need to then log him out
+                }
+            }
+
             //if the user changed his details that are in CustomUser -> update the new details in CustomUser
             if (Object.keys(userData).length) {
                 let resCustomUser

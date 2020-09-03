@@ -84,6 +84,7 @@ const GeneralUserPage = (props) => {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "DELETE",
         });
+        if (err) console.log("err ",err);
         if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
             openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן יותר למחוק את המשתמש' });
         }

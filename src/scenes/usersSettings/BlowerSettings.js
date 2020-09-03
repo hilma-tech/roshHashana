@@ -14,6 +14,7 @@ import Slider from '@material-ui/core/Slider';
 import Map from '../../components/maps/map';
 import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
+import { isBrowser } from 'react-device-detect';
 import './Settings.scss';
 
 const materialTheme = createMuiTheme({
@@ -106,7 +107,7 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, 'publicMeetings')
     }
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value != "e") {
+        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
             setValues(e.target.value, "username");
         }
     }
@@ -174,7 +175,7 @@ const IsolatedSettings = (props) => {
             setErrs(errs => ({ ...errs, can_blow_x_times: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' }));
             return;
         }
-        if (username && (username[0] != 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
+        if (username && (username[0] !== 0 || username.length !== 10)) { setMsgErr('מספר הפלאפון שהזנת אינו תקין', "username"); return; }
         if (address) {
             if (!Array.isArray(address) || !address.length) {
                 openGenAlert({ text: "הכתובת שהזנת אינה תקינה" })
@@ -216,6 +217,14 @@ const IsolatedSettings = (props) => {
 
         setErrs({}); //all
 
+        //the blower updated his volunteering_max_time to be smaller than it used to be
+        if (volunteering_max_time < originalVals.volunteering_max_time) {
+            openGenAlert({ text: `שים לב שהקטנת את זמן ההליכה המקסימלי. זמן זה אינו משפיע על המסלול הנוכחי. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+        }
+
+        if (can_blow_x_times < originalVals.can_blow_x_times) {//the blower updated his can_blow_x_times to be smaller than it used to be
+            sessionStorage.setItem('showAlertMaxBlowTimes', true); //update session storage to show the alert in sb_map_renderer.jsx
+        }
 
         //update blower details
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
