@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
-import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
 import { CONSTS } from '../../consts/const_messages';
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
