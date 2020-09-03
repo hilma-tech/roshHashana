@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
-// import './map.scss';
+import './map.scss';
 import { fetchShofarBlowersForMap, fetchBlastsForMap, fetchIsolatedForMap } from '../../scenes/admin/fetch_and_utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -19,6 +19,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [showShofarBlowers, setShowShofarBlowers] = useState(false)
     const [showBlasts, setShowBlasts] = useState(false)
     const [showIsolateds, setShowIsolateds] = useState(false)
+    const [selectedMarkerId, setSelectedMarkerId] = useState(-1)
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -37,9 +38,11 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
     }, []);
 
-    const zoomPlace = (place) => {
+    const zoomPlace = (place, id = -1) => {
+        console.log(id)
         setZoom(18)
         setCenter(place);
+        if (id !== -1) setSelectedMarkerId(id)
     }
 
     // const zoomOut = () => {
@@ -53,6 +56,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
+                console.log(res)
             }
         })
     }
@@ -152,8 +156,19 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
-            />
+                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, shofarBlower.sbId) }}
+            >
+                {shofarBlower.sbId === selectedMarkerId &&
+                    <InfoWindow onCloseClick={() => { }}>
+                        <div id="info-window-container">
+                            <div className="info-window-title bold turquoiseText">בעל תוקע</div>
+                            <div className="pub-shofar-blower-name-container"><img alt="" src='/icons/shofar.svg' /><div>{shofarBlower.name}</div></div>
+                            <div className="pub-address-container"><img alt="" src='/icons/address.svg' /><div>{shofarBlower.address}</div></div>
+                            {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                        </div>
+                    </InfoWindow>
+                }
+            </Marker>
         )}
         {showBlasts && blasts.map((blast, index) =>
             <Marker

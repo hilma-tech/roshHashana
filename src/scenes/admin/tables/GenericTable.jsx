@@ -23,6 +23,10 @@ const GenericTable = (props) => {
         if (props.tr) setTr(props.tr)
     }, [props.tr])
 
+    useEffect(() => {
+        setPage(1)
+    },[props.resaultsNum])
+
     const prevPageClicked = () => {
         if (1 === page) return
         setPage(prev => {
@@ -50,7 +54,7 @@ const GenericTable = (props) => {
                 </thead>
                 <tbody>
                     {!tr ?
-                        props.loading?
+                        props.loading ?
                             <tr className='headLine'>
                                 <td colSpan="9" className='noRes'>
                                     <div className='loading-spiner'></div>
