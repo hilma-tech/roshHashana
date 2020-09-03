@@ -76,10 +76,10 @@ const IsolatedPage = function (props) {
                     <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
                 </div>
                 <div className='statusNavContainer'>
-                    <div className={'orangeSubTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
+                    <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
                     <div style={{ width: '3.5vw' }}></div>
-                    <div className={'orangeSubTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
-                    <div className='blueSubTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
+                    <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
+                    <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
                 <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} />
             </div>

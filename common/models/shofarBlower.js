@@ -1,6 +1,7 @@
 'use strict';
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
+const blowerEvents = require('../../server/common/socket/blowerEvents');
 const to = require('../../server/common/to');
 
 const executeMySqlQuery = async (Model, query) =>
@@ -91,25 +92,41 @@ module.exports = function (ShofarBlower) {
             return false;
         }
         try {
+            let isolatedConnected = null; //the phone number of the isolated connected to the meeting (role 1)
+            let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
             const { userId } = options.accessToken;
             const { meetingId } = meetToDelete;
-            if (meetToDelete.isPublicMeeting) {
+            if (meetToDelete.isPublicMeeting) {//public meeting
                 let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                 if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
                     //only delete the connection between the blower and the meeting
+                    //general users who are connected to this meeting will be deleted once they log in 
                     await ShofarBlower.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, { blowerId: null, constMeeting: 0, start_time: null });
+                    let isolated = await ShofarBlower.app.models.isolated.findOne({ where: { and: [{ blowerMeetingId: meetingId }, { public_meeting: 1 }] }, include: ['UserToIsolated'] });
+                    if (isolated) {
+                        isolatedConnected = isolated.UserToIsolated().username;
+                    }
                 }
-                else await ShofarBlower.app.models.shofarBlowerPub.destroyById(meetingId); //there are no participants in this meeting, delete this meeting
+                else {//there are no participants in this meeting, delete this meeting
+                    await ShofarBlower.app.models.shofarBlowerPub.destroyById(meetingId);
+                    isMeetingDeleted = true;
+                }
             }
             else {
+                let isolated = await ShofarBlower.app.models.isolated.findOne({ where: { and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, include: ['UserToIsolated'] });
                 //private meeting -> change blowerMeetingId to null -> 
                 //only delete the connection between the blower and the meeting
                 await ShofarBlower.app.models.Isolated.upsertWithWhere({ and: [{ blowerMeetingId: userId }, { public_meeting: 0 }, { id: meetingId }] }, { blowerMeetingId: null, meeting_time: null });
+                if (isolated) {
+                    isolatedConnected = isolated.UserToIsolated().username;
+                }
             }
+            //call socket
+            await blowerEvents.deleteMeeting(ShofarBlower, meetToDelete, isMeetingDeleted, isolatedConnected);
             return true;
         } catch (error) {
             throw error;
-            //return false
+            // return false
         }
     }
 
