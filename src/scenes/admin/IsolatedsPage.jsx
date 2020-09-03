@@ -8,7 +8,7 @@ import Search from './Search';
 let status = 0
 
 const IsolatedPage = function (props) {
-    const { setLoading, setIsolateds } = useContext(AdminMainContext)
+    const { setLoading, setIsolateds, selectedIsolator, setSelectedIsolator } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
@@ -18,6 +18,15 @@ const IsolatedPage = function (props) {
             getIsolateds()
         })()
     }, [])
+
+    useEffect(() => {
+        if (selectedIsolator && props.location.pathname === "/searchings") {
+            props.history.push("/searcher")
+            console.log('selectedIsolator: ', selectedIsolator);
+        } else if (selectedIsolator === null && props.location.pathname === "/searcher") {
+            props.history.push("/searchings")
+        }
+    }, [selectedIsolator])
 
     const getIsolateds = function (filter = filters, startRow = 0) {
         (async () => {
@@ -72,7 +81,7 @@ const IsolatedPage = function (props) {
                     <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
                     <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} />
+                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} />
             </div>
         </div>
     );

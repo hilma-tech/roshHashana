@@ -24,9 +24,9 @@ const ConfirmShofarBlower = (props) => {
                             props.handleDismiss(false)
                             props.goTo('/shofar-blowers')
                         }}>אשר מתנדבים</div>
-                        <div className="blueText pointer" onClick={() => {
+                        <div className="confirm-later-btn blueText pointer" onClick={() => {
                             props.handleDismiss(false)
-                        }}>הזכר לי מאוחר יוותר</div>
+                        }}>הזכר לי מאוחר יותר</div>
                     </DialogContent>
                 </div>
             </Dialog>

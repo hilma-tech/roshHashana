@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { SBContext } from '../ctx/shofar_blower_context';
+import { AdminMainContext } from '../scenes/admin/ctx/AdminMainContext';
+
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 import moment from 'moment'
@@ -9,18 +11,33 @@ import { changePosition, splitJoinAddressOnIsrael, checkDateBlock } from '../fet
 
 
 const SBRouteList = (props) => {
+    const { admin: isAdmin, selectedSB, meetingsOfSelectedSB } = props
+    console.log('meetingsOfSelectedSB: ', meetingsOfSelectedSB);
     const [myRoute, setMyRoute] = useState([]);
     const [constB4, setConstB4] = useState([]);
     const [constAfter, setConstAfter] = useState([]);
-    const { userData, totalTime, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, assignMeetingInfo, isInRoute, setIsInRoute } = useContext(SBContext);
+    const sbctx = useContext(SBContext);
+
+    let userData, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, setIsInRoute;
+    if (isAdmin) {
+        myMeetings = meetingsOfSelectedSB;
+    } else if (sbctx) {
+        userData = sbctx.userData;
+        totalLength = sbctx.totalLength;
+        myMeetings = sbctx.myMeetings;
+        setMyMeetings = sbctx.setMyMeetings;
+        setAssignMeetingInfo = sbctx.setAssignMeetingInfo;
+        setIsInRoute = sbctx.setIsInRoute
+    }
+
     const CONST_MEETING = 'CONST_MEETING';
     const container = useRef(null);
 
-    const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
+    const disableEdit = !isAdmin && checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
-        const userStartTime = new Date(userData.startTime).getTime()
-        const userEndTime = userStartTime + userData.maxRouteDuration;
+        const userStartTime = isAdmin ? new Date(selectedSB.startTime).getTime() : new Date(userData.startTime).getTime()
+        const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
         const constStopsAfter = [];
@@ -38,21 +55,23 @@ const SBRouteList = (props) => {
                     constStopsAfter.push(myMeetings[i])
                 }
             }
-            else routeStops.push(myMeetings[i])
+            else {
+                routeStops.push(myMeetings[i])
+            }
         }
         setConstAfter(constStopsAfter);
         setConstB4(constStopsB4);
         setMyRoute(routeStops);
     }, [myMeetings]);
 
-    if (!userData) return null;
+    if (!userData && !isAdmin) return null;
 
 
 
     const textStart = "משך הליכה כולל"
-    const msTT = totalTime
-    const timeUnits = msTT ? "דקות" : ""
-    const tt = msTT ? Math.floor(msTT / 60000) : "---" //in minutes
+    // const msTT = totalTime
+    // const timeUnits = msTT ? "דקות" : ""
+    // const tt = msTT ? Math.floor(msTT / 60000) : "---" //in minutes
 
     let length = !isNaN(Number(totalLength)) ? totalLength : false
     let lengthUnits = `מטרים`
@@ -114,7 +133,7 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex == newIndex || disableEdit) return //no change, dragged and put back in original place
+        if (oldIndex == newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);
@@ -123,19 +142,23 @@ const SBRouteList = (props) => {
 
     return (
         <div className="sb-route-list" >
-            <div className="sb-side-list-title" >
-                מפת התקיעות שלי
-            </div>
-            {textValue ? <div className="under-title">
-                {`${textStart}: ${textValue}`}
-            </div> : null}
-            {disableEdit ? <div className="info-msg">יום התקיעה מתקרב והמסלול נעול לשינויים</div> : <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>}
+            {isAdmin ? null :
+                <>
+                    <div className="sb-side-list-title" >
+                        מפת התקיעות שלי
+                    </div>
+                    {textValue ? <div className="under-title">
+                        {`${textStart}: ${textValue}`}
+                    </div> : null}
+                    {disableEdit ? <div className="info-msg">יום התקיעה מתקרב והמסלול נעול לשינויים</div> : <div className="info-msg">* ניתן לגרור ולשנות את סדר הפגישות</div>}
+                </>}
             <div className="sb-list" id="sb-list" ref={container}>
                 {constB4 && Array.isArray(constB4) && constB4.map((item) => createItemContent(item, CONST_MEETING, `${item.meetingId}${item.isPublicMeeting}`))}
-                {userData ? createItemContent(userData, -1, -1) : null}
+                {isAdmin ? createItemContent(selectedSB, -1, -1) :
+                    (userData ? createItemContent(userData, -1, -1) : null)}
                 {disableEdit ? (myRoute && Array.isArray(myRoute) && myRoute.map((item, index) => createItemContent(item, index, `${item.meetingId}${item.isPublicMeeting}`)))
                     : <SortableList
-                        disabled={disableEdit}
+                        disabled={isAdmin || disableEdit}
                         helperClass="sort-item-container"
                         distance={1}
                         lockToContainerEdges={true}

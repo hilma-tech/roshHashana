@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               nextPage- function, onClick the left arrow.
               rowsNum- the number of rows for each page
               resaultsNum- the number of all the columns in the database. like: יש לי 345 אנשים שמחפשים בעל תוקע ואני מראה רק 20 מתוכם. המספר של הפרופס הוא 345
+        onRowClick- onClick event to happen on click of single row, passes the event and the index 
 */
 
 const GenericTable = (props) => {
@@ -64,7 +65,7 @@ const GenericTable = (props) => {
                             </tr> :
 
                             tr.map((td, i) =>
-                                <tr key={i} className="tableBodyStyle">
+                                <tr key={i} className="tableBodyStyle" onClick={props.onRowClick ? e => { props.onRowClick(e, i, td) } : undefined} >
                                     {td.map((j, index) => <td key={index} className={props.th ? props.th[index] && props.th[index][0] : ''}>{j}</td>)}
                                 </tr>
                             )
@@ -72,7 +73,8 @@ const GenericTable = (props) => {
                     }
                 </tbody>
             </table>
-            {props.navigation &&
+            {
+                props.navigation &&
                 <div>
                     <div className='tableNavigation'>
                         <FontAwesomeIcon icon={['fas', "chevron-right"]} className={'navArrow' + (page === 1 ? ' disabledNavArrow' : '')} onClick={prevPageClicked} />
@@ -81,7 +83,7 @@ const GenericTable = (props) => {
                     </div>
                 </div>
             }
-        </div>
+        </div >
     );
 }
 

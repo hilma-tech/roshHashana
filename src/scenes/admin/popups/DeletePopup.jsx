@@ -10,7 +10,7 @@ const DeletePopup = (props) => {
 
     return (
         <div>
-            <Dialog className='deletePopup' open={true} aria-labelledby="reset-modal">
+            <Dialog className='deletePopup' open={true} aria-labelledby="reset-modal" onBackdropClick={() => { if (!loading) props.handleDismiss() }} >
                 <div className='tagsPopup' style={{ textAlign: "center" }}>
                     <FontAwesomeIcon
                         icon={['fas', 'times']}
@@ -20,7 +20,7 @@ const DeletePopup = (props) => {
 
                     <DialogContent className="p-0">
                         <div className='textStyle' style={{ margin: '3vh 4vw', fontSize: '2.7vh' }}>
-                            האם אתה בטוח שאתה רוצה למחוק את ה{props.name}?
+                            האם את/ה בטוח/ה שאת/ה רוצה למחוק את ה{props.name}?
                         </div>
                         <div className="saveBtn pointer" style={{ float: 'left' }} onClick={() => {
                             setLoading(true)

@@ -163,6 +163,7 @@ module.exports = function (ShofarBlower) {
                     sb.id, 
                     sb.volunteering_max_time,
                     sb.volunteering_start_time AS "startTime", 
+                    sb.can_blow_x_times,
                     cu.name,
                     cu.username,
                     cu.address,
@@ -217,6 +218,11 @@ module.exports = function (ShofarBlower) {
                     console.log('get shofarBlower admin request error : ', confirmErr);
                     throw shofarBlowerErr
                 }
+                
+                const findPhone = `select username from CustomUser,shofar_blower where shofar_blower.id = ${id} and CustomUser.id=shofar_blower.userBlowerId`
+                let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
+                let objToSocketEvent= {"id" :id};
+                ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`)
                 return cb(null, true)
             } catch (err) {
                 cb(err);

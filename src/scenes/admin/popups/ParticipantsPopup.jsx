@@ -51,7 +51,7 @@ const ParticipantsPopup = (props) => {
                                 <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                             </div>
                             {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
-                            <ParticipantsTable />
+                            <ParticipantsTable getParticipants={getParticipants} filters={filters}/>
                         </div>
                     </DialogContent>
                 </div>

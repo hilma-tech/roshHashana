@@ -31,7 +31,9 @@
             "IsolatedTable",
             "ShofarBlowersTable",
             "BlowerFormAdmin",
-            "SingleShofarBlowerPage"
+            "SingleShofarBlowerPage",
+            "SingleIsolator",
+            "NewAdmin"
         ],
         "deafaultHomePage": "AdminHome"
     }

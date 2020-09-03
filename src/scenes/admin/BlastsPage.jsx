@@ -111,7 +111,11 @@ const BlastsPage = (props) => {
                         <div className={'orangeText subTitle pointer' + (!isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(false)}>תקיעה פרטית</div>
                         <div className='blueText subTitle resultNum bold'>{`סה"כ ${isPublic ? pubMeetingsNum : privateMeetingsNum} תוצאות`}</div>
                     </div>
-                    {isPublic ? <BlastsPubTable /> : <BlastsPrivateTable handleTrashClick={handleTrashClick} />}
+                    {isPublic ?
+                        <BlastsPubTable filters={filters} getBlastsPub={getBlastsPub} />
+                        :
+                        <BlastsPrivateTable filters={filters} getBlastsPrivate={getBlastsPrivate} handleTrashClick={handleTrashClick} />
+                    }
                 </div>
                 {blastInfo ? <BlastInfo handleTrashClick={handleTrashClick} /> : <BlastInfoPrev />}
             </div>

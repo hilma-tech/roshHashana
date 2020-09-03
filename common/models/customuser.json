@@ -192,6 +192,7 @@
       "principalId": "ADMIN",
       "permission": "ALLOW",
       "property": [
+        "createAdminUser",
         "adminGetSBRoute",
         "getAllAdminBlastsForMap"
       ]
