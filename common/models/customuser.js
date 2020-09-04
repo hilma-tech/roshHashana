@@ -1554,8 +1554,8 @@ module.exports = function (CustomUser) {
                 formattedStartTime = new Date(newIsolatorMeetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
             } catch (e) { console.log("assign: wrong time: ", newIsolatorMeetingObj.startTime, " ", e); return cb(true) }
             const blowerUpdateQ = newIsolatorMeetingObj.isPublicMeeting ?
-                `UPDATE shofar_blower_pub SET blowerId = ${sbId}, start_time = "${formattedStartTime}" WHERE id = ${newIsolatorMeetingObj.meetingId} AND blowerId IS NULL`
-                : `UPDATE isolated SET blowerMeetingId = ${sbId}, meeting_time = "${formattedStartTime}" WHERE id = ${newIsolatorMeetingObj.meetingId} AND blowerMeetingId IS NULL`
+                `UPDATE shofar_blower_pub SET blowerId = ${sbId}, start_time = "${formattedStartTime}" WHERE id = ${newIsolatorMeetingObj.id} AND blowerId IS NULL`
+                : `UPDATE isolated SET blowerMeetingId = ${sbId}, meeting_time = "${formattedStartTime}" WHERE id = ${newIsolatorMeetingObj.id} AND blowerMeetingId IS NULL`
             let [assignErr, assignRes] = await executeMySqlQuery(CustomUser, blowerUpdateQ)
             if (assignErr || !assignRes) {
                 console.log('assign update err: ', assignErr);

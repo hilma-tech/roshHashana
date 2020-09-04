@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import ShofarBlowerMap from '../../components/maps/shofar_blower_map'
 import SBRouteList from '../../components/sb_route_list';
-import { adminGetSBRoute, adminAssignSBToIsolator, adminUpdateMaxDurationAndAssign } from './fetch_and_utils';
+import { adminGetSBRoute, adminAssignSBToIsolator, adminUpdateMaxDurationAndAssign, adminUpdateMaxRouteLengthAndAssign } from './fetch_and_utils';
 import { assignSB } from '../../fetch_and_utils';
 import { MainContext } from '../../ctx/MainContext';
 
@@ -83,27 +83,27 @@ const SingleShofarBlowerPage = (props) => {
             checkAssignResForError(assignRes)
         })()
     }
-    const checkAssignResForError = (assignRes)=>{
+    const checkAssignResForError = (assignRes) => {
         if (assignRes && typeof assignRes === "object" && typeof assignRes.errName === "string") { //actually an error. (It's in assignRes on purpose, so I have control over it)
-        if (assignRes.errName === "MAX_DURATION" && assignRes.errData && assignRes.errData.newTotalTime !== null && assignRes.errData.newTotalTime !== undefined && assignRes.errData.maxRouteDuration !== undefined && assignRes.errData.maxRouteDuration !== null) {
-            //! MAX_DURATION
-            handleMaxDuration(assignRes.errData)
-            return;
+            if (assignRes.errName === "MAX_DURATION" && assignRes.errData && assignRes.errData.newTotalTime !== null && assignRes.errData.newTotalTime !== undefined && assignRes.errData.maxRouteDuration !== undefined && assignRes.errData.maxRouteDuration !== null) {
+                //! MAX_DURATION
+                handleMaxDuration(assignRes.errData)
+                return;
+            }
+            else if (assignRes.errName === "MAX_ROUTE_LENGTH" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
+                //! MAX_ROUTE_LENGTH
+                handleMaxRouteLength(assignRes.errData.currRouteLength)
+                return
+            }
+            else if (assignRes.errName === "MAX_ROUTE_LENGTH_20" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
+                //! MAX_ROUTE_LENGTH_20
+                openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
+                return
+            }
+            else openGenAlert({ text: assign_default_error })
         }
-        else if (assignRes.errName === "MAX_ROUTE_LENGTH" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
-            //! MAX_ROUTE_LENGTH
-            handleMaxRouteLength(assignRes.errData.currRouteLength)
-            return
-        }
-        else if (assignRes.errName === "MAX_ROUTE_LENGTH_20" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
-            //! MAX_ROUTE_LENGTH_20
-            openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
-            return
-        }
+        else if (typeof assignRes === "object" /* && !isNaN(Number(assignRes.meetingId)) && !isNaN(Number(assignRes.isPublicMeeting)) */) handleAssignSuccess(assignRes) //RES (need new meeting for local update)
         else openGenAlert({ text: assign_default_error })
-    }
-    else if (typeof assignRes === "object" /* && !isNaN(Number(assignRes.meetingId)) && !isNaN(Number(assignRes.isPublicMeeting)) */) handleAssignSuccess(assignRes) //RES (need new meeting for local update)
-    else openGenAlert({ text: assign_default_error })
     }
 
     const handleMaxDuration = async (data) => {
@@ -152,13 +152,10 @@ const SingleShofarBlowerPage = (props) => {
         adminUpdateMaxRouteLengthAndAssign(selectedSB, selectedIsolator,
             (error, res) => {
                 if (error || !res) {
-                    openGenAlert({ text: typeof error === "string" ? error : assign_error })
+                    openGenAlert({ text: typeof error === "string" ? error : assign_default_error })
                     return;
                 }
-                else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) {
-                    openGenAlert({ text: res, block: true })
-                    return;
-                }
+                // else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) { openGenAlert({ text: res, block: true }); return; }
                 checkAssignResForError(res) //res might contain a MAX_DURATION error
             })
     }

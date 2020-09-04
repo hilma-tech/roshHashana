@@ -279,7 +279,7 @@ export const adminUpdateMaxDurationAndAssign = async (sb, isolator, newMaxTimeVa
     }
 }
 
-export const adminUpdateMaxRouteLengthAndAssign = (sb, isolator) =>{
+export const adminUpdateMaxRouteLengthAndAssign = async (sb, isolator, cb) =>{
     let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/adminUpdateMaxRouteLengthAndAssign`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
