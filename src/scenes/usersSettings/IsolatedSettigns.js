@@ -66,7 +66,17 @@ const IsolatedSettings = (props) => {
 
         const updateData = {};
 
+        let originalIsPM;
+        let updatedIsPM;
         for (let field in { ...vals }) { // remove values that are as origin
+            if (field === "isPublicMeeting") {
+                originalIsPM = originalVals[field] ? 1 : 0
+                updatedIsPM = vals[field] ? 1 : 0
+                if (originalIsPM !== updatedIsPM) {
+                    updateData[field] = vals[field];
+                    continue
+                }
+            }
             if (vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
