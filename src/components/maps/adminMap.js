@@ -187,7 +187,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                                 <div>{shofarBlower.address}</div>
                             </div>
                             {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
-                            <div className='infoWindowButton' onClick={() => onInfoWindowSBClick(shofarBlower.sbId)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowSBClick(shofarBlower.sbId)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
                         </div>
                     </InfoWindow>
                 }
@@ -236,7 +236,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                                 <div>{isolated.address}</div>
                             </div>
                             {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
-                            <div className='infoWindowButton' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
                         </div>
                     </InfoWindow>
                 }
@@ -254,7 +254,23 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 position={{ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }}
                 zIndex={0}
                 onClick={() => { zoomPlace({ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }) }}
-            />
+            >
+                <InfoWindow onCloseClick={() => { }}>
+                    <div className="infoWindowContainer">
+                        <div className="infoWindowTitle bold blueText">מחפש</div>
+                        <div className="pubShofarBlowerNameContainer">
+                            <img alt="" src='/icons/shofar.svg' />
+                            <div>{selectedIsolator.name}</div>
+                        </div>
+                        <div className="pubAddressContainer">
+                            <img alt="" src='/icons/address.svg' />
+                            <div>{selectedIsolator.address}</div>
+                        </div>
+                        {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                        {/* <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div> */}
+                    </div>
+                </InfoWindow>
+            </Marker>
         }
     </GoogleMap>
 }
