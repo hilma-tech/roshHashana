@@ -59,12 +59,12 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             }
         }
 
-        if (myRoute.length === userData.can_blow_x_times) {
+        if (myRoute.length == userData.can_blow_x_times) {
             //! MAX_ROUTE_LENGTH
             handleMaxRouteLength(userData.can_blow_x_times)
             return;
         }
-        if (myRoute.length === 20) {
+        if (myRoute.length == 20) {
             //! MAX_ROUTE_LENGTH_20
             openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
             return
@@ -181,7 +181,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         if (!myMeetings.includes(newMeeting)) {
             setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
         }
-        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId !== newMeeting.meetingId))
+        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
 
         if (!genMapMeetings) return
         if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
@@ -220,15 +220,15 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                         return;
                     }
                     openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-                    setMyMeetings(myMeetings.filter(meet => meet.meetingId !== assignMeetingInfo.meetingId))
+                    setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
                     setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
 
                     if (genMapMeetings) {
                         if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
-                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId !== assignMeetingInfo.meetingId) }))
+                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
                         }
                         else if (Array.isArray(genMapMeetings.privateMeetings)) {
-                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId !== assignMeetingInfo.meetingId) }))
+                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
                         }
                     }
                     handleAssignment('close');

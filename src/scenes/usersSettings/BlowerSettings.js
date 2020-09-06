@@ -107,7 +107,7 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, 'publicMeetings')
     }
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value !== "e") {
             setValues(e.target.value, "username");
         }
     }
