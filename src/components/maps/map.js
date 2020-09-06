@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
+import { CONSTS } from '../../consts/const_messages';
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
 import Auth from '../../modules/auth/Auth';
 import Geocode from "react-geocode";
-import { CONSTS } from '../../consts/const_messages';
-import './map.scss';
 import moment from 'moment'
+import './map.scss';
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
-
-
 const SHOFAR_BLOWING_PUBLIC = 'shofar_blowing_public';
 const PRIVATE_MEETING = 'private meeting';
 
@@ -19,6 +18,7 @@ const MapComp = (props) => {
     const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
+    const socket = useSocket();
 
     useEffect(() => {
         (async () => {
@@ -26,15 +26,54 @@ const MapComp = (props) => {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
             if (mapContent) {
-                console.log(mapContent)
                 setMapInfo(mapContent);
             }
         })();
+    }, []);
 
+
+    useJoinLeave('blower-events', () => (err) => {
+        if (err) console.log("failed to join room");
+    });
+
+    const handleRemoveMeeting = (req) => {
+        setMapInfo((currMapInfo) => {
+            let publicMeetings = currMapInfo.publicMeetings.slice();
+            let privateMeetings = currMapInfo.privateMeetings.slice();
+            if (req.isPublicMeeting) {//public meeting
+                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                publicMeetings.splice(index, 1);
+            }
+            else {//private meeting
+                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                privateMeetings.splice(index, 1);
+            }
+            setAllLocations((allLoc) => {
+                //set all locations to an empty array because we want to update all locations according to the new data inside mapinfo
+                return [];
+            })
+
+            return { privateMeetings, publicMeetings };
+        });
+    };
+
+    useEffect(() => {
+        socket.on('newMeetingAssined', handleNewMeeting);
+        return () => {
+            socket.off('newMeetingAssined', handleNewMeeting);
+        }
+    }, []);
+
+    useEffect(() => {
+        socket.on('removeMeetingFromRoute', handleRemoveMeeting);
+        return () => {
+            socket.off('removeMeetingFromRoute', handleRemoveMeeting);
+        }
     }, []);
 
     useEffect(() => {
         (async () => {
+            console.log('hereee')
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
@@ -59,7 +98,23 @@ const MapComp = (props) => {
             await setPublicMapContent();
             setIsMarkerShown(true);
         })();
-    }, [mapInfo])
+    }, [mapInfo]);
+
+    const handleNewMeeting = (req) => {
+        setMapInfo((currMapInfo) => {
+            let publicMeetings = currMapInfo.publicMeetings.slice();
+            let privateMeetings = currMapInfo.privateMeetings.slice();
+            if (req.isPublicMeeting) {//public meeting
+                req.start_time = req.meetingStartTime;
+                publicMeetings.push(req);
+            }
+            else {//private meeting
+                delete req.meetingStartTime;
+                privateMeetings.push(req);
+            }
+            return { publicMeetings, privateMeetings }
+        });
+    };
 
     const findLocationCoords = async (address, isSelfLoc = false) => {
         let [error, res] = await to(Geocode.fromAddress(address));
@@ -154,14 +209,12 @@ const MapComp = (props) => {
                 containerElement={<div style={{ height: `100%` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img alt=""src='/icons/goUp.svg' /></div>}
+            {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img alt="" src='/icons/goUp.svg' /></div>}
         </div>
     );
 }
 
 export default MapComp;
-
-
 
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
@@ -205,7 +258,7 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
         {props.allLocations && Array.isArray(props.allLocations) && props.allLocations.map((locationInfo, index) => {
-            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo}  /> /* all blowing meetings locations */
+            return <MarkerGenerator key={index} blower={props.blower} isolated={props.isolated} locationInfo={locationInfo} /> /* all blowing meetings locations */
         })}
     </GoogleMap>
 }

@@ -119,6 +119,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
+            if (routeStops.length > userData.can_blow_x_times) { //changed settings of his max number of meetings, but is assigned to more
+                // שינית לאחרונה את המספר המקסימלי שלך לתקיעות בשופר, אך הינך רשום ל00 תקיעות, אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב
+                // on browser: מסלול המוצג מצד ימין
+                // (phone): מסלול המוצג בתחתית המסך
+            }
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
                 logE("err getoverviewpath 1 : ", err);
