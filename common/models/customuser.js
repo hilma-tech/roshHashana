@@ -6,7 +6,6 @@ const randomstring = require("randomstring");
 let sendMsg = require('../../server/sendSms/SendSms.js');
 const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
-const IsolatorInfoUpdateSocket = require('../../server/common/socket/isolatedInfoUpdates');
 const blowerEvents = require('../../server/common/socket/blowerEvents');
 const isolatedEvents = require('../../server/common/socket/isolatedEvents');
 const to = require('../../server/common/to');
@@ -420,6 +419,11 @@ module.exports = function (CustomUser) {
         return CustomUser.getLastItemThatIsNotIsrael(arr, pos - 1)
     }
 
+    CustomUser.publicHasBlower = async (publicMeetingId) => {
+        let res = await CustomUser.app.models.shofarBlowerPub.findOne({ where: { and: [{ id: publicMeetingId }, { blowerId: null }] } });
+        return res ? false : true;
+    }
+
     CustomUser.updateUserInfo = async (data, options) => {
         const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
         if (!options.accessToken || !options.accessToken.userId) { //check if the user is connected
@@ -489,20 +493,23 @@ module.exports = function (CustomUser) {
             //now update the other details according to the user's role
             if (role === 1) {
                 //isolator
-                let isolatedUpdateSocket = new IsolatorInfoUpdateSocket(CustomUser);
                 let pubMeetId = null;
                 let meetingChanged = false;
+                let isSocketCalled = false; //check if already called socket
                 let isolatedInfo = await Isolated.findOne({ where: { userIsolatedId: userId }, include: [{ UserToIsolated: true }] });
-                isolatedUpdateSocket.setCurrIsolatedInfo(isolatedInfo);
+                const oldData = {
+                    'isPublicMeeting': data.public_meeting,
+                    'oldIsPublicMeeting': isolatedInfo.public_meeting,
+                    'oldMeetingId': isolatedInfo.public_meeting ? isolatedInfo.blowerMeetingId : isolatedInfo.id
+                };
 
                 //if the user changed his address and he has a public meeting
-                if ((data.public_meeting || isolatedInfo.public_meeting) && data.address) {
+                if ((isolatedInfo.public_meeting && (data.public_meeting == undefined || data.public_meeting == null || data.public_meeting)) && data.address) {
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
                     if (canEditPubMeeting) {
                         pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
-                        isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
                     }
                     //we can not update the meeting so create a new meeting with the new address
                     else {
@@ -514,12 +521,11 @@ module.exports = function (CustomUser) {
 
                         if (Object.keys(meetData).length) {
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
-                            isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
                             meetingChanged = true;
                         }
                     }
                 }
-                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed to public meeting from private
+                else if (data.public_meeting && isolatedInfo && !isolatedInfo.public_meeting) {//changed from private meeting to public
                     let meetData = {};
                     //update the meeting address to the isolated's address
                     if (data.address) meetData.address = data.address;
@@ -532,22 +538,34 @@ module.exports = function (CustomUser) {
                     if (data.start_time) meetData.start_time = data.start_time;
 
                     if (Object.keys(meetData).length) {//create new public meeting 
-                        pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
-                        isolatedUpdateSocket.setNewMeetingId(pubMeetId && (typeof pubMeetId === "object" && pubMeetId.id) || pubMeetId);
+                        pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], isolatedInfo.blowerMeetingId, options);
                         meetingChanged = true;
                     }
                 }
-                else {
+                else if (isolatedInfo.public_meeting && (data.public_meeting == 0 || data.public_meeting === false)) {
                     //the user is changing from public to private -> check if can delete the public meeting
                     if (isolatedInfo) {
                         let meetingId = isolatedInfo.blowerMeetingId;
                         let canDeleteMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                         let publicMeeting = await shofarBlowerPub.findOne({ where: { id: meetingId } });
-                        isolatedUpdateSocket.setPublicMeetBlowerId((publicMeeting && publicMeeting.blowerId) ? publicMeeting.blowerId : false);
-                        if (canDeleteMeeting) await shofarBlowerPub.destroyById(meetingId);
+                        if (canDeleteMeeting) {
+                            data.blowerMeetingId = publicMeeting.blowerId;
+                            await shofarBlowerPub.destroyById(meetingId);
+                        }
+                        else {
+                            isSocketCalled = true;
+                            await isolatedEvents.newIsolator(CustomUser, data, isolatedInfo, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id); //socket
+                        }
                         pubMeetId = null;
                         meetingChanged = true;
                     }
+                }
+
+                if ((isolatedInfo.public_meeting && await CustomUser.publicHasBlower(isolatedInfo.blowerMeetingId) ||
+                    (!isolatedInfo.public_meeting && isolatedInfo.blowerMeetingId)) && !isSocketCalled) {
+                    //if the meeting has blower and we did not call the socket yet
+                    isSocketCalled = true;
+                    await isolatedEvents.modifyIsolatorInRoute(CustomUser, data, oldData, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id); //socket 
                 }
 
                 //the data to update in isolated table
@@ -555,7 +573,7 @@ module.exports = function (CustomUser) {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
-                    blowerMeetingId: pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : null
+                    blowerMeetingId: data.blowerMeetingId ? data.blowerMeetingId : pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : isolatedInfo.blowerMeetingId
                 }
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
@@ -567,12 +585,9 @@ module.exports = function (CustomUser) {
                         data.lat = data.address[1].lat
                         data.address = data.address[0]
                     }
-                    const oldData = {
-                        'oldIsPublicMeeting': isolatedInfo.public_meeting,
-                        'oldMeetingId': isolatedInfo.public_meeting ? isolatedInfo.blowerMeetingId : isolatedInfo.id
-                    };
-                    await isolatedEvents.updateIsolated(CustomUser, data, oldData, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id);
-                    await isolatedUpdateSocket.handleIsolatorUpdateInfo(data); //socket
+                    if (!isSocketCalled) {
+                        await isolatedEvents.modifyIsolatorInfo(CustomUser, data, oldData, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id);
+                    }
                 } catch (e) { console.log("socket error ", e); }
 
             }
@@ -624,7 +639,6 @@ module.exports = function (CustomUser) {
                         const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
                         if (!isExist) {
                             await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
-                            //TODO: add event and socket to general user-> to delete the user
                         }
                     });
                 }
@@ -1584,8 +1598,8 @@ module.exports = function (CustomUser) {
         console.log('admin update max duration and assign: ', sbId, newMaxTimeVal, meetingObj);
         (async () => {
             // if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
-                //block the function
-                // return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+            //block the function
+            // return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             // }
             if (!sb || Array.isArray(sb) || typeof sb !== "object") return cb(true)
             if (!isolator || Array.isArray(isolator) || typeof isolator !== "object") return cb(true)
@@ -1631,7 +1645,7 @@ module.exports = function (CustomUser) {
         console.log('admin update route length and assign: ', sb, isolator);
         (async () => {
             // if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {//block the function
-                // return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
+            // return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             // }
             if (!sb || Array.isArray(sb) || typeof sb !== "object") return cb(true)
             if (!isolator || Array.isArray(isolator) || typeof isolator !== "object") return cb(true)

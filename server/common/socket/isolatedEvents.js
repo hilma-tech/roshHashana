@@ -13,8 +13,16 @@ module.exports = {
             return;
         }
     },
-    updateIsolated: async function (Model, data, oldData, newMeetingId) {
-        console.log('data: ', data);
-
+    modifyIsolatorInfo: async function (Model, newData, oldData, newMeetingId) {
+        const objToSocketEvent = { ...newData, ...oldData, newMeetingId: newMeetingId };
+        Model.app.io.to('isolated-events').emit('modifyIsolatorInfo', objToSocketEvent);
+    },
+    newIsolator: async function (Model, newData, oldData, newMeetingId) {
+        const objToSocketEvent = { ...oldData.__data || oldData, ...newData, newMeetingId: newMeetingId };
+        Model.app.io.to('isolated-events').emit('newIsolator', objToSocketEvent);
+    },
+    modifyIsolatorInRoute: async function (Model, newData, oldData, newMeetingId) {
+        const objToSocketEvent = { ...oldData, ...newData, newMeetingId: newMeetingId, address: Array.isArray(newData.address)? newData.address[0]: newData.address };
+        Model.app.io.to('isolated-events').emit('modifyIsolatorInRoute', objToSocketEvent);
     }
 }
