@@ -46,9 +46,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
         ? <div id="info-window-container">
             <div className="info-window-title bold turquoiseText">בעל תוקע</div>
-            <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
-            <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
-            <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{selectedSB.username}</div></div>
+            <div className="pub-shofar-blower-name-container"><img alt="שם המחפש" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
+            <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
+            <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.username}</div></div>
         </div>
         : null
 
@@ -136,7 +136,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             } else {
                 if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
                 const getMyNewST = (mId, isPub) => {
-                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId === mId && st.isPublicMeeting === isPub)
+                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
                     if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
                     return false
                 }
@@ -151,7 +151,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                         if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                     }))
                     setMyMeetings(meets => meets.map(m => {
-                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId === m.meetingId && mToUpdate.isPublicMeeting === m.isPublicMeeting)
+                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
                         if (!newMMStartTime) return m
                         return { ...m, startTime: newMMStartTime.startTime }
                     }))
@@ -244,8 +244,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     />
             }
             {/* user location */}
-            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} /> {/* might need to disable when genMap is on */}
-
+            <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} /> {/* might need to disable when genMap is on */}
+            {isAdmin && data.selectedIsolatorLoc ?
+                <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} />
+                : null
+            }
             {isAdmin ? null :
                 <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
                     {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}

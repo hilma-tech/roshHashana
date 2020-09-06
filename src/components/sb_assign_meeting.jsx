@@ -59,12 +59,12 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             }
         }
 
-        if (myRoute.length === userData.can_blow_x_times) {
+        if (myRoute.length == userData.can_blow_x_times) {
             //! MAX_ROUTE_LENGTH
             handleMaxRouteLength(userData.can_blow_x_times)
             return;
         }
-        if (myRoute.length === 20) {
+        if (myRoute.length == 20) {
             //! MAX_ROUTE_LENGTH_20
             openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
             return
@@ -113,7 +113,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         let text = `שים לב, לאחר השיבוץ מספר התקיעות שלך יעמוד על ${Number(n) + 1} תקיעות`;
         // `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
         let updateRouteLength = await openGenAlertSync({ text, isPopup: { okayText: "מתאים לי", cancelText: "בטל" } })
-        console.log('res: ', updateRouteLength);
         if (!updateRouteLength) {
             return;
         }
@@ -151,7 +150,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //format end
 
         let text = `זמן המסלול לאחר השיבוץ שלך יהיה ${newTT} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${maxDur} דקות, לכן לא ניתן כעת לשבצך`
-        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה", cancelText: "סגור" } },
+        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה ושיבוץ", cancelText: "סגור" } },
             updateMaxRouteDuration => {
                 if (!updateMaxRouteDuration) {
                     return;
@@ -181,7 +180,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         if (!myMeetings.includes(newMeeting)) {
             setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
         }
-        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId !== newMeeting.meetingId))
+        setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
 
         if (!genMapMeetings) return
         if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
@@ -220,15 +219,15 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                         return;
                     }
                     openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-                    setMyMeetings(myMeetings.filter(meet => meet.meetingId !== assignMeetingInfo.meetingId))
+                    setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
                     setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
 
                     if (genMapMeetings) {
                         if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
-                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId !== assignMeetingInfo.meetingId) }))
+                            setGenMapMeetings(genMeets => ({ ...genMeets, publicMeetings: genMeets.publicMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
                         }
                         else if (Array.isArray(genMapMeetings.privateMeetings)) {
-                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId !== assignMeetingInfo.meetingId) }))
+                            setGenMapMeetings(genMeets => ({ ...genMeets, privateMeetings: genMeets.privateMeetings.filter(m => m.meetingId != assignMeetingInfo.meetingId) }))
                         }
                     }
                     handleAssignment('close');

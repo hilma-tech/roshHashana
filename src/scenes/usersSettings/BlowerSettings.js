@@ -107,7 +107,7 @@ const IsolatedSettings = (props) => {
         setValues(publicPlaces, 'publicMeetings')
     }
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value !== "e") {
             setValues(e.target.value, "username");
         }
     }
@@ -353,7 +353,7 @@ const IsolatedSettings = (props) => {
                 <div className="err-msg">{errs.general}</div>
             </SettingsLayout >
 
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {/* {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null} */}
         </>
     );
 }

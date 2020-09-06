@@ -23,7 +23,7 @@ export const SBProvider = ({ children }) => {
     const [genMapMeetings, setGenMapMeetings] = useState(null)
 
     const getLengthFromPrevStop = (meetingId, isPublicMeeting) => {
-        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId === meetingId && st.isPublicMeeting === isPublicMeeting))
+        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == meetingId && st.isPublicMeeting == isPublicMeeting))
         return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות").split("min").join("דקה") : st.duration.text) : null //google sometimes returns in english
     }
 
@@ -60,7 +60,7 @@ export const SBProvider = ({ children }) => {
     return <SBContext.Provider value={ctxValue} >
         <>
             {children}
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {/* {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null} */}
         </>
     </SBContext.Provider>
 }

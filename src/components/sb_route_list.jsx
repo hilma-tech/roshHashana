@@ -108,7 +108,7 @@ const SBRouteList = (props) => {
     }
 
     const createItemContent = (value, index, uniqueKey) => {
-        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={() => index !== -1 && openOrCloseMeetingInfo(value)}>
+        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1 && !isAdmin) ? 'clickAble' : ''}`} onClick={() => !isAdmin && index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 {index !== CONST_MEETING ? <div className="meeting-in-route-img">
                     {index === -1 ?
@@ -131,7 +131,7 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex === newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
+        if (oldIndex == newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
         //update myRoute and myMeetings according to the reordering
         setMyRoute(newRoute,);

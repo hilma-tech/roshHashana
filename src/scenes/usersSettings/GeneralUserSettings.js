@@ -57,7 +57,7 @@ const IsolatedSettings = (props) => {
     }
 
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value !== "e") {
             setValues(e.target.value, setUsername);
         }
     }
@@ -108,7 +108,7 @@ const IsolatedSettings = (props) => {
             return;
         }
 
-        if (usernameVal && (usernameVal[0] !== 0 || usernameVal.length !== 10)) {
+        if (usernameVal && (usernameVal[0] != 0 || usernameVal.length != 10)) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
             setPhoneMsgErr('מספר הפלאפון שהזנת אינו תקין');
             return;
@@ -167,7 +167,7 @@ const IsolatedSettings = (props) => {
                 </div>
                 <div className="err-msg">{msgErr}</div>
             </SettingsLayout>
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {/* {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null} */}
         </>
     );
 }

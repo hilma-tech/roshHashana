@@ -41,7 +41,7 @@ const IsolatedPage = (props) => {
 
     useOn('newMeetingAssined', (req) => {
         setUserInfo((userInfo) => {
-            if (userInfo.username === req.isolatedNum) { //update only if this is the isolated's meeting
+            if (userInfo.username == req.isolatedNum) { //update only if this is the isolated's meeting
                 return { ...userInfo, blowerMeetingId: req.meetingId, blowerName: req.blowerName, meetingTime: req.meetingStartTime };
             }
             else return userInfo;
@@ -50,7 +50,7 @@ const IsolatedPage = (props) => {
 
     useOn('removeMeetingFromRoute', (req) => {
         setUserInfo((userInfo) => {
-            if (Object.keys(req).length && req.isolatedNum === userInfo.username) {
+            if (Object.keys(req).length && req.isolatedNum == userInfo.username) {
                 //the isolated now doesnt have a meeting
                 return { ...userInfo, blowerMeetingId: null, blowerName: null, meetingTime: null };
             }
@@ -137,7 +137,7 @@ const IsolatedPage = (props) => {
             </div>
             {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} isolated />}
 
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {/* {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null} */}
         </>
     );
 }

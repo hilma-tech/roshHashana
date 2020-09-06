@@ -11,8 +11,8 @@ import { SBMapComponent } from './sb_map_renderer'
 
 import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils';
 import { isBrowser } from "react-device-detect";
-import { adminGetSBRoute } from '../../scenes/admin/fetch_and_utils';
 import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
+import { logE } from '../../handlers/consoleLogHandler';
 
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -150,6 +150,10 @@ const ShofarBlowerMap = (props) => {
                 newCenter = { lat: latNum, lng: lngNum };
             }
             if (newCenter !== center) setCenter(newCenter)
+            //set selected isolator location
+
+            let selectedIsolatorLoc = !props.selectedIsolator || typeof props.selectedIsolator !== "object" ? null : { location: { lat: props.selectedIsolator.lat, lng: props.selectedIsolator.lng }, meetingId: props.selectedIsolator.meetingId, }
+
             setAllMapData({ myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } })
         }
     }
@@ -279,10 +283,10 @@ const ShofarBlowerMap = (props) => {
         Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND_SECOND);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
-        if (error || !res) { console.log(`error getting geoCode of ${address}: `, error); return; }
+        if (error || !res) { logE(`error getting geoCode of ${address}: `, error); return; }
         try {
             return res.results[0].geometry.location;
-        } catch (e) { console.log(`ERROR getting ${address} geoCode, res.results[0].geometry.location `, e); }
+        } catch (e) { logE(`ERROR getting ${address} geoCode, res.results[0].geometry.location `, e); }
     }
 
 

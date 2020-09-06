@@ -42,16 +42,16 @@ class Register extends React.Component {
 
   handleChange(event) {
     this.setState({ alart: null })
-    if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value !== "." && event.target.value !== "-" && event.target.value !== "+" && event.target.value !== "e") ||
+    if ((event.target.id === "phone" && event.target.value.length < 11 && !isNaN(event.target.value) && event.target.value != "." && event.target.value !== "-" && event.target.value !== "+" && event.target.value !== "e") ||
       (event.target.id === "name" && event.target.value.length < 20) ||
-      (event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value !== ".")) {
+      (event.target.id === "key" && event.target.value.length < 5 && !isNaN(event.target.value) && event.target.value != ".")) {
       this.setState({ [event.target.id]: event.target.value })
     }
 
   }
 
   async handleSubmit() {
-    if (this.state.status === "start" && this.state.phone.length === 10 && this.state.name.length > 1 && this.state.phone[0] === 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
+    if (this.state.status == "start" && this.state.phone.length == 10 && this.state.name.length > 1 && this.state.phone[0] == 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -68,15 +68,14 @@ class Register extends React.Component {
           this.setState({ status: "stepTwo" })
         }
         return;
-
       }
-    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] !== 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
+    } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
       this.setState({ alart: SomethingMissing })
     }
-    if (this.state.status === "stepTwo" && this.state.key.length === 4) {
+    if (this.state.status == "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
       let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.meetingId ? this.props.location.state.meetingInfo.meetingId : this.props.location.state.meetingInfo.id : null
-      if (this.state.role === 3 && !meetingId) return this.props.history.push('/');
+      if (this.state.role == 3 && !meetingId) return this.props.history.push('/');
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
@@ -134,11 +133,9 @@ class Register extends React.Component {
 
       }
 
-    } else if (this.state.status === "stepTwo" && this.state.key.length < 4) {
+    } else if (this.state.status == "stepTwo" && this.state.key.length < 4) {
       this.setState({ alart: errKey })
     }
-
-
   }
   sendKey = async () => {
     if (!this.state.sendKey) {
@@ -165,7 +162,6 @@ class Register extends React.Component {
   }
 
   render() {
-    const { showAlert } = this.context;
     if (!this.props.location || !this.props.location.state) this.props.history.push("/")
 
     return (
@@ -191,7 +187,7 @@ class Register extends React.Component {
           <div className="allInputInRegisterPage" >
             <input id="name" className={`${isBrowser ? "browsername" : "mobilename"}`} type="text" placeholder={"נא להזין שם מלא"} value={this.state.name} onChange={this.handleChange} autoComplete={'off'} />
             <input id="phone" className={`${isBrowser ? "browserphone" : "mobilephone"}`} type="tel" placeholder={"נא להזין מספר טלפון נייד"} value={this.state.phone} onChange={this.handleChange} />
-            <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart !== null && this.state.alart}</div>
+            <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
             <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}>
               שלחו לי קוד כניסה
                  </button>
@@ -200,7 +196,7 @@ class Register extends React.Component {
           : <>
             <div className="allInputInRegisterPage" >
               <input id="key" className={`${isBrowser ? "browserkey" : "mobilekey"}`} type="tel" placeholder={"מה הקוד שקיבלת מאיתנו (בהודעת SMS)?"} value={this.state.key} onChange={this.handleChange} autoComplete={'off'} autoFocus={true} />
-              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart !== null && this.state.alart}</div>
+              <div className={`${isBrowser ? "browseralartRegisterPage" : "mobilealartRegisterPage"}`}>{this.state.alart != null && this.state.alart}</div>
               <button className={`${isBrowser ? "browserbutton1" : "mobilebutton1"}`} onClick={this.handleSubmit}> הכניסו אותי </button>
               <button id={`${isBrowser ? "browserbuttonAgn" : "mobilebuttonAgn"}`} onClick={this.sendKey} >
                 שלחו לי קוד חדש
@@ -210,7 +206,6 @@ class Register extends React.Component {
               </div>
             </div></>}
         {/* </div> */}
-        {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
       </div>
     );
   }
