@@ -567,6 +567,11 @@ module.exports = function (CustomUser) {
                         data.lat = data.address[1].lat
                         data.address = data.address[0]
                     }
+                    const oldData = {
+                        'oldIsPublicMeeting': isolatedInfo.public_meeting,
+                        'oldMeetingId': isolatedInfo.public_meeting ? isolatedInfo.blowerMeetingId : isolatedInfo.id
+                    };
+                    await isolatedEvents.updateIsolated(CustomUser, data, oldData, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id);
                     await isolatedUpdateSocket.handleIsolatorUpdateInfo(data); //socket
                 } catch (e) { console.log("socket error ", e); }
 

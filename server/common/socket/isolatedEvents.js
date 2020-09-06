@@ -13,7 +13,8 @@ module.exports = {
             return;
         }
     },
-    updateIsolated: async function (Model, data) {
+    updateIsolated: async function (Model, data, oldData, newMeetingId) {
+        console.log('data: ', data);
 
     }
 }
