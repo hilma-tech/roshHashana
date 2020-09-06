@@ -70,13 +70,12 @@ class Register extends React.Component {
         return;
       }
     } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
-      console.log(this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0));
       this.setState({ alart: SomethingMissing })
     }
-    if (this.state.status === "stepTwo" && this.state.key.length === 4) {
+    if (this.state.status === "stepTwo" && this.state.key.length == 4) {
       //TODO id for generalUser this.props.location.state.meetingInfo
       let meetingId = this.props.location.state.meetingInfo ? this.props.location.state.meetingInfo.meetingId ? this.props.location.state.meetingInfo.meetingId : this.props.location.state.meetingInfo.id : null
-      if (this.state.role === 3 && !meetingId) return this.props.history.push('/');
+      if (this.state.role == 3 && !meetingId) return this.props.history.push('/');
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/authenticationKey?key=${this.state.key}&&meetingId=${meetingId}&&role=${this.state.role}`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "get",
@@ -165,7 +164,6 @@ class Register extends React.Component {
   }
 
   render() {
-    const { showAlert } = this.context;
     if (!this.props.location || !this.props.location.state) this.props.history.push("/")
 
     return (
