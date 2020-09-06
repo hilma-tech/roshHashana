@@ -1,0 +1,33 @@
+.infoWindowContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Assistant', sans-serif !important;
+
+    .infoWindowTitle {
+        margin: 1.5vh 0;
+        text-align: start;
+        font-size: 1.7vh;
+    }
+
+    .pubShofarBlowerNameContainer,
+    .pubAddressContainer {
+        display: flex;
+
+        img {
+            width: 1.5vh;
+            margin: 0.5vh 1vw;
+        }
+    }
+
+    .infoWindowButton {
+        margin: 0.5vh 0;
+        padding: 0.5vh 0.5vw;
+        color: white;
+        background-color: #FDA42A;
+        border-radius: 2px;
+        width: fit-content;
+        align-self: flex-end;
+        font-size: 1.6vh;
+    }
+}
