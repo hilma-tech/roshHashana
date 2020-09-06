@@ -48,7 +48,7 @@
             text-decoration: underline;
             margin-bottom: 40%;
             font-size: 1.3rem;
-            margin-top: 5%;
+            margin-top: 2rem;
         }
         #see-map {
             font-weight: bold;
@@ -93,6 +93,7 @@
     }
     .icon {
         width: 1.5rem;
+        height: 1.5rem;
     }
 
     .meetingDetailsContainer {
@@ -105,7 +106,8 @@
             color: black;
             font-size: 1.3rem;
             line-height: normal;
-            margin-bottom: 5%;
+            margin-bottom: 3rem;
+            flex-direction: row;
             .clock {
                 margin-bottom: 2rem;
             }
