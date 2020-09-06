@@ -46,9 +46,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
         ? <div id="info-window-container">
             <div className="info-window-title bold turquoiseText">בעל תוקע</div>
-            <div className="pub-shofar-blower-name-container"><img alt="" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
-            <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
-            <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{selectedSB.username}</div></div>
+            <div className="pub-shofar-blower-name-container"><img alt="שם המחפש" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
+            <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
+            <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.username}</div></div>
         </div>
         : null
 
