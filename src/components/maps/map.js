@@ -46,11 +46,11 @@ const MapComp = (props) => {
             let publicMeetings = currMapInfo.publicMeetings.slice();
             let privateMeetings = currMapInfo.privateMeetings.slice();
             if (req.isPublicMeeting) {//public meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
                 publicMeetings.splice(index, 1);
             }
             else {//private meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
                 privateMeetings.splice(index, 1);
             }
             setAllLocations((allLoc) => {
