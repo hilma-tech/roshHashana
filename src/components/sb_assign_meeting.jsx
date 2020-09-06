@@ -113,7 +113,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         let text = `שים לב, לאחר השיבוץ מספר התקיעות שלך יעמוד על ${Number(n) + 1} תקיעות`;
         // `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
         let updateRouteLength = await openGenAlertSync({ text, isPopup: { okayText: "מתאים לי", cancelText: "בטל" } })
-        console.log('res: ', updateRouteLength);
         if (!updateRouteLength) {
             return;
         }
@@ -151,7 +150,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         //format end
 
         let text = `זמן המסלול לאחר השיבוץ שלך יהיה ${newTT} דקות וציינת שזמן המסלול המקסימלי שלך הינו ${maxDur} דקות, לכן לא ניתן כעת לשבצך`
-        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה", cancelText: "סגור" } },
+        openGenAlert({ text: text, isPopup: { okayText: "עדכון זמן ההליכה ושיבוץ", cancelText: "סגור" } },
             updateMaxRouteDuration => {
                 if (!updateMaxRouteDuration) {
                     return;

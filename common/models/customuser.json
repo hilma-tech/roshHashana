@@ -193,8 +193,10 @@
       "permission": "ALLOW",
       "property": [
         "createAdminUser",
-        "adminGetSBRoute",
-        "getAllAdminBlastsForMap"
+        "getAllAdminBlastsForMap",
+        "adminAssignSBToIsolator",
+        "adminUpdateMaxRouteLengthAndAssign",
+        "adminUpdateMaxDurationAndAssign"
       ]
     }
   ],

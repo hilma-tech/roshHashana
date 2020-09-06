@@ -133,7 +133,7 @@ const GeneralUserPage = (props) => {
                 </div>
             </div>
             {(openMap || isBrowser) && <Map closeMap={closeOrOpenMap} meetAddress={address} isolated />}
-            {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null}
+            {/* {showAlert && showAlert.text ? <GeneralAlert text={showAlert.text} warning={showAlert.warning} block={showAlert.block} isPopup={showAlert.isPopup} noTimeout={showAlert.noTimeout} /> : null} */}
 
         </>
     );

@@ -27,13 +27,13 @@
         flex-direction: row;
         #title {
             color: white;
-            font-size: 2rem;
+            font-size: 3vh;
             font-family: $Heebo;
         }
         #x-btn {
             color: white;
             height: 100%;
-            margin: 0 2rem;
+            margin: 0 3vh;
             height: 2rem; //like #title font-size
             width: auto;
         }
@@ -100,6 +100,20 @@
             text-align: right;
             font-size: 1.2rem;
         }
+    }
+    #assign-btn{
+        background-color: $orange;
+        border-radius: 36px;
+        color: white;
+        font-size: 1.5rem;
+        padding: .5rem 1.5rem;
+        box-shadow: 0px 3px 6px #00000029;
+        cursor: pointer;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        margin-bottom: 2rem;
+        margin-left: 2rem;
     }
 }
 .sb-map-container-admin {
@@ -210,20 +224,20 @@
             flex-direction: row;
             #title {
                 color: white;
-                font-size: 2rem;
+                font-size: 3vh;
                 font-family: $Heebo;
             }
             #x-btn {
                 color: white;
                 height: 100%;
                 margin: 0 2rem;
-                height: 2rem; //like #title font-size
+                height: 3vh; //like #title font-size
                 width: auto;
             }
         }
         #meeting-type {
             color: white;
-            font-size: 2rem;
+            font-size: 3vh;
             font-family: $Heebo;
             margin: 0 2rem;
         }

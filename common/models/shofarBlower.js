@@ -201,12 +201,12 @@ module.exports = function (ShofarBlower) {
 
                 let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerQ);
                 if (shofarBlowerErr || !shofarBlowerRes) {
-                    console.log('get shofarBlower admin request error : ', shofarBlowerErr);
+                    console.log('shofarblowererr get shofarBlower admin request error : ', shofarBlowerErr);
                     throw shofarBlowerErr
                 }
                 let [countErr, countRes] = await executeMySqlQuery(ShofarBlower, countQ);
                 if (countErr || !countRes) {
-                    console.log('get shofarBlower admin request error : ', countErr);
+                    console.log('countErr get shofarBlower admin request error : ', countErr);
                     throw countErr
                 }
 
@@ -233,13 +233,13 @@ module.exports = function (ShofarBlower) {
                 const confirmQ = `UPDATE shofar_blower SET confirm = 1 WHERE id = ${id}`
                 let [confirmErr, confirmRes] = await executeMySqlQuery(ShofarBlower, confirmQ);
                 if (confirmErr || !confirmRes) {
-                    console.log('get shofarBlower admin request error : ', confirmErr);
+                    console.log('confirmShofarBlower get shofarBlower admin request error : ', confirmErr);
                     throw shofarBlowerErr
                 }
-                
+
                 const findPhone = `select username from CustomUser,shofar_blower where shofar_blower.id = ${id} and CustomUser.id=shofar_blower.userBlowerId`
                 let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
-                let objToSocketEvent= {"id" :id};
+                let objToSocketEvent = { "id": id };
                 ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`)
                 return cb(null, true)
             } catch (err) {
@@ -370,11 +370,11 @@ module.exports = function (ShofarBlower) {
                 FROM shofar_blower AS sb 
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
                 WHERE sb.confirm = 1`
-                
+
                 let [shofarBlowersErr, shofarBlowersRes] = await executeMySqlQuery(ShofarBlower, shofarBlowersQ);
                 if (shofarBlowersErr || !shofarBlowersRes) {
-                    console.log('get shofarBlower admin request error : ', shofarBlowersErr);
-                    throw shofarBlowerErr
+                    console.log('getShofarBlowersForMap get shofarBlower admin request error : ', shofarBlowersErr);
+                    throw shofarBlowersErr
                 }
                 return cb(null, shofarBlowersRes)
             } catch (err) {
@@ -397,7 +397,7 @@ module.exports = function (ShofarBlower) {
                 const countQ = `SELECT COUNT(*) AS num FROM shofar_blower AS sb  WHERE sb.confirm = ${confirm || 0}`
                 let [countErr, countRes] = await executeMySqlQuery(ShofarBlower, countQ);
                 if (countErr || !countRes) {
-                    console.log('get shofarBlower admin request error : ', countErr);
+                    console.log('countAllVolunteers get shofarBlower admin request error : ', countErr);
                     throw shofarBlowerErr
                 }
                 return cb(null, countRes[0].num)
@@ -412,4 +412,76 @@ module.exports = function (ShofarBlower) {
         accepts: [{ arg: 'confirm', type: 'boolean' }],
         returns: { arg: 'res', type: 'number', root: true }
     });
+
+
+    ShofarBlower.adminGetSBRoute = function (options, sbId, withSBInfo, cb) {
+        if (!options || !options.accessToken || !options.accessToken.userId) {
+            return cb(true)
+        }
+
+        (async () => {
+            const myRouteQ = `
+        SELECT * FROM (
+            SELECT 
+                FALSE AS isPublicMeeting, 
+                isolated.id AS "meetingId",
+                CustomUser.address, 
+                CustomUser.lng, CustomUser.lat, 
+                false AS constMeeting,
+                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, 
+                meeting_time AS "startTime"
+            FROM isolated 
+                JOIN CustomUser ON userIsolatedId = CustomUser.id 
+                JOIN shofar_blower ON isolated.blowerMeetingId = shofar_blower.id
+            WHERE public_meeting = 0 
+                AND blowerMeetingId = ${sbId}
+                
+                UNION
+                
+            SELECT 
+                TRUE AS isPublicMeeting, 
+                shofar_blower_pub.id AS "meetingId", 
+                shofar_blower_pub.address, 
+                shofar_blower_pub.lng, shofar_blower_pub.lat, 
+                shofar_blower_pub.constMeeting AS constMeeting, 
+                NULL AS isolatedPhone, 
+                start_time AS "startTime" 
+            FROM shofar_blower_pub
+                    LEFT JOIN CustomUser blowerCU ON blowerCU.id = shofar_blower_pub.blowerId
+                    LEFT JOIN shofar_blower ON blowerCU.id = shofar_blower.userBlowerId 
+            WHERE shofar_blower.confirm = 1
+                AND shofar_blower.id = ${sbId}
+        ) a
+        ORDER BY startTime
+        `
+
+            let [errRoute, resRoute] = await executeMySqlQuery(ShofarBlower, myRouteQ)
+            if (errRoute || !resRoute) { console.log("errRoute || !resRoute for myRouteQ", errRoute || !resRoute); return cb(true) }
+            // console.log('resRoute: ', resRoute);
+            if (withSBInfo) {
+                const sbDataQ = `SELECT
+                    cu.name, cu.username AS "phone", cu.address, cu.lng, cu.lat, 
+                    shofar_blower.can_blow_x_times, shofar_blower.volunteering_start_time, shofar_blower.volunteering_max_time
+                FROM shofar_blower
+                    LEFT JOIN CustomUser cu ON cu.id = shofar_blower.userBlowerId
+                WHERE shofar_blower.id = ${sbId}
+                `
+                let [sbDataErr, sbData] = await executeMySqlQuery(ShofarBlower, sbDataQ)
+                if (sbDataErr || !Array.isArray(sbData) || sbData.length != 1) {
+                    console.log("sbDataErr: error getting user info about sb (admin): ", sbDataErr || sbData)
+                }
+                return cb(null, { meetings: resRoute, sbData })
+            } else {
+                return cb(null, resRoute)
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('adminGetSBRoute', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' }, { arg: "sbId", type: "number" }, { arg: "withSBInfo", type: "boolean" }],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    })
+
+
 }

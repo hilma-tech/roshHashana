@@ -14,7 +14,6 @@ export const updateSBDetails = async (blowerDetails, cb = () => { }) => {
     } else {
         typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false)
     }
-
 }
 
 export const updateIsolatedDetails = async (isolatedDetails, cb = () => { }) => {
