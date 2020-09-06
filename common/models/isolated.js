@@ -229,6 +229,7 @@ module.exports = function (Isolated) {
                     (isolated.public_meeting = 1 AND sbp.blowerId IS NULL))`
                 }
 
+                //todo check if need to add to select here: IF(isolated.public_meeting, sbp.id, isolated.id) AS id,isolated.public_meeting (for adminAssignSBToIsolator)
                 const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id

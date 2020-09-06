@@ -18,14 +18,14 @@ const ShofarBlowerPage = function (props) {
         getShofarBlowers()
     }, [])
 
-    useEffect(() => {
-        if (selectedSB && props.location.pathname === "/shofar-blowers") {
-            props.history.push("/shofar-blower")
-            console.log('selectedSB: ', selectedSB);
-        } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
-            props.history.push("/shofar-blowers")
-        }
-    }, [selectedSB])
+    // useEffect(() => {
+    //     console.log('selectedSB: ', selectedSB);
+    //     if (selectedSB && props.location.pathname === "/shofar-blowers") {
+    //         props.history.push("/shofar-blower")
+    //     } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
+    //         props.history.push("/shofar-blowers")
+    //     }
+    // }, [selectedSB])
 
     const getShofarBlowers = function (filter = filters, startRow = 0) {
         (async () => {
@@ -85,7 +85,7 @@ const ShofarBlowerPage = function (props) {
                     <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מתנדבים</div>
                     <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <ShofarBlowerTable selectedSB={selectedSB} setSelectedSB={setSelectedSB} getShofarBlowers={getShofarBlowers} setResultNum={setResultNum} resultNum={resultNum} status={status} />
+                <ShofarBlowerTable selectedSB={selectedSB} setSelectedSB={setSelectedSB} getShofarBlowers={getShofarBlowers} setResultNum={setResultNum} resultNum={resultNum} status={status} history={props.history} />
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from '../ctx/AdminMainContext';
-import { getTime, deletePublicMeeting } from '../fetch_and_utils';
+import { getTime } from '../fetch_and_utils';
 import GenericTable from './GenericTable'
 import '../styles/table.scss'
 
@@ -9,7 +9,6 @@ import '../styles/table.scss'
 const BlastsPubTable = (props) => {
     const { loadingBlastsPub, blastsPub, setBlastInfo, pubMeetingsNum } = useContext(AdminMainContext)
     const [tr, setTr] = useState(null)
-    let startRow = 0
 
     const th = [['name', 'בעל התוקע'], ['phone', 'סוג התקיעה'], ['address', 'כתובת'], ['time', 'שעה משוערת'], ['info infoPub tableIcons', '']]
 

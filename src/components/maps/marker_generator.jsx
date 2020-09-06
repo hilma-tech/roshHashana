@@ -43,7 +43,7 @@ export default MarkerGenerator;
 
 
 
-export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType }) => {
+export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType, defaultInfoState = false }) => {
     /**
      * icon: overrides props.type
      * location
@@ -51,7 +51,7 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
      * iconType: type of meeting, so we know the right icon
      **/
 
-    const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
+    const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(defaultInfoState);
 
     const closeOrOpenInfoWindow = () => setIsInfoWindowOpen(isInfoWindowOpen => !isInfoWindowOpen)
 

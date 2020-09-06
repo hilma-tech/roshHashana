@@ -148,7 +148,8 @@
                 "confirmShofarBlower",
                 "deleteShofarBlowerAdmin",
                 "InsertDataShofarBlowerAdmin",
-                "getShofarBlowersForMap"
+                "getShofarBlowersForMap",
+                "adminGetSBRoute"
             ]
         }
     ]

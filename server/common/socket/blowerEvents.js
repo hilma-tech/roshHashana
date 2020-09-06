@@ -1,5 +1,3 @@
-const { Modal } = require("@material-ui/core");
-
 module.exports = {
     assignMeetingSb: async function (Model, data) {
         Model.app.io.to('blower-events').emit('newMeetingAssined', data);

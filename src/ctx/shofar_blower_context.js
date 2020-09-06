@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { assignSB } from '../fetch_and_utils';
 import GeneralAlert from '../components/modals/general_alert';
 
 export const SBContext = React.createContext()
 
-let assigning = false;
 export const SBProvider = ({ children }) => {
     //alerts
-    let alertTO = null;
     const [showAlert, setShowAlert] = useState(false)
 
     //sb meetings, reqs and user data
@@ -26,7 +23,7 @@ export const SBProvider = ({ children }) => {
     const [genMapMeetings, setGenMapMeetings] = useState(null)
 
     const getLengthFromPrevStop = (meetingId, isPublicMeeting) => {
-        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == meetingId && st.isPublicMeeting == isPublicMeeting))
+        let st = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId === meetingId && st.isPublicMeeting === isPublicMeeting))
         return st && st.duration ? (typeof st.duration.text === "string" ? st.duration.text.split("mins").join("דקות").split("min").join("דקה") : st.duration.text) : null //google sometimes returns in english
     }
 

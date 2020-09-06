@@ -25,6 +25,7 @@ const MapComp = (props) => {
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
+            if (err){console.log(err)}
             if (mapContent) {
                 setMapInfo(mapContent);
             }
@@ -36,16 +37,20 @@ const MapComp = (props) => {
         if (err) console.log("failed to join room");
     });
 
+    useJoinLeave("isolated-events", (err) => {
+        if (err) console.log("failed to join room isolated-events");
+    });
+
     const handleRemoveMeeting = (req) => {
         setMapInfo((currMapInfo) => {
             let publicMeetings = currMapInfo.publicMeetings.slice();
             let privateMeetings = currMapInfo.privateMeetings.slice();
             if (req.isPublicMeeting) {//public meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
                 publicMeetings.splice(index, 1);
             }
             else {//private meeting
-                let index = publicMeetings.findIndex((meet) => req.meetingId == meet.meetingId);
+                let index = publicMeetings.findIndex((meet) => req.meetingId === meet.meetingId);
                 privateMeetings.splice(index, 1);
             }
             setAllLocations((allLoc) => {
@@ -64,6 +69,11 @@ const MapComp = (props) => {
         }
     }, []);
 
+    useOn('removeMeetingWithBlower', (req) => {
+        req.isPublicMeeting = req.public_meeting;
+        handleRemoveMeeting(req);
+    });
+
     useEffect(() => {
         socket.on('removeMeetingFromRoute', handleRemoveMeeting);
         return () => {
@@ -73,7 +83,6 @@ const MapComp = (props) => {
 
     useEffect(() => {
         (async () => {
-            console.log('hereee')
             Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND);
             Geocode.setLanguage("he");
             if (props.publicMap && navigator.geolocation) {
