@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import Geocode from "react-geocode";
 import { CONSTS } from '../../consts/const_messages';
-// import './map.scss';
+import './adminMap.scss';
 import { fetchShofarBlowersForMap, fetchBlastsForMap, fetchIsolatedForMap } from '../../scenes/admin/fetch_and_utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
+import { withRouter } from 'react-router';
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
@@ -19,8 +20,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [showShofarBlowers, setShowShofarBlowers] = useState(false)
     const [showBlasts, setShowBlasts] = useState(false)
     const [showIsolateds, setShowIsolateds] = useState(false)
-    
-    const { selectedIsolator } = useContext(AdminMainContext)
+    const [selectedMarkerId, setSelectedMarkerId] = useState(-1)
+
+    const { selectedIsolator, setSelectedSB } = useContext(AdminMainContext)
 
     useEffect(() => {
         const input = document.getElementById('search-input');
@@ -38,14 +40,16 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             else return;
         })
 
-        if(selectedIsolator){
-            showShofarBlowersMarkers()            
+        if (selectedIsolator) {
+            showShofarBlowersMarkers()
         }
     }, []);
 
-    const zoomPlace = (place) => {
+    const zoomPlace = (place, id = -1) => {
+        console.log(id)
         setZoom(18)
         setCenter(place);
+        if (id !== -1) setSelectedMarkerId(id)
     }
 
     // const zoomOut = () => {
@@ -59,6 +63,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
+                console.log(res)
             }
         })
     }
@@ -92,6 +97,15 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 zoomPlace(newCenter)
             }
         } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
+    }
+
+    const onInfoWindowSBClick = async (sbId) => {
+        setSelectedSB({ sbId })
+        props.history.push('/shofar-blower')
+    }
+
+    const onInfoWindowIsolatedClick = (id) => {
+
     }
 
     let options = CONSTS.MAP_OPTIONS;
@@ -158,8 +172,26 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }) }}
-            />
+                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, shofarBlower.sbId) }}
+            >
+                {shofarBlower.sbId === selectedMarkerId &&
+                    <InfoWindow onCloseClick={() => { }}>
+                        <div className="infoWindowContainer">
+                            <div className="infoWindowTitle bold blueText">בעל תוקע</div>
+                            <div className="pubShofarBlowerNameContainer">
+                                <img alt="" src='/icons/shofar.svg' />
+                                <div>{shofarBlower.name}</div>
+                            </div>
+                            <div className="pubAddressContainer">
+                                <img alt="" src='/icons/address.svg' />
+                                <div>{shofarBlower.address}</div>
+                            </div>
+                            {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowSBClick(shofarBlower.sbId)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                        </div>
+                    </InfoWindow>
+                }
+            </Marker>
         )}
         {showBlasts && blasts.map((blast, index) =>
             <Marker
@@ -189,10 +221,28 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }) }}
-            />
+                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, isolated.id) }}
+            >
+                {isolated.id === selectedMarkerId &&
+                    <InfoWindow onCloseClick={() => { }}>
+                        <div className="infoWindowContainer">
+                            <div className="infoWindowTitle bold blueText">מחפש</div>
+                            <div className="pubShofarBlowerNameContainer">
+                                <img alt="" src='/icons/shofar.svg' />
+                                <div>{isolated.name}</div>
+                            </div>
+                            <div className="pubAddressContainer">
+                                <img alt="" src='/icons/address.svg' />
+                                <div>{isolated.address}</div>
+                            </div>
+                            {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                        </div>
+                    </InfoWindow>
+                }
+            </Marker>
         )}
-         {!showIsolateds && selectedIsolator && 
+        {!showIsolateds && selectedIsolator &&
             <Marker
                 options={{
                     icon: {
@@ -204,10 +254,26 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 position={{ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }}
                 zIndex={0}
                 onClick={() => { zoomPlace({ lat: Number(selectedIsolator.lat), lng: Number(selectedIsolator.lng) }) }}
-            />
+            >
+                <InfoWindow onCloseClick={() => { }}>
+                    <div className="infoWindowContainer">
+                        <div className="infoWindowTitle bold blueText">מחפש</div>
+                        <div className="pubShofarBlowerNameContainer">
+                            <img alt="" src='/icons/shofar.svg' />
+                            <div>{selectedIsolator.name}</div>
+                        </div>
+                        <div className="pubAddressContainer">
+                            <img alt="" src='/icons/address.svg' />
+                            <div>{selectedIsolator.address}</div>
+                        </div>
+                        {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                        {/* <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div> */}
+                    </div>
+                </InfoWindow>
+            </Marker>
         }
     </GoogleMap>
 }
 ));
 
-export default AdminMap;
+export default withRouter(AdminMap);

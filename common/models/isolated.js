@@ -492,7 +492,7 @@ module.exports = function (Isolated) {
     Isolated.getIsolatedsWithoutMeetingForMap = function (cb) {
         (async () => {
             try {
-                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng 
+                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, isolated.id 
                 FROM isolated
                 LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                 LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
