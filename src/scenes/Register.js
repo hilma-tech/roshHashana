@@ -51,7 +51,6 @@ class Register extends React.Component {
   }
 
   async handleSubmit() {
-    console.log('handleSubmit: ');
     if (this.state.status === "start" && this.state.phone.length === 10 && this.state.name.length > 1 && this.state.phone[0] === 0 && /^[A-Zא-תa-z '"-]{2,}$/.test(this.state.name)) {
       let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/createUser`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -72,9 +71,6 @@ class Register extends React.Component {
       }
     } else if (this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0) || !/^[א-תa-z '"-]{2,}$/.test(this.state.name)) { //todo: האם שווה להפריד את בדיקת המספרים בשם שלו, ככה יהיה אפשר לומר לו שיש להכיל אותיות בלבד
       console.log(this.state.phone.length < 10 || this.state.name.length < 2 || (this.state.phone && this.state.phone[0] != 0));
-      console.log('this.state.name.length: ', this.state.name.length);
-      console.log('this.state.name:', this.state.name);
-      console.log('this.state.phone:', this.state.phone);
       this.setState({ alart: SomethingMissing })
     }
     if (this.state.status === "stepTwo" && this.state.key.length === 4) {
