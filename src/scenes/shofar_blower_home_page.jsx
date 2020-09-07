@@ -84,7 +84,6 @@ const SBHomePage = (props) => {
     });
 
     useOn("newIsolator", (req) => {
-        console.log('heree2', req)
         if (Array.isArray(req.address)) {
             req.address = req.address[0];
         }
