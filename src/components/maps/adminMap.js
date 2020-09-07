@@ -20,7 +20,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [showShofarBlowers, setShowShofarBlowers] = useState(false)
     const [showBlasts, setShowBlasts] = useState(false)
     const [showIsolateds, setShowIsolateds] = useState(false)
-    const [selectedMarkerId, setSelectedMarkerId] = useState(-1)
+    const [selectedMarkerId, setSelectedMarkerId] = useState('')
 
     const { selectedIsolator, setSelectedSB } = useContext(AdminMainContext)
 
@@ -46,8 +46,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     }, []);
 
     const zoomPlace = (place, id = -1) => {
-        // console.log(id)
-        setZoom(16)
+        setZoom(18)
         setCenter(place);
         if (id !== -1) setSelectedMarkerId(id)
     }
@@ -173,10 +172,10 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, shofarBlower.sbId) }}
+                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, 'shofarBlower-' + shofarBlower.sbId) }}
             >
-                {shofarBlower.sbId === selectedMarkerId &&
-                    <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
+                {selectedMarkerId.split('-')[0] === 'shofarBlower' && shofarBlower.sbId === Number(selectedMarkerId.split('-')[1]) &&
+                    <InfoWindow onCloseClick={() => { }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">בעל תוקע</div>
                             <div className="pubShofarBlowerNameContainer">
@@ -206,8 +205,29 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(blast.lat), lng: Number(blast.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }) }}
-            />
+                onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }, 'blast-' + blast.id) }}
+            >
+                {selectedMarkerId.split('-')[0] === 'blast' && blast.id === Number(selectedMarkerId.split('-')[1]) &&
+                    <InfoWindow onCloseClick={() => { }}>
+                        <div className="infoWindowContainer">
+                            <div className="infoWindowTitle bold blueText">{blast.isPublicMeeting ? 'תקיעה ציבורית' : 'תקיעה פרטית'}</div>
+                            <div className="pubShofarBlowerNameContainer">
+                                <img alt="" src='/icons/shofar.svg' />
+                                <div>{blast.blowerName}</div>
+                            </div>
+                            <div className="pubAddressContainer">
+                                <img alt="" src='/icons/address.svg' />
+                                <div>{blast.address}</div>
+                            </div>
+                            {/* <div className="pubAddressContainer" >
+                                <FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" />
+                                <div>{blast.username}</div>
+                            </div> */}
+                            {/* <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(blast.id, blast.isPublicMeeting)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div> */}
+                        </div>
+                    </InfoWindow>
+                }
+            </Marker>
         )}
 
         {showIsolateds && isolateds.map((isolated, index) =>
@@ -222,9 +242,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, isolated.id) }}
+                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, 'isolated-' + isolated.id) }}
             >
-                {isolated.id === selectedMarkerId &&
+                {selectedMarkerId.split('-')[0] === 'isolated' && isolated.id === Number(selectedMarkerId.split('-')[1]) &&
                     <InfoWindow onCloseClick={() => { }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">מחפש/ת</div>

@@ -80,6 +80,10 @@ const SBHomePage = (props) => {
         updateReqData(newReq);
     });
 
+    useOn('modifyIsolatorInRoute', (newReq) => {
+        updateMyMeet(newReq);
+    });
+
     useOn('removeMeeting', (req) => {
         setMeetingsReqs((meetingsReqs) => {
             return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.public_meeting) || (req.meetingId !== meet.meetingId))
@@ -114,24 +118,20 @@ const SBHomePage = (props) => {
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
-                if (newReqData.oldMeetingId !== null && newReqData.oldIsPublicMeeting !== null && newReqData.oldMeetingId !== undefined && newReqData.oldIsPublicMeeting !== undefined) {
-                    return (req.meetingId == newReqData.oldMeetingId
-                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
-                }
-                else if (newReqData.oldMeetingId !== null && newReqData.oldMeetingId !== undefined) {
-                    return (req.meetingId == newReqData.oldMeetingId
-                        && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
-                }
-                else if (newReqData.oldIsPublicMeeting !== null && newReqData.oldIsPublicMeeting !== undefined) {
-                    return (req.meetingId == newReqData.meetingId
-                        && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? newReqData : req
-                }
-                else {
-                    return (req.meetingId == newReqData.meetingId && req.isPublicMeeting == newReqData.isPublicMeeting) ? newReqData : req
-                }
-
+                return (req.meetingId == newReqData.oldMeetingId
+                    && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? { ...req, ...newReqData, meetingId: newReqData.newMeetingId } : req
             })
-        )
+        );
+    }
+
+    const updateMyMeet = (newReqData) => {
+        setMyMeetings(reqs => !Array.isArray(reqs) ? [] :
+            reqs.map((req) => {
+                console.log('req: ', req)
+                return (req.meetingId == newReqData.oldMeetingId
+                    && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? { ...req, ...newReqData, meetingId: newReqData.newMeetingId } : req
+            })
+        );
     }
 
     const fetchAndSetData = async () => {

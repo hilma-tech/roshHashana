@@ -170,10 +170,10 @@ module.exports = function (ShofarBlower) {
                 }
 
                 if (filter.address && filter.address.length > 0) {
-                    where += ` AND (MATCH(cu.address) AGAINST ('${filter.address}')) `
+                    where += ` AND (MATCH(cu.address) AGAINST ('"${filter.address}"')) `
                 }
                 if (filter.name && filter.name.length > 0) {
-                    where += ` AND (MATCH(cu.name) AGAINST ('${filter.name}'))`
+                    where += ` AND (MATCH(cu.name) AGAINST ('"${filter.name}"'))`
                 }
 
                 const shofarBlowerQ = `
