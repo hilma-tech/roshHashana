@@ -18,9 +18,11 @@ import SBAllMeetingsList from '../sb_all_meetings_list';
 import { updateMyStartTime, checkDateBlock, assignSB } from '../../fetch_and_utils';
 
 import { logE } from '../../handlers/consoleLogHandler'
+import { adminUpdateMyStartTime } from '../../scenes/admin/fetch_and_utils';
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
-    const { err, data, isAdmin, selectedSB } = props
+    const { err, data, isAdmin, selectedSB, handleForceAssign, assigned } = props
+    // console.log('data: ', data);
     if (err) return <div className="loader">{typeof err === "string" ? err : "אירעה שגיאה, נא נסו שנית מאוחר יותר"}</div>;
     if (!data) return <img alt="נטען..." className="loader" src='/images/loader.svg' />
     const { openGenAlert } = useContext(MainContext)
@@ -39,16 +41,26 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setIsPrint = sbctx.setIsPrint;
         totalLength = sbctx.totalLength;
     } else if (adminctx && typeof adminctx === "object") {
+        setMyMeetings = props.setMeetingsOfSelectedSB
+        userData = selectedSB
         startTimes = adminctx.startTimes
         setStartTimes = adminctx.setStartTimes
     }
 
     const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
-        ? <div id="info-window-container">
+        ? <div id="info-window-container" className="limit-map-info-window-size">
             <div className="info-window-title bold turquoiseText">בעל תוקע</div>
-            <div className="pub-shofar-blower-name-container"><img alt="שם המחפש" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
+            <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
             <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
-            <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.username}</div></div>
+            <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.phone || selectedSB.username}</div></div>
+            {assigned || !props.data.selectedIsolatorLoc ? null : <div onClick={handleForceAssign} className="pointer" id="assign-btn">שבץ</div>}
+        </div>
+        : null
+    const isolatorLocationInfo = isAdmin && props.data.selectedIsolatorLoc && typeof props.data.selectedIsolatorLoc === "object"
+        ? <div id="info-window-container" className="limit-map-info-window-size">
+            <div className="info-window-title bold turquoiseText">מחפש/ת</div>
+            <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{props.data.selectedIsolatorLoc.name}</div></div>
+            <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{props.data.selectedIsolatorLoc.address}</div></div>
         </div>
         : null
 
@@ -59,6 +71,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         anchor: isAdmin ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
+    const isolatorLocationIcon = isAdmin ? {
+        url: '/icons/single-orange.svg',
+        scaledSize: isAdmin ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(80, 80),
+        // origin: new window.google.maps.Point(0, 0),
+        anchor: isAdmin ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(50, 50),
+        // labelOrigin: new window.google.maps.Point(0, 60),
+    } : null;
 
 
     const [routePath, setRoutePath] = useState(null)
@@ -72,7 +91,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
-        window.onafterprint = (event) => {
+        window.onafterprint = (_e) => {
             window.history.replaceState({}, document.title, "/");
             setIsPrint(false);
         };
@@ -95,7 +114,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const setData = async () => {
         if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
-        const userStartTime = isAdmin ? new Date(selectedSB.startTime).getTime() : new Date(userData.startTime).getTime()
+        const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
@@ -119,43 +138,47 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
         }
         if (Array.isArray(routeStops) && routeStops.length) { // my route overViewPath
-            if (routeStops.length > userData.can_blow_x_times && JSON.parse(sessionStorage.getItem('showAlertMaxBlowTimes'))) { //changed settings of his max number of meetings, but is assigned to more
-                openGenAlert({ text: `-שינית לאחרונה את המספר המקסימלי שלך לתקיעות בשופר ל${userData.can_blow_x_times}, -אך הינך רשום ל${routeStops.length} תקיעות. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
-                sessionStorage.setItem('showAlertMaxBlowTimes', false); //update session storage in order to show the alert only once
-            }
+            try {
+                if (routeStops.length > userData.can_blow_x_times && JSON.parse(sessionStorage.getItem('showAlertMaxBlowTimes'))) { //changed settings of his max number of meetings, but is assigned to more
+                    openGenAlert({ text: `-שינית לאחרונה את המספר המקסימלי שלך לתקיעות בשופר ל${userData.can_blow_x_times}, -אך הינך רשום ל${routeStops.length} תקיעות. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+                    sessionStorage.setItem('showAlertMaxBlowTimes', false); //update session storage in order to show the alert only once
+                }
+            } catch (_e) { }
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
-                logE("err getoverviewpath 1 : ", err);
+                logE("getoverviewpath 1 : ", err);
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
             let newStartTimes = res.startTimes;
-
-            if (isAdmin) {
-                if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes) //when assigning values to setStartTimes and to startTimes, I take it from the right context (admin or sb)
-            } else {
-                if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
-                const getMyNewST = (mId, isPub) => {
-                    let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
-                    if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
-                    return false
+            if (newStartTimes && newStartTimes !== startTimes) setStartTimes(newStartTimes)
+            const getMyNewST = (mId, isPub) => {
+                let startTime = Array.isArray(newStartTimes) && newStartTimes.find(st => st.meetingId == mId && st.isPublicMeeting == isPub)
+                if (startTime && startTime.startTime) return new Date(startTime.startTime).toJSON()
+                return false
+            }
+            const meetingsToUpdateST = [];
+            for (let m of routeStops) { //loop current stops and their start times
+                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
+                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
+            }
+            if (meetingsToUpdateST && meetingsToUpdateST.length) {
+                if (isAdmin) {
+                    adminUpdateMyStartTime(meetingsToUpdateST, (error => {
+                        if (error) { openGenAlert({ text: typeof error === "string" ? error : "אירעה שגיאה בעת שמירת הנתונים" }); logE('adminUpdateMyStartTime error: ', error); }
+                    }))
                 }
-                const meetingsToUpdateST = [];
-                for (let m of routeStops) { //loop current stops and their start times
-                    let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                    if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
-                        meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
-                }
-                if (meetingsToUpdateST && meetingsToUpdateST.length) {
-                    if (!checkDateBlock('DATE_TO_BLOCK_BLOWER')) updateMyStartTime(meetingsToUpdateST, (error => {
+                else if (!checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+                    updateMyStartTime(meetingsToUpdateST, (error => {
                         if (error) { openGenAlert({ text: error === CONSTS.CURRENTLY_BLOCKED_ERR ? "מועד התקיעה מתקרב, לא ניתן לבצע שינויים במסלול" : error }); logE('updateMyStartTime error: ', error); }
                     }))
-                    setMyMeetings(meets => meets.map(m => {
-                        let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
-                        if (!newMMStartTime) return m
-                        return { ...m, startTime: newMMStartTime.startTime }
-                    }))
                 }
+                setMyMeetings(meets => meets.map(m => {
+                    let newMMStartTime = meetingsToUpdateST.find(mToUpdate => mToUpdate.meetingId == m.meetingId && mToUpdate.isPublicMeeting == m.isPublicMeeting)
+                    if (!newMMStartTime) return m
+                    return { ...m, startTime: newMMStartTime.startTime }
+                }))
             }
             setRoutePath(res.overviewPath)
         }
@@ -221,11 +244,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         if (showMeetingsList) sideListTO = setTimeout(() => { setShowMeetingsList(false) }, 400)
         setShowMeetingsListAni(false)
     }
-
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
     return (
         <GoogleMap
-            defaultZoom={18} //!change back to 18
+            defaultZoom={18}
             defaultOptions={mapOptions}
             center={props.center}
             onClick={closeSideMeetingsList}
@@ -245,8 +267,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
             {/* user location */}
             <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} /> {/* might need to disable when genMap is on */}
-            {isAdmin && data.selectedIsolatorLoc ?
-                <SBMarkerGenerator location={data.userOriginLoc} markerIcon={userLocationIcon} info={userLocationInfo} defaultInfoState={isAdmin} />
+            {isAdmin && data.selectedIsolatorLoc && data.selectedIsolatorLoc.location ?
+                <SBMarkerGenerator location={data.selectedIsolatorLoc.location} markerIcon={isolatorLocationIcon} info={isolatorLocationInfo} defaultInfoState={isAdmin} />
                 : null
             }
             {isAdmin ? null :

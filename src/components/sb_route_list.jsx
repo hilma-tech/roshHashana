@@ -108,7 +108,7 @@ const SBRouteList = (props) => {
     }
 
     const createItemContent = (value, index, uniqueKey) => {
-        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1 && !isAdmin) ? 'clickAble' : ''}`} onClick={() => !isAdmin && index !== -1 && openOrCloseMeetingInfo(value)}>
+        return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={isAdmin ? undefined : () => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 {index !== CONST_MEETING ? <div className="meeting-in-route-img">
                     {index === -1 ?
@@ -118,7 +118,7 @@ const SBRouteList = (props) => {
             </div>
             <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">
-                    <div className="meeting-in-route-title" >{index === -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : value.name)}</div>
+                    <div className="meeting-in-route-title" >{index === -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : (isAdmin ? value.isolatedName: value.name))}</div>
                     <div className="meeting-in-route-location" >{typeof value.address === "string" ? splitJoinAddressOnIsrael(value.address) : ""}</div>
                     <div className="meeting-in-route-comments" >{value.comments || ""}</div>
                 </div>
@@ -131,13 +131,17 @@ const SBRouteList = (props) => {
     }
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        if (oldIndex == newIndex || disableEdit || isAdmin || typeof setMyMeetings !== "function") return //no change, dragged and put back in original place, OR is admin
+        if (oldIndex == newIndex || disableEdit || (!isAdmin && typeof setMyMeetings !== "function") || (isAdmin && typeof props.setMeetingsOfSelectedSB !== "function")) return //no change, dragged and put back in original place, OR is admin
         let newRoute = changePosition(myRoute, oldIndex, newIndex);
-        //update myRoute and myMeetings according to the reordering
+        if (isAdmin) {
+            props.setMeetingsOfSelectedSB([...constB4, ...newRoute, ...constAfter])
+        }
+        else {
+            //update myRoute and myMeetings according to the reordering
+            setMyMeetings([...constB4, ...newRoute, ...constAfter]);
+        }
         setMyRoute(newRoute,);
-        setMyMeetings([...constB4, ...newRoute, ...constAfter]);
     };
-
     return (
         <div className="sb-route-list" >
             {isAdmin ? null :
@@ -156,7 +160,7 @@ const SBRouteList = (props) => {
                     (userData ? createItemContent(userData, -1, -1) : null)}
                 {disableEdit ? (myRoute && Array.isArray(myRoute) && myRoute.map((item, index) => createItemContent(item, index, `${item.meetingId}${item.isPublicMeeting}`)))
                     : <SortableList
-                        disabled={isAdmin || disableEdit}
+                        // disabled={isAdmin || disableEdit}
                         helperClass="sort-item-container"
                         distance={1}
                         lockToContainerEdges={true}

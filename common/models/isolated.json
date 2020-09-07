@@ -167,7 +167,8 @@
                 "getParticipantsMeeting",
                 "deleteConectionToMeeting",
                 "getPrivateMeetings",
-                "getIsolatedsWithoutMeetingForMap"
+                "getIsolatedsWithoutMeetingForMap",
+                "adminUpdateMyStartTime"
             ]
         }
     ]

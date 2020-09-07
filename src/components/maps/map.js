@@ -180,7 +180,7 @@ const MapComp = (props) => {
                             </div>
                             <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{date}</div></div>
                             {!props.blower && <>
-                                <div className="notes">ייתכנו שינויי בזמני התקיעות</div>
+                                <div className="notes">ייתכנו שינויים בזמני התקיעות</div>
                                 <div className="notes">יש להצטרף לתקיעה על מנת להתעדכן</div>
                                 <div className="join-button clickAble" onClick={() => joinPublicMeeting(pub)}>הצטרף לתקיעה</div>
                             </>}
