@@ -453,18 +453,7 @@ module.exports = function (Isolated) {
                 LIMIT ${startRow}, 7;
             `
             );
-
-            console.log(`SELECT
-            isolatedUser.name AS "name",
-            isolatedUser.username AS "phone",
-            isolatedUser.id AS "id",
-            isolated.id AS "idIsolated",
-            RoleMapping.roleId AS "role" 
-        FROM isolated
-            LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
-            LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
-        ${where}
-        LIMIT ${startRow}, 7`)
+            
             if (err) cb(err);
             if (res) {
                 return cb(null, res);

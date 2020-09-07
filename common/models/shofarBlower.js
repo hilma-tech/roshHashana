@@ -178,7 +178,8 @@ module.exports = function (ShofarBlower) {
 
                 const shofarBlowerQ = `
                 SELECT 
-                    cu.id, 
+                    cu.id AS userId, 
+                    sb.id,
                     sb.volunteering_max_time,
                     sb.volunteering_start_time AS "startTime", 
                     sb.can_blow_x_times,
