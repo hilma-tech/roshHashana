@@ -178,7 +178,7 @@ module.exports = function (ShofarBlower) {
 
                 const shofarBlowerQ = `
                 SELECT 
-                    sb.id, 
+                    cu.id, 
                     sb.volunteering_max_time,
                     sb.volunteering_start_time AS "startTime", 
                     sb.can_blow_x_times,
@@ -366,7 +366,7 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.getShofarBlowersForMap = function (cb) {
         (async () => {
             try {
-                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, sb.id AS "sbId" 
+                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, cu.id AS "sbId" 
                 FROM shofar_blower AS sb 
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
                 WHERE sb.confirm = 1`
@@ -425,32 +425,38 @@ module.exports = function (ShofarBlower) {
             SELECT 
                 FALSE AS isPublicMeeting, 
                 isolated.id AS "meetingId",
-                CustomUser.address, 
-                CustomUser.lng, CustomUser.lat, 
+                isolatedCU.name AS isolatedName, 
+                isolatedCU.address, 
+                isolatedCU.lng, isolatedCU.lat, 
+                isolatedCU.comments,
                 false AS constMeeting,
-                IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, 
-                meeting_time AS "startTime"
+                IF(isolated.public_phone = 1, isolatedCU.username, NULL) isolatedPhone, 
+                meeting_time AS "startTime",
+                NULL AS "signedCnt"
             FROM isolated 
-                JOIN CustomUser ON userIsolatedId = CustomUser.id 
-                JOIN shofar_blower ON isolated.blowerMeetingId = shofar_blower.id
-            WHERE public_meeting = 0 
-                AND blowerMeetingId = ${sbId}
+                JOIN CustomUser isolatedCU ON userIsolatedId = isolatedCU.id 
+                JOIN CustomUser sbCU ON isolated.blowerMeetingId = sbCU.id
+            WHERE isolated.public_meeting = 0 
+                AND sbCU.id = ${sbId}
                 
             UNION
                 
             SELECT 
                 TRUE AS isPublicMeeting, 
                 shofar_blower_pub.id AS "meetingId", 
+                NULL AS isolatedName, 
                 shofar_blower_pub.address, 
                 shofar_blower_pub.lng, shofar_blower_pub.lat, 
+                shofar_blower_pub.comments,
                 shofar_blower_pub.constMeeting AS constMeeting, 
                 NULL AS isolatedPhone, 
-                start_time AS "startTime" 
+                start_time AS "startTime",
+                (SELECT COUNT(*) FROM isolated WHERE isolated.public_meeting=1 AND blowerMeetingId=shofar_blower_pub.id) AS "signedCnt"
             FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerCU ON blowerCU.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerCU.id = shofar_blower.userBlowerId 
             WHERE shofar_blower.confirm = 1
-                AND shofar_blower.id = ${sbId}
+                AND blowerCU.id = ${sbId}
         ) a
         ORDER BY startTime
         `
@@ -460,17 +466,17 @@ module.exports = function (ShofarBlower) {
             // console.log('resRoute: ', resRoute);
             if (withSBInfo) {
                 const sbDataQ = `SELECT
-                    cu.name, cu.username AS "phone", cu.address, cu.lng, cu.lat, 
+                    cu.id, cu.name, cu.username AS "phone", cu.address, cu.lng, cu.lat, 
                     shofar_blower.can_blow_x_times, shofar_blower.volunteering_start_time, shofar_blower.volunteering_max_time
                 FROM shofar_blower
                     LEFT JOIN CustomUser cu ON cu.id = shofar_blower.userBlowerId
-                WHERE shofar_blower.id = ${sbId}
+                WHERE cu.id = ${sbId}
                 `
                 let [sbDataErr, sbData] = await executeMySqlQuery(ShofarBlower, sbDataQ)
                 if (sbDataErr || !Array.isArray(sbData) || sbData.length != 1) {
                     console.log("sbDataErr: error getting user info about sb (admin): ", sbDataErr || sbData)
                 }
-                return cb(null, { meetings: resRoute, sbData })
+                return cb(null, { meetings: resRoute, sbData: sbData[0] })
             } else {
                 return cb(null, resRoute)
             }

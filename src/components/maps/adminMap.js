@@ -100,6 +100,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     const onInfoWindowSBClick = async (sbId) => {
         setSelectedSB({ sbId })
+        // setIsFromIsolator(true)
         props.history.push('/shofar-blower')
     }
 
@@ -246,7 +247,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 {selectedMarkerId.split('-')[0] === 'isolated' && isolated.id === Number(selectedMarkerId.split('-')[1]) &&
                     <InfoWindow onCloseClick={() => { }}>
                         <div className="infoWindowContainer">
-                            <div className="infoWindowTitle bold blueText">מחפש</div>
+                            <div className="infoWindowTitle bold blueText">מחפש/ת</div>
                             <div className="pubShofarBlowerNameContainer">
                                 <img alt="" src='/icons/shofar.svg' />
                                 <div>{isolated.name}</div>
@@ -277,7 +278,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             >
                 <InfoWindow onCloseClick={() => { }}>
                     <div className="infoWindowContainer">
-                        <div className="infoWindowTitle bold blueText">מחפש</div>
+                        <div className="infoWindowTitle bold blueText">מחפש/ת</div>
                         <div className="pubShofarBlowerNameContainer">
                             <img alt="" src='/icons/shofar.svg' />
                             <div>{selectedIsolator.name}</div>

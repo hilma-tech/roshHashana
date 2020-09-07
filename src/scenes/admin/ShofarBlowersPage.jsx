@@ -7,7 +7,7 @@ import TopNavBar from './TopNavBar';
 import Search from './Search';
 import './styles/shofarBlowerPage.scss'
 
-let status = 1
+let status = 0 // 0 is not confirmed, 1 is confirmed shofar blowers
 
 const ShofarBlowerPage = function (props) {
     const { selectedSB, setSelectedSB, setLoading, setShofarBlowers } = useContext(AdminMainContext)
