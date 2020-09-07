@@ -20,14 +20,13 @@ const MarkerGenerator = (props) => {
     }
 
     let url = (type === PRIVATE_MEETING) ? (props.isolated || props.blower) ? '/icons/single.svg' : '/icons/single-blue.svg' : (props.isolated || props.blower) ? '/icons/group.svg' : '/icons/group-orange.svg';
-
+    console.log(isInfoWindowOpen, 'isInfoWindowOpen', info, 'info')
     const icon = props.icon ? props.icon : {
         url: url,
         scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(30, 30)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
-        anchor: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(25, 25) : new window.google.maps.Size(15, 15)) : new window.google.maps.Size(25, 25), // changes position of icon
+        anchor: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(15, 15)) : new window.google.maps.Point(25, 25), // changes position of icon
     }
-
     return (
         <Marker
             icon={icon}
@@ -43,7 +42,7 @@ export default MarkerGenerator;
 
 
 
-export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType, defaultInfoState = false, onClick }) => {
+export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType, defaultInfoState = false }) => {
     /**
      * icon: overrides props.type
      * location
@@ -68,13 +67,13 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(15, 15), // changes position of icon
     }
+    console.log(isInfoWindowOpen, 'isInfoWindowOpen', info, 'info')
 
     return (
         <Marker
             icon={icon}
             onClick={closeOrOpenInfoWindow}
             position={new window.google.maps.LatLng(latNum, lngNum)}
-            onClick={onClick || undefined}
         >
             {info && isInfoWindowOpen ? <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow> : null}
         </Marker>

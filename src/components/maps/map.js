@@ -258,7 +258,6 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
         anchor: new window.google.maps.Point(45, 45),
     }
 
-
     return <GoogleMap
         defaultZoom={20}
         defaultOptions={options}
