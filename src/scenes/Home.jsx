@@ -19,19 +19,17 @@ const Home = (props) => {
         num++;
         setImgLoadedNum(num);
     }
-    // credits:
-    //<div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
     return (
         <>
             <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: '5%' }} >
                 <div className="coap-imgs-container" style={{ padding: isBrowser ? '2.5%' : '0', justifyContent: isBrowser ? 'center' : 'space-evenly' }}  >
-                    <a href="https://www.hilma.tech/"> <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" /></a>
+                    <a href="https://www.hilma.tech/"> <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.png" /></a>
                     <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/unisyn.svg" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
                 </div>
-                <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '15%' }} >
+                <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '15%', height: isBrowser ? '80vh' : 'unset' }} >
 
                     <img alt="" style={{ width: isBrowser ? '21vw' : '55vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
                     <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
@@ -46,22 +44,24 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '4vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
-                        <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
+                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>{allMeeting}</div>
                     </>
                         : <>
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "5%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
-                    <div className="bottomLine" style={{ fontSize: isBrowser ? "2.5vh" : "1.5vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>
-                        <div className="contactUs"
-                            style={{ textAlign: isBrowser ? "right" : "center", width: isIOS ? "30%" : "26%" }} >
-                            <img style={{ width: isBrowser ? "6%" : "10%", marginLeft: "3%" }} src="/icons/envelope.svg" />
-                            <a className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות נוספות</a>
-                        </div>
+                    <div className="contactUs" style={{ whiteSpace: "nowrap" , marginTop: isBrowser? "0":"2vh"}} >
+                        <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />
+                        <a style={{ fontSize: "2.5vh"}}className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
+                    </div>
+                    <div className="bottomLine" style={{ fontSize: isBrowser ? "2.3vh" : "1.3vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>
+
                         <div style={{ width: "fit-content" }}>
                             האתר פותח כתרומה לחברה ע"י  <a className="underlineLink" href="https://www.hilma.tech/" target="_blank"> הילמה</a> |
-                         תוכן שיווקי:  <a className="underlineLink" href="http://www.my-idea.co.il/" target="_blank"> אפרת שפירא</a> </div>
+                       התמונה באדיבות: <a className="underlineLink" href="https://www.thekotel.org//" target="_blank" >הקרן למורשת הכותל המערבי </a> |
+                         תוכן שיווקי:  <a className="underlineLink" href="http://www.my-idea.co.il/" target="_blank"> אפרת שפירא</a>
+                        </div>
                     </div>
                 </div>
             </div>
