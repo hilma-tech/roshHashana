@@ -50,8 +50,8 @@ const ShofarBlowerMap = (props) => {
         isPrint = sbctx.isPrint;
     }
     if (isAdmin && adminctx) {
+        startTimes = adminctx.startTimes;
         meetingsOfSelectedSB = adminctx.meetingsOfSelectedSB;
-        setMeetingsOfSelectedSB = adminctx.setMeetingsOfSelectedSB
     }
 
 
@@ -73,10 +73,10 @@ const ShofarBlowerMap = (props) => {
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}</div>)
 
     const publicLocInfo = (meetingData, assign = false) => (<div id="info-window-container">
-        <div className="info-window-header">{isAdmin ? (assign ? "מחפש תקיעה ציבורית" : "תקיעה ציבורית") : (assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי")}</div>
+        <div className="info-window-header">{isAdmin ? (assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית") : (assign ? "מחפש/ת תקיעה ציבורית" : "תקיעה ציבורית שלי")}</div>
         {meetingData && meetingData.address ? <div className="pub-address-container"><img alt="" src={'/icons/address.svg'} /><div>{splitJoinAddressOnIsrael(meetingData.address) + `${meetingData.comments ? ", " + meetingData.comments : ""}`}</div></div> : null}
         <div className="pub-start-time-container"><img alt="" src={'/icons/clock.svg'} /><div>{meetingData && meetingData.startTime ? `${new Date(meetingData.startTime).toLocaleDateString("en-US")} ${new Date(meetingData.startTime).getHours().toString().padStart(2, 0)}:${new Date(meetingData.startTime).getMinutes().toString().padStart(2, 0)}` : "---"}</div></div>
-        {assign || isAdmin ? null : <div className="notes">ייתכנו שינויי בזמני התקיעות</div>}
+        {assign || isAdmin ? null : <div className="notes">ייתכנו שינויים בזמני התקיעות</div>}
         {assign && !disableEdit ? <div className="join-button" onClick={() => { handleAssign(meetingData) }} >שיבוץ</div> : null}
     </div>)
 
@@ -84,7 +84,7 @@ const ShofarBlowerMap = (props) => {
     useEffect(() => {
         (async () => {
             if (isAdmin) {
-                adminUseEffect()
+                // adminUseEffect()
                 return;
             }
             if (userData && typeof userData === "object" && !Array.isArray(userData)) {
@@ -107,11 +107,14 @@ const ShofarBlowerMap = (props) => {
             }
         })();
     }, [userData])
+    useEffect(() => {
+        adminUseEffect()
+    }, [props.selectedSB, props.meetingsOfSelectedSB])
 
     const adminUseEffect = async () => {
-        if (props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id) {
+        if (props.selectedSB && typeof props.selectedSB === "object" && props.selectedSB.id && props.meetingsOfSelectedSB) {
             let myRouteCnt = 0;
-            const userStartTime = new Date(props.selectedSB.startTime).getTime()
+            const userStartTime = new Date(props.selectedSB.volunteering_start_time).getTime()
             const userEndTime = userStartTime + props.selectedSB.volunteering_max_time;
             let myStartT
             let meetingStartTime
@@ -132,8 +135,8 @@ const ShofarBlowerMap = (props) => {
                         info: myMeeting.isPublicMeeting ? publicLocInfo(myMeeting, false) : privateLocInfo(myMeeting, false)
                     }
                     isConstMeeting ?
-                        locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
-                        locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
+                        locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING
+                        : locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
                     return locObj;
                 })
 
@@ -152,9 +155,11 @@ const ShofarBlowerMap = (props) => {
             if (newCenter !== center) setCenter(newCenter)
             //set selected isolator location
 
-            let selectedIsolatorLoc = !props.selectedIsolator || typeof props.selectedIsolator !== "object" ? null : { location: { lat: props.selectedIsolator.lat, lng: props.selectedIsolator.lng }, meetingId: props.selectedIsolator.meetingId, }
+            let selectedIsolatorLoc = !props.selectedIsolator || typeof props.selectedIsolator !== "object" ? null :
+                { ...props.selectedIsolator, location: { lat: props.selectedIsolator.lat, lng: props.selectedIsolator.lng }, meetingId: props.selectedIsolator.id, }
 
-            setAllMapData({ myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } })
+            // console.log('setAllMapData: ', { selectedIsolatorLoc, myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } });
+            setAllMapData({ selectedIsolatorLoc, myMLocs: myMeetingsLocs, userOriginLoc: { lat: props.selectedSB.lat, lng: props.selectedSB.lng } })
         }
     }
 
@@ -311,11 +316,14 @@ const ShofarBlowerMap = (props) => {
 
                 err={err}
                 isAdmin={isAdmin}
+                handleForceAssign={isAdmin ? props.handleForceAssign : undefined}
+                assigned={props.assigned}
                 selectedSB={props.selectedSB}
                 data={allMapData}
                 history={props.history}
                 allGenLocations={allGenLocations}
                 handleMapChanged={handleMapChanged}
+                setMeetingsOfSelectedSB={props.setMeetingsOfSelectedSB}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}

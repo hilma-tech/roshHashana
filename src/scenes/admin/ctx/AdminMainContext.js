@@ -22,7 +22,6 @@ export const AdminMainProvider = ({ children }) => {
     const [showConfirmPopup, setShowConfirmPopup] = useState(null)
     //single shofar blower page:(3)
     const [selectedSB, setSelectedSB] = useState(null)
-    const [isFromIsolator, setIsFromIsolator] = useState(null)
     const [selectedIsolator, setSelectedIsolator] = useState(null)
     const [startTimes, setStartTimes] = useState(null)
     const [totalLength, setTotalLength] = useState(null)
@@ -59,7 +58,6 @@ export const AdminMainProvider = ({ children }) => {
         selectedSB, setSelectedSB,
         startTimes, setStartTimes, totalLength,
         selectedIsolator, setSelectedIsolator,
-        isFromSearcher: isFromIsolator, setIsFromSearcher: setIsFromIsolator
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>

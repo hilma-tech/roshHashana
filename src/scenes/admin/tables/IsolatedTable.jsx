@@ -68,7 +68,7 @@ const IsolatedTable = (props) => {
 
             {showDeletePopup &&
                 <DeletePopup
-                    name='מחפש'
+                    name='מחפש/ת'
                     handleDismiss={() => setShowDeletePopup(false)}
                     handleDelete={() => handleDelete()}
                 />

@@ -46,8 +46,8 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     }, []);
 
     const zoomPlace = (place, id = -1) => {
-        console.log(id)
-        setZoom(18)
+        // console.log(id)
+        setZoom(16)
         setCenter(place);
         if (id !== -1) setSelectedMarkerId(id)
     }
@@ -101,6 +101,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     const onInfoWindowSBClick = async (sbId) => {
         setSelectedSB({ sbId })
+        // setIsFromIsolator(true)
         props.history.push('/shofar-blower')
     }
 
@@ -175,7 +176,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, shofarBlower.sbId) }}
             >
                 {shofarBlower.sbId === selectedMarkerId &&
-                    <InfoWindow onCloseClick={() => { }}>
+                    <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">בעל תוקע</div>
                             <div className="pubShofarBlowerNameContainer">
@@ -226,7 +227,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 {isolated.id === selectedMarkerId &&
                     <InfoWindow onCloseClick={() => { }}>
                         <div className="infoWindowContainer">
-                            <div className="infoWindowTitle bold blueText">מחפש</div>
+                            <div className="infoWindowTitle bold blueText">מחפש/ת</div>
                             <div className="pubShofarBlowerNameContainer">
                                 <img alt="" src='/icons/shofar.svg' />
                                 <div>{isolated.name}</div>
@@ -257,7 +258,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             >
                 <InfoWindow onCloseClick={() => { }}>
                     <div className="infoWindowContainer">
-                        <div className="infoWindowTitle bold blueText">מחפש</div>
+                        <div className="infoWindowTitle bold blueText">מחפש/ת</div>
                         <div className="pubShofarBlowerNameContainer">
                             <img alt="" src='/icons/shofar.svg' />
                             <div>{selectedIsolator.name}</div>

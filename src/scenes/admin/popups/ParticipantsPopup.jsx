@@ -50,7 +50,7 @@ const ParticipantsPopup = (props) => {
                             <div className="mb-3">
                                 <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                             </div>
-                            {participantsPublicMeeting && <div className="results">סכ"ה {participantsPublicMeeting.length} משתתפים</div>}
+                            {participantsPublicMeeting && <div className="results">סה"כ {participantsPublicMeeting.length} משתתפים</div>}
                             <ParticipantsTable getParticipants={getParticipants} filters={filters}/>
                         </div>
                     </DialogContent>

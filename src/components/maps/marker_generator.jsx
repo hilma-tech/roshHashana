@@ -43,7 +43,7 @@ export default MarkerGenerator;
 
 
 
-export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType, defaultInfoState = false }) => {
+export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, markerIcon, iconType, defaultInfoState = false, onClick }) => {
     /**
      * icon: overrides props.type
      * location
@@ -73,7 +73,9 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
         <Marker
             icon={icon}
             onClick={closeOrOpenInfoWindow}
-            position={new window.google.maps.LatLng(latNum, lngNum)}>
+            position={new window.google.maps.LatLng(latNum, lngNum)}
+            onClick={onClick || undefined}
+        >
             {info && isInfoWindowOpen ? <InfoWindow onCloseClick={closeOrOpenInfoWindow}>{info}</InfoWindow> : null}
         </Marker>
     );
