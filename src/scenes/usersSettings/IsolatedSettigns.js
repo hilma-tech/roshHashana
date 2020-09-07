@@ -49,7 +49,7 @@ const IsolatedSettings = (props) => {
 
 
     const handlePhoneChange = (e) => {
-        if (!isNaN(e.target.value) && e.target.value !== "." && e.target.value !== "-" && e.target.value !== "+" && e.target.value !== "e") {
+        if (!isNaN(e.target.value) && e.target.value != "." && e.target.value != "-" && e.target.value != "+" && e.target.value !== "e") {
             setValues(e.target.value, "username");
         }
     }
@@ -66,7 +66,17 @@ const IsolatedSettings = (props) => {
 
         const updateData = {};
 
+        let originalIsPM;
+        let updatedIsPM;
         for (let field in { ...vals }) { // remove values that are as origin
+            if (field === "isPublicMeeting") {
+                originalIsPM = originalVals[field] ? 1 : 0
+                updatedIsPM = vals[field] ? 1 : 0
+                if (originalIsPM !== updatedIsPM) {
+                    updateData[field] = vals[field];
+                    continue
+                }
+            }
             if (vals[field] !== originalVals[field]) {
                 updateData[field] = typeof vals[field] === "string" ? vals[field].trim() : vals[field]
             }
@@ -117,7 +127,7 @@ const IsolatedSettings = (props) => {
             return;
         }
 
-        if (username && (username[0] !== 0 || username.length !== 10)) {
+        if (username && (username[0] != 0 || username.length != 10)) {
             openGenAlert({ text: 'מספר הפלאפון שהזנת אינו תקין' });
             setAnErr('מספר הפלאפון שהזנת אינו תקין', 'username');
             return;

@@ -59,10 +59,10 @@ module.exports = function (shofarBlowerPub) {
         let numOfRegistered = await shofarBlowerPub.app.models.Isolated.find({ where: { and: [{ public_meeting: 1 }, { blowerMeetingId: meetingId }] } });
 
         if (numOfRegistered.length <= 1) {
-            let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: null }] } });
-            //if the meeting has no shofar blower assigned already
-            if (pubMeet) return true;
-            else return false;
+            let pubMeet = await shofarBlowerPub.findOne({ where: { and: [{ id: meetingId }, { blowerId: { "neq": null } }, { constMeeting: 1 }] } });
+            //this is the shofar blower's meeting
+            if (pubMeet) return false;
+            else return true;
         }
         else return false;
     }
