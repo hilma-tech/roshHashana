@@ -175,7 +175,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, 'shofarBlower-' + shofarBlower.sbId) }}
             >
                 {selectedMarkerId.split('-')[0] === 'shofarBlower' && shofarBlower.sbId === Number(selectedMarkerId.split('-')[1]) &&
-                    <InfoWindow onCloseClick={() => { }}>
+                    <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">בעל תוקע</div>
                             <div className="pubShofarBlowerNameContainer">
@@ -208,7 +208,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(blast.lat), lng: Number(blast.lng) }, 'blast-' + blast.id) }}
             >
                 {selectedMarkerId.split('-')[0] === 'blast' && blast.id === Number(selectedMarkerId.split('-')[1]) &&
-                    <InfoWindow onCloseClick={() => { }}>
+                    <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">{blast.isPublicMeeting ? 'תקיעה ציבורית' : 'תקיעה פרטית'}</div>
                             <div className="pubShofarBlowerNameContainer">
@@ -245,7 +245,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, 'isolated-' + isolated.id) }}
             >
                 {selectedMarkerId.split('-')[0] === 'isolated' && isolated.id === Number(selectedMarkerId.split('-')[1]) &&
-                    <InfoWindow onCloseClick={() => { }}>
+                    <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">מחפש/ת</div>
                             <div className="pubShofarBlowerNameContainer">
