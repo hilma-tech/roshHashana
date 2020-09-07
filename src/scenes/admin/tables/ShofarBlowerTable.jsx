@@ -9,7 +9,7 @@ import DeletePopup from '../popups/DeletePopup';
 const whereToDelete = { id: -1, index: -1 }
 
 const ShofarBlowerTable = (props) => {
-    const { loading, shofarBlowers, setShofarBlowers, setBlowerNum, setBlastsNum } = useContext(AdminMainContext)
+    const { loading, shofarBlowers, setShofarBlowers, setBlowerNum, setBlastsNum, setShofarBlowerIdToEdit } = useContext(AdminMainContext)
     const { openGenAlert } = useContext(MainContext)
     const [tr, setTr] = useState(null)
     const [confirmArr, setConfirmArr] = useState([])
@@ -35,7 +35,7 @@ const ShofarBlowerTable = (props) => {
                 shofarBlower.blastsNum,
                 shofarBlower.volunteering_max_time + " דק'",
                 props.status === 0 ? null : <img src='/icons/way.svg' alt='way' className='pointer' onClick={() => { handleRouteClick(shofarBlower) }} style={{ height: '2.5vh' }} />,
-                <FontAwesomeIcon className='pointer' icon={['fas', 'pen']} color='#A5A4BF' onClick={handleEditClick} />,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'pen']} color='#A5A4BF' onClick={() => handleEditClick(shofarBlower.id)} />,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(shofarBlower.id, index)} />
             ]
         }))
@@ -71,8 +71,9 @@ const ShofarBlowerTable = (props) => {
         setSelectedSB(sb)
     }
 
-    const handleEditClick = (e) => {
-
+    const handleEditClick = (id) => {
+        setShofarBlowerIdToEdit(id)
+        props.history.push('/edit-shofar-blower')
     }
 
     const handleTrashClick = (id, index) => {
