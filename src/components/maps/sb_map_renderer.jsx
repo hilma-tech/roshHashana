@@ -48,8 +48,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
-        ? <div id="info-window-container" className="limit-map-info-window-size">
-            <div className="info-window-title bold turquoiseText">בעל תוקע</div>
+        ? <div id="info-window-container">
+            <div className="info-window-title bold blueText">בעל תוקע</div>
             <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
             <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
             <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.phone || selectedSB.username}</div></div>
@@ -58,7 +58,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         : null
     const isolatorLocationInfo = isAdmin && props.data.selectedIsolatorLoc && typeof props.data.selectedIsolatorLoc === "object"
         ? <div id="info-window-container" className="limit-map-info-window-size">
-            <div className="info-window-title bold turquoiseText">מחפש/ת</div>
+            <div className="info-window-title bold blueText">מחפש/ת</div>
             <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{props.data.selectedIsolatorLoc.name}</div></div>
             <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{props.data.selectedIsolatorLoc.address}</div></div>
         </div>
@@ -66,9 +66,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     const userLocationIcon = {
         url: isAdmin ? "/icons/single-blue.svg" : '/icons/sb_origin.svg',
-        scaledSize: isAdmin ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(80, 80),
+        scaledSize: isAdmin ? new window.google.maps.Size(30, 30) : new window.google.maps.Size(80, 80),
         // origin: new window.google.maps.Point(0, 0),
-        anchor: isAdmin ? new window.google.maps.Point(25, 25) : new window.google.maps.Point(50, 50),
+        anchor: isAdmin ? new window.google.maps.Point(15, 15) : new window.google.maps.Point(50, 50),
         // labelOrigin: new window.google.maps.Point(0, 60),
     }
     const isolatorLocationIcon = isAdmin ? {

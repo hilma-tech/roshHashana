@@ -67,6 +67,7 @@ const ShofarBlowerTable = (props) => {
 
     const handleRouteClick = (sb) => {
         props.history && props.history.push && props.history.push("/shofar-blower")
+        // console.log('setSelectedSB sb: ', sb);
         setSelectedSB(sb)
     }
 

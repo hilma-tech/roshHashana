@@ -98,8 +98,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         } catch (e) { console.log(`ERROR getting ירושלים geoCode, res.results[0].geometry.location `, e); }
     }
 
-    const onInfoWindowSBClick = async (sbId) => {
-        setSelectedSB({ sbId })
+    const onInfoWindowSBClick = async (userId) => {
+        // console.log('setSelectedSB: userId ', userId);
+        setSelectedSB({ userId })
         // setIsFromIsolator(true)
         props.history.push('/shofar-blower')
     }
@@ -172,9 +173,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, 'shofarBlower-' + shofarBlower.sbId) }}
+                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, 'shofarBlower-' + shofarBlower.userId) }}
             >
-                {selectedMarkerId.split('-')[0] === 'shofarBlower' && shofarBlower.sbId === Number(selectedMarkerId.split('-')[1]) &&
+                {selectedMarkerId.split('-')[0] === 'shofarBlower' && shofarBlower.userId === Number(selectedMarkerId.split('-')[1]) &&
                     <InfoWindow onCloseClick={() => { }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">בעל תוקע</div>
@@ -187,7 +188,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                                 <div>{shofarBlower.address}</div>
                             </div>
                             {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
-                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowSBClick(shofarBlower.sbId)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowSBClick(shofarBlower.userId)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
                         </div>
                     </InfoWindow>
                 }

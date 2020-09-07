@@ -27,7 +27,7 @@ const SingleShofarBlowerPage = (props) => {
 
         // console.log('selectedSB: ', selectedSB);
         if (selectedIsolator || (!selectedIsolator && selectedSB))
-            fetchAdminSBRoute(selectedSB.sbId || selectedSB.id, selectedIsolator || (!selectedSB.phone && !selectedSB.username) || !selectedSB.can_blow_x_times || !selectedSB.volunteering_start_time || !selectedSB.volunteering_max_time)
+            fetchAdminSBRoute(selectedSB.userId, selectedIsolator || (!selectedSB.phone && !selectedSB.username) || !selectedSB.can_blow_x_times || !selectedSB.volunteering_start_time || !selectedSB.volunteering_max_time)
         //if selectedSB(:obj) has .id --> came from shofar-blowers-table
         //else, if has .sbId --> came from home-page-map
         //else, if isFromIsolator --> came from searchera and selectedSB is a num (an id)
@@ -37,11 +37,8 @@ const SingleShofarBlowerPage = (props) => {
         }
     }, [])
 
-    if (!selectedIsolator && (!selectedSB || selectedSB === null)) { //if came from shofar blower page-table but we don't have a selected sb -- redirect to shofar blowers page-table
-        if (props.history && props.history.push) { props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
-    }
-    if (selectedIsolator && !selectedSB) { //if came from single isolater but has no selectedSB (=sbId) -- redirect to searcher (which might redirect to searchers)
-        if (props.history && props.history.push) { props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
+    if ((selectedIsolator && !selectedSB) || (!selectedIsolator && (!selectedSB || selectedSB === null))) { //if came from shofar blower page-table but we don't have a selected sb -- redirect to shofar blowers page-table
+        if (props.history && props.history.goBack) { props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
     }
 
     const cleanUp = () => {
@@ -64,12 +61,7 @@ const SingleShofarBlowerPage = (props) => {
 
 
     const handleXClick = () => {
-        props.history.goBack()
-        // if (isFromIsolator) { props.history && props.history.push && props.history.push("/searcher") }
-        // else {
         cleanUp()
-        // props.history && props.history.push && props.history.push("/shofar-blowers")
-        // }
     }
     const handleForceAssign = () => { //lol
         if (!selectedSB || !selectedIsolator || typeof selectedSB !== "object" || typeof selectedIsolator !== "object") {

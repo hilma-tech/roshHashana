@@ -367,7 +367,7 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.getShofarBlowersForMap = function (cb) {
         (async () => {
             try {
-                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, cu.id AS "sbId" 
+                const shofarBlowersQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, cu.id AS "userId" 
                 FROM shofar_blower AS sb 
                 LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id 
                 WHERE sb.confirm = 1`

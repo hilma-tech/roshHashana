@@ -23,9 +23,9 @@ const MarkerGenerator = (props) => {
 
     const icon = props.icon ? props.icon : {
         url: url,
-        scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
+        scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(30, 30)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(25, 25), // changes position of icon
+        anchor: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(25, 25) : new window.google.maps.Size(15, 15)) : new window.google.maps.Size(25, 25), // changes position of icon
     }
 
     return (
@@ -64,9 +64,9 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
 
     const icon = markerIcon || {
         url: iconUrl,
-        scaledSize: (iconType === PRIVATE_MEETING) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
+        scaledSize: (iconType === PRIVATE_MEETING) ? new window.google.maps.Size(30, 30) : new window.google.maps.Size(30, 30), // the svg borders and margins משפיעים here
         origin: new window.google.maps.Point(0, 0),
-        anchor: new window.google.maps.Point(25, 25), // changes position of icon
+        anchor: new window.google.maps.Point(15, 15), // changes position of icon
     }
 
     return (
