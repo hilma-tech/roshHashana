@@ -490,5 +490,51 @@ module.exports = function (ShofarBlower) {
         returns: { arg: 'res', type: 'boolean', root: true }
     })
 
+    ShofarBlower.getShofarBlowerByIdAdmin = function (id, cb) {
+        (async () => {
+            try {
+                const shofarBlowerQ = `
+                SELECT 
+                    sb.id, 
+                    cu.id AS userId, 
+                    cu.name, 
+                    cu.username AS phone, 
+                    sb.can_blow_x_times AS blastsNum, 
+                    sb.volunteering_start_time AS chosenTime, 
+                    cu.address, 
+                    sb.volunteering_max_time 
+                FROM shofar_blower AS sb 
+                    LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
+                WHERE sb.id = ${id}
+                `
+                let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerQ);
+                if (shofarBlowerErr || !shofarBlowerRes) {
+                    console.log('shofarBlowerAllVolunteers get shofarBlower admin request error : ', shofarBlowerErr);
+                    throw shofarBlowerErr
+                }
+                if (!shofarBlowerRes[0]) throw 'shofar blower not exist'
+                const shofarBlowerPubQ = `
+                SELECT id, address, comments, start_time
+                FROM shofar_blower_pub 
+                WHERE blowerId = ${shofarBlowerRes[0].userId}
+                `
+                let [shofarBlowerPubErr, shofarBlowerPubRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerPubQ);
+                if (shofarBlowerPubErr || !shofarBlowerPubRes) {
+                    console.log('shofarBlowerPubAllVolunteers get shofarBlowerPub admin request error : ', shofarBlowerPubErr);
+                    throw shofarBlowerPubErr
+                }
+                shofarBlowerRes[0].publicPlaces = shofarBlowerPubRes
+                return cb(null, shofarBlowerRes[0])
 
+            } catch (err) {
+                cb(err);
+            }
+        })()
+    }
+
+    ShofarBlower.remoteMethod('getShofarBlowerByIdAdmin', {
+        http: { verb: 'post' },
+        accepts: [{ arg: 'id', type: 'number' }],
+        returns: { arg: 'res', type: 'number', root: true }
+    });
 }

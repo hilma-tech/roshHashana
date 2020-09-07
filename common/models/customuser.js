@@ -1281,90 +1281,81 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    // CustomUser.updateUserInfoAdmin = async (data, options) => {
-    //     const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
+    CustomUser.updateUserInfoAdmin = async (data, options) => {
+        const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
 
-    //     const userId = data.userId;
+        const userId = data.userId;
 
-    //     let role = await getUserRole(userId);
-    //     if (!role) return;
+        let role = await getUserRole(userId);
+        if (!role) return;
 
-    //     try {
-    //         let userData = {}
-    //         if (data.name) userData.name = data.name
-    //         if (data.username) userData.username = data.username
-    //         if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
-    //         if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-    //         if (data.comments && data.comments.length < 255) userData.comments = data.comments
-    //         else userData.comments = '';
+        try {
+            //create object with blower info and update ShofarBlower table with this info
+            let newBloData = {}
+            if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
+            if (data.can_blow_x_times) newBloData.can_blow_x_times = data.can_blow_x_times
+            if (data.volunteering_start_time) newBloData.volunteering_start_time = data.volunteering_start_time
+            if (Object.values(newBloData).length) {
+                let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
+            }
 
-    //         if (data.address && data.address[0]) {
-    //             userData.address = data.address[0]
-    //             let addressArr = data.address[0]
-    //             if (typeof addressArr === "string" && addressArr.length) {
-    //                 addressArr = addressArr.split(", ")
-    //                 let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
-    //                 userData.city = city || addressArr[addressArr.length - 1];
-    //             }
-    //         }
+            //if the shofar blower added or updated public meetings -> update them
+            if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
 
-    //         let resCustomUser
-    //         if (Object.keys(userData).length) {
-    //             try {
-    //                 resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
-    //             } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
-    //         }
+                //filter the public meetings -> only meetings with address, and start time
+                let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
 
-    //         //shofar blower
+                //update or create meetings
+                let city;
+                publicMeetingsArr.forEach(async (publicMeeting) => {
+                    if (publicMeeting.address && publicMeeting.address[0]) {
+                        let addressArr = publicMeeting.address[0]
+                        if (typeof addressArr === "string" && addressArr.length) {
+                            addressArr = addressArr.split(", ")
+                            city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                        }
+                    }
+                    const obj = {
+                        address: publicMeeting.address && publicMeeting.address[0],
+                        lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
+                        lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
+                        city,
+                        constMeeting: true,
+                        comments: publicMeeting.placeDescription || publicMeeting.comments,
+                        start_time: publicMeeting.time || publicMeeting.start_time,
+                        blowerId: userId
+                    }
+                    //update the public meeting
+                    if (publicMeeting.id) await CustomUser.app.models.shofarBlowerPub.upsertWithWhere({ id: publicMeeting.id }, obj);
+                    else await CustomUser.app.models.shofarBlowerPub.create(obj); //create new pub meeting
+                });
 
-    //         let newBloData = {}
-    //         if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
-    //         if (data.can_blow_x_times) newBloData.can_blow_x_times = data.can_blow_x_times
-    //         if (data.volunteering_start_time) newBloData.volunteering_start_time = data.volunteering_start_time
-    //         if (Object.values(newBloData).length) {
-    //             let resBlower = await ShofarBlower.upsertWithWhere({ userBlowerId: userId }, newBloData);
-    //         }
-    //         if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
-    //             // update also all the public meetings
-    //             const [errDeletePublicMeetings, resDeletePublicMeetings] = await to(shofarBlowerPub.destroyAll({ blowerId: userId }))
-    //             if (errDeletePublicMeetings) {
-    //                 console.log("errDeletePublicMeetings", errDeletePublicMeetings)
-    //             }
-    //             else console.log("successfully deleted all public meetings (in order to create)");
+                //go through all const meetings of the shofar blower and check if there is a meeting that was deleted
+                const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                meetings.forEach(async (meet) => {
+                    const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
+                    if (!isExist) {
+                        await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
+                    }
+                });
+            }
 
-    //             let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
+            if (data.address) {
+                //if the shofar blower changed his address 
+                //-> delete his connection to all his meetings (not constMeeting)
 
-    //             let city;
-    //             publicMeetingsArr = publicMeetingsArr.map(publicMeeting => {
-    //                 if (publicMeeting.address && publicMeeting.address[0]) {
-    //                     let addressArr = publicMeeting.address[0]
-    //                     if (typeof addressArr === "string" && addressArr.length) {
-    //                         addressArr = addressArr.split(", ")
-    //                         city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
-    //                     }
-    //                 }
-    //                 return {
-    //                     address: publicMeeting.address && publicMeeting.address[0],
-    //                     lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
-    //                     lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
-    //                     city,
-    //                     constMeeting: true,
-    //                     comments: publicMeeting.placeDescription || publicMeeting.comments,
-    //                     start_time: publicMeeting.time || publicMeeting.start_time,
-    //                     blowerId: userId
-    //                 }
-    //             })
-    //             console.log("publicMeetingsArr to create", publicMeetingsArr)
-    //             const [errCreatePublicMeetings, resCreatePublicMeetings] = await to(shofarBlowerPub.create(publicMeetingsArr))
-    //             if (errDeletePublicMeetings) {
-    //                 console.log("errCreatePublicMeetings", errCreatePublicMeetings)
-    //             } else console.log("successfully created the publicMeetings");
-    //         }
+                //update private meetings
+                await CustomUser.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { meeting_time: null, blowerMeetingId: null });
 
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+                //update public meetings
+                await CustomUser.app.models.shofarBlowerPub.updateAll({ and: [{ constMeeting: 0 }, { blowerId: userId }] }, { blowerId: null, start_time: null });
+                //TODO: add event and socket to general user-> to delete the user
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
         console.log('adminAssignSBToIsolator: ', sb, isolator);
         (async () => {
@@ -1578,7 +1569,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             console.log('update volunteering_max_time, newMaxTimeMins: ', newMaxTimeMins);
-            
+
             //socket to shofar blower + all shofar blowers (remove from reqs)
 
             // call assignSB
@@ -1626,7 +1617,7 @@ module.exports = function (CustomUser) {
 
         })();
     }
-    
+
     CustomUser.remoteMethod('adminUpdateMaxRouteLengthAndAssign', {
         http: { verb: 'post' },
         accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' },

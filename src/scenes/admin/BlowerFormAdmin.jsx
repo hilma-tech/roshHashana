@@ -16,6 +16,8 @@ import Auth from '../../modules/auth/Auth';
 import MomentUtils from '@date-io/moment';
 import '../detailsForm/detailsForm.scss';
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { getShofarBlowerByIdAdmin } from './fetch_and_utils';
 
 const materialTheme = createMuiTheme({
     overrides: {
@@ -40,7 +42,7 @@ const format = 'HH:mm';
 
 export default function BlowerFormAdmin(props) {
     // const { showAlert } = useContext(MainContext)
-    const { shofarBlowerIdToEdit } = useContext(AdminMainContext)
+    const { shofarBlowerIdToEdit, setShofarBlowerIdToEdit } = useContext(AdminMainContext)
 
     const [errorMsg, setErrorMsg] = useState('')
     const [publicMeetErr, setPublicMeetErr] = useState('')
@@ -57,6 +59,31 @@ export default function BlowerFormAdmin(props) {
     const [publicPlaces, setPublicPlaces] = useState([]) //a list of all the public places that the shofar blower added,
     const [walkTime, setWalkTime] = useState(-15) //the total time the shofar blower wants to walk
 
+    useEffect(() => {
+        (async () => {
+            if (props.location.pathname === '/edit-shofar-blower' && !shofarBlowerIdToEdit) props.history.goBack()
+            else if (shofarBlowerIdToEdit) {
+                await getShofarBlowerByIdAdmin(shofarBlowerIdToEdit, (err, res) => {
+                    if (!err) {
+                        console.log(res)
+                        setName(res.name)
+                        setPhone(res.phone)
+                        setBlastsNum(Number(res.blastsNum))
+                        setAddress(res.address)
+                        setChosenTime(res.chosenTime)
+                        if (res.publicPlaces.length > 0) {
+                            setOpenPublicMeetingOptions(true)
+                            setPublicPlaces(res.publicPlaces)
+                        }
+                    }
+                })
+            }
+        })()
+
+        return () => {
+            setShofarBlowerIdToEdit(null)
+        }
+    }, [])
     //update the start time the shofar blower wants to start his volunteering
     const changeChosenTime = (time) => {
         setChosenTime(time._d)
@@ -254,7 +281,7 @@ export default function BlowerFormAdmin(props) {
 
             <div className="form-container" style={{ width: isBrowser ? '40%' : '100%' }}>
                 <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={props.history.goBack} />
-                <div className="msg-txt header">{shofarBlowerIdToEdit ? 'בעל תוקע חדש' : 'עריכת בעל תוקע'}</div>
+                <div className="msg-txt header">{!shofarBlowerIdToEdit ? 'בעל תוקע חדש' : 'עריכת בעל תוקע'}</div>
 
                 <form onSubmit={saveShofarBlowerDetails} onKeyPress={handleKeyPress}>
 
@@ -293,7 +320,7 @@ export default function BlowerFormAdmin(props) {
                     {/* address inputs */}
                     <div className="title">מה הכתובת ממנה הוא יוצא?</div>
                     <div id="comment">נא לרשום את הכתובת המלאה</div>
-                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' />
+                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={address} />
                     <div className="err-msg ">{addressErr}</div>
 
                     {/* walk time slider */}
@@ -305,7 +332,7 @@ export default function BlowerFormAdmin(props) {
                     <div className="title">האם ישנו מקום ציבורי בו אתה תוקע ואנשים נוספים יכולים להצטרף לתקיעה?</div>
                     <div className="checkbox-container">
                         <div>כן</div>
-                        <input id="yes" className="clickAble" type="radio" name="isPublicMeeting" onChange={changeShowMeetingOptions} />
+                        <input id="yes" className="clickAble" type="radio" name="isPublicMeeting" onChange={changeShowMeetingOptions} checked={openPublicMeetingOptions} />
                     </div>
 
                     {/* Public Meeting Options */}
@@ -318,6 +345,7 @@ export default function BlowerFormAdmin(props) {
                                     index={index}
                                     format={format}
                                     updatePublicPlace={updatePublicPlace}
+                                    info={place}
                                 />
                             })}
                             <div id="add-public-place" className="clickAble" onClick={addPublicPlace}>
@@ -329,7 +357,7 @@ export default function BlowerFormAdmin(props) {
 
                     <div className="checkbox-container">
                         <div>לא</div>
-                        <input id="no" className="clickAble" type="radio" name="isPublicMeeting" defaultChecked onChange={(e) => changeShowMeetingOptions(e)} />
+                        <input id="no" className="clickAble" type="radio" name="isPublicMeeting" onChange={(e) => changeShowMeetingOptions(e)} checked={!openPublicMeetingOptions} />
                     </div>
 
                     <div className="err-msg ">{errorMsg}</div>
