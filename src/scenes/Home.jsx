@@ -60,7 +60,7 @@ const Home = (props) => {
                             <a className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות נוספות</a>
                         </div>
                         <div style={{ width: "fit-content" }}>
-                            האתר פותח כתרומה למען החברה ע"י  <a className="underlineLink" href="https://www.hilma.tech/" target="_blank"> הילמה</a> |
+                            האתר פותח כתרומה לחברה ע"י  <a className="underlineLink" href="https://www.hilma.tech/" target="_blank"> הילמה</a> |
                          תוכן שיווקי:  <a className="underlineLink" href="http://www.my-idea.co.il/" target="_blank"> אפרת שפירא</a> </div>
                     </div>
                 </div>
