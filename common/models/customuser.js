@@ -1668,6 +1668,7 @@ module.exports = function (CustomUser) {
 
         })();
     }
+    
     CustomUser.remoteMethod('adminUpdateMaxRouteLengthAndAssign', {
         http: { verb: 'post' },
         accepts: [{ arg: 'options', type: 'object', http: 'optionsFromRequest' },

@@ -193,7 +193,7 @@ export default class BlowerFormAdmin extends Component {
             this.setState({ phoneErr: 'מספר פלאפון לא תקין' });
             return;
         }
-        if (this.state.blastsNum > 20 || this.state.blastsNum.value.length > 2) { // check can_blow_x_times value
+        if (this.state.blastsNum > 20 || this.state.blastsNum.length > 2) { // check can_blow_x_times value
             this.setState({ numOfBlowErr: 'לא ניתן לבצע תקיעת שופר יותר מ-20 פעמים' });
             return;
         }
