@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { isBrowser } from "react-device-detect";
+import { isBrowser, isIOS } from "react-device-detect";
 import Map from '../components/maps/map';
 import './Home.scss'
 
@@ -23,16 +23,16 @@ const Home = (props) => {
     return (
         <>
             <div className={`HomePage ${openMap ? 'slide-out-top' : 'slide-in-top'}`} style={{ display: imgLoadedNum < 2 ? 'none' : 'flex', paddingBottom: '5%' }} >
-                <div className="coap-imgs-container" style={{ width: isBrowser ? '50%' : '75%' }}>
-                    <a href="https://www.hilma.tech/"><img alt="" style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" /></a>
-                    <img alt="" style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
-                    <img alt="" style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/SynagogueOrg.png" />
-                    <img alt="" style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
+                <div className="coap-imgs-container" style={{ padding: isBrowser ? '2.5%' : '0', justifyContent: isBrowser ? 'center' : 'space-evenly' }}  >
+                    <a href="https://www.hilma.tech/"> <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.png" /></a>
+                    <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
+                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/unisyn.svg" />
+                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
                 </div>
-                <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '5%' }} >
+                <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '15%', height: isBrowser ? '80vh' : 'unset' }} >
 
                     <img alt="" style={{ width: isBrowser ? '21vw' : '55vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
-                    <div className="d-lg-none d-md-none text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
+                    <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
                         <div className="stuckHouse">{stuckHouse}</div>
                     </div>
                     <div className="buttonAll justify-content-center align-items-center">
@@ -44,16 +44,27 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '4vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
-                        <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>מפת תקיעות ארצית</div>
+                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>{allMeeting}</div>
                     </>
                         : <>
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "5%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
-                    <div id="shivuki-credit">{'תוכן שיווקי: אפרת שפירא www.my-idea.co.il'}</div>
-                    <div id='contact-us'>לפניות ובקשות נוספות ניתן ליצור קשר במייל shofar2all@gmail.com</div>
-                    <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
+                                        <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
+
+                    <div className="contactUs" style={{ whiteSpace: "nowrap" , marginTop: isBrowser? "0":"2vh"}} >
+                        <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />
+                        <a style={{ fontSize: "2.5vh"}}className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
+                    </div>
+                    <div className="bottomLine" style={{ fontSize: isBrowser ? "2.3vh" : "1.3vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>
+
+                        <div style={{ width: "fit-content" }}>
+                            האתר פותח כתרומה לחברה ע"י  <a className="underlineLink" href="https://www.hilma.tech/" target="_blank"> הילמה</a> |
+                       התמונה באדיבות: <a className="underlineLink" href="https://www.thekotel.org//" target="_blank" >הקרן למורשת הכותל המערבי </a> |
+                         תוכן שיווקי:  <a className="underlineLink" href="http://www.my-idea.co.il/" target="_blank"> אפרת שפירא</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             {openMap && <Map publicMap closeMap={() => setOpenMap(false)} history={props.history} />}
