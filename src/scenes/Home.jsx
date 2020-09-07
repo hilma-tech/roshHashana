@@ -28,7 +28,7 @@ const Home = (props) => {
                 <div className="coap-imgs-container" style={{ padding: isBrowser ? '2.5%' : '0', justifyContent: isBrowser ? 'center' : 'space-evenly' }}  >
                     <a href="https://www.hilma.tech/"> <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/hilma.svg" /></a>
                     <img style={{ height: isBrowser ? '2.8rem' : '1.8rem' }} src="/images/AMITlogo.png" />
-                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/unisyn.png" />
+                    <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/unisyn.svg" />
                     <img style={{ height: isBrowser ? '2.5rem' : '1.5rem' }} src="/images/srugim.svg" />
                 </div>
                 <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '15%' }} >
