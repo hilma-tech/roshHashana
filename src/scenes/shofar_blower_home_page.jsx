@@ -63,17 +63,31 @@ const SBHomePage = (props) => {
         if (err) console.log("failed to join room blower-events");
     });
 
-    useOn('newMeetingAssined', (req) => {
+    useOn('newMeetingAssigned', (req) => {
         setMeetingsReqs((meetingsReqs) => {
             return meetingsReqs.filter((meet) => (meet.isPublicMeeting !== req.isPublicMeeting) || (req.meetingId !== meet.meetingId))
         });
     });
 
     useOn('removeMeetingFromRoute', (req) => {
-        setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req]);
+        if (req.meetingDeleted) {
+            setMeetingsReqs((meetingsReqs) =>
+                Array.isArray(meetingsReqs) ?
+                    meetingsReqs.filter((meet) =>
+                        meet.meetingId !== req.meetingId || meet.isPublicMeeting !== req.isPublicMeeting)
+
+                    : meetingsReqs
+
+            );
+        } else
+            setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req]);
     });
 
     useOn("newIsolator", (req) => {
+        console.log('heree2', req)
+        if (Array.isArray(req.address)) {
+            req.address = req.address[0];
+        }
         addNewReq(req)
     });;
     useOn('modifyIsolatorInfo', (newReq) => {

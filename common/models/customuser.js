@@ -131,21 +131,30 @@ module.exports = function (CustomUser) {
                             CustomUser.findOne({ where: { keyId: resKey.id } }, (err3, resUser) => {
                                 if (err3) return cb(err3, null);
                                 if (resUser) {
-                                    RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
-                                        if (err4) console.log("Err4", err4);
-                                        if (resRole) {
-                                            if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
-                                                console.log(`RoleMapping.updateAll: where { principalId: resUser.id(=${resUser.id}) } , { roleId: role(=${role}) }`);
-                                                RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
-                                                    if (err5) console.log("Err5", err5);
-                                                    if (resNewRole) {
-                                                        CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
-                                                    }
-                                                })
-                                            } else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
+                                    CustomUser.updateAll({ keyId: resKey.id }, { keyId: null }, (errUpdate, resUpdate) => {
+                                        if (resUpdate) {
+
+                                            RoleMapping.findOne({ where: { principalId: resUser.id } }, (err4, resRole) => {
+                                                if (err4) console.log("Err4", err4);
+                                                if (resRole) {
+                                                    if (resRole.roleId != 3 && resRole.roleId != role && !resUser.address) {
+                                                        console.log(`RoleMapping.updateAll: where { principalId: resUser.id(=${resUser.id}) } , { roleId: role(=${role}) }`);
+                                                        RoleMapping.updateAll({ principalId: resUser.id }, { roleId: role }, (err5, resNewRole) => {
+                                                            if (err5) console.log("Err5", err5);
+                                                            if (resNewRole) {
+                                                                CustomUser.cookieAndAccessToken(resUser.id, meetingId, role, options, res, cb)
+                                                            }
+                                                        })
+                                                    } else CustomUser.cookieAndAccessToken(resUser.id, meetingId, resRole.roleId, options, res, cb)
+                                                }
+
+                                            })
+                                        }
+                                        if (errUpdate) {
+                                            return cb(errUpdate, null);
                                         }
 
-                                    })
+                                    });
                                 }
                             })
                         }
@@ -509,6 +518,7 @@ module.exports = function (CustomUser) {
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
                     if (canEditPubMeeting) {
+                        console.log('here3')
                         pubMeetId = await shofarBlowerPub.upsertWithWhere({ id: meetingId }, { address: data.address[0], lat: data.address[1].lat, lng: data.address[1].lng });
                     }
                     //we can not update the meeting so create a new meeting with the new address
@@ -520,7 +530,10 @@ module.exports = function (CustomUser) {
                         if (data.start_time) meetData.start_time = data.start_time
 
                         if (Object.keys(meetData).length) {
+                            console.log('hereee')
                             pubMeetId = await shofarBlowerPub.createNewPubMeeting([meetData], null, options);
+                            isSocketCalled = true;
+                            await isolatedEvents.newIsolator(CustomUser, data, isolatedInfo, pubMeetId ? typeof pubMeetId === "object" ? pubMeetId.id : pubMeetId : isolatedInfo.id); //socket
                             meetingChanged = true;
                         }
                     }

@@ -123,7 +123,7 @@ module.exports = function (ShofarBlower) {
                 }
             }
             //call socket
-            await blowerEvents.deleteMeeting(ShofarBlower, meetToDelete, isMeetingDeleted, isolatedConnected);
+            blowerEvents.deleteMeeting(ShofarBlower, meetToDelete, isMeetingDeleted, isolatedConnected);
             return true;
         } catch (error) {
             throw error;
