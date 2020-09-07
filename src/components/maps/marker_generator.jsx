@@ -20,7 +20,6 @@ const MarkerGenerator = (props) => {
     }
 
     let url = (type === PRIVATE_MEETING) ? (props.isolated || props.blower) ? '/icons/single.svg' : '/icons/single-blue.svg' : (props.isolated || props.blower) ? '/icons/group.svg' : '/icons/group-orange.svg';
-    console.log(isInfoWindowOpen, 'isInfoWindowOpen', info, 'info')
     const icon = props.icon ? props.icon : {
         url: url,
         scaledSize: (type === PRIVATE_MEETING) ? ((props.isolated || props.blower) ? new window.google.maps.Size(50, 50) : new window.google.maps.Size(30, 30)) : new window.google.maps.Size(50, 50), // the svg borders and margins משפיעים here
@@ -67,7 +66,6 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
         origin: new window.google.maps.Point(0, 0),
         anchor: new window.google.maps.Point(15, 15), // changes position of icon
     }
-    console.log(isInfoWindowOpen, 'isInfoWindowOpen', info, 'info')
 
     return (
         <Marker
