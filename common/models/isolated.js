@@ -451,9 +451,8 @@ module.exports = function (Isolated) {
                     LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
                 ${where}
                 LIMIT ${startRow}, 7;
-            `
-            );
-            
+            `);
+
             if (err) cb(err);
             if (res) {
                 return cb(null, res);
