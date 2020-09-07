@@ -1449,7 +1449,7 @@ module.exports = function (CustomUser) {
             }
 
             //! check route length
-            console.log(`checking route length ${sbRoute.length}, ${sbData.can_blow_x_times} and that is not >= to 20`);
+            console.log(`admin checking route length ${sbRoute.length}, ${sbData.can_blow_x_times} and that is not >= to 20 --> if true return err `, sbData.can_blow_x_times == sbRoute.length || sbRoute.length == 20);
             if (sbData.can_blow_x_times == sbRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: sbData.can_blow_x_times } })
             }
@@ -1502,7 +1502,7 @@ module.exports = function (CustomUser) {
             const newIsolatorMeetingObj = { ...isolator, startTime: assignStartTime } //will b returned to client
 
             //! check max total time length
-            console.log(`checking max duration (curr)${sbData.maxRouteDuration} (new)${newSBTotalTime}`);
+            console.log(`checking max duration (curr)${sbData.maxRouteDuration} (new)${newSBTotalTime} --> if true return err ${sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration}`);
             if (sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newSBTotalTime, maxRouteDuration: sbData.maxRouteDuration, newAssignMeetingObj: newIsolatorMeetingObj } })
             }
@@ -1565,7 +1565,8 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             console.log('update volunteering_max_time, newMaxTimeMins: ', newMaxTimeMins);
-
+            
+            //socket to shofar blower + all shofar blowers (remove from reqs)
 
             // call assignSB
             CustomUser.adminAssignSBToIsolator(options, sb, isolator, (assignE, assignR) => {

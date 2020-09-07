@@ -39,7 +39,7 @@ const SBHomePage = (props) => {
     const socket = useSocket();
 
     useEffect(() => {
-        if (userData != null) {
+        if (userData != null) { //!
             socket.on(`blower_true_confirmQ_${userData.username}`, fn);
 
             return () => {
