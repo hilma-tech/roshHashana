@@ -19,7 +19,7 @@ const SingleIsolatorPage = (props) => {
                 <div id="top" >
                     <div id="right-side" >
                         <FontAwesomeIcon id="x-btn" icon={['fas', 'times']} className='pointer' onClick={() => { props.history.goBack(); setSelectedIsolator(null) }} />
-                        <div id="title" >{`מחפש - ${selectedIsolator && selectedIsolator.name}, ${selectedIsolator && selectedIsolator.address}`}</div>
+                        <div id="title" >{`מחפש/ת - ${selectedIsolator && selectedIsolator.name}, ${selectedIsolator && selectedIsolator.address}`}</div>
                     </div>
                     <div id="meeting-type" >{`מפגש ${selectedIsolator && selectedIsolator.isPublicMeeting ? "תקיעה ציבורי" : "תקיעה פרטי"}`}</div>
                 </div>

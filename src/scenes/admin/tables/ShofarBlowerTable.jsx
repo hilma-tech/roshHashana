@@ -9,7 +9,7 @@ import DeletePopup from '../popups/DeletePopup';
 const whereToDelete = { id: -1, index: -1 }
 
 const ShofarBlowerTable = (props) => {
-    const { loading, shofarBlowers, setShofarBlowers } = useContext(AdminMainContext)
+    const { loading, shofarBlowers, setShofarBlowers, setBlowerNum, setBlastsNum } = useContext(AdminMainContext)
     const { openGenAlert } = useContext(MainContext)
     const [tr, setTr] = useState(null)
     const [confirmArr, setConfirmArr] = useState([])
@@ -54,6 +54,8 @@ const ShofarBlowerTable = (props) => {
                     return [...prev]
                 })
                 props.setResultNum(n => Number(n) - 1)
+                setBlowerNum(prev => prev + 1)
+                setBlastsNum(prev => prev + sbToConfirm.blastsNum)
                 setConfirmArr(prev => {
                     prev.splice(prev.indexOf(id), 1)
                     return [...prev]
@@ -65,6 +67,7 @@ const ShofarBlowerTable = (props) => {
 
     const handleRouteClick = (sb) => {
         props.history && props.history.push && props.history.push("/shofar-blower")
+        // console.log('setSelectedSB sb: ', sb);
         setSelectedSB(sb)
     }
 
@@ -87,6 +90,7 @@ const ShofarBlowerTable = (props) => {
                         return [...prev]
                     })
                     setShowDeletePopup(false)
+                    props.setResultNum(n => Number(n) - 1)
                 }
             })
         })()

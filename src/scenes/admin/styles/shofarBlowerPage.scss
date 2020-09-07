@@ -29,12 +29,13 @@
             color: white;
             font-size: 3vh;
             font-family: $Heebo;
+            text-align: right;
         }
         #x-btn {
             color: white;
             height: 100%;
             margin: 0 3vh;
-            height: 2rem; //like #title font-size
+            height: 3vh; //like #title font-size
             width: auto;
         }
     }
@@ -51,6 +52,10 @@
         height: 90vh;
         background-color: $grey;
         padding: 30px 5%;
+        overflow-y: auto;
+        &::-webkit-scrollbar{
+            display: none;
+        }
         #about-sb {
             color: $dark-turquise;
             display: flex;
@@ -106,6 +111,22 @@
         border-radius: 36px;
         color: white;
         font-size: 1.5rem;
+        box-shadow: 0px 3px 6px #00000029;
+        cursor: pointer;
+        margin: 0.5vh 0;
+        padding: 0.5vh 0.5vw;
+        border-radius: 2px;
+        width: fit-content;
+        align-self: flex-end;
+        font-size: 1.1rem;
+    }
+    #notify-sb-btn{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: $dark-turquise;
+        border-radius: 36px;
+        font-size: 1.5rem;
         padding: .5rem 1.5rem;
         box-shadow: 0px 3px 6px #00000029;
         cursor: pointer;
@@ -114,6 +135,13 @@
         bottom: 0;
         margin-bottom: 2rem;
         margin-left: 2rem;
+        color: white;
+        & > svg{
+            margin-left: 10px;
+        }
+        &:hover{
+            // color: #94b2b8;
+        }
     }
 }
 .sb-map-container-admin {
@@ -194,6 +222,7 @@
             .meeting-in-route-comments {
                 width: fit-content;
                 font-size: 0.9rem;
+                text-align: right;
             }
         }
         .meeting-in-route-info-2 {
@@ -226,6 +255,7 @@
                 color: white;
                 font-size: 3vh;
                 font-family: $Heebo;
+                text-align: right;
             }
             #x-btn {
                 color: white;

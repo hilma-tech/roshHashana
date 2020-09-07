@@ -271,7 +271,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
                 {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
-                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{`${startDate.toLocaleDateString("en-US")}, ${startDate.getHours().toString().padStart(2, 0)}:${startDate.getMinutes().toString().padStart(2, 0)}`}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויי בזמני התקיעות</div></> : null}
+                {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{`${startDate.toLocaleDateString("en-US")}, ${startDate.getHours().toString().padStart(2, 0)}:${startDate.getMinutes().toString().padStart(2, 0)}`}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויים בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
                 {inRoute && walkDuration ? <div className="walk-duration" >{`זמן הליכה מהנקודה הקודמת ${walkDuration}`}</div> : null}
             </div>

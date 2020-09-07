@@ -230,7 +230,7 @@ module.exports = function (Isolated) {
                 }
 
                 //todo check if need to add to select here: IF(isolated.public_meeting, sbp.id, isolated.id) AS id,isolated.public_meeting (for adminAssignSBToIsolator)
-                const isolatedQ = `SELECT isolated.id, cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
+                const isolatedQ = `SELECT IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting", cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                     LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
@@ -348,9 +348,8 @@ module.exports = function (Isolated) {
                 `SELECT  (	
                     (SELECT COUNT(*) as resNum
                     FROM shofar_blower_pub
-                        LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
-                        LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
-                    WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1
+                        LEFT JOIN shofar_blower ON shofar_blower_pub.blowerId = shofar_blower.userBlowerId 
+                    WHERE shofar_blower_pub.blowerId IS NOT NULL AND shofar_blower.confirm = 1
                     )+(
                     SELECT COUNT(*)                     
                     FROM isolated
@@ -407,7 +406,7 @@ module.exports = function (Isolated) {
                     `SELECT COUNT(*) as resNum                    
                     FROM isolated
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
-                LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
+                LEFT JOIN CustomUser blowerUser ON blowerUser.id = isolated.blowerMeetingId
                 LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                     ${where}`
                 );
@@ -452,8 +451,8 @@ module.exports = function (Isolated) {
                     LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
                 ${where}
                 LIMIT ${startRow}, 7;
-            `
-            );
+            `);
+
             if (err) cb(err);
             if (res) {
                 return cb(null, res);
@@ -498,7 +497,7 @@ module.exports = function (Isolated) {
                 LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
                 WHERE (isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NULL) 
                     OR (isolated.public_meeting = 1 AND sbp.blowerId IS NULL)`
-                
+
                 let [isolatedsErr, isolatedsRes] = await executeMySqlQuery(Isolated, isolatedsQ);
                 if (isolatedsErr || !isolatedsRes) {
                     console.log('get Isolated admin request error : ', isolatedsErr);
@@ -516,4 +515,50 @@ module.exports = function (Isolated) {
         accepts: [],
         returns: { arg: 'res', type: 'object', root: true }
     });
+
+    Isolated.adminUpdateMyStartTime = function (options, meetings, cb) {
+        console.log('adminUpdateMyStartTime:');
+        if (!options || !options.accessToken || !options.accessToken.userId) {
+            console.log("NO_USER_ID_IN_OPTIONS in adminUpdateMyStartTime, meetings are:", meetings);
+            return
+        }
+        (async () => {
+            if (Isolated.checkMeetingToUpdate(meetings)) {
+                let [uErr, uRes] = await singleStartTimeUpdate(meetings)
+                if (uErr || !uRes) {
+                    console.log('admin update (not array) start time error: ', uErr);
+                    return cb(true)
+                } else
+                    return cb(null, true)
+            }
+            else if (Array.isArray(meetings)) {
+                let errFlag = false
+                let meeting
+                for (let i in meetings) {
+                    meeting = meetings[i]
+                    let [uErr, uRes] = await Isolated.singleStartTimeUpdate(meeting)
+                    if (uErr) {
+                        errFlag = true;
+                        console.log(`admin update start time of item (${i}: ${meeting}) from array error: `, uErr);
+                        continue;
+                    }
+                }
+                if (errFlag) return cb("ONE_UPDATE_ERROR_AT_LEAST")
+                return cb(null, true)
+            } else {
+                console.log("admin wrong var type", meetings);
+                return cb(true)
+            }
+        })()
+    }
+
+    Isolated.remoteMethod('adminUpdateMyStartTime', {
+        http: { verb: 'POST' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+            { arg: 'meetings', type: 'any' },
+        ],
+        returns: { arg: 'res', type: 'boolean', root: true }
+    });
+
 }
