@@ -36,7 +36,7 @@ const SBAllMeetingsList = ({ mobile }) => {
             {Array.isArray(meetingsReqsTemp) && meetingsReqsTemp.length ? meetingsReqsTemp.map((m, i) => {
                 return <div className="open-meeting-in-list" key={"sb-meetings-list-" + i} >
                     <div className="open-meeting-in-list-info">
-                        <div className="open-meeting-in-list-title" >{m.isPublicMeeting ? "קריאה ציבורית" : m.name}</div>
+                        <div className="open-meeting-in-list-title" >{m.isPublicMeeting ? "תקיעה ציבורית" : m.name}</div>
                         <div className="open-meeting-in-list-location" >{m.address || ""}</div>
                         <div className="open-meeting-in-list-comments" >{m.comments || ""}</div>
                     </div>
