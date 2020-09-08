@@ -43,6 +43,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         if (selectedIsolator) {
             showShofarBlowersMarkers()
         }
+        else showIsolatedsMarkers()
     }, []);
 
     const zoomPlace = (place, userId = -1) => {

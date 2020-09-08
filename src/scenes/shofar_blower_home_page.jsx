@@ -16,6 +16,7 @@ import { isBrowser } from 'react-device-detect';
 
 import './mainPages/MainPage.scss';
 import './sb.scss'
+import { set } from 'mobx';
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -33,7 +34,18 @@ const SBHomePage = (props) => {
 
     useJoinLeave("admin-blower-events", (err) => {
         if (err) console.log("failed to join room");
-    })
+    });
+
+    useJoinLeave("admin-isolated-events", (err) => {
+        if (err) console.log("failed to join room");
+    });
+
+    useOn('deleteIsolatedByAdmin', (reqToRemove) => {
+        //remove the request if exist in meeting requests
+        removeReq(reqToRemove);
+        //remove meeting from route if exist
+        setMyMeetings(meetings => Array.isArray(meetings) ? meetings.filter(meet => meet.meetingId != reqToRemove.meetingId || meet.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+    });
 
     const socket = useSocket();
 
@@ -121,11 +133,11 @@ const SBHomePage = (props) => {
 
 
     const addNewReq = (newReq) => {
-        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq]);
         // no update on genMapData
     }
     const removeReq = (reqToRemove) => {
-        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId || req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
     }
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
@@ -144,6 +156,10 @@ const SBHomePage = (props) => {
                     && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? { ...req, ...newReqData, meetingId: newReqData.newMeetingId } : req
             })
         );
+    }
+
+    const addMeetingToMyRoute = (req) => {
+        setMyMeetings(meetings => Array.isArray(meetings) ? [...meetings, req] : [req]);
     }
 
     const fetchAndSetData = async (withoutUserData) => {

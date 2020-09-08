@@ -336,5 +336,17 @@ export const adminUpdateMyStartTime = async (obj, cb) => {
     }
     else
         typeof cb === "function" && cb(res === CONSTS.CURRENTLY_BLOCKED_ERR ? CONSTS.CURRENTLY_BLOCKED_ERR : false) //no error
+}
 
+export const getShofarBlowerByIdAdmin = async (id, cb) => {
+    let [res, err] = await Auth.superAuthFetch(`/api/ShofarBlowers/getShofarBlowerByIdAdmin`, {
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ id })
+    })
+    if (err || !res) {
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
+    }
+    else
+        return cb(null, res)
 } 

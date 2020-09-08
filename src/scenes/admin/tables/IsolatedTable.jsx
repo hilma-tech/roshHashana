@@ -27,7 +27,7 @@ const IsolatedTable = (props) => {
                     <div className='myTooltip'>{isolated.comments}</div>
                 </div>,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'map-marker-alt']} color='#A5A4BF' onClick={() => handleIsolatorClick(isolated)} />,
-                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.id, index)} />,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.isolatedId, index)} />,
             ]
         }))
     }, [isolateds])
