@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 import { withRouter } from 'react-router';
 
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
 const AdminMap = withScriptjs(withGoogleMap((props) => {
@@ -21,9 +22,13 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [showIsolateds, setShowIsolateds] = useState(false)
     const [selectedMarkerId, setSelectedMarkerId] = useState('')
 
-    const { selectedIsolator, setSelectedSB } = useContext(AdminMainContext)
-
+    const { setSelectedIsolator, selectedIsolator, setSelectedSB } = useContext(AdminMainContext)
+    const socket = useSocket();
+    useJoinLeave('blower-events', (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
     useEffect(() => {
+        socket.on('newMeetingAssigned', handleNewMeeting)
         const input = document.getElementById('search-input');
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ country: "il" });
@@ -38,13 +43,26 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
             else return;
         })
-
         if (selectedIsolator) {
             showShofarBlowersMarkers()
         }
         else showIsolatedsMarkers()
+        return () => {
+            socket.off('newMeetingAssigned', handleNewMeeting);
+        }
     }, []);
-
+   
+    const handleNewMeeting = (req) => {
+        setIsolateds(prevIsolateds => {
+            if (prevIsolateds.length !== 0) {
+                let isolateds = [...prevIsolateds]
+                isolateds = isolateds.filter((isolated) => (isolated.isolatedId !== req.isolatedId))
+                return isolateds
+            } else {
+                return prevIsolateds;
+            }
+        })
+    };
     const zoomPlace = (place, userId = -1) => {
         setZoom(18)
         setCenter(place);
@@ -101,17 +119,18 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         // console.log('setSelectedSB: userId ', userId);
         setSelectedSB({ userId })
         // setIsFromIsolator(true)
-        props.history.push('/shofar-blower')
+        props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blower')
     }
 
     const handleSBClick = (sb) => {
         setSelectedSB({ userId: sb.userId })
-        props.history.push('/shofar-blower')
-        // zoomPlace({ lat: Number(sb.lat), lng: Number(sb.lng) }, 'shofarBlower-' + sb.userId)
+        // props.history.push('/shofar-blower')
+        zoomPlace({ lat: Number(sb.lat), lng: Number(sb.lng) }, 'shofarBlower-' + sb.userId)
     }
 
-    const onInfoWindowIsolatedClick = (id) => {
-
+    const onInfoWindowIsolatedClick = (isolated) => {
+        setSelectedIsolator(isolated)
+        props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher')
     }
 
     let options = CONSTS.MAP_OPTIONS;
@@ -153,15 +172,15 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' />
             </div>
             <div className={'mapIconContainer blueText pointer' + (showShofarBlowers ? ' mapIconSelected' : '')} onClick={showShofarBlowersMarkers}>
-                <img src='icons/shofar-blue.svg' alt='' />
+                <img src='/icons/shofar-blue.svg' alt='' />
                 <div className='textInHover blueBackground bold'>בעלי תקיעה</div>
             </div>
             <div className={'mapIconContainer lightblueText pointer' + (showBlasts ? ' mapIconSelected' : '')} onClick={showBlastsMarkers}>
-                <img src='icons/group.svg' alt='' />
+                <img src='/icons/group.svg' alt='' />
                 <div className='textInHover lightblueBackground bold'>תקיעות</div>
             </div>
             <div className={'mapIconContainer orangeText pointer' + (showIsolateds ? ' mapIconSelected' : '')} onClick={showIsolatedsMarkers}>
-                <img src='icons/singleOrange.svg' alt='' />
+                <img src='/icons/singleOrange.svg' alt='' />
                 <div className='textInHover orangeBackground bold'>מחפשים</div>
             </div>
         </div>
@@ -170,7 +189,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 key={index}
                 options={{
                     icon: {
-                        url: 'icons/shofar-blue.svg',
+                        url: '/icons/shofar-blue.svg',
                         scaledSize: { width: 25, height: 25 },
                         anchor: { x: 12.5, y: 12.5 }
                     }
@@ -203,7 +222,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 key={index}
                 options={{
                     icon: {
-                        url: 'icons/group.svg',
+                        url: '/icons/group.svg',
                         scaledSize: { width: 25, height: 25 },
                         anchor: { x: 12.5, y: 12.5 }
                     }
@@ -240,7 +259,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 key={index}
                 options={{
                     icon: {
-                        url: 'icons/singleOrange.svg',
+                        url: '/icons/singleOrange.svg',
                         scaledSize: { width: 25, height: 25 },
                         anchor: { x: 12.5, y: 12.5 }
                     }
@@ -262,7 +281,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                                 <div>{isolated.address}</div>
                             </div>
                             {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
-                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated.id)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
+                            <div className='infoWindowButton pointer' onClick={() => onInfoWindowIsolatedClick(isolated)}>{!selectedIsolator ? 'לעוד פרטים' : 'שבץ'}</div>
                         </div>
                     </InfoWindow>
                 }
@@ -272,7 +291,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             <Marker
                 options={{
                     icon: {
-                        url: 'icons/singleOrange.svg',
+                        url: '/icons/singleOrange.svg',
                         scaledSize: { width: 35, height: 35 },
                         anchor: { x: 17.5, y: 17.5 }
                     }

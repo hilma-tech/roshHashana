@@ -4,6 +4,7 @@ import { AdminMainContext } from '../ctx/AdminMainContext';
 import GenericTable from './GenericTable'
 import DeletePopup from '../popups/DeletePopup';
 import { deleteIsolated } from '../fetch_and_utils';
+import { withRouter } from 'react-router';
 // import '../styles/staffList.scss'
 // import Loading from '../Loading';
 
@@ -60,6 +61,7 @@ const IsolatedTable = (props) => {
 
     const handleIsolatorClick = (isolator) => {
         typeof props.setSelectedIsolator === "function" && props.setSelectedIsolator(isolator)
+        props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher")
     }
 
     return (
@@ -78,4 +80,4 @@ const IsolatedTable = (props) => {
     );
 }
 
-export default IsolatedTable
+export default withRouter(IsolatedTable)

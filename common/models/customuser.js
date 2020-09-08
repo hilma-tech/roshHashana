@@ -1122,10 +1122,11 @@ module.exports = function (CustomUser) {
             }
 
             // find name and phone number of isolater
-            const findIsolatedQ = `select isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
             let [isolatedErr, isolatedRes] = await executeMySqlQuery(CustomUser, findIsolatedQ)
             //call socket
             let socketObj = {
+                isolatedId: (isolatedRes && isolatedRes[0] && isolatedRes[0].isolatedId) ? isolatedRes[0].isolatedId : null,
                 blowerId: userId,
                 meetingStartTime: formattedStartTime,
                 meetingId: newAssignMeetingObj.meetingId,

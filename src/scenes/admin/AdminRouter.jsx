@@ -20,16 +20,16 @@ const AdminRouter = (props) => {
             <Fragment>
                 <AdminMainProvider>
                     <Switch>
-                        <Route exact path={`/a`} compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
-                        <PrivateRoute exact path={`/blasts`} compName="BlastsPage" component={(props) => <BlastsPage {...props} />} />
-                        <PrivateRoute exact path={`/home`} compName="AdminHome" component={(props) => <AdminHome {...props} />} />
-                        <PrivateRoute exact path={`/searchings`} compName="IsolatedTable" component={(props) => <IsolatedsPage {...props} />} />
-                        <PrivateRoute exact path={`/searcher`} compName="SingleIsolator" component={(props) => <SingleIsolatorPage {...props} />} />
-                        <PrivateRoute exact path={`/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
-                        <PrivateRoute exact path={`/shofar-blower`} compName="SingleShofarBlowerPage" component={(props) => <SingleShofarBlowerPage {...props} />} />
-                        <PrivateRoute exact path={`/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
-                        <PrivateRoute exact path={`/edit-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
-                        <PrivateRoute exact path={`/jdlgtjerwitgeswteswrtwsfsd`} compName="NewAdmin" component={(props) => <NewAdmin {...props} />} />
+                        <Route exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs`} compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/blasts`} compName="BlastsPage" component={(props) => <BlastsPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/home`} compName="AdminHome" component={(props) => <AdminHome {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searchings`} compName="IsolatedTable" component={(props) => <IsolatedsPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher`} compName="SingleIsolator" component={(props) => <SingleIsolatorPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blowers`} compName="ShofarBlowersTable" component={(props) => <ShofarBlowersPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blower`} compName="SingleShofarBlowerPage" component={(props) => <SingleShofarBlowerPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/add-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/edit-shofar-blower`} compName="BlowerFormAdmin" component={(props) => <BlowerFormAdmin {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/jdlgtjerwitgeswteswrtwsfsd`} compName="NewAdmin" component={(props) => <NewAdmin {...props} />} />
                     </Switch>
                 </AdminMainProvider>
             </Fragment>

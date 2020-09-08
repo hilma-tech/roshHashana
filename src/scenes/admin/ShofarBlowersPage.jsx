@@ -74,7 +74,7 @@ const ShofarBlowerPage = function (props) {
                     <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                     <div style={{ margin: '0 1vw' }}></div>
                     <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
-                    <div className='bluePlusContainer pointer' onClick={() => { props.history.push('/add-shofar-blower') }}>
+                    <div className='bluePlusContainer pointer' onClick={() => { props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/add-shofar-blower') }}>
                         <FontAwesomeIcon icon={['fas', 'plus-circle']} />
                         <div>הוספת בעל תקיעה</div>
                     </div>
