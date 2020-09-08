@@ -22,7 +22,6 @@ const IsolatedPage = function (props) {
     useEffect(() => {
         if (selectedIsolator && props.location.pathname === "/searchings") {
             props.history.push("/searcher")
-            console.log('selectedIsolator: ', selectedIsolator);
         } else if (selectedIsolator === null && props.location.pathname === "/searcher") {
             props.history.push("/searchings")
         }
