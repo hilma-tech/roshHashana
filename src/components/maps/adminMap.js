@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 import { withRouter } from 'react-router';
 
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
 
 const AdminMap = withScriptjs(withGoogleMap((props) => {
@@ -22,8 +23,12 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [selectedMarkerId, setSelectedMarkerId] = useState('')
 
     const { setSelectedIsolator, selectedIsolator, setSelectedSB } = useContext(AdminMainContext)
-
+    const socket = useSocket();
+    useJoinLeave('blower-events', (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
     useEffect(() => {
+        socket.on('newMeetingAssigned', handleNewMeeting)
         const input = document.getElementById('search-input');
         let autocomplete = new window.google.maps.places.Autocomplete(input);
         autocomplete.setComponentRestrictions({ country: "il" });
@@ -38,13 +43,26 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
             else return;
         })
-
         if (selectedIsolator) {
             showShofarBlowersMarkers()
         }
         else showIsolatedsMarkers()
+        return () => {
+            socket.off('newMeetingAssigned', handleNewMeeting);
+        }
     }, []);
-
+   
+    const handleNewMeeting = (req) => {
+        setIsolateds(prevIsolateds => {
+            if (prevIsolateds.length !== 0) {
+                let isolateds = [...prevIsolateds]
+                isolateds = isolateds.filter((isolated) => (isolated.isolatedId !== req.isolatedId))
+                return isolateds
+            } else {
+                return prevIsolateds;
+            }
+        })
+    };
     const zoomPlace = (place, userId = -1) => {
         setZoom(18)
         setCenter(place);

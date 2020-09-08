@@ -5,18 +5,26 @@ import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
 
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
+
 let status = 0
 
 const IsolatedPage = function (props) {
     const { setLoading, setIsolateds, selectedIsolator, setSelectedIsolator } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
+    const socket = useSocket();
+    useJoinLeave('blower-events', (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
 
     useEffect(() => {
-        (async () => {
-            setLoading(true)
-            getIsolateds()
-        })()
+        setLoading(true)
+        getIsolateds();
+        socket.on('newMeetingAssigned', handleNewMeeting)
+        return () => {
+            socket.off('newMeetingAssigned', handleNewMeeting);
+        }
     }, [])
 
     const getIsolateds = function (filter = filters, startRow = 0) {
@@ -33,13 +41,27 @@ const IsolatedPage = function (props) {
             })
         })()
     }
+    const compareIsPublicMeetings = (pm1, pm2) => {
+        let pm1bool = (pm1 == 0 || pm1 == false) ? false : (pm1 == 1 || pm1 == true) ? true : null
+        let pm2bool = (pm2 == 0 || pm2 == false) ? false : (pm2 == 1 || pm2 == true) ? true : null
+        return (pm1bool === null || pm2bool === null) ? false : pm1bool == pm2bool
+    }
+    const handleNewMeeting = (req) => {
+        if (status === 0) {
+            setIsolateds(prevIsolateds => {
+                let isolateds = [...prevIsolateds]
+                isolateds = isolateds.filter((isolated) => (!compareIsPublicMeetings(isolated.isPublicMeeting, req.isPublicMeeting) || isolated.id !== req.meetingId))
+                return isolateds
+            })
+        }
+    };
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
             pervFilters.name = value
             return pervFilters
         })
-        getIsolateds(filters)
+
     }
 
     const onSearchAddress = function (value) {

@@ -218,8 +218,9 @@ const ShofarBlowerMap = (props) => {
         let meetingStartTime
         let isConstMeeting
         let locObj = {}
-        let myMeetingsLocs = !Array.isArray(myMeetings) ? []
-            : myMeetings.map((myMeeting, i) => {
+        let myMeetingsLocs = []
+        if (Array.isArray(myMeetings) && myMeetings.length)
+            for (let myMeeting of myMeetings) {
                 myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
                 meetingStartTime = new Date(myMeeting.startTime).getTime()
                 isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
@@ -235,8 +236,8 @@ const ShofarBlowerMap = (props) => {
                 isConstMeeting ?
                     locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
                     locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
-                return locObj;
-            })
+                myMeetingsLocs.push(locObj);
+            }
 
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
     }
@@ -287,7 +288,7 @@ const ShofarBlowerMap = (props) => {
 
 
     const getLngLatOfLocation = async (address) => {
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND_SECOND);
+        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { logE(`error getting geoCode of ${address}: `, error); return; }
@@ -330,7 +331,7 @@ const ShofarBlowerMap = (props) => {
                 showIsolators={props.showIsolators}
                 isolators={props.isolators}
 
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
