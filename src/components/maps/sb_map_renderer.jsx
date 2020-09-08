@@ -109,7 +109,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }, [isPrint])
 
     useEffect(() => {
-        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
+        if (data && Array.isArray(data.myMLocs)) {
             setData();
         }
 
@@ -119,7 +119,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         window.print()
     }
     const setData = async () => {
-        if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
+        if (!Array.isArray(data.myMLocs)) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
         const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
@@ -166,9 +166,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
             const meetingsToUpdateST = [];
             for (let m of routeStops) { //loop current stops and their start times
-                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
-                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
+                let myNewStartTime = getMyNewST(m.meetingId || m.id, m.isPublicMeeting)
+                if (!m.startTime || (!m.id && !m.meetingId) || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                    meetingsToUpdateST.push({ meetingId: m.meetingId || m.id, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
                 if (isAdmin) {
@@ -188,7 +188,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 }))
             }
             setRoutePath(res.overviewPath)
-        }
+        } else { /* console.log("jfksl");  */setRoutePath([]) }
 
         //get const meetings overview
         let constOverviewPaths = [];
@@ -310,6 +310,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
 const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators, isolators, handleForceAssign, setSelectedIsolator }) => (
     <>
+        {/* {console.log('routePath: ', routePath)} */}
         {/* reqsLocs */
             Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
                 data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} defaultInfoState={false} info={m.info} />)

@@ -1369,6 +1369,7 @@ module.exports = function (CustomUser) {
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 
             const sbId = sb.sbId || sb.id;
+            if (isNaN(Number(sbId))) return cb("SB_INFO")
             if (isNaN(Number(isolator.id)) || (isolator.isPublicMeeting != 0 && isolator.isPublicMeeting != 1 && isolator.isPublicMeeting != true && isolator.isPublicMeeting != false)) return cb("ISOLATOR_INFO")
 
             //check if user is confirmed by admin (and get userData for route calc later on)
@@ -1564,9 +1565,18 @@ module.exports = function (CustomUser) {
                 IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
                 IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
             `
-
-            CustomUser.app.io.to('').emit('meetingAssignedByAdmin', { isPublicMeeting: newIsolatorMeetingObj.isPublicMeeting, meetingId: newIsolatorMeetingObj.id })
-            CustomUser.app.io.to('').emit('addMeetingToMyRoute', {})
+            let sbDataForSocket
+            try { sbDataForSocket = await CustomUser.findOne({ where: { id: sbId } }); } catch (e) { }
+            if (sbDataForSocket) {
+                console.log('from findOne, sbDataForSocket: ', sbDataForSocket);
+                let sbPhone = sbDataForSocket.username
+                if (sbPhone) {
+                    // console.log(`emit adminAddMeetingToMyRoute-${sbPhone} to admin-blower-events`, newIsolatorMeetingObj);
+                    CustomUser.app.io.to(`admin-blower-events`).emit(`adminAddMeetingToMyRoute-${sbPhone}`, newIsolatorMeetingObj)
+                } else { console.log("no sbPhone for socket (adminAssigned) ", sbPhone); }
+            }
+            CustomUser.app.io.to('admin-blower-events').emit('removeReqFromReqs', { isPublicMeeting: newIsolatorMeetingObj.isPublicMeeting, meetingId: newIsolatorMeetingObj.id })
+            // console.log('emit removeReqFromReqs to admin-blower-events: ', { isPublicMeeting: newIsolatorMeetingObj.isPublicMeeting, meetingId: newIsolatorMeetingObj.id });
             return cb(null, newIsolatorMeetingObj) //success, return new meeting obj (contains meeting start time)
             //socket:
         })();

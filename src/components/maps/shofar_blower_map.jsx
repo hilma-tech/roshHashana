@@ -335,7 +335,9 @@ const ShofarBlowerMap = (props) => {
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-            {backToCenterBtn && (!isAdmin || (isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat)) ? <div className="center-map-btn-container"><FontAwesomeIcon icon="crosshairs" className="center-map-btn" onClick={() => { setBackToCenterBtn(false); setCenter(isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat ? { lat: Number(props.selectedSB.lat), lng: Number(props.selectedSB.lng) } : userOriginLoc) }} /></div> : null}
+            {backToCenterBtn && (!isAdmin || (isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat))
+                ? <div className="center-map-btn-container"><FontAwesomeIcon icon="crosshairs" className="center-map-btn" onClick={() => { setBackToCenterBtn(false); setCenter(isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat ? { lat: Number(props.selectedSB.lat), lng: Number(props.selectedSB.lng) } : userOriginLoc) }} /></div>
+                : null}
         </div>
     );
 }

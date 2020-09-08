@@ -7,21 +7,17 @@ import Auth from '../modules/auth/Auth';
 
 import ShofarBlowerMap from '../components/maps/shofar_blower_map'
 
-import GeneralAlert from '../components/modals/general_alert'
 import SBAssignMeeting from '../components/sb_assign_meeting';
 import SBNotConfirmed from '../components/sb_not_confirmed';
 import SBSideInfo from '../components/sb_side_info';
 
-import { isBrowser } from 'react-device-detect';
-
 import './mainPages/MainPage.scss';
 import './sb.scss'
-import { set } from 'mobx';
 
 let fetching = false
 const SBHomePage = (props) => {
 
-    const { showAlert, openGenAlert, openGenAlertSync } = useContext(MainContext)
+    const { openGenAlert, openGenAlertSync } = useContext(MainContext)
     const {
         userData, setUserData,
         myMeetings, meetingsReqs,
@@ -31,21 +27,6 @@ const SBHomePage = (props) => {
 
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
-
-    useJoinLeave("admin-blower-events", (err) => {
-        if (err) console.log("failed to join room");
-    });
-
-    useJoinLeave("admin-isolated-events", (err) => {
-        if (err) console.log("failed to join room");
-    });
-
-    useOn('deleteIsolatedByAdmin', (reqToRemove) => {
-        //remove the request if exist in meeting requests
-        removeReq(reqToRemove);
-        //remove meeting from route if exist
-        setMyMeetings(meetings => Array.isArray(meetings) ? meetings.filter(meet => meet.meetingId != reqToRemove.meetingId || meet.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
-    });
 
     const socket = useSocket();
 
@@ -62,20 +43,43 @@ const SBHomePage = (props) => {
     }, []);
 
     useEffect(() => {
-        if (userData != null && userData && !userData.confirm) {
-            socket.on(`blower_true_confirmQ_${userData.username}`, onConfirmed);
-            return () => {
-                socket.off(`blower_true_confirmQ_${userData.username}`, onConfirmed);
-            };
+        if (userData != null && userData && typeof userData == "object") {
+            socket.on(`adminAddMeetingToMyRoute-${userData.username}`, addMeetingToMyRoute)
+            if (!userData.confirm) {
+                socket.on(`blower_true_confirmQ_${userData.username}`, onConfirmed);
+            }
         }
+        return () => {
+            if(userData){
+                socket.off(`adminAddMeetingToMyRoute-${userData.username}`, addMeetingToMyRoute)
+                socket.off(`blower_true_confirmQ_${userData.username}`, onConfirmed);
+            }
+        };
     }, [userData]);
-
-    const onConfirmed = async (_req) => {
-        await openGenAlertSync({ text: "מנהל המערכת אישר אותך!", isPopup: { okayText: "לדף הבית" } })
-        setUserData((userData) => ({ ...userData, confirm: 1 }));
-        fetchAndSetData(true)
-        return;
+    const compareIsPublicMeetings = (pm1, pm2) => {
+        let pm1bool = (pm1 == 0 || pm1 == false) ? false : (pm1 == 1 || pm1 == true) ? true : null
+        let pm2bool = (pm2 == 0 || pm2 == false) ? false : (pm2 == 1 || pm2 == true) ? true : null
+        return (pm1bool === null || pm2bool === null) ? false : pm1bool == pm2bool
     }
+
+    useJoinLeave("admin-blower-events", (err) => {
+        if (err) console.log("failed to join room");
+    });
+
+    useJoinLeave("admin-isolated-events", (err) => {
+        if (err) console.log("failed to join room");
+    });
+
+    useOn('removeReqFromReqs', (reqToRemoveFromReqs) => {
+        setMeetingsReqs(reqs => reqs.filter(req => (!(reqToRemoveFromReqs.meetingId == req.meetingId && compareIsPublicMeetings(reqToRemoveFromReqs.isPublicMeeting, req.isPublicMeeting)))))
+    })
+
+    useOn('deleteIsolatedByAdmin', (reqToRemove) => {
+        //remove the request if exist in meeting requests
+        removeReq(reqToRemove);
+        //remove meeting from route if exist
+        setMyMeetings(meetings => Array.isArray(meetings) ? meetings.filter(meet => meet.meetingId != reqToRemove.meetingId || meet.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+    });
 
 
     useJoinLeave("isolated-events", (err) => {
@@ -131,6 +135,13 @@ const SBHomePage = (props) => {
         });
     });
 
+    //SOCKET CALLBACKFS --START ----------------------------------------------------------------------------------------
+    const onConfirmed = async (_req) => {
+        await openGenAlertSync({ text: "מנהל המערכת אישר אותך!", isPopup: { okayText: "לדף הבית" } })
+        setUserData((userData) => ({ ...userData, confirm: 1 }));
+        fetchAndSetData(true)
+        return;
+    }
 
     const addNewReq = (newReq) => {
         setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq]);
@@ -159,8 +170,10 @@ const SBHomePage = (props) => {
     }
 
     const addMeetingToMyRoute = (req) => {
+        console.log('addMeetingToMyRoute: ', req);
         setMyMeetings(meetings => Array.isArray(meetings) ? [...meetings, req] : [req]);
     }
+    //SOCKET CALLBACKFS --END ----------------------------------------------------------------------------------------
 
     const fetchAndSetData = async (withoutUserData) => {
         fetching = true
