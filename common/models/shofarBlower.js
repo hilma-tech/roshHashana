@@ -496,13 +496,16 @@ module.exports = function (ShofarBlower) {
                 const shofarBlowerQ = `
                 SELECT 
                     sb.id, 
+                    cu.id AS userId,
                     cu.id AS userId, 
                     cu.name, 
                     cu.username AS phone, 
                     sb.can_blow_x_times AS blastsNum, 
                     sb.volunteering_start_time AS chosenTime, 
                     cu.address, 
-                    sb.volunteering_max_time 
+                    cu.lat,
+                    cu.lng,
+                    sb.volunteering_max_time AS walkTime 
                 FROM shofar_blower AS sb 
                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
                 WHERE sb.id = ${id}
@@ -514,7 +517,7 @@ module.exports = function (ShofarBlower) {
                 }
                 if (!shofarBlowerRes[0]) throw 'shofar blower not exist'
                 const shofarBlowerPubQ = `
-                SELECT id, address, comments, start_time
+                SELECT id, address, comments, start_time ,lat, lng
                 FROM shofar_blower_pub 
                 WHERE blowerId = ${shofarBlowerRes[0].userId}
                 `
@@ -523,6 +526,15 @@ module.exports = function (ShofarBlower) {
                     console.log('shofarBlowerPubAllVolunteers get shofarBlowerPub admin request error : ', shofarBlowerPubErr);
                     throw shofarBlowerPubErr
                 }
+                for (let i of shofarBlowerPubRes) {
+                    i.address = [i.address, { lat: i.lat, lng: i.lng }]
+                    delete i.lat
+                    delete i.lng
+                }
+
+                shofarBlowerRes[0].address = [shofarBlowerRes[0].address, { lat: Number(shofarBlowerRes[0].lat), lng: Number(shofarBlowerRes[0].lng) }]
+                delete shofarBlowerRes[0].lat
+                delete shofarBlowerRes[0].lng
                 shofarBlowerRes[0].publicPlaces = shofarBlowerPubRes
                 return cb(null, shofarBlowerRes[0])
 
