@@ -1067,12 +1067,15 @@ module.exports = function (CustomUser) {
                 url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
+                console.log('result: ', result);
                 result.startTimes = []
                 let leg;
                 let prevStartTimeVal
                 let legDuration
                 for (let i in stops) {
-                    leg = result.routes[0].legs[i]
+                    try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
+                    console.log('result: ', result);
+                    if (leg === null) { return cb(true) }
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
