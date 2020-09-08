@@ -67,7 +67,7 @@ const MapComp = (props) => {
     useEffect(() => {
         socket.on('newMeetingAssigned', handleNewMeeting);
         return () => {
-            socket.off('newMeetingAssgined', handleNewMeeting);
+            socket.off('newMeetingAssigned', handleNewMeeting);
         }
     }, []);
 
