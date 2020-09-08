@@ -19,6 +19,7 @@ import { updateMyStartTime, checkDateBlock, assignSB } from '../../fetch_and_uti
 
 import { logE } from '../../handlers/consoleLogHandler'
 import { adminUpdateMyStartTime } from '../../scenes/admin/fetch_and_utils';
+import { useRef } from 'react';
 
 export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { err, data, isAdmin, selectedSB, handleForceAssign, assigned } = props
@@ -28,11 +29,15 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const { openGenAlert } = useContext(MainContext)
     const sbctx = useContext(SBContext)
     const adminctx = useContext(AdminMainContext)
+
+    const mapRef = useRef()
+
     let userData,
         setStartTimes, startTimes,
         setMyMeetings,
         isPrint, setIsPrint,
-        totalLength
+        totalLength,
+        setSelectedIsolator
     if (sbctx && typeof sbctx === "object") {
         userData = sbctx.userData;
         setStartTimes = sbctx.setStartTimes;
@@ -40,32 +45,34 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         setMyMeetings = sbctx.setMyMeetings;
         setIsPrint = sbctx.setIsPrint;
         totalLength = sbctx.totalLength;
+        setSelectedIsolator = () => { }
     } else if (adminctx && typeof adminctx === "object") {
         setMyMeetings = props.setMeetingsOfSelectedSB
         userData = selectedSB
         startTimes = adminctx.startTimes
         setStartTimes = adminctx.setStartTimes
+        setSelectedIsolator = adminctx.setSelectedIsolator
     }
 
     const userLocationInfo = isAdmin && selectedSB && typeof selectedSB === "object"
-        ? <div id="info-window-container">
+        ? <div id="info-window-container" className="limit-map-info-window-size">
             <div className="info-window-title bold blueText">בעל תוקע</div>
             <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{selectedSB.name}</div></div>
             <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{selectedSB.address}</div></div>
             <div className="pub-address-container" ><img src="טלפון" className="icon-on-map-locationInfo" src="/icons/phone.svg" /><div>{selectedSB.phone || selectedSB.username}</div></div>
-            {assigned || !props.data.selectedIsolatorLoc ? null : <div onClick={handleForceAssign} className="pointer" id="assign-btn">שבץ</div>}
         </div>
         : null
     const isolatorLocationInfo = isAdmin && props.data.selectedIsolatorLoc && typeof props.data.selectedIsolatorLoc === "object"
-        ? <div id="info-window-container" className="limit-map-info-window-size">
+        ? <div id="info-window-container">
             <div className="info-window-title bold blueText">מחפש/ת</div>
             <div className="pub-shofar-blower-name-container"><img alt="שם המחפש/ת" src={'/icons/shofar.svg'} /><div>{props.data.selectedIsolatorLoc.name}</div></div>
             <div className="pub-address-container"><img alt="מיקום" src={'/icons/address.svg'} /><div>{props.data.selectedIsolatorLoc.address}</div></div>
+            {assigned || !props.data.selectedIsolatorLoc ? null : <div onClick={handleForceAssign} className="pointer" id="assign-btn">שבץ</div>}
         </div>
         : null
 
     const userLocationIcon = {
-        url: isAdmin ? "/icons/single-blue.svg" : '/icons/sb_origin.svg',
+        url: isAdmin ? "/icons/shofar-blue.svg" : '/icons/sb_origin.svg',
         scaledSize: isAdmin ? new window.google.maps.Size(30, 30) : new window.google.maps.Size(80, 80),
         // origin: new window.google.maps.Point(0, 0),
         anchor: isAdmin ? new window.google.maps.Point(15, 15) : new window.google.maps.Point(50, 50),
@@ -102,7 +109,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     }, [isPrint])
 
     useEffect(() => {
-        if (data && Array.isArray(data.myMLocs) && data.myMLocs.length) {
+        if (data && Array.isArray(data.myMLocs)) {
             setData();
         }
 
@@ -112,7 +119,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         window.print()
     }
     const setData = async () => {
-        if (!Array.isArray(data.myMLocs) || !data.myMLocs.length) return;
+        if (!Array.isArray(data.myMLocs)) return;
         const userOrigin = { location: data.userOriginLoc, origin: true }
         const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
@@ -159,9 +166,9 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
             const meetingsToUpdateST = [];
             for (let m of routeStops) { //loop current stops and their start times
-                let myNewStartTime = getMyNewST(m.meetingId, m.isPublicMeeting)
-                if (!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
-                    meetingsToUpdateST.push({ meetingId: m.meetingId, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
+                let myNewStartTime = getMyNewST(m.meetingId || m.id, m.isPublicMeeting)
+                if (!m.startTime || (!m.id && !m.meetingId) || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                    meetingsToUpdateST.push({ meetingId: m.meetingId || m.id, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
                 if (isAdmin) {
@@ -181,7 +188,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                 }))
             }
             setRoutePath(res.overviewPath)
-        }
+        } else { /* console.log("jfksl");  */setRoutePath([]) }
 
         //get const meetings overview
         let constOverviewPaths = [];
@@ -247,11 +254,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const changeMap = () => setGenMap(v => { props.handleMapChanged(!v); return !v })
     return (
         <GoogleMap
+            ref={mapRef}
             defaultZoom={18}
             defaultOptions={mapOptions}
             center={props.center}
             onClick={closeSideMeetingsList}
             onDrag={closeSideMeetingsList}
+            onCenterChanged={() => { props.onCenterChanged(mapRef.current.getCenter()) }}
         >
             {
                 genMap ?
@@ -263,6 +272,10 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                         data={data}
                         b4OrAfterRoutePath={b4OrAfterRoutePath}
                         routePath={routePath}
+                        showIsolators={props.showIsolators}
+                        isolators={props.isolators}
+                        handleForceAssign={handleForceAssign}
+                        setSelectedIsolator={setSelectedIsolator}
                     />
             }
             {/* user location */}
@@ -295,15 +308,16 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     );
 }));
 
-const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
+const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators, isolators, handleForceAssign, setSelectedIsolator }) => (
     <>
+        {/* {console.log('routePath: ', routePath)} */}
         {/* reqsLocs */
             Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
-                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} info={m.info} />)
+                data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} defaultInfoState={false} info={m.info} />)
                 : null}
         {/* myMLocs */
             Array.isArray(data.myMLocs) && data.myMLocs.length ?
-                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconUrl={m.iconUrl} iconType={m.iconType} location={m.location} info={m.info} />)
+                data.myMLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconUrl={m.iconUrl} iconType={m.iconType} defaultInfoState={false} location={m.location} info={m.info} />)
                 : null}
 
         {Array.isArray(routePath) ?
@@ -326,6 +340,32 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath }) => (
                     />
                 ))
                 : null}
+
+        {showIsolators && isolators.map((isolator, index) =>
+            <SBMarkerGenerator
+                key={index}
+                markerIcon={{
+                    url: 'icons/singleOrange.svg',
+                    scaledSize: { width: 25, height: 25 },
+                    anchor: { x: 12.5, y: 12.5 }
+                }}
+                onClick={() => { setSelectedIsolator(isolator) }}
+                location={{ lat: Number(isolator.lat), lng: Number(isolator.lng) }}
+                info={<div className="infoWindowContainer">
+                    <div className="infoWindowTitle bold blueText">מחפש/ת</div>
+                    <div className="pubShofarBlowerNameContainer">
+                        <img alt="" src='/icons/shofar.svg' />
+                        <div>{isolator.name}</div>
+                    </div>
+                    <div className="pubAddressContainer">
+                        <img alt="" src='/icons/address.svg' />
+                        <div>{isolator.address}</div>
+                    </div>
+                    {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
+                    <div className='infoWindowButton pointer' onClick={() => { handleForceAssign("PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I", isolator) }}>שבץ</div>
+                </div>}
+            />
+        )}
 
     </>
 );

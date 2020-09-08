@@ -96,6 +96,9 @@ module.exports = function (ShofarBlower) {
             let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
             const { userId } = options.accessToken;
             const { meetingId } = meetToDelete;
+            if (!userId || isNaN(Number(userId)) || !meetingId || isNaN(Number(meetingId))) {
+                return false;
+            }
             if (meetToDelete.isPublicMeeting) {//public meeting
                 let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                 if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
@@ -282,7 +285,7 @@ module.exports = function (ShofarBlower) {
                     //delete the meeting
                     meetingsToDelete.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
-                await ShofarBlower.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+                await ShofarBlower.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { blowerMeetingId: null, meeting_time: null });
                 //TODO: להודיע למבודדים שבוטלה להם הפגישה
                 await ShofarBlower.destroyById(id);
 
@@ -419,6 +422,8 @@ module.exports = function (ShofarBlower) {
         if (!options || !options.accessToken || !options.accessToken.userId) {
             return cb(true)
         }
+
+        if (!sbId || isNaN(Number(sbId)) || sbId < 1) return cb("NO_SHOFAR_BLOWER"); // need shofar blower id
 
         (async () => {
             const myRouteQ = `

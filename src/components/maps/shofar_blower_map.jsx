@@ -13,6 +13,7 @@ import { splitJoinAddressOnIsrael, checkDateBlock } from '../../fetch_and_utils'
 import { isBrowser } from "react-device-detect";
 import { AdminMainContext } from '../../scenes/admin/ctx/AdminMainContext';
 import { logE } from '../../handlers/consoleLogHandler';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 const to = promise => (promise.then(data => ([null, data])).catch(err => ([err])))
@@ -56,6 +57,7 @@ const ShofarBlowerMap = (props) => {
 
 
     const [center, setCenter] = useState({});
+    const [backToCenterBtn, setBackToCenterBtn] = useState(false);
 
     const [userOriginLoc, setUserOriginLoc] = useState(null)
     const [allGenLocations, setAllGenLocations] = useState(null)
@@ -313,6 +315,7 @@ const ShofarBlowerMap = (props) => {
                 location={props.location}
                 changeCenter={setCenter}
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
+                onCenterChanged={(s) => { setCenter(s); setBackToCenterBtn(true) }}
 
                 err={err}
                 isAdmin={isAdmin}
@@ -324,13 +327,17 @@ const ShofarBlowerMap = (props) => {
                 allGenLocations={allGenLocations}
                 handleMapChanged={handleMapChanged}
                 setMeetingsOfSelectedSB={props.setMeetingsOfSelectedSB}
+                showIsolators={props.showIsolators}
+                isolators={props.isolators}
 
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
             />
-
+            {backToCenterBtn && (!isAdmin || (isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat))
+                ? <div className="center-map-btn-container"><FontAwesomeIcon icon="crosshairs" className="center-map-btn" onClick={() => { setBackToCenterBtn(false); setCenter(isAdmin && props.selectedSB && props.selectedSB.lng && props.selectedSB.lat ? { lat: Number(props.selectedSB.lat), lng: Number(props.selectedSB.lng) } : userOriginLoc) }} /></div>
+                : null}
         </div>
     );
 }

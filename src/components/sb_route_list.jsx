@@ -111,19 +111,20 @@ const SBRouteList = (props) => {
         return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={isAdmin ? undefined : () => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
                 {index !== CONST_MEETING ? <div className="meeting-in-route-img">
-                    {index === -1 ?
+                    {index == -1 ?
                         <img src="/icons/white_shofar.svg" />
-                        : index + 1}
+                        : Number(index) + 1}
                 </div> : null}
             </div>
             <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">
-                    <div className="meeting-in-route-title" >{index === -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : (isAdmin ? value.isolatedName: value.name))}</div>
+                    <div className="meeting-in-route-title" >{index == -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : (isAdmin ? value.isolatedName : value.name))}</div>
                     <div className="meeting-in-route-location" >{typeof value.address === "string" ? splitJoinAddressOnIsrael(value.address) : ""}</div>
                     <div className="meeting-in-route-comments" >{value.comments || ""}</div>
+                    {isAdmin && value.isPublicMeeting && !isNaN(Number(value.signedCnt)) ? <div className="meeting-in-route-comments" >{`${value.signedCnt} משתתפים`}</div> : null}
                 </div>
                 <div className="meeting-in-route-info-2">
-                    <img src={value.isPublicMeeting ? "/icons/group-orange.svg" : "/icons/single-blue.svg"} alt={value.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
+                    <img src={index == -1 ? "/icons/shofar-blue.svg" : value.isPublicMeeting ? "/icons/group-orange.svg" : "/icons/single-blue.svg"} alt={value.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
                     <div className="meeting-in-route-time">{moment(value.startTime).format("HH:mm")}</div>
                 </div>
             </div>
