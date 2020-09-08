@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CONSTS } from '../../consts/const_messages';
 import MarkerGenerator from './marker_generator';
 import { isBrowser } from 'react-device-detect';
@@ -18,6 +19,7 @@ const MapComp = (props) => {
     const [selfLocation, setSelfLocation] = useState({});
     const [userLocation, setIsMarkerShown] = useState(false);
     const [mapInfo, setMapInfo] = useState({});
+    const [backToCenterBtn, setBackToCenterBtn] = useState(false);
     const socket = useSocket();
 
     useEffect(() => {
@@ -25,7 +27,7 @@ const MapComp = (props) => {
             let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/getMapData?isPubMap=${props.publicMap || false}`, {
                 headers: { Accept: "application/json", "Content-Type": "application/json" }
             }, true);
-            if (err){console.log(err)}
+            if (err) { console.log(err) }
             if (mapContent) {
                 setMapInfo(mapContent);
             }
@@ -33,7 +35,7 @@ const MapComp = (props) => {
     }, []);
 
 
-    useJoinLeave('blower-events', () => (err) => {
+    useJoinLeave('blower-events', (err) => {
         if (err) console.log("failed to join room");
     });
 
@@ -63,9 +65,9 @@ const MapComp = (props) => {
     };
 
     useEffect(() => {
-        socket.on('newMeetingAssined', handleNewMeeting);
+        socket.on('newMeetingAssigned', handleNewMeeting);
         return () => {
-            socket.off('newMeetingAssined', handleNewMeeting);
+            socket.off('newMeetingAssgined', handleNewMeeting);
         }
     }, []);
 
@@ -211,6 +213,7 @@ const MapComp = (props) => {
                 findLocationCoords={findLocationCoords}
                 changeCenter={setCenter}
                 allLocations={allLocations}
+                onCenterChanged={(s) => { setCenter(s); setBackToCenterBtn(true) }}
                 center={Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 userLocation={userLocation}
                 googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
@@ -219,6 +222,7 @@ const MapComp = (props) => {
                 mapElement={<div style={{ height: `100%` }} />}
             />
             {(props.publicMap || !isBrowser) && <div className={`${isBrowser ? 'close-map ' : 'close-map-mobile'} clickAble`} onClick={props.closeMap}><img alt="" src='/icons/goUp.svg' /></div>}
+            {backToCenterBtn ? <div className="center-map-btn-container"><FontAwesomeIcon icon="crosshairs" className="center-map-btn" onClick={() => { setBackToCenterBtn(false); setCenter(selfLocation) }} /></div> : null}
         </div>
     );
 }
@@ -227,7 +231,7 @@ export default MapComp;
 
 
 const MyMapComponent = withScriptjs(withGoogleMap((props) => {
-
+    const mapRef = useRef()
     let options = CONSTS.MAP_OPTIONS;
     var israelPolygon = new window.google.maps.Polygon({
         paths: CONSTS.ISRAEL_COORDS,
@@ -259,9 +263,11 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) => {
     }
 
     return <GoogleMap
+        ref={mapRef}
         defaultZoom={20}
         defaultOptions={options}
         center={props.center}
+        onCenterChanged={() => { props.onCenterChanged(mapRef.current.getCenter()); }}
     >
         <SearchBoxGenerator settings={props.settings} publicMap={props.publicMap} changeCenter={props.changeCenter} center={props.center} findLocationCoords={props.findLocationCoords} />
         {props.userLocation ? <MarkerGenerator position={props.selfLocation} icon={userLocationIcon} meetAddress={props.meetAddress} /> : null} {/* my location */}
