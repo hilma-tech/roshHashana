@@ -122,11 +122,11 @@ const SBHomePage = (props) => {
     }, []);
 
     const addNewReq = (newReq) => {
-        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq]);
         // no update on genMapData
     }
     const removeReq = (reqToRemove) => {
-        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId && req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
+        setMeetingsReqs(reqs => Array.isArray(reqs) ? reqs.filter(req => req.meetingId != reqToRemove.meetingId || req.isPublicMeeting != reqToRemove.isPublicMeeting) : [])
     }
     const updateReqData = (newReqData) => {
         setMeetingsReqs(reqs => !Array.isArray(reqs) ? [] :
@@ -145,6 +145,10 @@ const SBHomePage = (props) => {
                     && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? { ...req, ...newReqData, meetingId: newReqData.newMeetingId } : req
             })
         );
+    }
+
+    const addMeetingToMyRoute = (req) => {
+        setMyMeetings(meetings => Array.isArray(meetings) ? [...meetings, req] : [req]);
     }
 
     const fetchAndSetData = async () => {

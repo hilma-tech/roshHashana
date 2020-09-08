@@ -25,6 +25,7 @@ export const AdminMainProvider = ({ children }) => {
     const [selectedIsolator, setSelectedIsolator] = useState(null)
     const [startTimes, setStartTimes] = useState(null)
     const [totalLength, setTotalLength] = useState(null)
+    const [shofarBlowerIdToEdit, setShofarBlowerIdToEdit] = useState(null)
 
     useEffect(() => {
         if (startTimes) setTotalLength(getTotalLength())
@@ -58,6 +59,7 @@ export const AdminMainProvider = ({ children }) => {
         selectedSB, setSelectedSB,
         startTimes, setStartTimes, totalLength,
         selectedIsolator, setSelectedIsolator,
+        shofarBlowerIdToEdit, setShofarBlowerIdToEdit
     }
 
     return <AdminMainContext.Provider value={ctxValue} >{children}</AdminMainContext.Provider>
