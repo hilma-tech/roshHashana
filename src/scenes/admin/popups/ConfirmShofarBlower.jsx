@@ -22,7 +22,7 @@ const ConfirmShofarBlower = (props) => {
                         </div>
                         <div className="saveBtn blueText bold pointer" style={{ margin: '0 auto 2vh', fontSize: '3vh', boxShadow: '#00000029 0 3px 6px' }} onClick={() => {
                             props.handleDismiss(false)
-                            props.goTo('/shofar-blowers')
+                            props.goTo('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blowers')
                         }}>אשר מתנדבים</div>
                         <div className="confirm-later-btn blueText pointer" onClick={() => {
                             props.handleDismiss(false)

@@ -345,7 +345,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
             <SBMarkerGenerator
                 key={index}
                 markerIcon={{
-                    url: 'icons/singleOrange.svg',
+                    url: '/icons/singleOrange.svg',
                     scaledSize: { width: 25, height: 25 },
                     anchor: { x: 12.5, y: 12.5 }
                 }}

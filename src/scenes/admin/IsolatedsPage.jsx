@@ -19,14 +19,6 @@ const IsolatedPage = function (props) {
         })()
     }, [])
 
-    useEffect(() => {
-        if (selectedIsolator && props.location.pathname === "/searchings") {
-            props.history.push("/searcher")
-        } else if (selectedIsolator === null && props.location.pathname === "/searcher") {
-            props.history.push("/searchings")
-        }
-    }, [selectedIsolator])
-
     const getIsolateds = function (filter = filters, startRow = 0) {
         (async () => {
             if (!filter) filter = filters

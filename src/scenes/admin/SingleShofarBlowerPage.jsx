@@ -40,7 +40,7 @@ const SingleShofarBlowerPage = (props) => {
     }, [])
 
     if ((selectedIsolator && !selectedSB) || (!selectedIsolator && (!selectedSB || selectedSB === null))) { //if came from shofar blower page-table but we don't have a selected sb -- redirect to shofar blowers page-table
-        if (props.history && props.history.goBack) { assigned ? props.history.push('searching') : props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
+        if (props.history && props.history.goBack) { assigned ? props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searching') : props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
     }
 
     const cleanUp = () => {
@@ -195,7 +195,7 @@ const SingleShofarBlowerPage = (props) => {
             </div>
             {(selectedIsolator && !assigned) ? null : <div className='mapNavContainer' id="mapNavContainer-in-shofar-blower-map">
                 <div className={'mapIconContainer orangeText pointer' + (showIsolators ? ' mapIconSelected' : '')} onClick={showIsolatorsMarkers}>
-                    <img src='icons/singleOrange.svg' alt='' />
+                    <img src='/icons/singleOrange.svg' alt='' />
                     <div className='textInHover orangeBackground bold'>מחפשים</div>
                 </div>
             </div>}

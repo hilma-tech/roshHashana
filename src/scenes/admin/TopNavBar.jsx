@@ -39,12 +39,12 @@ const TopNavBar = (props) => {
         <div className="admin-header">
             <div>
                 <FontAwesomeIcon icon={['fas', 'bars']} color="#747474" className="menueIcon pointer" onClick={() => { setOpenSideBar(true) }} />
-                <img onClick={() => { props.history.push("/home") }} className="pointer iconNav" alt="יום תרועה" src='/images/blueHeader.svg' />
+                <img onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/home") }} className="pointer iconNav" alt="יום תרועה" src='/images/blueHeader.svg' />
             </div>
             <div className="general-numbers">
-                <span onClick={() => { props.history.push("/searchings") }} className="pointer orange"><span className="black-font"> {isolatedNum} </span> <div className="header-detail">מחפשים בעלי תקיעה</div></span>
-                <span onClick={() => { props.history.push("/shofar-blowers") }} className="pointer dark-turq"><span className="black-font"> {blowersNum} </span> <div className="header-detail">מתנדבים לתקוע בשופר</div></span>
-                <span onClick={() => { props.history.push("/blasts") }} className="pointer light-blue"><span className="black-font"> {blastsNum} </span> <div className="header-detail">תקיעות שופר ברחבי הארץ</div></span>
+                <span onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searchings") }} className="pointer orange"><span className="black-font"> {isolatedNum} </span> <div className="header-detail">מחפשים בעלי תקיעה</div></span>
+                <span onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blowers") }} className="pointer dark-turq"><span className="black-font"> {blowersNum} </span> <div className="header-detail">מתנדבים לתקוע בשופר</div></span>
+                <span onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/blasts") }} className="pointer light-blue"><span className="black-font"> {blastsNum} </span> <div className="header-detail">תקיעות שופר ברחבי הארץ</div></span>
             </div>
         </div>
     </>;
