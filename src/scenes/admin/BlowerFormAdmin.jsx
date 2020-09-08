@@ -40,6 +40,8 @@ const materialTheme = createMuiTheme({
 
 const format = 'HH:mm';
 
+let originalValues = null
+
 export default function BlowerFormAdmin(props) {
     // const { showAlert } = useContext(MainContext)
     const { shofarBlowerIdToEdit, setShofarBlowerIdToEdit } = useContext(AdminMainContext)
@@ -58,6 +60,7 @@ export default function BlowerFormAdmin(props) {
     const [openPublicMeetingOptions, setOpenPublicMeetingOptions] = useState(false) // open or close the public meeting options form
     const [publicPlaces, setPublicPlaces] = useState([]) //a list of all the public places that the shofar blower added,
     const [walkTime, setWalkTime] = useState(-15) //the total time the shofar blower wants to walk
+    const [publicPlacesChanged, setPublicPlacesChanged] = useState(false)
 
     useEffect(() => {
         (async () => {
@@ -71,10 +74,12 @@ export default function BlowerFormAdmin(props) {
                         setBlastsNum(Number(res.blastsNum))
                         setAddress(res.address)
                         setChosenTime(res.chosenTime)
+                        setWalkTime(res.walkTime)
                         if (res.publicPlaces.length > 0) {
                             setOpenPublicMeetingOptions(true)
                             setPublicPlaces(res.publicPlaces)
                         }
+                        originalValues = res
                     }
                 })
             }
@@ -84,6 +89,7 @@ export default function BlowerFormAdmin(props) {
             setShofarBlowerIdToEdit(null)
         }
     }, [])
+
     //update the start time the shofar blower wants to start his volunteering
     const changeChosenTime = (time) => {
         setChosenTime(time._d)
@@ -99,6 +105,7 @@ export default function BlowerFormAdmin(props) {
 
     //update the public meeting that the shofar blower added
     const updatePublicPlace = (index, keyName, publicPlaceVal) => {
+        setPublicPlacesChanged(true)
         let value;
         if (keyName === 'time') {
             value = new Date(publicPlaceVal);
@@ -113,6 +120,7 @@ export default function BlowerFormAdmin(props) {
 
     //create another public place
     const addPublicPlace = () => {
+        setPublicPlacesChanged(true)
         if (publicPlaces.length < 4) {
             setPublicPlaces(prev => {
                 prev.push({ id: prev.length })
@@ -124,6 +132,7 @@ export default function BlowerFormAdmin(props) {
 
     //remove the public meeting
     const removePubPlace = (index) => {
+        setPublicPlacesChanged(true)
         setPublicPlaces(prev => {
             prev.splice(index, 1)
             return [...prev]
@@ -153,10 +162,12 @@ export default function BlowerFormAdmin(props) {
 
     //update walk time
     const handleWalkTImeChange = (event, newValue) => {
+
         setWalkTime(newValue)
     }
 
     const handleAddressChange = (address) => {
+        console.log(address)
         setAddress(address)
     }
 
@@ -240,34 +251,58 @@ export default function BlowerFormAdmin(props) {
             "volunteering_start_time": startTime,
             "volunteering_max_time": Math.abs(walkTime),//endTime,
             "address": address,
-            "publicPlaces": publicPlaces
+            "publicMeetings": publicPlaces
         }
+
+        const userData = {
+            phone: phone,
+            name: name,
+            role: 2
+        }
+
+        if (shofarBlowerIdToEdit) {
+            if (blastsNum === originalValues.blastsNum) delete blowerDetails["can_blow_x_times"]
+            if (chosenTime === originalValues.chosenTime) delete blowerDetails["volunteering_start_time"]
+            if (walkTime === originalValues.walkTime) delete blowerDetails["volunteering_max_time"]
+            if (address === originalValues.address) delete blowerDetails.address
+            if (!publicPlacesChanged) delete blowerDetails.publicPlaces
+            console.log(blowerDetails)
+            blowerDetails.userId = originalValues.userId
+
+            // if (phone === originalValues.phone) delete userData.phone
+            // if (name === originalValues.name) delete userData.name
+        }
+
         setErrorMsg('')
         setPhoneErr('')
         setAddressErr('')
         setNumOfBlowErr('')
 
-        let [cuRes, duErr] = await Auth.superAuthFetch('/api/CustomUsers/' + (true ? 'createUser' : 'editUser'), {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ phone: phone, name: name, role: 2 })
-        }, true);
-        if (duErr || !cuRes) {
-            return duErr === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר"
+        if (!shofarBlowerIdToEdit) {
+            let [cuRes, duErr] = await Auth.superAuthFetch('/api/CustomUsers/createUser', {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify(userData)
+            }, true);
+            if (duErr || !cuRes) {
+                return duErr === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה, נא עברו על פרטי הרשמתכם או נסו שנית מאוחר יותר"
+            }
+            blowerDetails.userId = cuRes.id
         }
 
-        blowerDetails.userId = cuRes.id
         //update shofar blower details
-        let [res, error] = await Auth.superAuthFetch(`/api/shofarBlowers/` + (true ? 'InsertDataShofarBlowerAdmin' : 'editDataShofarBlowerAdmin'), {
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ data: blowerDetails })
-        }, true);
-        if (!error) {
-            props.history.goBack()
-        }
-        else if (res) {
-            setErrorMsg(typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה')
+        if (Object.keys(blowerDetails).length > 1) {
+            let [res, error] = await Auth.superAuthFetch(`/api/` + (!shofarBlowerIdToEdit ? 'shofarBlowers/InsertDataShofarBlowerAdmin' : 'CustomUsers/updateUserInfoAdmin'), {
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify({ data: blowerDetails })
+            }, true);
+            if (!error) {
+                props.history.goBack()
+            }
+            else if (res) {
+                setErrorMsg(typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה')
+            }
         }
     }
 
@@ -286,14 +321,16 @@ export default function BlowerFormAdmin(props) {
                 <form onSubmit={saveShofarBlowerDetails} onKeyPress={handleKeyPress}>
 
                     {/* shofar blowing name input */}
-                    <div className="title">שם מלא</div>
-                    <input type="text" placeholder={"נא להזין שם מלא"} value={name} onChange={handleNameChange} autoComplete={'off'} />
-                    <div className="err-msg ">{nameErr}</div>
+                    {!shofarBlowerIdToEdit && <div>
+                        <div className="title">שם מלא</div>
+                        <input type="text" placeholder={"נא להזין שם מלא"} value={name} onChange={handleNameChange} autoComplete={'off'} />
+                        <div className="err-msg ">{nameErr}</div>
 
-                    {/* shofar blowing phone input */}
-                    <div className="title">מספר פלאפון</div>
-                    <input type="tel" placeholder={"נא להזין מספר טלפון נייד"} value={phone} onChange={handlePhoneChange} />
-                    <div className="err-msg ">{phoneErr}</div>
+                        {/* shofar blowing phone input */}
+                        <div className="title">מספר פלאפון</div>
+                        <input type="tel" placeholder={"נא להזין מספר טלפון נייד"} value={phone} onChange={handlePhoneChange} />
+                        <div className="err-msg ">{phoneErr}</div>
+                    </div>}
 
                     {/* shofar blowing times input */}
                     <div className="title">כמה פעמים יהיה מוכן לתקוע בשופר באזורו?</div>
@@ -320,7 +357,7 @@ export default function BlowerFormAdmin(props) {
                     {/* address inputs */}
                     <div className="title">מה הכתובת ממנה הוא יוצא?</div>
                     <div id="comment">נא לרשום את הכתובת המלאה</div>
-                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={address} />
+                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={address.length > 0 ? address[0] : address} />
                     <div className="err-msg ">{addressErr}</div>
 
                     {/* walk time slider */}

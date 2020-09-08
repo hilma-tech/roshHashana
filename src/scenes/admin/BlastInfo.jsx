@@ -38,7 +38,7 @@ const BlastInfo = (props) => {
 
             <div className="flexContainer leftdives">
                 <div className="bold fonttkia">תקיעה {blastInfo.type}</div>
-                <div>10 משתתפים</div>
+                {blastInfo.type === "ציבורית" && <div>{blastInfo.participantsNum} משתתפים</div>}
             </div>
 
             <div className="flexContainer infoBox">
@@ -95,7 +95,7 @@ const BlastInfo = (props) => {
             </div>
             <ParticipantsPopup />
 
-        </div >
+        </div>
     );
 }
 export default BlastInfo;

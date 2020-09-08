@@ -17,7 +17,6 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     const [shofarBlowers, setShofarBlowers] = useState([])
     const [blasts, setBlasts] = useState([])
     const [isolateds, setIsolateds] = useState([])
-
     const [showShofarBlowers, setShowShofarBlowers] = useState(false)
     const [showBlasts, setShowBlasts] = useState(false)
     const [showIsolateds, setShowIsolateds] = useState(false)
@@ -81,7 +80,6 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         fetchShofarBlowersForMap((err, res) => {
             if (!err) {
                 setShofarBlowers(res)
-                // console.log(res)
             }
         })
     }
@@ -159,10 +157,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     return <GoogleMap
         zoom={zoom}
-        onZoomChanged={(num) => setZoom(num)}
+        onZoomChanged={() => setZoom(null)}
         center={center}
         defaultOptions={options}
-
     >
         <div className='mapNavContainer'>
             <div className="inputContainer" >

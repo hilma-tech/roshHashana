@@ -110,10 +110,14 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs)) {
-            setData();
+            if (!data.myMLocs.length) {
+                setRoutePath([])
+            } else {
+                setTimeout(() => { data && Array.isArray(data.myMLocs) && data.myMLocs.length && setData() }, 0)
+            }
         }
-
     }, [data.myMLocs])
+
     const handlePrint = () => {
         document.scrollTop = 0
         window.print()
@@ -151,6 +155,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     sessionStorage.setItem('showAlertMaxBlowTimes', false); //update session storage in order to show the alert only once
                 }
             } catch (_e) { }
+            if (!Array.isArray(routeStops) || !routeStops.length) { setRoutePath([]); return }
+
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
                 logE("getoverviewpath 1 : ", err);
@@ -187,8 +193,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     return { ...m, startTime: newMMStartTime.startTime }
                 }))
             }
-            setRoutePath(res.overviewPath)
-        } else { /* console.log("jfksl");  */setRoutePath([]) }
+            if (!Array.isArray(routeStops) || !routeStops.length)
+                setRoutePath([])
+            else {
+                if (Array.isArray(routeStops) && routeStops.length)
+                    setRoutePath(res.overviewPath)
+            }
+        } else setRoutePath([])
 
         //get const meetings overview
         let constOverviewPaths = [];

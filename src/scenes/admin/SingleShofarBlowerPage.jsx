@@ -66,6 +66,7 @@ const SingleShofarBlowerPage = (props) => {
         cleanUp()
     }
     const handleForceAssign = (va, iso) => { //lol
+        console.log(iso, 'isoooo')
         if (va !== "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && (!selectedSB || !selectedIsolator || typeof selectedSB !== "object" || typeof selectedIsolator !== "object")) {
             openGenAlert({ text: "לא ניתן לשבץ" }); // not supposed to get here came to this page to assign (should get here only by mistake when not meaning to assign).. or when some data is missing bu mistake(idk)
             return
@@ -74,7 +75,7 @@ const SingleShofarBlowerPage = (props) => {
             openGenAlert({ text: "לא ניתן לשבץ" });
             return
         }
-        if(va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso){
+        if (va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso) {
             setSelectedIsolator(iso)
         }
 
@@ -104,6 +105,10 @@ const SingleShofarBlowerPage = (props) => {
                 //! MAX_ROUTE_LENGTH_20
                 openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
                 return
+            }
+            else if (assignRes.errName === "MAX_DURATION_180") {
+                openGenAlert({ text: "אורך מסלולך לאחר השיבוץ ארוך מדי, נא נסו להשתבץ לפגישה אחרת", isPopup: { okayText: "הבנתי" } })
+                return;
             }
             else openGenAlert({ text: assign_default_error })
         }
@@ -138,7 +143,7 @@ const SingleShofarBlowerPage = (props) => {
                     openGenAlert({ text: typeof err === "string" ? err : assign_default_error })
                     return;
                 }
-                handleAssignSuccess()//shouldn't get MAX_ROUTE_LENGTH error now, cos validation is first on that and then on max duration
+                handleAssignSuccess(selectedIsolator)//shouldn't get MAX_ROUTE_LENGTH error now, cos validation is first on that and then on max duration
             })
         return;
     }

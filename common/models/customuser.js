@@ -1064,7 +1064,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -1088,7 +1088,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
+            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1099,6 +1099,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${userData.maxRouteDuration} (new)${newTotalTime}`);
+            if (!newTotalTime || isNaN(newTotalTime) || newTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
@@ -1169,7 +1170,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${userId}`)
@@ -1287,7 +1288,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.updateUserInfoAdmin = async (data, options) => {
-        const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
+        const { ShofarBlower } = CustomUser.app.models;
 
         const userId = data.userId;
 
@@ -1361,6 +1362,14 @@ module.exports = function (CustomUser) {
             throw error;
         }
     }
+
+    CustomUser.remoteMethod('updateUserInfoAdmin', {
+        http: { verb: 'POST' },
+        accepts: [{ arg: 'data', type: 'object' }],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
         console.log('adminAssignSBToIsolator: ', sb, isolator);
         (async () => {
@@ -1479,7 +1488,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -1503,7 +1512,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducerFn = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //mins to ms
+            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1514,6 +1523,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${sbData.maxRouteDuration} (new)${newSBTotalTime} --> if true return err ${sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration}`);
+            if (!newSBTotalTime || isNaN(newSBTotalTime) || newSBTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newSBTotalTime, maxRouteDuration: sbData.maxRouteDuration, newAssignMeetingObj: newIsolatorMeetingObj } })
             }
@@ -1611,7 +1621,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${sbId}`)
