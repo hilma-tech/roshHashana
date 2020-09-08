@@ -230,7 +230,7 @@ module.exports = function (Isolated) {
                 }
 
                 //todo check if need to add to select here: IF(isolated.public_meeting, sbp.id, isolated.id) AS id,isolated.public_meeting (for adminAssignSBToIsolator)
-                const isolatedQ = `SELECT IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting", cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
+                const isolatedQ = `SELECT isolated.id AS "isolatedId", IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting", cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                     LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
@@ -282,7 +282,7 @@ module.exports = function (Isolated) {
     Isolated.deleteIsolatedAdmin = function (id, cb) {
         (async () => {
             try {
-                let isolatedInfo = await Isolated.findById(id, { fields: { public_meeting: true, blowerMeetingId: true, userIsolatedId: true } });
+                let isolatedInfo = await Isolated.findById(id);//, { fields: { public_meeting: true, blowerMeetingId: true, userIsolatedId: true } });
                 if (isolatedInfo.public_meeting) {
                     //check the user's public meeting and see if there are other isolated registered in the meeting
                     //go to public meetings and check if the meeting has people in it or blower
@@ -298,6 +298,8 @@ module.exports = function (Isolated) {
                 await Isolated.destroyById(id);
 
                 await Isolated.app.models.CustomUser.destroyById(isolatedInfo.userIsolatedId);
+                //call socket and update in blowers 
+                Isolated.app.io.to('admin-isolated-events').emit('deleteIsolatedByAdmin', { id: id, meetingId: isolatedInfo.public_meeting ? isolatedInfo.blowerMeetingId : id, isPublicMeeting: isolatedInfo.public_meeting });
 
                 return cb(null, 'SUCCESS');
 
