@@ -5,7 +5,7 @@ import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
 
-import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
 
 let status = 0
 
@@ -49,21 +49,19 @@ const IsolatedPage = function (props) {
             })
         })()
     }
+    const compareIsPublicMeetings = (pm1, pm2) => {
+        let pm1bool = (pm1 == 0 || pm1 == false) ? false : (pm1 == 1 || pm1 == true) ? true : null
+        let pm2bool = (pm2 == 0 || pm2 == false) ? false : (pm2 == 1 || pm2 == true) ? true : null
+        return (pm1bool === null || pm2bool === null) ? false : pm1bool == pm2bool
+    }
     const handleNewMeeting = (req) => {
         if (status === 0) {
             setIsolateds(prevIsolateds => {
-                console.log('prevSetIsolateds: ', prevIsolateds);
                 let isolateds = [...prevIsolateds]
-                if (req.isPublicMeeting === 1) {
-                    console.log('req.meetingId: ', req.meetingId);
-                    isolateds = isolateds.filter((isolated) => isolated.id !== req.meetingId)
-                    console.log("isolateds", isolateds)
-                    return isolateds
-                }
-       
+                isolateds = isolateds.filter((isolated) => (!compareIsPublicMeetings(isolated.isPublicMeeting, req.isPublicMeeting) || isolated.id !== req.meetingId))
+                return isolateds
             })
         }
-        console.log("req!!!", req)
     };
 
     const onSearchName = function (value) {
