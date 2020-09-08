@@ -70,11 +70,14 @@ module.exports = function (shofarBlowerPub) {
     shofarBlowerPub.getPublicMeetings = function (startRow, filter, cb) {
         (async () => {
             let where = 'WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1'
+            let orderBy = ''
             if (filter.address && filter.address.length > 0) {
-                where += ` AND MATCH(shofar_blower_pub.address) AGAINST ('"${filter.address}"')`
+                where += ` AND shofar_blower_pub.address REGEXP '${filter.address}'`
+                orderBy += `ORDER BY CASE WHEN shofar_blower_pub.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
             }
             if (filter.name && filter.name.length > 0) {
-                where += ` AND MATCH(blowerUser.name) AGAINST ('"${filter.name}"')`
+                where += ` AND blowerUser.name REGEXP '${filter.name}'`
+                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN blowerUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
             }
 
             //get all public meetings
@@ -84,12 +87,14 @@ module.exports = function (shofarBlowerPub) {
                     blowerUser.username AS "phone",
                     shofar_blower_pub.id,
                     shofar_blower_pub.address,
-                    shofar_blower_pub.comments ,
-                    shofar_blower_pub.start_time
+                    shofar_blower_pub.comments,
+                    shofar_blower_pub.start_time,
+                    (SELECT COUNT(*) FROM isolated WHERE blowerMeetingId = shofar_blower_pub.id) AS participantsNum
                 FROM shofar_blower_pub
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
-                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
+                    LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId
                 ${where}
+                ${orderBy}
                 LIMIT ${startRow}, 7`); //confirm change
 
             if (errPublic) cb(errPublic);

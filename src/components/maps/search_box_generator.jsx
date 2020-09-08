@@ -50,7 +50,7 @@ export const FormSearchBoxGenerator = ({ onAddressChange, uId, defaultValue, cla
         script.async = true;
         script.defer = true;
         script.id = "mapScript";
-        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&callback=init`
+        script.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}&callback=init`
         document.head.appendChild(script);
 
         return () => {

@@ -1064,7 +1064,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -1287,7 +1287,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.updateUserInfoAdmin = async (data, options) => {
-        const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
+        const { ShofarBlower } = CustomUser.app.models;
 
         const userId = data.userId;
 
@@ -1361,6 +1361,14 @@ module.exports = function (CustomUser) {
             throw error;
         }
     }
+
+    CustomUser.remoteMethod('updateUserInfoAdmin', {
+        http: { verb: 'POST' },
+        accepts: [{ arg: 'data', type: 'object' }],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
         console.log('adminAssignSBToIsolator: ', sb, isolator);
         (async () => {
@@ -1479,7 +1487,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []

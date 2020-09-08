@@ -47,7 +47,7 @@ const BlastsPubTable = (props) => {
 
     return (
         <div className='blastsTable'>
-            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={pubMeetingsNum} />
+            <GenericTable th={th} tr={tr} loading={loadingBlastsPub} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={7} resaultsNum={pubMeetingsNum} />
         </div>
     );
 }
