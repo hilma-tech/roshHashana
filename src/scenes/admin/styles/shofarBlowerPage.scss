@@ -53,7 +53,7 @@
         background-color: $grey;
         padding: 30px 5%;
         overflow-y: auto;
-        &::-webkit-scrollbar{
+        &::-webkit-scrollbar {
             display: none;
         }
         #about-sb {
@@ -106,7 +106,7 @@
             font-size: 1.2rem;
         }
     }
-    #assign-btn{
+    #assign-btn {
         background-color: $orange;
         border-radius: 36px;
         color: white;
@@ -120,14 +120,14 @@
         align-self: flex-end;
         font-size: 1.1rem;
     }
-    #notify-sb-btn{
+    #notify-sb-btn {
         display: flex;
         flex-direction: row;
         align-items: center;
         background-color: $dark-turquise;
         border-radius: 36px;
         font-size: 1.5rem;
-        padding: .5rem 1.5rem;
+        padding: 0.5rem 1.5rem;
         box-shadow: 0px 3px 6px #00000029;
         cursor: pointer;
         position: absolute;
@@ -136,10 +136,10 @@
         margin-bottom: 2rem;
         margin-left: 2rem;
         color: white;
-        & > svg{
+        & > svg {
             margin-left: 10px;
         }
-        &:hover{
+        &:hover {
             // color: #94b2b8;
         }
     }
@@ -148,7 +148,8 @@
     width: 60vw;
     height: 90vh;
     position: relative;
-    & > div {
+    & > div:not(.center-map-btn-container) {
+        //if center-map-btn-container className changes, change here too!!!
         height: 100% !important;
     }
 }
@@ -270,6 +271,32 @@
             font-size: 3vh;
             font-family: $Heebo;
             margin: 0 2rem;
+        }
+    }
+}
+.center-map-btn-container {
+    //if className changes, need to change up there ^^^ too (at .sb-map-container-admin)
+    //same as in sb.scss
+    height: 2rem;
+    width: 2rem;
+    position: absolute;
+    left: 2rem;
+    bottom: 3rem;
+    opacity: 0.8;
+    .center-map-btn {
+        box-shadow: #00000029 0 3px 6px;
+        opacity: 0.8;
+        // position: relative;
+        cursor: pointer;
+        background-color: #c9c9c9;
+        border-radius: 50%;
+        padding: 5px;
+        height: 90%;
+        width: 90%;
+        // font-size: 100%;
+        // color: white;
+        &:hover {
+            background-color: #a8a4a4;
         }
     }
 }

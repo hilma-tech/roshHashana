@@ -173,6 +173,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
     }
 
     const handleAssignSuccess = (newMeeting) => {
+        //set center to original location
         openGenAlert({ text: "שובצת בהצלחה" })
         closeAssign()
 
@@ -189,7 +190,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         else if (Array.isArray(genMapMeetings.publicMeetings)) {
             setGenMapMeetings(genMeets => ({ publicMeetings: genMeets.publicMeetings, privateMeetings: Array.isArray(genMeets.privateMeetings) ? [...genMeets.publicMeetings, newMeeting] : [newMeeting] }))
         }
-
         //LOCAL STATE (genMeetings and myMeetings) UPDATE WITH NEW MEETING --END
     }
 
@@ -219,8 +219,8 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                         return;
                     }
                     openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-                    setMyMeetings(myMeetings.filter(meet => meet.meetingId != assignMeetingInfo.meetingId))
-                    setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, assignMeetingInfo] : [assignMeetingInfo])
+                    setMyMeetings(myMeetings.filter(meet => (meet.meetingId != assignMeetingInfo.meetingId || Boolean(meet.isPublicMeeting) !== Boolean(assignMeetingInfo.isPublicMeeting))))
+                    setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, { ...assignMeetingInfo, startTime: null }] : [{ ...assignMeetingInfo, startTime: null }])
 
                     if (genMapMeetings) {
                         if (assignMeetingInfo.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {

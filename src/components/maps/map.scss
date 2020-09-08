@@ -6,12 +6,37 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    .center-map-btn-container {
+        //same as in ShofarBlowerPage.scss
+        height: 2rem;
+        width: 2rem;
+        position: absolute;
+        left: 2rem;
+        bottom: 3rem;
+        opacity: 0.8;
+        .center-map-btn {
+            box-shadow: #00000029 0 3px 6px;
+            opacity: 0.8;
+            // position: relative;
+            cursor: pointer;
+            background-color: #c9c9c9;
+            border-radius: 50%;
+            padding: 5px;
+            height: 90%;
+            width: 90%;
+            // font-size: 100%;
+            // color: white;
+            &:hover {
+                background-color: #a8a4a4;
+            }
+        }
+    }
 
     #info-window-container {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        font-family: 'Assistant', sans-serif !important;
+        font-family: "Assistant", sans-serif !important;
 
         div {
             font-size: 0.8rem;
@@ -150,7 +175,20 @@
     }
 }
 
-
+#mapNavContainer-in-shofar-blower-map {
+    position: absolute;
+    top: 12vh;
+    right: unset;
+    left: 5vw;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    z-index: 2;
+    padding: 1.5vh 3vh;
+    border-radius: 10px;
+    background-color: white;
+    backdrop-filter: none;
+}
 .mapNavContainer {
     position: absolute;
     top: 11vh;
@@ -166,7 +204,7 @@
     .inputContainer {
         // background-color: #ffffffc4;
         margin-left: 35vw;
-        
+
         input {
             padding: 1vh 0.5vw;
             border: #7070708e solid 0.5px;
@@ -214,18 +252,17 @@
         .blueBackground {
             background-color: #156879 !important;
         }
-        
+
         .orangeBackground {
-            background-color: #FDA42A !important;
+            background-color: #fda42a !important;
         }
-        
+
         .lightblueBackground {
-            background-color: #82C0CC !important;
+            background-color: #82c0cc !important;
         }
     }
 
     .mapIconSelected {
         border: solid 1px;
-
     }
 }

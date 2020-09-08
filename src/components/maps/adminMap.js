@@ -45,10 +45,10 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         else showIsolatedsMarkers()
     }, []);
 
-    const zoomPlace = (place, id = -1) => {
+    const zoomPlace = (place, userId = -1) => {
         setZoom(18)
         setCenter(place);
-        if (id !== -1) setSelectedMarkerId(id)
+        if (userId !== -1) setSelectedMarkerId(userId)
     }
 
     // const zoomOut = () => {
@@ -102,6 +102,12 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         setSelectedSB({ userId })
         // setIsFromIsolator(true)
         props.history.push('/shofar-blower')
+    }
+
+    const handleSBClick = (sb) => {
+        setSelectedSB({ userId: sb.userId })
+        props.history.push('/shofar-blower')
+        // zoomPlace({ lat: Number(sb.lat), lng: Number(sb.lng) }, 'shofarBlower-' + sb.userId)
     }
 
     const onInfoWindowIsolatedClick = (id) => {
@@ -171,7 +177,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(shofarBlower.lat), lng: Number(shofarBlower.lng) }, 'shofarBlower-' + shofarBlower.userId) }}
+                onClick={() => { handleSBClick(shofarBlower) }}
             >
                 {selectedMarkerId.split('-')[0] === 'shofarBlower' && shofarBlower.userId === Number(selectedMarkerId.split('-')[1]) &&
                     <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>

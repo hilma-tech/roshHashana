@@ -365,7 +365,7 @@ module.exports = function (CustomUser) {
                 userInfo.volunteering_start_time = blower.volunteering_start_time;
                 userInfo.volunteering_max_time = blower.volunteering_max_time;
 
-                let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId } });
+                let publicMeetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { blowerId: userId, constMeeting: 1 } });
                 userInfo.publicMeetings = [];
                 let pm;
                 if (Array.isArray(publicMeetings))
@@ -835,7 +835,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.mapInfoSB = function (options, cb) { // might make sense to move this to ShofarBlower.js BUT..
+    CustomUser.mapInfoSB = function (options, withoutUserData = false, cb) { // might make sense to move this to ShofarBlower.js BUT..
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
@@ -843,24 +843,27 @@ module.exports = function (CustomUser) {
             }
             const { userId } = options.accessToken
 
-            const userDataQ = `SELECT 
-                                shofar_blower.confirm, 
-                                shofar_blower.can_blow_x_times, 
-                                volunteering_start_time AS "startTime", 
-                                volunteering_max_time*60000 AS "maxRouteDuration", 
-                                CustomUser.name, 
-                                CustomUser.address, 
-                                CustomUser.lng,
-                                CustomUser.lat 
-                            FROM shofar_blower 
-                                LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
-                            WHERE CustomUser.id = ${userId}`
+            if (!withoutUserData) {
+                const userDataQ = `SELECT 
+                shofar_blower.confirm, 
+                shofar_blower.can_blow_x_times, 
+                volunteering_start_time AS "startTime", 
+                volunteering_max_time*60000 AS "maxRouteDuration", 
+                CustomUser.name, 
+                CustomUser.username, 
+                CustomUser.address, 
+                CustomUser.lng,
+                CustomUser.lat 
+                FROM shofar_blower 
+                LEFT JOIN CustomUser ON CustomUser.id = shofar_blower.userBlowerId 
+                WHERE CustomUser.id = ${userId}`
 
-            let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
-            if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
-            if (!userData || !userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
-            allRes.userData = userDataErr || !userData ? true : userData
-            if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
+                let [userDataErr, userData] = await executeMySqlQuery(CustomUser, userDataQ)
+                if (userDataErr || !userData) console.log('userDataErr: ', userDataErr);
+                if (!userData || !userData[0] || !userData[0].address) return cb(null, "NO_ADDRESS")
+                allRes.userData = userDataErr || !userData ? true : userData
+                if (!userData[0] || !userData[0].confirm) return cb(null, allRes)
+            }
 
             //open PRIVATE meeting requests
             const openPriReqsQ = /* request for private meetings */`SELECT 
@@ -936,7 +939,8 @@ module.exports = function (CustomUser) {
     CustomUser.remoteMethod('mapInfoSB', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+            { arg: "withoutUserData", type: "boolean" }
         ],
         returns: { arg: 'res', type: 'string', root: true }
     });
@@ -1373,6 +1377,8 @@ module.exports = function (CustomUser) {
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
 
             const sbId = sb.sbId || sb.id;
+            if (isNaN(Number(sbId))) return cb("SB_INFO")
+            if (isNaN(Number(isolator.id)) || (isolator.isPublicMeeting != 0 && isolator.isPublicMeeting != 1 && isolator.isPublicMeeting != true && isolator.isPublicMeeting != false)) return cb("ISOLATOR_INFO")
 
             //check if user is confirmed by admin (and get userData for route calc later on)
             const userDataQ =
@@ -1536,7 +1542,51 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
+            // what info the shofar blower client needs
+            `
+            isolated.id AS "meetingId", 
+            false AS "isPublicMeeting", 
+            IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
+            CustomUser.name, 
+            CustomUser.address,
+            CustomUser.lng,
+            CustomUser.lat
+
+            shofar_blower_pub.id AS "meetingId", 
+                shofar_blower_pub.constMeeting, 
+                start_time AS "startTime", 
+                shofar_blower_pub.address, 
+                shofar_blower_pub.comments, 
+                shofar_blower_pub.lng, 
+                shofar_blower_pub.lat,
+                true AS "isPublicRoute", 
+                COUNT(isolated.id) AS "signedCount",  
+                true AS isPublicMeeting 
+
+                isolated.id AS "meetingId", 
+                isolated.meeting_time AS "startTime", 
+                CustomUser.address,
+                CustomUser.lng,
+                CustomUser.lat,
+                CustomUser.comments, 
+                CustomUser.name,
+                IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
+                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
+            `
+            let sbDataForSocket
+            try { sbDataForSocket = await CustomUser.findOne({ where: { id: sbId } }); } catch (e) { }
+            if (sbDataForSocket) {
+                console.log('from findOne, sbDataForSocket: ', sbDataForSocket);
+                let sbPhone = sbDataForSocket.username
+                if (sbPhone) {
+                    // console.log(`emit adminAddMeetingToMyRoute-${sbPhone} to admin-blower-events`, newIsolatorMeetingObj);
+                    CustomUser.app.io.to(`admin-blower-events`).emit(`adminAddMeetingToMyRoute-${sbPhone}`, newIsolatorMeetingObj)
+                } else { console.log("no sbPhone for socket (adminAssigned) ", sbPhone); }
+            }
+            CustomUser.app.io.to('admin-blower-events').emit('removeReqFromReqs', { isPublicMeeting: newIsolatorMeetingObj.isPublicMeeting, meetingId: newIsolatorMeetingObj.id })
+            // console.log('emit removeReqFromReqs to admin-blower-events: ', { isPublicMeeting: newIsolatorMeetingObj.isPublicMeeting, meetingId: newIsolatorMeetingObj.id });
             return cb(null, newIsolatorMeetingObj) //success, return new meeting obj (contains meeting start time)
+            //socket:
         })();
     }
 

@@ -18,7 +18,7 @@ const ShofarBlowerTable = (props) => {
     let setSelectedSB = props.setSelectedSB
     let selectedSB = props.selectedSB
 
-    const th = [shofarBlowers && shofarBlowers.length ? ['confrim', ''] : null, ['name', 'שם'], ['phone', 'פלאפון'], ['address', 'נקודת יציאה'], ['blastsNum', 'תקיעות בשופר'], ['maxTime', 'זמן מקסימלי'], ['road tableIcons', ''], ['edit tableIcons', ''], ['delete tableIcons', '']]
+    const th = [shofarBlowers && shofarBlowers.length ? ['confrim', ''] : null, ['name', 'שם'], ['phone', 'פלאפון'], ['address', 'נקודת יציאה'], ['blastsNum', 'תקיעות בשופר שנקבעו'], ['maxTime', 'זמן הליכה מקסימלי'], ['road tableIcons', ''], ['edit tableIcons', ''], ['delete tableIcons', '']]
 
 
     useEffect(() => {
@@ -107,7 +107,8 @@ const ShofarBlowerTable = (props) => {
 
             {showDeletePopup &&
                 <DeletePopup
-                    name='מתנדב'
+                    okayText="מחק"
+                    name='מתנדב/ת'
                     handleDismiss={() => setShowDeletePopup(false)}
                     handleDelete={() => handleDelete()}
                 />
