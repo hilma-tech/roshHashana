@@ -948,7 +948,7 @@ module.exports = function (CustomUser) {
     CustomUser.assignSB = function (options, meetingObj, cb) {
 
         (async () => {
-            console.log('assignSB: ');
+            console.log('assignSB: ', meetingObj);
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
