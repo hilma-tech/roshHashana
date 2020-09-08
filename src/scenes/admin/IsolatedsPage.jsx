@@ -5,18 +5,26 @@ import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
 
+import { useSocket, useJoinLeave, useOn } from "@hilma/socket.io-react";
+
 let status = 0
 
 const IsolatedPage = function (props) {
     const { setLoading, setIsolateds, selectedIsolator, setSelectedIsolator } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
+    const socket = useSocket();
+    useJoinLeave('blower-events', (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
 
     useEffect(() => {
-        (async () => {
-            setLoading(true)
-            getIsolateds()
-        })()
+        setLoading(true)
+        getIsolateds();
+        socket.on('newMeetingAssigned', handleNewMeeting)
+        return () => {
+            socket.off('newMeetingAssigned', handleNewMeeting);
+        }
     }, [])
 
     useEffect(() => {
@@ -42,13 +50,29 @@ const IsolatedPage = function (props) {
             })
         })()
     }
+    const handleNewMeeting = (req) => {
+        if (status === 0) {
+            setIsolateds(prevIsolateds => {
+                console.log('prevSetIsolateds: ', prevIsolateds);
+                let isolateds = [...prevIsolateds]
+                if (req.isPublicMeeting === 1) {
+                    console.log('req.meetingId: ', req.meetingId);
+                    isolateds = isolateds.filter((isolated) => isolated.id !== req.meetingId)
+                    console.log("isolateds", isolateds)
+                    return isolateds
+                }
+       
+            })
+        }
+        console.log("req!!!", req)
+    };
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
             pervFilters.name = value
             return pervFilters
         })
-        getIsolateds(filters)
+
     }
 
     const onSearchAddress = function (value) {
