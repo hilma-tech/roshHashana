@@ -74,7 +74,7 @@ const SingleShofarBlowerPage = (props) => {
             openGenAlert({ text: "לא ניתן לשבץ" });
             return
         }
-        if(va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso){
+        if (va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso) {
             setSelectedIsolator(iso)
         }
 
@@ -104,6 +104,10 @@ const SingleShofarBlowerPage = (props) => {
                 //! MAX_ROUTE_LENGTH_20
                 openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
                 return
+            }
+            else if (assignRes.errName === "MAX_DURATION_180") {
+                openGenAlert({ text: "אורך מסלולך לאחר השיבוץ ארוך מדי, נא נסו להשתבץ לפגישה אחרת", isPopup: { okayText: "הבנתי" } })
+                return;
             }
             else openGenAlert({ text: assign_default_error })
         }

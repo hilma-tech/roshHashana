@@ -218,8 +218,9 @@ const ShofarBlowerMap = (props) => {
         let meetingStartTime
         let isConstMeeting
         let locObj = {}
-        let myMeetingsLocs = !Array.isArray(myMeetings) ? []
-            : myMeetings.map((myMeeting, i) => {
+        let myMeetingsLocs = []
+        if (Array.isArray(myMeetings) && myMeetings.length)
+            for (let myMeeting of myMeetings) {
                 myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
                 meetingStartTime = new Date(myMeeting.startTime).getTime()
                 isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
@@ -235,8 +236,8 @@ const ShofarBlowerMap = (props) => {
                 isConstMeeting ?
                     locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
                     locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
-                return locObj;
-            })
+                myMeetingsLocs.push(locObj);
+            }
 
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
     }

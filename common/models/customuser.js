@@ -1088,7 +1088,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
+            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1099,6 +1099,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${userData.maxRouteDuration} (new)${newTotalTime}`);
+            if (!newTotalTime || isNaN(newTotalTime) || newTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
@@ -1168,7 +1169,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${userId}`)
@@ -1502,7 +1503,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducerFn = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //mins to ms
+            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1513,6 +1514,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${sbData.maxRouteDuration} (new)${newSBTotalTime} --> if true return err ${sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration}`);
+            if (!newSBTotalTime || isNaN(newSBTotalTime) || newSBTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newSBTotalTime, maxRouteDuration: sbData.maxRouteDuration, newAssignMeetingObj: newIsolatorMeetingObj } })
             }
@@ -1610,7 +1612,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${sbId}`)

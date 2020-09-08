@@ -102,6 +102,10 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
                 return
             }
+            else if (res.errName === "MAX_DURATION_180") {
+                openGenAlert({ text: "אורך מסלולך לאחר השיבוץ ארוך מדי, נא נסו להשתבץ לפגישה אחרת", isPopup: { okayText: "הבנתי" } })
+                return;
+            }
             else openGenAlert({ text: assign_error })
         }
         else if (typeof res === "object" && !isNaN(Number(res.meetingId)) && !isNaN(Number(res.isPublicMeeting))) handleAssignSuccess(res) //RES (need new meeting info to update myMeetings)
@@ -131,6 +135,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                     return;
                 }
                 checkAssignResForError(res)
+                console.log('checkAssignResForError: ', res);
             })
     }
 
@@ -219,7 +224,12 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                         return;
                     }
                     openGenAlert({ text: "הפגישה הוסרה ממסלולך בהצלחה" })
-                    setMyMeetings(myMeetings.filter(meet => (meet.meetingId != assignMeetingInfo.meetingId || Boolean(meet.isPublicMeeting) !== Boolean(assignMeetingInfo.isPublicMeeting))))
+                    setMyMeetings(myMeetings.filter((meet, i) => {
+                        if (i == 0 && myMeetings.length == 1) {
+                            window.location.reload()
+                        }
+                        return (meet.meetingId != assignMeetingInfo.meetingId || Boolean(meet.isPublicMeeting) !== Boolean(assignMeetingInfo.isPublicMeeting))
+                    }))
                     setMeetingsReqs(meetList => Array.isArray(meetList) ? [...meetList, { ...assignMeetingInfo, startTime: null }] : [{ ...assignMeetingInfo, startTime: null }])
 
                     if (genMapMeetings) {
