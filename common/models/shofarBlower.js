@@ -282,7 +282,7 @@ module.exports = function (ShofarBlower) {
                     //delete the meeting
                     meetingsToDelete.length > 0 && await ShofarBlower.app.models.shofarBlowerPub.destroyAll({ id: { inq: meetingsToDelete } });
                 }
-                await ShofarBlower.app.models.Isolated.updateAll({ where: { and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] } }, { blowerMeetingId: null, meeting_time: null });
+                await ShofarBlower.app.models.Isolated.updateAll({ and: [{ public_meeting: 0 }, { blowerMeetingId: userId }] }, { blowerMeetingId: null, meeting_time: null });
                 //TODO: להודיע למבודדים שבוטלה להם הפגישה
                 await ShofarBlower.destroyById(id);
 
