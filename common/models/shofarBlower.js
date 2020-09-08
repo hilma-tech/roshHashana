@@ -96,6 +96,9 @@ module.exports = function (ShofarBlower) {
             let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
             const { userId } = options.accessToken;
             const { meetingId } = meetToDelete;
+            if (!userId || isNaN(Number(userId)) || !meetToDelete || isNaN(Number(meetToDelete))) {
+                return false;
+            }
             if (meetToDelete.isPublicMeeting) {//public meeting
                 let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                 if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
