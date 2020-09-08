@@ -287,7 +287,7 @@ const ShofarBlowerMap = (props) => {
 
 
     const getLngLatOfLocation = async (address) => {
-        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY_SECOND_SECOND);
+        Geocode.setApiKey(process.env.REACT_APP_GOOGLE_KEY);
         Geocode.setLanguage("he");
         let [error, res] = await to(Geocode.fromAddress(address));
         if (error || !res) { logE(`error getting geoCode of ${address}: `, error); return; }
@@ -330,7 +330,7 @@ const ShofarBlowerMap = (props) => {
                 showIsolators={props.showIsolators}
                 isolators={props.isolators}
 
-                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}`}
+                googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=he&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                 loadingElement={<img alt="נטען..." className="loader" src='/images/loader.svg' />}
                 containerElement={<div style={{ height: `100vh` }} />}
                 mapElement={<div style={{ height: `100%` }} />}
