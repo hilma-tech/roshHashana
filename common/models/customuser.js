@@ -1286,7 +1286,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.updateUserInfoAdmin = async (data, options) => {
-        const { shofarBlowerPub, Isolated, ShofarBlower } = CustomUser.app.models;
+        const { ShofarBlower } = CustomUser.app.models;
 
         const userId = data.userId;
 
@@ -1360,6 +1360,14 @@ module.exports = function (CustomUser) {
             throw error;
         }
     }
+
+    CustomUser.remoteMethod('updateUserInfoAdmin', {
+        http: { verb: 'POST' },
+        accepts: [{ arg: 'data', type: 'object' }],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
         console.log('adminAssignSBToIsolator: ', sb, isolator);
         (async () => {

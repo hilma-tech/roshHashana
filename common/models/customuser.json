@@ -196,7 +196,8 @@
         "getAllAdminBlastsForMap",
         "adminAssignSBToIsolator",
         "adminUpdateMaxRouteLengthAndAssign",
-        "adminUpdateMaxDurationAndAssign"
+        "adminUpdateMaxDurationAndAssign",
+        "updateUserInfoAdmin"
       ]
     }
   ],

@@ -21,7 +21,7 @@ const IsolatedTable = (props) => {
             return [
                 isolated.name,
                 isolated.phone,
-                isolated.address,
+                isolated.address || '*משתמש ציבורי*',
                 isolated.comments && <div className='tooltipContainer'>
                     <FontAwesomeIcon icon='comment' color='#A5A4BF' />
                     <div className='myTooltip'>{isolated.comments}</div>
