@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import ShofarBlowerMap from '../../components/maps/shofar_blower_map'
 import SBRouteList from '../../components/sb_route_list';
-import { adminGetSBRoute, adminAssignSBToIsolator, adminUpdateMaxDurationAndAssign, adminUpdateMaxRouteLengthAndAssign } from './fetch_and_utils';
+import { adminGetSBRoute, adminAssignSBToIsolator, adminUpdateMaxDurationAndAssign, adminUpdateMaxRouteLengthAndAssign, fetchIsolatedForMap } from './fetch_and_utils';
 import { MainContext } from '../../ctx/MainContext';
 
 const assign_default_error = "אירעה שגיאה, לא ניתן לשבץ כעת, עמכם הסליחה"
@@ -16,9 +16,11 @@ const assign_default_error = "אירעה שגיאה, לא ניתן לשבץ כע
 const SingleShofarBlowerPage = (props) => {
     const [meetingsOfSelectedSB, setMeetingsOfSelectedSB] = useState(null)
     const [assigned, setAssigned] = useState(false)
+    const [showIsolators, setShowIsolators] = useState(false)
+    const [isolators, setIsolatorsLocations] = useState([])
 
     const { selectedSB, setSelectedSB, totalLength,
-        selectedIsolator // came from isolator
+        selectedIsolator, setSelectedIsolator // came from isolator
     } = useContext(AdminMainContext)
     const { openGenAlert, openGenAlertSync } = useContext(MainContext)
 
@@ -38,7 +40,7 @@ const SingleShofarBlowerPage = (props) => {
     }, [])
 
     if ((selectedIsolator && !selectedSB) || (!selectedIsolator && (!selectedSB || selectedSB === null))) { //if came from shofar blower page-table but we don't have a selected sb -- redirect to shofar blowers page-table
-        if (props.history && props.history.goBack) { props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
+        if (props.history && props.history.goBack) { assigned ? props.history.push('searching') : props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
     }
 
     const cleanUp = () => {
@@ -63,13 +65,22 @@ const SingleShofarBlowerPage = (props) => {
     const handleXClick = () => {
         cleanUp()
     }
-    const handleForceAssign = () => { //lol
-        if (!selectedSB || !selectedIsolator || typeof selectedSB !== "object" || typeof selectedIsolator !== "object") {
+    const handleForceAssign = (va, iso) => { //lol
+        if (va !== "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && (!selectedSB || !selectedIsolator || typeof selectedSB !== "object" || typeof selectedIsolator !== "object")) {
             openGenAlert({ text: "לא ניתן לשבץ" }); // not supposed to get here came to this page to assign (should get here only by mistake when not meaning to assign).. or when some data is missing bu mistake(idk)
             return
         }
+        if (va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && (typeof iso !== "object" || !iso)) {
+            openGenAlert({ text: "לא ניתן לשבץ" });
+            return
+        }
+        if(va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso){
+            setSelectedIsolator(iso)
+        }
+
         (async () => {
-            let [assignErr, assignRes] = await adminAssignSBToIsolator(selectedSB, selectedIsolator)
+            console.log('adminAssignSBToIsolator: ', selectedIsolator || iso);
+            let [assignErr, assignRes] = await adminAssignSBToIsolator(selectedSB, selectedIsolator || iso)
             if (assignErr || !assignRes) {
                 openGenAlert({ text: assign_default_error })
                 return
@@ -96,7 +107,7 @@ const SingleShofarBlowerPage = (props) => {
             }
             else openGenAlert({ text: assign_default_error })
         }
-        else if (typeof assignRes === "object" /* && !isNaN(Number(assignRes.meetingId)) && !isNaN(Number(assignRes.isPublicMeeting)) */) handleAssignSuccess(assignRes) //RES (need new meeting for local update)
+        else if (typeof assignRes === "object" && assignRes) handleAssignSuccess(assignRes) //RES (need new meeting for local update)
         else openGenAlert({ text: assign_default_error })
     }
 
@@ -152,12 +163,24 @@ const SingleShofarBlowerPage = (props) => {
             })
     }
 
-    const handleAssignSuccess = () => {
+    const handleAssignSuccess = (assignRes) => {
         openGenAlert({ text: "שובץ בהצלחה" });
         setAssigned(true)
-        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, selectedIsolator] : [selectedIsolator]))
+        if (showIsolators && Array.isArray(isolators)) {
+            setIsolatorsLocations(isos => isos.filter(i => i.id != assignRes.id || i.isPublicMeeting != assignRes.isPublicMeeting))
+        }
+        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, selectedIsolator || assignRes] : [selectedIsolator || assignRes]))
     }
 
+    const showIsolatorsMarkers = () => {
+        setShowIsolators(s => !s)
+        if (isolators.length > 0) return
+        fetchIsolatedForMap((err, res) => {
+            if (!err && Array.isArray(res)) {
+                setIsolatorsLocations(res)
+            } else openGenAlert({ text: "אירעה שגיאה, לא ניתן להציג את רשימת המחפשים כעת" })
+        })
+    }
 
     // let ttlength = "100 מטרים"
     let ttlength = totalLength || 0 + " מטרים"
@@ -169,6 +192,12 @@ const SingleShofarBlowerPage = (props) => {
                 <FontAwesomeIcon id="x-btn" icon={['fas', 'times']} className='pointer' onClick={handleXClick} />
                 <div id="title" >{`מפת תקיעות השופר של - ${selectedSB && selectedSB.name || ""}`}</div>
             </div>
+            {(selectedIsolator && !assigned) ? null : <div className='mapNavContainer' id="mapNavContainer-in-shofar-blower-map">
+                <div className={'mapIconContainer orangeText pointer' + (showIsolators ? ' mapIconSelected' : '')} onClick={showIsolatorsMarkers}>
+                    <img src='icons/singleOrange.svg' alt='' />
+                    <div className='textInHover orangeBackground bold'>מחפשים</div>
+                </div>
+            </div>}
             <div id='map-and-info'>
                 <div id="side-info-container">
                     <div id="about-sb">
@@ -193,6 +222,8 @@ const SingleShofarBlowerPage = (props) => {
                         selectedIsolator={!assigned && selectedIsolator}
                         meetingsOfSelectedSB={meetingsOfSelectedSB}
                         setMeetingsOfSelectedSB={setMeetingsOfSelectedSB}
+                        showIsolators={showIsolators}
+                        isolators={isolators}
                     /> : <div>אירעה שגיאה, נא נסו שנית מאוחר יותר</div>)}
             </div>
         </div>

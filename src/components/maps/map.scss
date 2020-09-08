@@ -150,7 +150,20 @@
     }
 }
 
-
+#mapNavContainer-in-shofar-blower-map {
+    position: absolute;
+    top: 12vh;
+    right: unset;
+    left: 5vw;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    z-index: 2;
+    padding: 1.5vh 3vh;
+    border-radius: 10px;
+    background-color: white;
+    backdrop-filter: none;
+}
 .mapNavContainer {
     position: absolute;
     top: 11vh;

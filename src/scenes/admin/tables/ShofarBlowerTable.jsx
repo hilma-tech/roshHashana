@@ -106,7 +106,8 @@ const ShofarBlowerTable = (props) => {
 
             {showDeletePopup &&
                 <DeletePopup
-                    name='מתנדב'
+                    okayText="מחק"
+                    name='מתנדב/ת'
                     handleDismiss={() => setShowDeletePopup(false)}
                     handleDelete={() => handleDelete()}
                 />

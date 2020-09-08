@@ -23,7 +23,7 @@ const IsolatedTable = (props) => {
                 isolated.phone,
                 isolated.address,
                 isolated.comments && <div className='tooltipContainer'>
-                    <FontAwesomeIcon icon={['fas', 'exclamation-circle']} color='#A5A4BF' />
+                    <FontAwesomeIcon icon='comment' color='#A5A4BF' />
                     <div className='myTooltip'>{isolated.comments}</div>
                 </div>,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'map-marker-alt']} color='#A5A4BF' onClick={() => handleIsolatorClick(isolated)} />,
@@ -58,8 +58,8 @@ const IsolatedTable = (props) => {
         props.getIsolateds(null, (page - 1) * 7)
     }
 
-    const handleIsolatorClick = (isolated) => {
-        typeof props.setSelectedIsolator === "function" && props.setSelectedIsolator(isolated)
+    const handleIsolatorClick = (isolator) => {
+        typeof props.setSelectedIsolator === "function" && props.setSelectedIsolator(isolator)
     }
 
     return (
@@ -68,6 +68,7 @@ const IsolatedTable = (props) => {
 
             {showDeletePopup &&
                 <DeletePopup
+                    okayText="מחק"
                     name='מחפש/ת'
                     handleDismiss={() => setShowDeletePopup(false)}
                     handleDelete={() => handleDelete()}

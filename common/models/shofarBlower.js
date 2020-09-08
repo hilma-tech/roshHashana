@@ -420,6 +420,8 @@ module.exports = function (ShofarBlower) {
             return cb(true)
         }
 
+        if (!sbId || isNaN(Number(sbId)) || sbId < 1) return cb("NO_SHOFAR_BLOWER"); // need shofar blower id
+
         (async () => {
             const myRouteQ = `
         SELECT * FROM (

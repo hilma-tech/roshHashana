@@ -491,7 +491,8 @@ module.exports = function (Isolated) {
     Isolated.getIsolatedsWithoutMeetingForMap = function (cb) {
         (async () => {
             try {
-                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, isolated.id 
+                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, isolated.id AS "isolatedId", cu.comments, 
+                IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting"
                 FROM isolated
                 LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                 LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  

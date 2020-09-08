@@ -20,14 +20,13 @@ import './sb.scss'
 let fetching = false
 const SBHomePage = (props) => {
 
-    const { showAlert, openGenAlert } = useContext(MainContext)
+    const { showAlert, openGenAlert, openGenAlertSync } = useContext(MainContext)
     const {
         userData, setUserData,
         myMeetings, meetingsReqs,
         setMyMeetings, setMeetingsReqs,
         isInRoute, setIsInRoute,
         assignMeetingInfo } = useContext(SBContext)
-    // const socket = useSocket();
 
 
     const onMobile = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i].some(toMatchItem => navigator.userAgent.match(toMatchItem));
@@ -39,19 +38,31 @@ const SBHomePage = (props) => {
     const socket = useSocket();
 
     useEffect(() => {
-        if (userData != null) { //!
-            socket.on(`blower_true_confirmQ_${userData.username}`, fn);
+        (async () => {
+            if (!fetching && (
+                !meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length) ||
+                !myMeetings || (Array.isArray(myMeetings) && !myMeetings.length) ||
+                !userData || (Array.isArray(userData) && !userData.length))
+            ) {
+                fetchAndSetData()
+            }
+        })();
+    }, []);
 
+    useEffect(() => {
+        if (userData != null && userData && !userData.confirm) {
+            socket.on(`blower_true_confirmQ_${userData.username}`, onConfirmed);
             return () => {
-                socket.off(`blower_true_confirmQ_${userData.username}`, fn);
+                socket.off(`blower_true_confirmQ_${userData.username}`, onConfirmed);
             };
         }
     }, [userData]);
 
-    const fn = (req) => {
+    const onConfirmed = async (_req) => {
+        await openGenAlertSync({ text: "מנהל המערכת אישר אותך!", isPopup: { okayText: "לדף הבית" } })
         setUserData((userData) => ({ ...userData, confirm: 1 }));
+        fetchAndSetData(true)
         return;
-
     }
 
 
@@ -77,7 +88,6 @@ const SBHomePage = (props) => {
                         meet.meetingId !== req.meetingId || meet.isPublicMeeting !== req.isPublicMeeting)
 
                     : meetingsReqs
-
             );
         } else
             setMeetingsReqs((meetingsReqs) => [...meetingsReqs, req]);
@@ -109,17 +119,6 @@ const SBHomePage = (props) => {
         });
     });
 
-    useEffect(() => {
-        (async () => {
-            if (!fetching && (
-                !meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length) ||
-                !myMeetings || (Array.isArray(myMeetings) && !myMeetings.length) ||
-                !userData || (Array.isArray(userData) && !userData.length))
-            ) {
-                fetchAndSetData()
-            }
-        })();
-    }, []);
 
     const addNewReq = (newReq) => {
         setMeetingsReqs(reqs => Array.isArray(reqs) ? [...reqs, newReq] : [newReq])
@@ -147,9 +146,9 @@ const SBHomePage = (props) => {
         );
     }
 
-    const fetchAndSetData = async () => {
+    const fetchAndSetData = async (withoutUserData) => {
         fetching = true
-        let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/mapInfoSB`, null, true);
+        let [mapContent, err] = await Auth.superAuthFetch(`/api/CustomUsers/mapInfoSB?withoutUserData=${withoutUserData ? true : false}`, null, true);
         if (err || !mapContent) {
             const error = err === "NO_INTERNET" ? "אין חיבור לאינטרנט, לא ניתן לטעון את המידע" : (err.error && err.error.status === "401" ? false : "אירעה שגיאה, נא נסו שנית מאוחר יותר")
             error && openGenAlert({ text: error })
@@ -158,7 +157,7 @@ const SBHomePage = (props) => {
         if (mapContent === "NO_ADDRESS") {
             Auth.logout()
         }
-        else if (mapContent && typeof mapContent === "object" && mapContent.userData && mapContent.userData[0]) {
+        else if (mapContent && typeof mapContent === "object" && ((!withoutUserData && mapContent.userData && mapContent.userData[0]) || withoutUserData)) {
             if (!meetingsReqs || (Array.isArray(meetingsReqs) && !meetingsReqs.length)) setMeetingsReqs(mapContent.openReqs)
             //sort my routes by startTime, where closest (lowest) is first
             if (!myMeetings || (Array.isArray(myMeetings) && !myMeetings.length)) setMyMeetings(Array.isArray(mapContent.myRoute) ? mapContent.myRoute.sort((a, b) => (new Date(a.startTime) > new Date(b.startTime) ? 1 : new Date(a.startTime) < new Date(b.startTime) ? -1 : 0)) : null)

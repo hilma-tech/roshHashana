@@ -25,7 +25,7 @@ const DeletePopup = (props) => {
                         <div className="saveBtn pointer" style={{ float: 'left' }} onClick={() => {
                             setLoading(true)
                             props.handleDelete()
-                        }}>אישור</div>
+                        }}>{props.okayText || "אישור"}</div>
                     </DialogContent>
                 </div>
             </Dialog>
