@@ -18,15 +18,6 @@ const ShofarBlowerPage = function (props) {
         getShofarBlowers()
     }, [])
 
-    // useEffect(() => {
-    //     console.log('selectedSB: ', selectedSB);
-    //     if (selectedSB && props.location.pathname === "/shofar-blowers") {
-    //         props.history.push("/shofar-blower")
-    //     } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
-    //         props.history.push("/shofar-blowers")
-    //     }
-    // }, [selectedSB])
-
     const getShofarBlowers = function (filter = filters, startRow = 0) {
         (async () => {
             if (!filter) filter = filters
