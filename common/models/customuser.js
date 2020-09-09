@@ -948,7 +948,7 @@ module.exports = function (CustomUser) {
     CustomUser.assignSB = function (options, meetingObj, cb) {
 
         (async () => {
-            console.log('assignSB: ');
+            console.log('assignSB: ', meetingObj);
             if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
                 //block the function
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
@@ -1072,7 +1072,8 @@ module.exports = function (CustomUser) {
                 let prevStartTimeVal
                 let legDuration
                 for (let i in stops) {
-                    leg = result.routes[0].legs[i]
+                    try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
+                    if (leg === null) { return cb(true) }
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
@@ -1088,7 +1089,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //mins to ms
+            const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1099,6 +1100,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${userData.maxRouteDuration} (new)${newTotalTime}`);
+            if (!newTotalTime || isNaN(newTotalTime) || newTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (userData && userData.maxRouteDuration && newTotalTime && newTotalTime > userData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newTotalTime, maxRouteDuration: userData.maxRouteDuration, newAssignMeetingObj: newAssignMeetingObj } })
             }
@@ -1121,10 +1123,11 @@ module.exports = function (CustomUser) {
             }
 
             // find name and phone number of isolater
-            const findIsolatedQ = `select isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
             let [isolatedErr, isolatedRes] = await executeMySqlQuery(CustomUser, findIsolatedQ)
             //call socket
             let socketObj = {
+                isolatedId: (isolatedRes && isolatedRes[0] && isolatedRes[0].isolatedId) ? isolatedRes[0].isolatedId : null,
                 blowerId: userId,
                 meetingStartTime: formattedStartTime,
                 meetingId: newAssignMeetingObj.meetingId,
@@ -1168,7 +1171,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${userId}`)
@@ -1494,7 +1497,8 @@ module.exports = function (CustomUser) {
                 let prevStartTimeVal
                 let legDuration
                 for (let i in stops) {
-                    leg = result.routes[0].legs[i]
+                    try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
+                    if (!leg) return cb(true)
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!sbData || !new Date(sbData.startTime).getTime) continue;
@@ -1510,7 +1514,7 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             const totalTimeReducerFn = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
-            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //mins to ms
+            const newSBTotalTime = result.startTimes.reduce(totalTimeReducerFn, 0) * 1000 //seconds to ms
 
             let assignStartTime;
             try {
@@ -1521,6 +1525,7 @@ module.exports = function (CustomUser) {
 
             //! check max total time length
             console.log(`checking max duration (curr)${sbData.maxRouteDuration} (new)${newSBTotalTime} --> if true return err ${sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration}`);
+            if (!newSBTotalTime || isNaN(newSBTotalTime) || newSBTotalTime > 180 * 60000) return cb(null, { errName: "MAX_DURATION_180" })
             if (sbData && sbData.maxRouteDuration && newSBTotalTime && newSBTotalTime > sbData.maxRouteDuration) {
                 return cb(null, { errName: "MAX_DURATION", errData: { newTotalTime: newSBTotalTime, maxRouteDuration: sbData.maxRouteDuration, newAssignMeetingObj: newIsolatorMeetingObj } })
             }
@@ -1618,7 +1623,7 @@ module.exports = function (CustomUser) {
             try {
                 newMaxTimeMins = Number(newMaxTimeVal) / 60000
             } catch (_e) { return cb(true) }
-            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(true)
+            if (!newMaxTimeMins || isNaN(newMaxTimeMins) || newMaxTimeMins > 180) return cb(null, { errName: "MAX_DURATION_180" })
 
             //! update volunteering_max_time
             const [durationUpdateErr, durationUpdateRes] = await executeMySqlQuery(CustomUser, `UPDATE shofar_blower SET volunteering_max_time=${newMaxTimeMins < 15 ? 15 : Math.ceil(newMaxTimeMins)} WHERE userBlowerId = ${sbId}`)

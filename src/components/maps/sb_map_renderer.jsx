@@ -110,10 +110,14 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs)) {
-            setData();
+            if (!data.myMLocs.length) {
+                setRoutePath([])
+            } else {
+                setTimeout(() => { data && Array.isArray(data.myMLocs) && data.myMLocs.length && setData() }, 0)
+            }
         }
-
     }, [data.myMLocs])
+
     const handlePrint = () => {
         document.scrollTop = 0
         window.print()
@@ -151,9 +155,11 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     sessionStorage.setItem('showAlertMaxBlowTimes', false); //update session storage in order to show the alert only once
                 }
             } catch (_e) { }
+            if (!Array.isArray(routeStops) || !routeStops.length) { setRoutePath([]); return }
+
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
-                logE("getoverviewpath 1 : ", err);
+                // logE("getoverviewpath 1 : ", err);
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
@@ -167,7 +173,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             const meetingsToUpdateST = [];
             for (let m of routeStops) { //loop current stops and their start times
                 let myNewStartTime = getMyNewST(m.meetingId || m.id, m.isPublicMeeting)
-                if (!m.startTime || (!m.id && !m.meetingId) || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                if ((!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) && (m.id || m.meetingId) && (m.isPublicMeeting != null && m.isPublicMeeting != undefined)) //compare with newly calculated start time
                     meetingsToUpdateST.push({ meetingId: m.meetingId || m.id, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {
@@ -187,8 +193,13 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
                     return { ...m, startTime: newMMStartTime.startTime }
                 }))
             }
-            setRoutePath(res.overviewPath)
-        } else { /* console.log("jfksl");  */setRoutePath([]) }
+            if (!Array.isArray(routeStops) || !routeStops.length)
+                setRoutePath([])
+            else {
+                if (Array.isArray(routeStops) && routeStops.length)
+                    setRoutePath(res.overviewPath)
+            }
+        } else setRoutePath([])
 
         //get const meetings overview
         let constOverviewPaths = [];
@@ -345,7 +356,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
             <SBMarkerGenerator
                 key={index}
                 markerIcon={{
-                    url: 'icons/singleOrange.svg',
+                    url: '/icons/singleOrange.svg',
                     scaledSize: { width: 25, height: 25 },
                     anchor: { x: 12.5, y: 12.5 }
                 }}

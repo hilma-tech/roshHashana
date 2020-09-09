@@ -214,11 +214,14 @@ module.exports = function (Isolated) {
         (async () => {
             try {
                 let where = ''
+                let orderBy = ''
                 if (filter.address && filter.address.length > 0) {
-                    where += `WHERE (MATCH(cu.address) AGAINST ('${filter.address}')) `
+                    where += `WHERE cu.address REGEXP '${filter.address}' `
+                    orderBy += `ORDER BY CASE WHEN cu.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.name && filter.name.length > 0) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} (MATCH(cu.name) AGAINST ('${filter.name}'))`
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} cu.name REGEXP '${filter.name}'`
+                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.haveMeeting === true) {
                     where += `${where.length > 0 ? ' AND' : 'WHERE'} ((isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NOT NULL) OR
@@ -230,12 +233,24 @@ module.exports = function (Isolated) {
                 }
 
                 //todo check if need to add to select here: IF(isolated.public_meeting, sbp.id, isolated.id) AS id,isolated.public_meeting (for adminAssignSBToIsolator)
-                const isolatedQ = `SELECT isolated.id AS "isolatedId", IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting", cu.name, isolated.public_phone, cu.username, cu.address, cu.lat, cu.lng, cu.comments
+                const isolatedQ = `SELECT 
+                    isolated.id AS "isolatedId", 
+                    IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, 
+                    isolated.public_meeting AS "isPublicMeeting",
+                    cu.name, 
+                    isolated.public_phone, 
+                    cu.username, 
+                    cu.address, 
+                    cu.lat, 
+                    cu.lng, 
+                    cu.comments,
+                    sbUser.name AS shofarBlowerName
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
                     LEFT JOIN shofar_blower_pub sbp ON isolated.blowerMeetingId = sbp.id  
+                    LEFT JOIN CustomUser sbUser ON IF(isolated.public_meeting = 1, sbp.blowerId, isolated.blowerMeetingId) = sbUser.id
                 ${where}
-                ORDER BY cu.name
+                ${orderBy.length > 0 ? orderBy : 'ORDER BY isolatedId DESC'}
                 LIMIT ${startRow}, 7`
 
                 const countQ = `SELECT COUNT(*) as resNum
@@ -377,12 +392,15 @@ module.exports = function (Isolated) {
         (async () => {
 
             let where = 'WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1'
+            let orderBy = ''
             if (filter.address && filter.address.length > 0) {
-                where += ` AND MATCH(isolatedUser.address) AGAINST ('"${filter.address}"')`
+                where += ` AND isolatedUser.address REGEXP '${filter.address}'`
+                orderBy += `ORDER BY CASE WHEN isolatedUser.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
             }
             if (filter.name && filter.name.length > 0) {
-                where += ` AND MATCH(isolatedUser.name) AGAINST ('"${filter.name}"')`
-                where += ` OR MATCH(blowerUser.name) AGAINST ('"${filter.name}"')`
+                where += ` AND (isolatedUser.name REGEXP '${filter.name}' OR blowerUser.name REGEXP '${filter.name}')`
+                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN isolatedUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END, 
+                CASE WHEN blowerUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
             }
 
             let [err, res] = await executeMySqlQuery(Isolated,
@@ -400,8 +418,10 @@ module.exports = function (Isolated) {
                 LEFT JOIN CustomUser blowerUser ON blowerUser.id =isolated.blowerMeetingId
                 LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId 
                 ${where}
+                ${orderBy}
                 LIMIT ${startRow}, 7`
             );
+            
             if (err) cb(err);
             if (res) {
                 let [err1, res1] = await executeMySqlQuery(Isolated,
@@ -493,7 +513,13 @@ module.exports = function (Isolated) {
     Isolated.getIsolatedsWithoutMeetingForMap = function (cb) {
         (async () => {
             try {
-                const isolatedsQ = `SELECT cu.name, cu.address, cu.lat, cu.lng, isolated.id AS "isolatedId", cu.comments, 
+                const isolatedsQ = `SELECT 
+                cu.name, 
+                cu.address, 
+                cu.lat, 
+                cu.lng, 
+                isolated.id AS "isolatedId", 
+                cu.comments, 
                 IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, isolated.public_meeting AS "isPublicMeeting"
                 FROM isolated
                 LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id

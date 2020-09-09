@@ -50,4 +50,24 @@
             border-bottom: none;
         }
     }
+    .contactUs-settings {
+        margin-top: 5%;
+        margin-right: 2%;
+        white-space: nowrap;
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        .emailUs-settings {
+            font-size: 1.1rem;
+            text-decoration: none !important;
+            color: $turquoise;
+            &:link {
+                text-decoration: none !important;
+            }
+        }
+        img {
+            width: 4%;
+            margin-left: 10px;
+        }
+    }
 }

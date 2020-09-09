@@ -66,14 +66,14 @@ const ShofarBlowerTable = (props) => {
     }
 
     const handleRouteClick = (sb) => {
-        props.history && props.history.push && props.history.push("/shofar-blower")
+        props.history && props.history.push && props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blower")
         // console.log('setSelectedSB sb: ', sb);
         setSelectedSB(sb)
     }
 
     const handleEditClick = (id) => {
         setShofarBlowerIdToEdit(id)
-        props.history.push('/edit-shofar-blower')
+        props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/edit-shofar-blower')
     }
 
     const handleTrashClick = (id, index) => {

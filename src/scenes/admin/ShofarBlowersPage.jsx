@@ -18,15 +18,6 @@ const ShofarBlowerPage = function (props) {
         getShofarBlowers()
     }, [])
 
-    // useEffect(() => {
-    //     console.log('selectedSB: ', selectedSB);
-    //     if (selectedSB && props.location.pathname === "/shofar-blowers") {
-    //         props.history.push("/shofar-blower")
-    //     } else if (selectedSB === null && props.location.pathname === "/shofar-blower") {
-    //         props.history.push("/shofar-blowers")
-    //     }
-    // }, [selectedSB])
-
     const getShofarBlowers = function (filter = filters, startRow = 0) {
         (async () => {
             if (!filter) filter = filters
@@ -74,7 +65,7 @@ const ShofarBlowerPage = function (props) {
                     <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
                     <div style={{ margin: '0 1vw' }}></div>
                     <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
-                    <div className='bluePlusContainer pointer' onClick={() => { props.history.push('/add-shofar-blower') }}>
+                    <div className='bluePlusContainer pointer' onClick={() => { props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/add-shofar-blower') }}>
                         <FontAwesomeIcon icon={['fas', 'plus-circle']} />
                         <div>הוספת בעל תקיעה</div>
                     </div>

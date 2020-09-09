@@ -51,7 +51,7 @@ const Home = (props) => {
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "5%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
-                    <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
+                    <button onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
 
                     <div className="contactUs" style={{ whiteSpace: "nowrap", marginTop: isBrowser ? "0" : "2vh" }} >
                         <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />

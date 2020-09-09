@@ -27,7 +27,7 @@ const PRIVATE_MEETING = 'private meeting';
 const ShofarBlowerMap = (props) => {
     let isAdmin = props.admin
 
-    const { openGenAlert } = useContext(MainContext)
+    const { openGenAlert, center, setCenter,setDefaultCenter } = useContext(MainContext)
     const adminctx = useContext(AdminMainContext)
     const sbctx = useContext(SBContext)
     let userData,
@@ -56,7 +56,6 @@ const ShofarBlowerMap = (props) => {
     }
 
 
-    const [center, setCenter] = useState({});
     const [backToCenterBtn, setBackToCenterBtn] = useState(false);
 
     const [userOriginLoc, setUserOriginLoc] = useState(null)
@@ -106,6 +105,8 @@ const ShofarBlowerMap = (props) => {
                 }
                 if (newCenter !== center) setCenter(newCenter)
                 setUserOriginLoc(newCenter)
+                setDefaultCenter(newCenter) //for context
+                // console.log('setDefaultCenter: ', newCenter);
             }
         })();
     }, [userData])
@@ -155,8 +156,10 @@ const ShofarBlowerMap = (props) => {
                 newCenter = { lat: latNum, lng: lngNum };
             }
             if (newCenter !== center) setCenter(newCenter)
+            setDefaultCenter(newCenter) //for socket
+            // console.log('setDefaultCenter: ', newCenter);
+            
             //set selected isolator location
-
             let selectedIsolatorLoc = !props.selectedIsolator || typeof props.selectedIsolator !== "object" ? null :
                 { ...props.selectedIsolator, location: { lat: props.selectedIsolator.lat, lng: props.selectedIsolator.lng }, meetingId: props.selectedIsolator.id, }
 
@@ -218,8 +221,9 @@ const ShofarBlowerMap = (props) => {
         let meetingStartTime
         let isConstMeeting
         let locObj = {}
-        let myMeetingsLocs = !Array.isArray(myMeetings) ? []
-            : myMeetings.map((myMeeting, i) => {
+        let myMeetingsLocs = []
+        if (Array.isArray(myMeetings) && myMeetings.length)
+            for (let myMeeting of myMeetings) {
                 myStartT = Array.isArray(startTimes) && startTimes.find(st => st.meetingId == myMeeting.meetingId)
                 meetingStartTime = new Date(myMeeting.startTime).getTime()
                 isConstMeeting = myMeeting.constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)
@@ -235,8 +239,8 @@ const ShofarBlowerMap = (props) => {
                 isConstMeeting ?
                     locObj.iconType = myMeeting.isPublicMeeting ? SHOFAR_BLOWING_PUBLIC : PRIVATE_MEETING :
                     locObj.iconUrl = `/icons/route_nums/route_${myRouteCnt}.svg`
-                return locObj;
-            })
+                myMeetingsLocs.push(locObj);
+            }
 
         setAllMapData({ userData, userOriginLoc, reqsLocs: meetingsReqsLocs, myMLocs: myMeetingsLocs })
     }

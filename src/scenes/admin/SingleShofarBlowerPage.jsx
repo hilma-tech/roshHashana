@@ -40,7 +40,7 @@ const SingleShofarBlowerPage = (props) => {
     }, [])
 
     if ((selectedIsolator && !selectedSB) || (!selectedIsolator && (!selectedSB || selectedSB === null))) { //if came from shofar blower page-table but we don't have a selected sb -- redirect to shofar blowers page-table
-        if (props.history && props.history.goBack) { assigned ? props.history.push('searching') : props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
+        if (props.history && props.history.goBack) { assigned ? props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searching') : props.history.goBack(); return null } else return <div>אנא לחזור לעמוד הקודם, תודה</div>
     }
 
     const cleanUp = () => {
@@ -75,7 +75,7 @@ const SingleShofarBlowerPage = (props) => {
             openGenAlert({ text: "לא ניתן לשבץ" });
             return
         }
-        if(va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso){
+        if (va === "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && typeof iso === "object" && iso) {
             setSelectedIsolator(iso)
         }
 
@@ -105,6 +105,10 @@ const SingleShofarBlowerPage = (props) => {
                 //! MAX_ROUTE_LENGTH_20
                 openGenAlert({ text: "לא ניתן להשתבץ ליותר מ20 תקיעות", isPopup: { okayText: "הבנתי" } })
                 return
+            }
+            else if (assignRes.errName === "MAX_DURATION_180") {
+                openGenAlert({ text: "אורך מסלולך לאחר השיבוץ ארוך מדי, נא נסו להשתבץ לפגישה אחרת", isPopup: { okayText: "הבנתי" } })
+                return;
             }
             else openGenAlert({ text: assign_default_error })
         }
@@ -195,7 +199,7 @@ const SingleShofarBlowerPage = (props) => {
             </div>
             {(selectedIsolator && !assigned) ? null : <div className='mapNavContainer' id="mapNavContainer-in-shofar-blower-map">
                 <div className={'mapIconContainer orangeText pointer' + (showIsolators ? ' mapIconSelected' : '')} onClick={showIsolatorsMarkers}>
-                    <img src='icons/singleOrange.svg' alt='' />
+                    <img src='/icons/singleOrange.svg' alt='' />
                     <div className='textInHover orangeBackground bold'>מחפשים</div>
                 </div>
             </div>}

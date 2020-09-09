@@ -10,6 +10,9 @@ export const MainProvider = ({ children }) => {
     const [showAlert, setShowAlert] = useState(false)
     //alerts END
 
+    const [center, setCenter] = useState(null); //for maps
+    const [defaultCenter, setDefaultCenter] = useState(null); //for maps
+
     const [userInfo, setUserInfo] = useState(null);
 
     const closeAlert = () => { setShowAlert(false) }
@@ -35,7 +38,9 @@ export const MainProvider = ({ children }) => {
 
     const ctxValue = {
         openGenAlertSync, openGenAlert, showAlert,
-        userInfo, setUserInfo
+        userInfo, setUserInfo,
+        center, setCenter,
+        defaultCenter, setDefaultCenter
     }
 
     return <MainContext.Provider value={ctxValue} >

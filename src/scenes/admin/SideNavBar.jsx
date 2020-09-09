@@ -17,7 +17,7 @@ const SideNavBar = (props) => {
         { name: "ראשי", path: '/home' },
         { name: "מחפשים", path: '/searchings' },
         { name: "בעלי תקיעה", path: '/shofar-blowers' },
-        { name: "תקיעות", path: '/blasts' }
+        { name: "תקיעות", path: '/meetings' }
     ]
 
     const logOut = async () => {
@@ -63,7 +63,7 @@ const SideNavBar = (props) => {
                         if (text === null) return null
                         return (
                             <ListItem index={index} button className='containSideListItem' key={text.name} onClick={() => {
-                                props.history.push(text.path)
+                                props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs' + text.path)
                                 setOpenSideBar(false)
                             }}>
                                 <ListItemText disableTypography className='optionTextContainer' primary={text.name} />

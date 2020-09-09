@@ -5,27 +5,27 @@ import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
 
+import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
+
 let status = 0
 
 const IsolatedPage = function (props) {
     const { setLoading, setIsolateds, selectedIsolator, setSelectedIsolator } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
+    const socket = useSocket();
+    useJoinLeave('blower-events', (err) => {
+        if (err) console.log("failed to join room blower-events");
+    })
 
     useEffect(() => {
-        (async () => {
-            setLoading(true)
-            getIsolateds()
-        })()
-    }, [])
-
-    useEffect(() => {
-        if (selectedIsolator && props.location.pathname === "/searchings") {
-            props.history.push("/searcher")
-        } else if (selectedIsolator === null && props.location.pathname === "/searcher") {
-            props.history.push("/searchings")
+        setLoading(true)
+        getIsolateds();
+        socket.on('newMeetingAssigned', handleNewMeeting)
+        return () => {
+            socket.off('newMeetingAssigned', handleNewMeeting);
         }
-    }, [selectedIsolator])
+    }, [])
 
     const getIsolateds = function (filter = filters, startRow = 0) {
         (async () => {
@@ -41,6 +41,20 @@ const IsolatedPage = function (props) {
             })
         })()
     }
+    const compareIsPublicMeetings = (pm1, pm2) => {
+        let pm1bool = (pm1 == 0 || pm1 == false) ? false : (pm1 == 1 || pm1 == true) ? true : null
+        let pm2bool = (pm2 == 0 || pm2 == false) ? false : (pm2 == 1 || pm2 == true) ? true : null
+        return (pm1bool === null || pm2bool === null) ? false : pm1bool == pm2bool
+    }
+    const handleNewMeeting = (req) => {
+        if (status === 0) {
+            setIsolateds(prevIsolateds => {
+                let isolateds = [...prevIsolateds]
+                isolateds = isolateds.filter((isolated) => (!compareIsPublicMeetings(isolated.isPublicMeeting, req.isPublicMeeting) || isolated.id !== req.meetingId))
+                return isolateds
+            })
+        }
+    };
 
     const onSearchName = function (value) {
         setFilters(pervFilters => {
@@ -80,7 +94,7 @@ const IsolatedPage = function (props) {
                     <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
                     <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} />
+                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} haveMeeting={filters.haveMeeting} />
             </div>
         </div>
     );
