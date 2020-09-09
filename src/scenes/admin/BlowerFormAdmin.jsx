@@ -266,7 +266,6 @@ export default function BlowerFormAdmin(props) {
             if (walkTime === originalValues.walkTime) delete blowerDetails["volunteering_max_time"]
             if (address === originalValues.address) delete blowerDetails.address
             if (!publicPlacesChanged) delete blowerDetails.publicPlaces
-            console.log(blowerDetails)
             blowerDetails.userId = originalValues.userId
 
             // if (phone === originalValues.phone) delete userData.phone
