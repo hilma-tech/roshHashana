@@ -21,12 +21,19 @@ const moment = require('moment');
 
 useQuery(q, (err, isolated) => {
     if (err) throw err;
-    for (let isolater of isolated) {
+    let isolator;
+    let count = 0;
+    for (let i = 0; i < isolated.length; i++) {
+        isolator = isolated[i];
         date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
         msg = isolater.blowerName ?
             `שלום ${isolater.name}\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""}\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}\nשעת תקיעה משוערת ${date}\nבריאות טובה\nשנה טובה ומתוקה!`
             : `שלום ${isolater.name}, טרם נמצא לך תוקע, צוות "יום תרועה" על זה (;`
         sendMsg(isolater.phoneNumber, msg)
         console.log(`-> \ncalling send msg to _isolater_ with: phoneNumber:${isolater.phoneNumber}, msg: ${msg}\n<-\n`);
+        count++;
+        if (isolated.length - 1 == i) { //in last place 
+            console.log('script is done, send msg to ', count, ' isolated');
+        }
     }
 })

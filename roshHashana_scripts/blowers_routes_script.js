@@ -53,9 +53,13 @@ useQuery(query, (err, meetings, _fields) => {
         }
     }
     let cnt = 0
-    for (let msg of smsMsgsArr) {
+    let msg;
+    for (let i = 0; i < smsMsgsArr.length; i++) {
+        msg = smsMsgsArr[i]
         console.log('(not) sendMsg to: ', msg);
-        if (cnt === smsMsgsArr.length - 1) sendMsg("0546969090", msg[1])
+        if (cnt === smsMsgsArr.length - 1) sendMsg(msg[0], msg[1])
         cnt++
+        if (smsMsgsArr.length - 1 == i) //in last place 
+            console.log("script is done, send msg to", cnt, ' shofar blowers')
     }
 });
