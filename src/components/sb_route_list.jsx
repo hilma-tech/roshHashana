@@ -46,7 +46,6 @@ const SBRouteList = (props) => {
         let meetingStartTime;
 
         //fill routeStops, constStopsb4 and constStopsAfter
-        console.log('myMeetings: ', myMeetings);
         for (let i in myMeetings) {
             meetingStartTime = new Date(myMeetings[i].startTime).getTime()
             if (myMeetings[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
@@ -162,7 +161,7 @@ const SBRouteList = (props) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "POST",
-                    body: JSON.stringify({ meetToDelete: value, blowerId: Number(selectedSB.id) })
+                    body: JSON.stringify({ meetToDelete: value, blowerId: selectedSB.id })
                 });
                 if (err || !res) { //open alert of something went wrong
                     openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })

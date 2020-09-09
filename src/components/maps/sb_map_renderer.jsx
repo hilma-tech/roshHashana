@@ -363,7 +363,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
                 onClick={() => { setSelectedIsolator(isolator) }}
                 location={{ lat: Number(isolator.lat), lng: Number(isolator.lng) }}
                 info={<div className="infoWindowContainer">
-                    <div className="infoWindowTitle bold blueText">מחפש/ת</div>
+                    <div className="infoWindowTitle bold blueText">{`מחפש/ת ${isolator.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}`}</div>
                     <div className="pubShofarBlowerNameContainer">
                         <img alt="" src='/icons/shofar.svg' />
                         <div>{isolator.name}</div>
