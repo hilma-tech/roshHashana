@@ -1073,7 +1073,7 @@ module.exports = function (CustomUser) {
                 let legDuration
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
-                    if (leg === null) { return cb(true) }
+                    if (leg === null) { console.log("(assignSB) google error, fetch result: ", result); return cb(true) }
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
