@@ -959,10 +959,6 @@ module.exports = function (CustomUser) {
                     return cb(null, allRes)
                 }
             }
-            allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-            allRes.openReqs = [...priReqRes, ...pubReqs]
-            return cb(null, allRes)
-
         })();
     }
     CustomUser.myPublicIsolatedQuery = (publicMeetingId) => {
