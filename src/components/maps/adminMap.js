@@ -185,6 +185,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 <div className='textInHover orangeBackground bold'>מחפשים</div>
             </div>
         </div>
+        
         {showShofarBlowers && shofarBlowers.map((shofarBlower, index) =>
             <Marker
                 key={index}

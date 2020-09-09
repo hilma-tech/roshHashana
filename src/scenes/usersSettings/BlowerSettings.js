@@ -37,9 +37,10 @@ const materialTheme = createMuiTheme({
 });
 
 const format = 'HH:mm';
-
+let keyId = 0
 let publicMeetingsChanged = false;
-const IsolatedSettings = (props) => {
+
+const BlowerSettings = (props) => {
     const { openGenAlert, showAlert, openGenAlertSync } = useContext(MainContext);
     const [settingsType, setSettingsType] = useState('');
 
@@ -75,7 +76,8 @@ const IsolatedSettings = (props) => {
         publicMeetingsChanged = true
         let publicMeetings = Array.isArray(vals.publicMeetings) ? [...vals.publicMeetings] : []
         if (publicMeetings.length < 4) {
-            publicMeetings.push({ id: vals.publicMeetings.length });
+            keyId++
+            publicMeetings.push({ keyId: 'key' + keyId });
             setValues(publicMeetings, "publicMeetings");
             if (errs.general && errs.general.length) setMsgErr(' ')
         }
@@ -227,6 +229,7 @@ const IsolatedSettings = (props) => {
         }
 
         //update blower details
+        console.log('updateData: ', updateData);
         let [res, err] = await Auth.superAuthFetch(`/api/CustomUsers/updateUserInfo`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "PUT",
@@ -331,7 +334,7 @@ const IsolatedSettings = (props) => {
                 <div id="public-blowing-set" className="fade-in" style={{ display: (settingsType === 'public-blowing-set-btn' ? 'block' : 'none'), marginRight: "0" }}>
                     {vals.publicMeetings && vals.publicMeetings.map((place, index) => {
                         return (
-                            <div key={place.id}>
+                            <div key={place.id || place.keyId}>
                                 <AddPublicPlace
                                     disabled={disableEdit}
                                     removePubPlace={removePubPlace}
@@ -357,4 +360,4 @@ const IsolatedSettings = (props) => {
         </>
     );
 }
-export default IsolatedSettings;
+export default BlowerSettings;

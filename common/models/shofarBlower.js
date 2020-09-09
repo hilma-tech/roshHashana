@@ -174,12 +174,26 @@ module.exports = function (ShofarBlower) {
                 }
 
                 if (filter.address && filter.address.length > 0) {
-                    where += ` AND cu.address REGEXP '${filter.address}' `
-                    orderBy = `ORDER BY CASE WHEN cu.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
+                    if (!/^[A-Zא-תa-z '"-()0-9,]{1,}$/.test(filter.address)) return cb('address is not valid')
+                    let addressArr = filter.address.split("'")
+                    let address = ""
+                    for (let i = 0; i < addressArr.length; i++) {
+                        address += addressArr[i] + ((addressArr.length - 1) === i ? '' : "\\'")
+                    }
+
+                    where += ` AND cu.address REGEXP '${address}' `
+                    orderBy = `ORDER BY CASE WHEN cu.address LIKE '${address}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.name && filter.name.length > 0) {
-                    where += ` AND cu.name REGEXP '${filter.name}'`
-                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
+                    if (!/^[A-Zא-תa-z '"-]{1,}$/.test(filter.name)) return cb('name is not valid')
+                    let nameArr = filter.name.split("'")
+                    let name = ""
+                    for (let i = 0; i < nameArr.length; i++) {
+                        name += nameArr[i] + ((nameArr.length - 1) === i ? '' : "\\'")
+                    }
+
+                    where += ` AND cu.name REGEXP '${name}'`
+                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${name}%' THEN 0 ELSE 1 END`
                 }
 
                 const shofarBlowerQ = `

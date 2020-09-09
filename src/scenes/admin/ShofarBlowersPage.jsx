@@ -62,9 +62,9 @@ const ShofarBlowerPage = function (props) {
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מתנדבים לתקוע בשופר</div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
                     <div style={{ margin: '0 1vw' }}></div>
-                    <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
+                    <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' regex={/^[A-Zא-תa-z '"-()0-9,]{1,}$/} />
                     <div className='bluePlusContainer pointer' onClick={() => { props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/add-shofar-blower') }}>
                         <FontAwesomeIcon icon={['fas', 'plus-circle']} />
                         <div>הוספת בעל תקיעה</div>

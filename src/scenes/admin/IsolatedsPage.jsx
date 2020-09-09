@@ -84,9 +84,9 @@ const IsolatedPage = function (props) {
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                 <div style={{ display: 'flex' }}>
-                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
                     <div style={{ margin: '0 1vw' }}></div>
-                    <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
+                    <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' regex={/^[A-Zא-תa-z '"-()0-9,]{1,}$/} />
                 </div>
                 <div className='statusNavContainer'>
                     <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
