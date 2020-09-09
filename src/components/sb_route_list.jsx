@@ -128,7 +128,7 @@ const SBRouteList = (props) => {
                     {isAdmin && value.isPublicMeeting && !isNaN(Number(value.signedCnt)) ? <div className="meeting-in-route-comments" >{`${value.signedCnt} משתתפים`}</div> : null}
                 </div>
                 <div className="meeting-in-route-info-2">
-                    <img src={index == -1 ? "/icons/shofar-blue.svg" : value.isPublicMeeting ? "/icons/group-orange.svg" : "/icons/single-blue.svg"} alt={value.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
+                    <img src={index == -1 ? "/icons/shofar-blue.svg" : value.isPublicMeeting ? "/icons/group-blue.svg" : "/icons/single-blue.svg"} alt={value.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
                     <div className="meeting-in-route-time">{moment(isAdmin ? value.volunteering_start_time : value.startTime).format("HH:mm")}</div>
                 </div>
             </div>
