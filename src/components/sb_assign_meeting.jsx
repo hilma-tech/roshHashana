@@ -210,7 +210,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             return;
         }
 
-        openGenAlert({ text: `האם את/ה בטוח/ה שברצונך למחוק פגישה זו ממסלולך? ${assignMeetingInfo && assignMeetingInfo.signedCount ? `ישנם ${assignMeetingInfo.signedCount} המחובר/ים לפגישה` : ""}`, isPopup: { okayText: "מחק", cancelText: "בטל, השאר את התקיעה" } },
+        openGenAlert({ text: `האם את/ה בטוח/ה שברצונך למחוק פגישה זו ממסלולך? ${assignMeetingInfo && assignMeetingInfo.signedCount ? `ישנם ${assignMeetingInfo.signedCount} המחובר/ים לפגישה` : ""}`, isPopup: { okayText: "מחק", cancelText: "בטל" } },
             async del => {
                 if (!del) return;
                 let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
