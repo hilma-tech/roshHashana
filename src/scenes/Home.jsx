@@ -3,6 +3,8 @@ import { isBrowser, isIOS } from "react-device-detect";
 import Map from '../components/maps/map';
 import './Home.scss'
 
+const BLOWER = "blower"
+
 const Home = (props) => {
     const allMeeting = "לכל מפגשי \n תקיעות שופר בארץ"
     const stuckHouse = "תקועים בבית? \n אנחנו נדאג לכם לתקיעת שופר"
@@ -11,7 +13,10 @@ const Home = (props) => {
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
 
     const onClickRegister = (e) => {
-        props.history.push("/register", { type: e });
+        let p
+        try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
+        let url = e === BLOWER && p === "t" ? "/register?p=t" : "/register" //todo continue till shofar home page url
+        props.history.push(url, { type: e });
     }
 
     const updateNumImgLoaded = () => {
@@ -39,7 +44,7 @@ const Home = (props) => {
                         <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} `} style={{ marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
                             <button style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לשמוע תקיעת שופר  </button>
-                            <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value="blower" onClick={(e) => onClickRegister(e.target.value)}>
+                            <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value={BLOWER} onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לתקוע בשופר </button>
                         </div>
                     </div>

@@ -190,7 +190,7 @@ const SingleShofarBlowerPage = (props) => {
     // let ttlength = "100 מטרים"
     let ttlength = totalLength || 0 + " מטרים"
     let tooltipText = `עד ${selectedSB.can_blow_x_times == 1 ? "תקיעה אחת" : (selectedSB.can_blow_x_times + " תקיעות בשופר")}\nעד ${selectedSB.volunteering_max_time} דקות הליכה`
-
+    
     return (
         <div className="single-shofar-blower-page">
             <div id="top" >

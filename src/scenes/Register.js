@@ -5,7 +5,7 @@ import './Register.scss';
 import { isBrowser } from "react-device-detect";
 import { CONSTS } from '../consts/const_messages';
 import { MainContext } from '../ctx/MainContext';
-import GeneralAlert from '../components/modals/general_alert';
+
 const errKey = "קוד שגוי"
 const timeOut = "זמן הקוד פג"
 const SomethingMissing = "שם או מספר טלפון לא תקין"
@@ -17,7 +17,7 @@ class Register extends React.Component {
     this.state = {
       // type: this.props.location.state.type === 'blower' ? blower : isolator,
       status: "start",
-      role: (this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null,
+      role: this.props.location.state ? ((this.props.location.state.type === 'blower') ? 2 : (this.props.location.state.type === 'isolator') ? 1 : (this.props.location.state.type === 'generalUser') ? 3 : null) : null,
       phone: "",
       name: "",
       key: "",

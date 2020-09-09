@@ -1,39 +1,61 @@
-require('dotenv').config()
-
 const { sendMsg } = require('../server/sendSms/SendSms');
 const useQuery = require('./query_excecute');
+// all meetings, ordered by blower id and by time
 const query = `
 SELECT * FROM
     (
     SELECT false isPublicMeeting, false constMeeting, isolated.blowerMeetingId AS "blowerId", blower.name AS blowerName, blower.username AS "blowerPhone", CustomUser.address AS "meetingAddress", CustomUser.comments AS "addressComments", 
-    IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, meeting_time AS "meetingStartTime"
+        IF(isolated.public_phone = 1, CustomUser.username, NULL) isolatedPhone, meeting_time AS "meetingStartTime"
     FROM isolated 
     JOIN CustomUser ON userIsolatedId = CustomUser.id 
-    LEFT JOIN CustomUser blower ON isolated.blowerMeetingId = blower.id 
+        LEFT JOIN CustomUser blower ON isolated.blowerMeetingId = blower.id 
     WHERE public_meeting = 0 
-    AND blowerMeetingId IS NOT NULL
+        AND blowerMeetingId IS NOT NULL
+
     UNION
+    
     SELECT true isPublicMeeting, shofar_blower_pub.constMeeting, shofar_blower_pub.blowerId AS "blowerId", blower.name AS blowerName, blower.username AS "blowerPhone", shofar_blower_pub.address AS "meetingAddress", shofar_blower_pub.comments AS "addressComments", NULL isolatedPhone, start_time AS "meetingStartTime"
     FROM isolated 
-    JOIN shofar_blower_pub on isolated.blowerMeetingId =  shofar_blower_pub.id
-    LEFT JOIN CustomUser blower ON isolated.blowerMeetingId = blower.id 
-    WHERE public_meeting = 1 AND shofar_blower_pub.blowerId IS NOT NULL AND shofar_blower_pub.constMeeting = 0
+    JOIN shofar_blower_pub on isolated.blowerMeetingId = shofar_blower_pub.id
+        LEFT JOIN CustomUser blower ON shofar_blower_pub.blowerId = blower.id 
+    WHERE public_meeting = 1 
+        AND shofar_blower_pub.blowerId IS NOT NULL 
+        AND shofar_blower_pub.constMeeting = 0
+    
     UNION 
+    
     SELECT true isPublicMeeting, shofar_blower_pub.constMeeting, shofar_blower_pub.blowerId AS "blowerId", blower.name AS blowerName, blower.username AS "blowerPhone", shofar_blower_pub.address AS "meetingAddress", shofar_blower_pub.comments AS "addressComments", NULL isolatedPhone, start_time AS "meetingStartTime"
     FROM shofar_blower_pub
-    LEFT JOIN CustomUser blower ON blower.id = shofar_blower_pub.blowerId
+        LEFT JOIN CustomUser blower ON blower.id = shofar_blower_pub.blowerId
     WHERE blowerId IS NOT NULL AND constMeeting = 1
     ) a
     ORDER BY blowerId, meetingStartTime
 `;
 
-let msg = "";
-useQuery(query, (err, data, _fields) => {
+let smsMsgsArr = []
+let meetingsMsg = "";
+let secondMsg = `המסלול שלך מוכן ומחכה לך באתר שלנו https://shofar2all.com/?p=t שם תוכל/י לצפות בו ולהדפיסו.\nבברכה, מיזם "יום תרועה".`;
+let meetingStartTime;
+let meetingDate; //temp, to get hours and minutes for meetingStartTime
+useQuery(query, (err, meetings, _fields) => {
     if (err) throw err;
-    console.log('data: ', data);
-    for (let meeting of data) {
-        msg = `שלום ${meeting.blowerName || ""}, המסלול שלך מוכן ומחכה לך באתר שלנו ${process.env.REACT_APP_DOMAIN}/?p=t שם תוכל/י לצפות בו ולהדפיסו. בברכה, מיזם "יום תרועה"`;
-        console.log('msg: ', msg);
-        // sendMsg(blower.phoneNumber, msg)
+    console.log('meetings: ', meetings);
+    for (let i = 0; i < meetings.length; i++) {
+        meetingDate = new Date(meetings[i].meetingStartTime);
+        meetingStartTime = String(meetingDate.getHours()).padStart(2, 0) + ":" + String(meetingDate.getMinutes()).padStart(2, 0);
+        if (typeof meetings[i].meetingAddress === "string" && meetingStartTime && meetings[i].isPublicMeeting !== null && meetings[i].isPublicMeeting !== undefined)
+            meetingsMsg += `\n\n${meetingStartTime}, ${meetings[i].isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}, ${meetings[i].meetingAddress.split(", ישראל").join("")}`
+
+        if (!meetings[Number(i) + 1] || !meetings[Number(i) + 1].blowerId || meetings[Number(i) + 1].blowerId != meetings[i].blowerId) {
+            //in curr blower but next one is a new blower
+            smsMsgsArr.push([meetings[i].blowerPhone, `שלום ${meetings[i].blowerName || ""}, כאן יום תרועה מדבר אלייך. מסלול תקיעת השופר שלך בראש השנה הוא:` + meetingsMsg + "\n\n" + secondMsg])
+            meetingsMsg = ``
+        }
+    }
+    let cnt = 0
+    for (let msg of smsMsgsArr) {
+        console.log('(not) sendMsg to: ', msg);
+        if (cnt === smsMsgsArr.length - 1) sendMsg("0546969090", msg[1])
+        cnt++
     }
 });
