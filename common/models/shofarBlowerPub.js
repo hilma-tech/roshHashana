@@ -72,12 +72,26 @@ module.exports = function (shofarBlowerPub) {
             let where = 'WHERE blowerId IS NOT NULL AND shofar_blower.confirm = 1'
             let orderBy = ''
             if (filter.address && filter.address.length > 0) {
-                where += ` AND shofar_blower_pub.address REGEXP '${filter.address}'`
-                orderBy += `ORDER BY CASE WHEN shofar_blower_pub.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
+                if (!/^[A-Zא-תa-z '"-()0-9,]{1,}$/.test(filter.address)) return cb('address is not valid')
+                let addressArr = filter.address.split("'")
+                let address = ""
+                for (let i = 0; i < addressArr.length; i++) {
+                    address += addressArr[i] + ((addressArr.length - 1) === i ? '' : "\\'")
+                }
+
+                where += ` AND shofar_blower_pub.address REGEXP '${address}'`
+                orderBy += `ORDER BY CASE WHEN shofar_blower_pub.address LIKE '${address}%' THEN 0 ELSE 1 END`
             }
             if (filter.name && filter.name.length > 0) {
-                where += ` AND blowerUser.name REGEXP '${filter.name}'`
-                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN blowerUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
+                if (!/^[A-Zא-תa-z '"-]{1,}$/.test(filter.name)) return cb('name is not valid')
+                let nameArr = filter.name.split("'")
+                let name = ""
+                for (let i = 0; i < nameArr.length; i++) {
+                    name += nameArr[i] + ((nameArr.length - 1) === i ? '' : "\\'")
+                }
+
+                where += ` AND blowerUser.name REGEXP '${name}'`
+                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN blowerUser.name LIKE '${name}%' THEN 0 ELSE 1 END`
             }
 
             //get all public meetings

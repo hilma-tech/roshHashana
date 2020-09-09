@@ -95,14 +95,14 @@ const BlastsPage = (props) => {
 
     return (
         <div>
-            <TopNavBar history={props.history}  />
+            <TopNavBar history={props.history} />
             <div className="BlastsPage">
                 <div className="width75">
                     <div className="textHead bold">תקיעות</div>
                     <div style={{ display: 'flex' }}>
-                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                        <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
                         <div style={{ margin: '0 1vw' }}></div>
-                        <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' />
+                        <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' regex={/^[A-Zא-תa-z '"-()0-9,]{1,}$/} />
                     </div>
                     <div className='statusNavContainer'>
                         <div className={'orangeText subTitle pointer' + (isPublic ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(true)}>תקיעה ציבורית</div>
