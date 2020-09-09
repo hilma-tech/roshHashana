@@ -164,7 +164,7 @@ module.exports = function (ShofarBlower) {
         (async () => {
             try {
                 let where = ''
-
+                let orderBy = ''
                 if (filter.confirm) {
                     where = 'WHERE (sb.confirm = 1)'
                 }
@@ -173,10 +173,12 @@ module.exports = function (ShofarBlower) {
                 }
 
                 if (filter.address && filter.address.length > 0) {
-                    where += ` AND (MATCH(cu.address) AGAINST ('"${filter.address}"')) `
+                    where += ` AND cu.address REGEXP '${filter.address}' `
+                    orderBy = `ORDER BY CASE WHEN cu.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.name && filter.name.length > 0) {
-                    where += ` AND (MATCH(cu.name) AGAINST ('"${filter.name}"'))`
+                    where += ` AND cu.name REGEXP '${filter.name}'`
+                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
                 }
 
                 const shofarBlowerQ = `
@@ -195,13 +197,13 @@ module.exports = function (ShofarBlower) {
                 FROM shofar_blower AS sb 
                     LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
                 ${where}
-                ORDER BY cu.name
-                LIMIT ${startRow}, 7`
+                ${orderBy.length > 0 ? orderBy : 'ORDER BY userId DESC'}
+                LIMIT ${ startRow}, 7`
 
                 const countQ = `SELECT COUNT(*) as resNum
-                FROM shofar_blower AS sb
-                LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
-                ${where}`
+            FROM shofar_blower AS sb
+            LEFT JOIN CustomUser cu ON sb.userBlowerId = cu.id
+            ${ where} `
 
                 let [shofarBlowerErr, shofarBlowerRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerQ);
                 if (shofarBlowerErr || !shofarBlowerRes) {
@@ -234,17 +236,17 @@ module.exports = function (ShofarBlower) {
     ShofarBlower.confirmShofarBlower = function (id, cb) {
         (async () => {
             try {
-                const confirmQ = `UPDATE shofar_blower SET confirm = 1 WHERE id = ${id}`
+                const confirmQ = `UPDATE shofar_blower SET confirm = 1 WHERE id = ${id} `
                 let [confirmErr, confirmRes] = await executeMySqlQuery(ShofarBlower, confirmQ);
                 if (confirmErr || !confirmRes) {
                     console.log('confirmShofarBlower get shofarBlower admin request error : ', confirmErr);
                     throw shofarBlowerErr
                 }
 
-                const findPhone = `select username from CustomUser,shofar_blower where shofar_blower.id = ${id} and CustomUser.id=shofar_blower.userBlowerId`
+                const findPhone = `select username from CustomUser, shofar_blower where shofar_blower.id = ${id} and CustomUser.id = shofar_blower.userBlowerId`
                 let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
                 let objToSocketEvent = { "id": id };
-                ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`)
+                ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username} `)
                 return cb(null, true)
             } catch (err) {
                 cb(err);
@@ -267,10 +269,10 @@ module.exports = function (ShofarBlower) {
                 const userId = userData.userBlowerId;
 
                 let [errPublicMeeting, resPublicMeeting] = await executeMySqlQuery(ShofarBlower,
-                    `select count(isolated.id) as participantsNum , shofar_blower_pub.id as meetingId, blowerId as userId
-                         from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId 
-                         where (blowerId = ${userId}) 
-                         group by shofar_blower_pub.id `);
+                    `select count(isolated.id) as participantsNum, shofar_blower_pub.id as meetingId, blowerId as userId
+            from isolated right join shofar_blower_pub on  shofar_blower_pub.id = isolated.blowerMeetingId
+            where(blowerId = ${ userId})
+            group by shofar_blower_pub.id`);
                 if (resPublicMeeting && Array.isArray(resPublicMeeting)) {
                     let meetingsToUpdate = [], meetingsToDelete = [];
 

@@ -11,9 +11,7 @@ const SingleIsolatorPage = (props) => {
             props.history.goBack()
             return
         }
-        return () => {
-            setSelectedIsolator(null)
-        }
+
     }, [])
 
     if (selectedIsolator)
