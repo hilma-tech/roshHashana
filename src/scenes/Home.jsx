@@ -58,8 +58,8 @@ const Home = (props) => {
                     }
                     <button onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
 
-                    <div className="contactUs" style={{ whiteSpace: "nowrap", marginTop: isBrowser ? "0" : "2vh" }} >
-                        <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />
+                    <div className="contactUs" style={{ marginTop: isBrowser ? "0" : "2vh" }} >
+                        <img style={{ width: "12%" }} src="/icons/envelope.svg" />
                         <a style={{ fontSize: "2.5vh" }} className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
                     </div>
                     <div className="bottomLine" style={{ fontSize: isBrowser ? "2.3vh" : "1.3vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>

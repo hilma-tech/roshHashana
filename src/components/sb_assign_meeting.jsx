@@ -216,7 +216,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "POST",
-                    body: JSON.stringify({ meetToDelete: assignMeetingInfo })
+                    body: JSON.stringify({ meetToDelete: assignMeetingInfo, blowerId: null })
                 });
                 if (err || !res) { //open alert of something went wrong
                     openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })
