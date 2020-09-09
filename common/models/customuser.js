@@ -976,7 +976,9 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
+
             if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
+
             let userData = userDataRes[0]
             //! check that number of meetings in not at max
             // then
@@ -1019,8 +1021,10 @@ module.exports = function (CustomUser) {
 
             const [priRouteErr, priRouteRes] = await executeMySqlQuery(CustomUser, priRouteMeetsQ)
             if (priRouteErr || !priRouteRes) { console.log('private route error : ', priRouteErr); return cb(true) }
+
             const [pubsErr, pubsRes] = await executeMySqlQuery(CustomUser, allPubsQ)
             if (pubsErr || !pubsRes) { console.log('public route and request error : ', pubsErr); return cb(true) }
+
             const myPubRoutes = []
             const pubReqs = []
             let r
@@ -1049,6 +1053,7 @@ module.exports = function (CustomUser) {
             if (userData.can_blow_x_times == myRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: userData.can_blow_x_times } })
             }
+
             if (myRoute.length == 20) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH_20", errData: { currRouteLength: userData.can_blow_x_times } })
             }
@@ -1088,6 +1093,7 @@ module.exports = function (CustomUser) {
                 console.log('google maps request for directions, in assign: err, ', e)
                 return cb(true)
             }
+
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
 
@@ -1108,7 +1114,9 @@ module.exports = function (CustomUser) {
             //update:
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
+
             if (!newAssignMeetingObj.meetingId) return cb(true)
+
             try {
                 formattedStartTime = new Date(newAssignMeetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
             } catch (e) { console.log("assign: wrong time: ", newAssignMeetingObj.startTime, " ", e); return cb(true) }
@@ -1485,7 +1493,7 @@ module.exports = function (CustomUser) {
             try { waypoints = stops.map(s => (`${s.lat},${s.lng}`)) } catch (e) { waypoints = [] }
             let destination;
             try { destination = waypoints.pop() } catch (e) { destination = {}; console.log("urnc"); return cb(true) }
-
+            console.log('1')
             let url = ""
             let result
             try {
@@ -1499,6 +1507,7 @@ module.exports = function (CustomUser) {
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
                     if (!leg) return cb(true)
+                    console.log('2')
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!sbData || !new Date(sbData.startTime).getTime) continue;

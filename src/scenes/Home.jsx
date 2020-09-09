@@ -40,8 +40,8 @@ const Home = (props) => {
                     <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
                         <div className="stuckHouse">{stuckHouse}</div>
                     </div>
-                    <div className="buttonAll justify-content-center align-items-center">
-                        <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} ` + ' row justify-content-center '} style={{ width: isBrowser && '56vw', marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
+                    <div className="buttonAll ">
+                        <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} `} style={{ marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
                             <button style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לשמוע תקיעת שופר  </button>
                             <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value={BLOWER} onClick={(e) => onClickRegister(e.target.value)}>

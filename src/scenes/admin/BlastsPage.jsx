@@ -20,7 +20,6 @@ const BlastsPage = (props) => {
             if (!filter) filter = {}
             setLoadingBlastsPub(true)
             await fetchBlastsPub(startRow, filter, (err, res) => {
-                console.log(err, res)
                 setLoadingBlastsPub(false)
                 if (!err) {
                     setBlastsPub(res.publicMeetings)

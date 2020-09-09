@@ -166,7 +166,8 @@ module.exports = function (ShofarBlower) {
                 let where = ''
                 let orderBy = ''
                 if (filter.confirm) {
-                    where = 'WHERE (sb.confirm = 1)'
+                    where = `WHERE (sb.confirm = 1) 
+                    AND cu.address IS NOT NULL`
                 }
                 else {
                     where = 'WHERE (sb.confirm = 0)'
@@ -347,8 +348,8 @@ module.exports = function (ShofarBlower) {
                 let resBlower = await ShofarBlower.create(objToBlower)
                 let resCU = await ShofarBlower.app.models.CustomUser.updateAll({ id: userId }, objToCU);
                 //if the shofar blower added publicPlaces,
-                if (data.publicPlaces) {
-                    let [errPublicMeetings, resPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicPlaces, userId, options, true));
+                if (data.publicMeetings) {
+                    let [errPublicMeetings, resPublicMeetings] = await to(ShofarBlower.app.models.shofarBlowerPub.createNewPubMeeting(data.publicMeetings, userId, options, true));
                     if (errPublicMeetings) { console.log("errPublicMeetings", errPublicMeetings); return { ok: false } }
                     if (resPublicMeetings) { console.log("resPublicMeetings", resPublicMeetings); }
                 }
