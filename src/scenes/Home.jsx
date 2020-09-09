@@ -3,6 +3,8 @@ import { isBrowser, isIOS } from "react-device-detect";
 import Map from '../components/maps/map';
 import './Home.scss'
 
+const BLOWER = "blower"
+
 const Home = (props) => {
     const allMeeting = "לכל מפגשי \n תקיעות שופר בארץ"
     const stuckHouse = "תקועים בבית? \n אנחנו נדאג לכם לתקיעת שופר"
@@ -11,7 +13,10 @@ const Home = (props) => {
     const [imgLoadedNum, setImgLoadedNum] = useState(0);
 
     const onClickRegister = (e) => {
-        props.history.push("/register", { type: e });
+        let p
+        try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
+        let url = e === BLOWER && p === "t" ? "/register?p=t" : "/register" //todo continue till shofar home page url
+        props.history.push(url, { type: e });
     }
 
     const updateNumImgLoaded = () => {
@@ -39,12 +44,12 @@ const Home = (props) => {
                         <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} `} style={{ marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
                             <button style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לשמוע תקיעת שופר  </button>
-                            <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value="blower" onClick={(e) => onClickRegister(e.target.value)}>
+                            <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value={BLOWER} onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לתקוע בשופר </button>
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw', marginTop: isBrowser ? '20%' : "6%" }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="clickAble" style={{ marginTop: '2%' }} onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>{allMeeting}</div>
                     </>
                         : <>
@@ -53,8 +58,8 @@ const Home = (props) => {
                     }
                     <button onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
 
-                    <div className="contactUs" style={{ whiteSpace: "nowrap", marginTop: isBrowser ? "0" : "2vh" }} >
-                        <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />
+                    <div className="contactUs" style={{ marginTop: isBrowser ? "0" : "2vh", minWidth: isBrowser ? '20%' : '45%' }} >
+                        <img style={{ width: "12%" }} src="/icons/envelope.svg" />
                         <a style={{ fontSize: "2.5vh" }} className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
                     </div>
                     <div className="bottomLine" style={{ fontSize: isBrowser ? "2.3vh" : "1.3vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>

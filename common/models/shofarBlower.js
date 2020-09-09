@@ -83,22 +83,27 @@ module.exports = function (ShofarBlower) {
     }
 
     //delete meeting from blower meetings
-    ShofarBlower.deleteMeeting = async (meetToDelete, options) => {
-        if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
+    ShofarBlower.deleteMeeting = async (meetToDelete, blowerId /*if not null -> the admin is deleting the meeting*/, options) => {
+        if (!blowerId && checkDateBlock('DATE_TO_BLOCK_BLOWER')) {
             //block the function
             return CONSTS.CURRENTLY_BLOCKED_ERR;
         }
         if (!options.accessToken || !options.accessToken.userId) {
             return false;
         }
+        if (blowerId !== null && isNaN(Number(blowerId))) {
+            return false;
+        }
+
         try {
             let isolatedConnected = null; //the phone number of the isolated connected to the meeting (role 1)
             let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
-            const { userId } = options.accessToken;
+            const userId = blowerId ? blowerId : options.accessToken.userId; //the blower id
             const { meetingId } = meetToDelete;
             if (!userId || isNaN(Number(userId)) || !meetingId || isNaN(Number(meetingId))) {
                 return false;
             }
+
             if (meetToDelete.isPublicMeeting) {//public meeting
                 let participantsNum = await ShofarBlower.app.models.Isolated.count({ and: [{ 'blowerMeetingId': meetingId }, { public_meeting: 1 }] });
                 if (participantsNum && participantsNum > 0) { //there are  participants in this meeting
@@ -147,6 +152,7 @@ module.exports = function (ShofarBlower) {
         http: { verb: 'post' },
         accepts: [
             { arg: 'meetToDelete', type: 'object' },
+            { arg: 'blowerId', type: 'any' },
             { arg: 'options', type: 'object', http: "optionsFromRequest" }
         ],
         returns: { arg: 'res', type: 'object', root: true }

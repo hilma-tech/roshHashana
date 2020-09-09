@@ -26,6 +26,18 @@
    }
    .contactUs {
       font-weight: bold;
+      box-sizing: content-box;
+      width: fit-content;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: fit-content;
+      align-items: center;
+      align-content: center;
+      img {
+         width: 12%;
+         align-self: center;
+      }
    }
    .regularLink {
       text-decoration: none;
@@ -99,7 +111,7 @@
          // margin: 0 2vw;
          color: white;
          border: none;
-         width: 13rem;
+         width: 20rem;
       }
       .browserRegisterBlower {
          margin: 0 2vw 0 0;
@@ -109,7 +121,7 @@
          font-size: 3vh;
          font-weight: bold;
          background-color: #489fb5;
-         width: 13rem;
+         width: 20rem;
       }
    }
    .mobileButtonForRegister {
@@ -123,7 +135,7 @@
          color: white;
          border: none;
          padding: 3% 5%;
-         width: 19rem;
+         width: 20rem;
          font-size: 3vh;
          font-weight: bold;
          margin-top: 5%;
@@ -133,7 +145,7 @@
          color: white;
          border: none;
          padding: 2.5%;
-         width: 19rem;
+         width: 20rem;
          font-size: 3vh;
          font-weight: bold;
          // margin-top: 4%;

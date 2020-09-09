@@ -933,10 +933,46 @@ module.exports = function (CustomUser) {
                     pubReqs.push(r)
                 } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
+            if (!myPubRoutes || !myPubRoutes.length) {
+                allRes.myRoute = [...myPubRoutes, ...priRouteRes]
+                allRes.openReqs = [...priReqRes, ...pubReqs]
+                return cb(null, allRes)
+            }
+            for (let i in myPubRoutes) {
+                if (!myPubRoutes[i].meetingId || isNaN(myPubRoutes[i].meetingId) || myPubRoutes[i].meetingId < 1) continue
+                let [errrrBlah, isolatorPublicInRoute] = await executeMySqlQuery(CustomUser, `
+                SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone"
+                FROM isolated
+                LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
+                LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
+                WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId = ${myPubRoutes[i].meetingId}
+                `)
+                if (errrrBlah || !Array.isArray(isolatorPublicInRoute) || isolatorPublicInRoute.length != 1) {
+                    continue;
+                }
+                myPubRoutes[i].isolatedName = isolatorPublicInRoute[0].isolatedName
+                myPubRoutes[i].isolatedPhone = isolatorPublicInRoute[0].isolatedPhone
+
+                if (i == myPubRoutes.length - 1) {
+                    allRes.myRoute = [...myPubRoutes, ...priRouteRes]
+                    allRes.openReqs = [...priReqRes, ...pubReqs]
+                    return cb(null, allRes)
+                }
+            }
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
             allRes.openReqs = [...priReqRes, ...pubReqs]
             return cb(null, allRes)
+
         })();
+    }
+    CustomUser.myPublicIsolatedQuery = (publicMeetingId) => {
+        return `
+        SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone"
+        FROM isolated
+            LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
+            LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
+        WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId = ${publicMeetingId}
+        `
     }
     CustomUser.remoteMethod('mapInfoSB', {
         http: { verb: 'get' },
@@ -956,10 +992,8 @@ module.exports = function (CustomUser) {
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             }
             if (!meetingObj || typeof (meetingObj) !== "object" || Array.isArray(meetingObj)) return cb(true)
-            console.log('1');
 
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
-            console.log('2');
 
             const { userId } = options.accessToken;
 
@@ -980,10 +1014,8 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
-            console.log('3');
 
             if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
-            console.log('4');
 
             let userData = userDataRes[0]
             //! check that number of meetings in not at max
@@ -1027,11 +1059,9 @@ module.exports = function (CustomUser) {
 
             const [priRouteErr, priRouteRes] = await executeMySqlQuery(CustomUser, priRouteMeetsQ)
             if (priRouteErr || !priRouteRes) { console.log('private route error : ', priRouteErr); return cb(true) }
-            console.log('5');
 
             const [pubsErr, pubsRes] = await executeMySqlQuery(CustomUser, allPubsQ)
             if (pubsErr || !pubsRes) { console.log('public route and request error : ', pubsErr); return cb(true) }
-            console.log('6');
 
             const myPubRoutes = []
             const pubReqs = []
@@ -1061,12 +1091,10 @@ module.exports = function (CustomUser) {
             if (userData.can_blow_x_times == myRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: userData.can_blow_x_times } })
             }
-            console.log('7');
 
             if (myRoute.length == 20) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH_20", errData: { currRouteLength: userData.can_blow_x_times } })
             }
-            console.log('8');
 
             const origin = `${userData.lat},${userData.lng}`
 
@@ -1075,7 +1103,6 @@ module.exports = function (CustomUser) {
             try { waypoints = stops.map(s => (`${s.lat},${s.lng}`)) } catch (e) { waypoints = [] }
             let destination;
             try { destination = waypoints.pop() } catch (e) { destination = {}; return cb(true) }
-            console.log('9');
 
             let url = ""
             let result
@@ -1090,8 +1117,6 @@ module.exports = function (CustomUser) {
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
                     if (leg === null) { console.log("(assignSB) google error, fetch result: ", result); return cb(true) }
-                    console.log('10');
-
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
@@ -1106,7 +1131,6 @@ module.exports = function (CustomUser) {
                 console.log('google maps request for directions, in assign: err, ', e)
                 return cb(true)
             }
-            console.log('11');
 
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
@@ -1128,15 +1152,12 @@ module.exports = function (CustomUser) {
             //update:
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
-            console.log('12');
 
             if (!newAssignMeetingObj.meetingId) return cb(true)
-            console.log('13');
 
             try {
                 formattedStartTime = new Date(newAssignMeetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
             } catch (e) { console.log("assign: wrong time: ", newAssignMeetingObj.startTime, " ", e); return cb(true) }
-            console.log('14');
 
             const blowerUpdateQ = newAssignMeetingObj.isPublicMeeting ?
                 `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${newAssignMeetingObj.meetingId} AND blowerId IS NULL`
@@ -1146,7 +1167,6 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
-            console.log('15');
 
             // find name and phone number of isolater
             const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
@@ -1515,7 +1535,7 @@ module.exports = function (CustomUser) {
             try { waypoints = stops.map(s => (`${s.lat},${s.lng}`)) } catch (e) { waypoints = [] }
             let destination;
             try { destination = waypoints.pop() } catch (e) { destination = {}; console.log("urnc"); return cb(true) }
-
+            console.log('1')
             let url = ""
             let result
             try {
@@ -1529,6 +1549,7 @@ module.exports = function (CustomUser) {
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
                     if (!leg) return cb(true)
+                    console.log('2')
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!sbData || !new Date(sbData.startTime).getTime) continue;
@@ -1704,7 +1725,7 @@ module.exports = function (CustomUser) {
             }
 
             // call assignSB
-            CustomUser.adminAssignSB(options, sb, isolator, (assignE, assignR) => {
+            CustomUser.adminAssignSBToIsolator(options, sb, isolator, (assignE, assignR) => {
                 return cb(assignE, assignR)
             })
 

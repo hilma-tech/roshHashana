@@ -134,10 +134,7 @@ const BlowerSettings = (props) => {
         }
         if (fromX) {
             if (publicMeetingsChanged || (updateData && Object.keys(updateData).length !== 0)) {
-                openGenAlert({
-                    text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`,
-                    isPopup: { okayText: "צא", cancelText: "המשך לערוך" }
-                },
+                openGenAlert({ text: `האם אתה בטוח שברצונך לצאת? \n השינויים שביצעת לא ישמרו`, isPopup: { okayText: "צא", cancelText: "המשך לערוך" } },
                     (res) => {
                         if (res) {
                             props.history.goBack();
@@ -150,14 +147,10 @@ const BlowerSettings = (props) => {
             } else {
                 props.history.goBack();
                 return
-
             }
         }
         if (!Object.keys(updateData) || !Object.keys(updateData).length) {
-            openGenAlert({
-                text: "נשמר בהצלחה",
-                isPopup: { okayText: "אישור" }
-            },
+            openGenAlert({ text: "נשמר בהצלחה", isPopup: { okayText: "אישור" } },
                 (res) => {
                     if (res)
                         props.history.goBack();
@@ -222,6 +215,7 @@ const BlowerSettings = (props) => {
         //the blower updated his volunteering_max_time to be smaller than it used to be
         if (volunteering_max_time < originalVals.volunteering_max_time) {
             openGenAlert({ text: `שים לב שהקטנת את זמן ההליכה המקסימלי. זמן זה אינו משפיע על המסלול הנוכחי. אם ברצונך למחוק מהמסלול שלך תקיעות, תוכל לעשות זאת ב ${isBrowser ? 'מסלול המוצג מימין' : 'מסלול המוצג בתחתית המסך'}`, isPopup: { okayText: "הבנתי" } });
+            return;
         }
 
         if (can_blow_x_times < originalVals.can_blow_x_times) {//the blower updated his can_blow_x_times to be smaller than it used to be
@@ -237,6 +231,7 @@ const BlowerSettings = (props) => {
         }, true);
         if (err || !res) {
             openGenAlert({ text: err && err.error && err.error.message === "PHONE_EXISTS" ? "מספר הטלפון בשימוש" : "חלה תקלה, לא ניתן לעדכן כעת. נסו שוב מאוחר יותר." })
+            return
         }
         else {
             if (res === CONSTS.CURRENTLY_BLOCKED_ERR) {
@@ -244,10 +239,7 @@ const BlowerSettings = (props) => {
                 setVals(originalVals)
                 return;
             }
-            openGenAlert({
-                text: "נשמר בהצלחה",
-                isPopup: { okayText: "אישור" }
-            },
+            openGenAlert({ text: "נשמר בהצלחה", isPopup: { okayText: "אישור" } },
                 (res) => {
                     if (res)
                         props.history.goBack();
@@ -327,7 +319,7 @@ const BlowerSettings = (props) => {
                 </div>
 
                 <div id="public-blowing-set-btn" className="clickAble" onClick={changeSettingsType}>
-                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות</div>
+                    <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>תקיעות ציבוריות שלי</div>
                     <div className="noSelect" onClick={() => changeSettingsTypeWithParameter('public-blowing-set-btn')}>{settingsType === 'public-blowing-set-btn' ? '-' : '+'}</div>
                 </div>
 
