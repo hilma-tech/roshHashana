@@ -64,7 +64,7 @@ export default function BlowerFormAdmin(props) {
 
     useEffect(() => {
         (async () => {
-            if (props.location.pathname === '/edit-shofar-blower' && !shofarBlowerIdToEdit) props.history.goBack()
+            if (props.location.pathname === '/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/edit-shofar-blower' && !shofarBlowerIdToEdit) props.history.goBack()
             else if (shofarBlowerIdToEdit) {
                 await getShofarBlowerByIdAdmin(shofarBlowerIdToEdit, (err, res) => {
                     if (!err) {
@@ -320,16 +320,14 @@ export default function BlowerFormAdmin(props) {
                 <form onSubmit={saveShofarBlowerDetails} onKeyPress={handleKeyPress}>
 
                     {/* shofar blowing name input */}
-                    {!shofarBlowerIdToEdit && <div>
-                        <div className="title">שם מלא</div>
-                        <input type="text" placeholder={"נא להזין שם מלא"} value={name} onChange={handleNameChange} autoComplete={'off'} />
-                        <div className="err-msg ">{nameErr}</div>
+                    <div className="title">שם מלא</div>
+                    <input type="text" disabled={shofarBlowerIdToEdit} placeholder={"נא להזין שם מלא"} value={name} onChange={handleNameChange} autoComplete={'off'} />
+                    <div className="err-msg ">{nameErr}</div>
 
-                        {/* shofar blowing phone input */}
-                        <div className="title">מספר פלאפון</div>
-                        <input type="tel" placeholder={"נא להזין מספר טלפון נייד"} value={phone} onChange={handlePhoneChange} />
-                        <div className="err-msg ">{phoneErr}</div>
-                    </div>}
+                    {/* shofar blowing phone input */}
+                    <div className="title">מספר פלאפון</div>
+                    <input type="tel" disabled={shofarBlowerIdToEdit} placeholder={"נא להזין מספר טלפון נייד"} value={phone} onChange={handlePhoneChange} />
+                    <div className="err-msg ">{phoneErr}</div>
 
                     {/* shofar blowing times input */}
                     <div className="title">כמה פעמים יהיה מוכן לתקוע בשופר באזורו?</div>
