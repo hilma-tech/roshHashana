@@ -1,5 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { SBContext } from '../ctx/shofar_blower_context';
+import { MainContext } from '../ctx/MainContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Auth from '../modules/auth/Auth';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
@@ -15,6 +18,7 @@ const SBRouteList = (props) => {
     const [constB4, setConstB4] = useState([]);
     const [constAfter, setConstAfter] = useState([]);
     const sbctx = useContext(SBContext);
+    const { openGenAlert } = useContext(MainContext)
 
     let userData, totalLength, myMeetings, setMyMeetings, setAssignMeetingInfo, setIsInRoute;
     if (isAdmin) {
@@ -34,7 +38,7 @@ const SBRouteList = (props) => {
     const disableEdit = !isAdmin && checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
-        const userStartTime = isAdmin ? new Date(selectedSB.startTime).getTime() : new Date(userData.startTime).getTime()
+        const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
@@ -128,6 +132,9 @@ const SBRouteList = (props) => {
                     <div className="meeting-in-route-time">{moment(isAdmin ? value.volunteering_start_time : value.startTime).format("HH:mm")}</div>
                 </div>
             </div>
+            <div className="trash-icon">
+                {index !== -1 && props.admin ? <FontAwesomeIcon className="pointer " style={{ fontSize: "1.7vh" }} icon={['fas', 'trash']} color='#156879' onClick={() => { handleTrashClick(index, value) }} /> : null}
+            </div>
         </div>)
     }
 
@@ -143,6 +150,33 @@ const SBRouteList = (props) => {
         }
         setMyRoute(newRoute,);
     };
+
+    const handleTrashClick = (index, value) => {
+        if (!value || !selectedSB || !selectedSB.id) {
+            openGenAlert({ text: 'לא ניתן למחוק כעת, אנא נסה שנית מאוחר יותר ' });
+        }
+        openGenAlert({ text: `האם את/ה בטוח/ה שברצונך למחוק פגישה זו ממסלול בעל התקוע? ${value && value.signedCount ? `ישנם ${value.signedCount} המחובר/ים לפגישה` : ""}`, isPopup: { okayText: "מחק", cancelText: "בטל, השאר את התקיעה" } },
+            async del => {
+                if (!del) return;
+                let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    method: "POST",
+                    body: JSON.stringify({ meetToDelete: value, blowerId: selectedSB.id })
+                });
+                if (err || !res) { //open alert of something went wrong
+                    openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })
+                }
+                if (res) {
+                    openGenAlert({ text: "הפגישה הוסרה מהמסלול בהצלחה" })
+                    props.setMeetingsOfSelectedSB(myMeetings.filter((meet, i) => {
+                        if (i == 0 && myMeetings.length == 1) {
+                            window.location.reload()
+                        }
+                        return (meet.meetingId != value.meetingId || Boolean(meet.isPublicMeeting) !== Boolean(value.isPublicMeeting))
+                    }))
+                }
+            })
+    }
     return (
         <div className="sb-route-list" >
             {isAdmin ? null :

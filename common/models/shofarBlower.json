@@ -143,6 +143,7 @@
             "permission": "ALLOW",
             "property": [
                 "count",
+                "deleteMeeting",
                 "countAllVolunteers",
                 "getShofarBlowersForAdmin",
                 "confirmShofarBlower",

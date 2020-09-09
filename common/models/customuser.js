@@ -931,10 +931,42 @@ module.exports = function (CustomUser) {
                     pubReqs.push(r)
                 } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
-            allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-            allRes.openReqs = [...priReqRes, ...pubReqs]
-            return cb(null, allRes)
+            if (!myPubRoutes || !myPubRoutes.length) {
+                allRes.myRoute = [...myPubRoutes, ...priRouteRes]
+                allRes.openReqs = [...priReqRes, ...pubReqs]
+                return cb(null, allRes)
+            }
+            for (let i in myPubRoutes) {
+                if (!myPubRoutes[i].meetingId || isNaN(myPubRoutes[i].meetingId) || myPubRoutes[i].meetingId < 1) continue
+                let [errrrBlah, isolatorPublicInRoute] = await executeMySqlQuery(CustomUser, `
+                SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone"
+                FROM isolated
+                LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
+                LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
+                WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId = ${myPubRoutes[i].meetingId}
+                `)
+                if (errrrBlah || !Array.isArray(isolatorPublicInRoute) || isolatorPublicInRoute.length != 1) {
+                    continue;
+                }
+                myPubRoutes[i].isolatedName = isolatorPublicInRoute[0].isolatedName
+                myPubRoutes[i].isolatedPhone = isolatorPublicInRoute[0].isolatedPhone
+
+                if (i == myPubRoutes.length - 1) {
+                    allRes.myRoute = [...myPubRoutes, ...priRouteRes]
+                    allRes.openReqs = [...priReqRes, ...pubReqs]
+                    return cb(null, allRes)
+                }
+            }
         })();
+    }
+    CustomUser.myPublicIsolatedQuery = (publicMeetingId) => {
+        return `
+        SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone"
+        FROM isolated
+            LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
+            LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
+        WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId = ${publicMeetingId}
+        `
     }
     CustomUser.remoteMethod('mapInfoSB', {
         http: { verb: 'get' },
