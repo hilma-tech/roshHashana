@@ -38,7 +38,7 @@ const SBRouteList = (props) => {
     const disableEdit = !isAdmin && checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
-        const userStartTime = isAdmin ? new Date(selectedSB.startTime).getTime() : new Date(userData.startTime).getTime()
+        const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
         const constStopsB4 = [];
