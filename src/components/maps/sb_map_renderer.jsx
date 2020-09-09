@@ -159,7 +159,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
             let [err, res] = await getOverviewPath(window.google, userOrigin.location, routeStops, { getTimes: true, userData })
             if (err) {
-                logE("getoverviewpath 1 : ", err);
+                // logE("getoverviewpath 1 : ", err);
                 if (typeof err === "string") { openGenAlert({ text: err }); }
                 return
             }
@@ -173,7 +173,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             const meetingsToUpdateST = [];
             for (let m of routeStops) { //loop current stops and their start times
                 let myNewStartTime = getMyNewST(m.meetingId || m.id, m.isPublicMeeting)
-                if (!m.startTime || (!m.id && !m.meetingId) || new Date(m.startTime).toJSON() != myNewStartTime) //compare with newly calculated start time
+                if ((!m.startTime || new Date(m.startTime).toJSON() != myNewStartTime) && (m.id || m.meetingId) && (m.isPublicMeeting != null && m.isPublicMeeting != undefined)) //compare with newly calculated start time
                     meetingsToUpdateST.push({ meetingId: m.meetingId || m.id, isPublicMeeting: m.isPublicMeeting, startTime: myNewStartTime })
             }
             if (meetingsToUpdateST && meetingsToUpdateST.length) {

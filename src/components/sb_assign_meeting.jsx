@@ -14,7 +14,7 @@ const assign_error = "אירעה שגיאה, לא ניתן להשתבץ כעת, 
 
 const SBAssignMeeting = ({ history, inRoute }) => {
 
-    const { openGenAlert, openGenAlertSync } = useContext(MainContext)
+    const { openGenAlert, openGenAlertSync, setCenter, defaultCenter } = useContext(MainContext)
     const { userData,
         assignMeetingInfo, setAssignMeetingInfo,
         myMeetings, setMyMeetings,
@@ -187,6 +187,9 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             setMyMeetings(mym => Array.isArray(mym) ? [...mym, newMeeting] : [newMeeting])
         }
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
+
+        setTimeout(() => { setCenter(defaultCenter) }, 1000)
+        console.log('setCenter: ', defaultCenter);
 
         if (!genMapMeetings) return
         if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
