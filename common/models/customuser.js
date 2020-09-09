@@ -931,9 +931,10 @@ module.exports = function (CustomUser) {
                     pubReqs.push(r)
                 } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
+            
+            allRes.openReqs = [...priReqRes, ...pubReqs]
+            allRes.myRoute = [...myPubRoutes, ...priRouteRes]
             if (!myPubRoutes || !myPubRoutes.length) {
-                allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-                allRes.openReqs = [...priReqRes, ...pubReqs]
                 return cb(null, allRes)
             }
             for (let i in myPubRoutes) {
@@ -953,7 +954,6 @@ module.exports = function (CustomUser) {
 
                 if (i == myPubRoutes.length - 1) {
                     allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-                    allRes.openReqs = [...priReqRes, ...pubReqs]
                     return cb(null, allRes)
                 }
             }

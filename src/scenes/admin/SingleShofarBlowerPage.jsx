@@ -30,10 +30,6 @@ const SingleShofarBlowerPage = (props) => {
         // console.log('selectedSB: ', selectedSB);
         if (selectedIsolator || (!selectedIsolator && selectedSB))
             fetchAdminSBRoute(selectedSB.userId, selectedIsolator || (!selectedSB.phone && !selectedSB.username) || !selectedSB.can_blow_x_times || !selectedSB.volunteering_start_time || !selectedSB.volunteering_max_time)
-        //if selectedSB(:obj) has .id --> came from shofar-blowers-table
-        //else, if has .sbId --> came from home-page-map
-        //else, if isFromIsolator --> came from searchera and selectedSB is a num (an id)
-        //todo: check if this workd ^, coming from : map/shofarBlowers/searcher
         return () => {
             cleanUp()
         }
@@ -81,24 +77,25 @@ const SingleShofarBlowerPage = (props) => {
 
         (async () => {
             console.log('adminAssignSBToIsolator: ', selectedIsolator || iso);
+            console.log('selectedSB: ', selectedSB);
             let [assignErr, assignRes] = await adminAssignSBToIsolator(selectedSB, selectedIsolator || iso)
             if (assignErr || !assignRes) {
                 openGenAlert({ text: assign_default_error })
                 return
             }
-            checkAssignResForError(assignRes)
+            checkAssignResForError(assignRes, selectedIsolator || iso)
         })()
     }
-    const checkAssignResForError = (assignRes) => {
+    const checkAssignResForError = (assignRes, iso) => {
         if (assignRes && typeof assignRes === "object" && typeof assignRes.errName === "string") { //actually an error. (It's in assignRes on purpose, so I have control over it)
             if (assignRes.errName === "MAX_DURATION" && assignRes.errData && assignRes.errData.newTotalTime !== null && assignRes.errData.newTotalTime !== undefined && assignRes.errData.maxRouteDuration !== undefined && assignRes.errData.maxRouteDuration !== null) {
                 //! MAX_DURATION
-                handleMaxDuration(assignRes.errData)
+                handleMaxDuration(assignRes.errData, iso)
                 return;
             }
             else if (assignRes.errName === "MAX_ROUTE_LENGTH" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
                 //! MAX_ROUTE_LENGTH
-                handleMaxRouteLength(assignRes.errData.currRouteLength)
+                handleMaxRouteLength(assignRes.errData.currRouteLength, iso)
                 return
             }
             else if (assignRes.errName === "MAX_ROUTE_LENGTH_20" && assignRes.errData && assignRes.errData.currRouteLength !== null && assignRes.errData.currRouteLength !== undefined) {
@@ -116,7 +113,7 @@ const SingleShofarBlowerPage = (props) => {
         else openGenAlert({ text: assign_default_error })
     }
 
-    const handleMaxDuration = async (data) => {
+    const handleMaxDuration = async (data, iso) => {
         //format
         let newTT = data.newTotalTime;
         try {
@@ -136,19 +133,19 @@ const SingleShofarBlowerPage = (props) => {
         if (!updateMaxRouteDuration) {
             return;
         }
-        adminUpdateMaxDurationAndAssign(selectedSB, selectedIsolator, data.newTotalTime,
+        adminUpdateMaxDurationAndAssign(selectedSB, selectedIsolator || iso, data.newTotalTime,
             err => {
                 if (err) {
                     // if (err === CONSTS.CURRENTLY_BLOCKED_ERR) { openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן להשתבץ יותר' }); return; }
                     openGenAlert({ text: typeof err === "string" ? err : assign_default_error })
                     return;
                 }
-                handleAssignSuccess(selectedIsolator)//shouldn't get MAX_ROUTE_LENGTH error now, cos validation is first on that and then on max duration
+                handleAssignSuccess(selectedIsolator, iso)//shouldn't get MAX_ROUTE_LENGTH error now, cos validation is first on that and then on max duration
             })
         return;
     }
 
-    const handleMaxRouteLength = async (n) => {
+    const handleMaxRouteLength = async (n, iso) => {
         if (isNaN(Number(n))) return
         let text = `שים לב, לאחר השיבוץ מספר התקיעות של בעל התקיעה יעמוד על ${Number(n) + 1} תקיעות. בעל התקיעות קבע את ${n} כמספר התקיעות המקסימלי שלו`;
         // `מספר התקיעות הנוכחי שלך הוא ${n} וציינת שאתה תוקע ${n} פעמים, לכן לא ניתן כעת לשבצך`
@@ -157,24 +154,25 @@ const SingleShofarBlowerPage = (props) => {
             return;
         }
         // if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) { openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true }); return; }
-        adminUpdateMaxRouteLengthAndAssign(selectedSB, selectedIsolator,
+        adminUpdateMaxRouteLengthAndAssign(selectedSB, selectedIsolator || iso,
             (error, res) => {
                 if (error || !res) {
                     openGenAlert({ text: typeof error === "string" ? error : assign_default_error })
                     return;
                 }
                 // else if (res && res === CONSTS.CURRENTLY_BLOCKED_ERR) { openGenAlert({ text: res, block: true }); return; }
-                checkAssignResForError(res) //res might contain a MAX_DURATION error
+                checkAssignResForError(res, iso) //res might contain a MAX_DURATION error
             })
     }
 
-    const handleAssignSuccess = (assignRes) => {
+    const handleAssignSuccess = (assignRes, iso) => {
         openGenAlert({ text: "שובץ בהצלחה" });
         setAssigned(true)
         if (showIsolators && Array.isArray(isolators)) {
-            setIsolatorsLocations(isos => isos.filter(i => i.id != assignRes.id || i.isPublicMeeting != assignRes.isPublicMeeting))
+            setIsolatorsLocations(isos => isos.filter(i => assignRes ? (i.id != assignRes.id || i.isPublicMeeting != assignRes.isPublicMeeting) : (i.id != iso.id || i.isPublicMeeting != iso.isPublicMeeting)))
         }
-        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, selectedIsolator || assignRes] : [selectedIsolator || assignRes]))
+        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, selectedIsolator || assignRes || iso] : [selectedIsolator || assignRes || iso]))
+        setSelectedIsolator(null)
     }
 
     const showIsolatorsMarkers = () => {
@@ -190,7 +188,7 @@ const SingleShofarBlowerPage = (props) => {
     // let ttlength = "100 מטרים"
     let ttlength = totalLength || 0 + " מטרים"
     let tooltipText = `עד ${selectedSB.can_blow_x_times == 1 ? "תקיעה אחת" : (selectedSB.can_blow_x_times + " תקיעות בשופר")}\nעד ${selectedSB.volunteering_max_time} דקות הליכה`
-    
+
     return (
         <div className="single-shofar-blower-page">
             <div id="top" >
