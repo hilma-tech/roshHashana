@@ -954,8 +954,10 @@ module.exports = function (CustomUser) {
                 return cb(null, CONSTS.CURRENTLY_BLOCKED_ERR);
             }
             if (!meetingObj || typeof (meetingObj) !== "object" || Array.isArray(meetingObj)) return cb(true)
+            console.log('1');
 
             if (!options || !options.accessToken || !options.accessToken.userId) return cb(true)
+            console.log('2');
 
             const { userId } = options.accessToken;
 
@@ -976,7 +978,11 @@ module.exports = function (CustomUser) {
 
             let [userDataErr, userDataRes] = await executeMySqlQuery(CustomUser, userDataQ)
             if (userDataErr || !userDataRes) { console.log('userDataErr: ', userDataErr); return cb(true) }
+            console.log('3');
+
             if (!userDataRes[0] || !userDataRes[0].confirm) { console.log("not confirmed"); return cb(true) }
+            console.log('4');
+
             let userData = userDataRes[0]
             //! check that number of meetings in not at max
             // then
@@ -1019,8 +1025,12 @@ module.exports = function (CustomUser) {
 
             const [priRouteErr, priRouteRes] = await executeMySqlQuery(CustomUser, priRouteMeetsQ)
             if (priRouteErr || !priRouteRes) { console.log('private route error : ', priRouteErr); return cb(true) }
+            console.log('5');
+
             const [pubsErr, pubsRes] = await executeMySqlQuery(CustomUser, allPubsQ)
             if (pubsErr || !pubsRes) { console.log('public route and request error : ', pubsErr); return cb(true) }
+            console.log('6');
+
             const myPubRoutes = []
             const pubReqs = []
             let r
@@ -1049,9 +1059,12 @@ module.exports = function (CustomUser) {
             if (userData.can_blow_x_times == myRoute.length) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH", errData: { currRouteLength: userData.can_blow_x_times } })
             }
+            console.log('7');
+
             if (myRoute.length == 20) {
                 return cb(null, { errName: "MAX_ROUTE_LENGTH_20", errData: { currRouteLength: userData.can_blow_x_times } })
             }
+            console.log('8');
 
             const origin = `${userData.lat},${userData.lng}`
 
@@ -1060,6 +1073,7 @@ module.exports = function (CustomUser) {
             try { waypoints = stops.map(s => (`${s.lat},${s.lng}`)) } catch (e) { waypoints = [] }
             let destination;
             try { destination = waypoints.pop() } catch (e) { destination = {}; return cb(true) }
+            console.log('9');
 
             let url = ""
             let result
@@ -1073,7 +1087,9 @@ module.exports = function (CustomUser) {
                 let legDuration
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
-                    if (leg === null) { return cb(true) }
+                    if (leg === null) { console.log("(assignSB) google error, fetch result: ", result); return cb(true) }
+                    console.log('10');
+
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!userData || !new Date(userData.startTime).getTime) continue;
@@ -1088,6 +1104,8 @@ module.exports = function (CustomUser) {
                 console.log('google maps request for directions, in assign: err, ', e)
                 return cb(true)
             }
+            console.log('11');
+
             const totalTimeReducer = (accumulator, s) => (s && s.duration ? (accumulator + (Number(s.duration.value) || 1) + (CONSTS.SHOFAR_BLOWING_DURATION_MS / 1000)) : null)
             const newTotalTime = result.startTimes.reduce(totalTimeReducer, 0) * 1000 //seconds to ms
 
@@ -1108,10 +1126,15 @@ module.exports = function (CustomUser) {
             //update:
             let formattedStartTime;
             if (!new Date(newAssignMeetingObj.startTime).getTime) return cb(true);
+            console.log('12');
+
             if (!newAssignMeetingObj.meetingId) return cb(true)
+            console.log('13');
+
             try {
                 formattedStartTime = new Date(newAssignMeetingObj.startTime).toJSON().split("T").join(" ").split(/\.\d{3}\Z/).join("")
             } catch (e) { console.log("assign: wrong time: ", newAssignMeetingObj.startTime, " ", e); return cb(true) }
+            console.log('14');
 
             const blowerUpdateQ = newAssignMeetingObj.isPublicMeeting ?
                 `UPDATE shofar_blower_pub SET blowerId = ${userId}, start_time = "${formattedStartTime}" WHERE id = ${newAssignMeetingObj.meetingId} AND blowerId IS NULL`
@@ -1121,6 +1144,7 @@ module.exports = function (CustomUser) {
                 console.log('assign update err: ', assignErr);
                 return cb(true)
             }
+            console.log('15');
 
             // find name and phone number of isolater
             const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
