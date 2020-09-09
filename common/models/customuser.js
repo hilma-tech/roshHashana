@@ -1719,7 +1719,7 @@ module.exports = function (CustomUser) {
             }
 
             // call assignSB
-            CustomUser.adminAssignSB(options, sb, isolator, (assignE, assignR) => {
+            CustomUser.adminAssignSBToIsolator(options, sb, isolator, (assignE, assignR) => {
                 return cb(assignE, assignR)
             })
 
