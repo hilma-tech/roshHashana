@@ -42,6 +42,8 @@ const format = 'HH:mm';
 
 let originalValues = null
 
+let keyId = 1
+
 export default function BlowerFormAdmin(props) {
     // const { showAlert } = useContext(MainContext)
     const { shofarBlowerIdToEdit, setShofarBlowerIdToEdit } = useContext(AdminMainContext)
@@ -123,7 +125,8 @@ export default function BlowerFormAdmin(props) {
         setPublicPlacesChanged(true)
         if (publicPlaces.length < 4) {
             setPublicPlaces(prev => {
-                prev.push({ id: prev.length })
+                keyId++
+                prev.push({ keyId: 'key' + keyId })
                 return [...prev]
             })
         }
@@ -374,7 +377,7 @@ export default function BlowerFormAdmin(props) {
                         <div className="public-meeting-options">
                             {publicPlaces && publicPlaces.map((place, index) => {
                                 return <AddPublicPlace
-                                    key={"k" + place.id}
+                                    key={place.id || place.keyId}
                                     removePubPlace={removePubPlace}
                                     index={index}
                                     format={format}

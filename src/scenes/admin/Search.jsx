@@ -24,13 +24,18 @@ const Search = (props) => {
         else delayTime = setTimeout(() => props.onSearch(searchValue), 300)
     }, [searchValue])
 
+    const onChange = function (e) {
+        if (props.regex && (!props.regex.test(e.target.value) && e.target.value.length !== 0)) return
+        setSearchValue(e.target.value)
+    }
+
 
     return (
         <div className='inputContainer'>
             <input
                 placeholder={props.placeholder}
                 value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={onChange}
             />
             {!searchValue || searchValue.length === 0 ?
                 <FontAwesomeIcon icon={['fas', 'search']} className='inputIcon' /> :

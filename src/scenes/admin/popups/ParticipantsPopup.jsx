@@ -48,7 +48,7 @@ const ParticipantsPopup = (props) => {
                     <DialogContent className="p-0" >
                         <div >
                             <div className="mb-3">
-                                <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' />
+                                <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
                             </div>
                             {participantsPublicMeeting && <div className="results">סה"כ {participantsPublicMeeting.length} משתתפים</div>}
                             <ParticipantsTable getParticipants={getParticipants} filters={filters}/>

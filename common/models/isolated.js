@@ -216,12 +216,26 @@ module.exports = function (Isolated) {
                 let where = ''
                 let orderBy = ''
                 if (filter.address && filter.address.length > 0) {
-                    where += `WHERE cu.address REGEXP '${filter.address}' `
-                    orderBy += `ORDER BY CASE WHEN cu.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
+                    if (!/^[A-Zא-תa-z '"-()0-9,]{1,}$/.test(filter.address)) return cb('address is not valid')
+                    let addressArr = filter.address.split("'")
+                    let address = ""
+                    for (let i = 0; i < addressArr.length; i++) {
+                        address += addressArr[i] + ((addressArr.length - 1) === i ? '' : "\\'")
+                    }
+
+                    where += `WHERE cu.address REGEXP '${address}' `
+                    orderBy += `ORDER BY CASE WHEN cu.address LIKE '${address}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.name && filter.name.length > 0) {
-                    where += `${where.length > 0 ? ' AND' : 'WHERE'} cu.name REGEXP '${filter.name}'`
-                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
+                    if (!/^[A-Zא-תa-z '"-]{1,}$/.test(filter.name)) return cb('name is not valid')
+                    let nameArr = filter.name.split("'")
+                    let name = ""
+                    for (let i = 0; i < nameArr.length; i++) {
+                        name += nameArr[i] + ((nameArr.length - 1) === i ? '' : "\\'")
+                    }
+
+                    where += `${where.length > 0 ? ' AND' : 'WHERE'} cu.name REGEXP '${name}'`
+                    orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN cu.name LIKE '${name}%' THEN 0 ELSE 1 END`
                 }
                 if (filter.haveMeeting === true) {
                     where += `${where.length > 0 ? ' AND' : 'WHERE'} ((isolated.public_meeting = 0 AND isolated.blowerMeetingId IS NOT NULL) OR
@@ -394,13 +408,26 @@ module.exports = function (Isolated) {
             let where = 'WHERE isolated.public_meeting = 0 and isolated.blowerMeetingId IS NOT NULL AND shofar_blower.confirm = 1'
             let orderBy = ''
             if (filter.address && filter.address.length > 0) {
-                where += ` AND isolatedUser.address REGEXP '${filter.address}'`
-                orderBy += `ORDER BY CASE WHEN isolatedUser.address LIKE '${filter.address}%' THEN 0 ELSE 1 END`
+                if (!/^[A-Zא-תa-z '"-()0-9,]{1,}$/.test(filter.address)) return cb('address is not valid')
+                let addressArr = filter.address.split("'")
+                let address = ""
+                for (let i = 0; i < addressArr.length; i++) {
+                    address += addressArr[i] + ((addressArr.length - 1) === i ? '' : "\\'")
+                }
+                where += ` AND isolatedUser.address REGEXP '${address}'`
+                orderBy += `ORDER BY CASE WHEN isolatedUser.address LIKE '${address}%' THEN 0 ELSE 1 END`
             }
             if (filter.name && filter.name.length > 0) {
-                where += ` AND (isolatedUser.name REGEXP '${filter.name}' OR blowerUser.name REGEXP '${filter.name}')`
-                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN isolatedUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END, 
-                CASE WHEN blowerUser.name LIKE '${filter.name}%' THEN 0 ELSE 1 END`
+                if (!/^[A-Zא-תa-z '"-]{1,}$/.test(filter.name)) return cb('name is not valid')
+                let nameArr = filter.name.split("'")
+                let name = ""
+                for (let i = 0; i < nameArr.length; i++) {
+                    name += nameArr[i] + ((nameArr.length - 1) === i ? '' : "\\'")
+                }
+
+                where += ` AND (isolatedUser.name REGEXP '${name}' OR blowerUser.name REGEXP '${name}')`
+                orderBy += `${orderBy.length > 0 ? ',' : 'ORDER BY'} CASE WHEN isolatedUser.name LIKE '${name}%' THEN 0 ELSE 1 END, 
+                CASE WHEN blowerUser.name LIKE '${name}%' THEN 0 ELSE 1 END`
             }
 
             let [err, res] = await executeMySqlQuery(Isolated,
@@ -421,7 +448,7 @@ module.exports = function (Isolated) {
                 ${orderBy}
                 LIMIT ${startRow}, 7`
             );
-            
+
             if (err) cb(err);
             if (res) {
                 let [err1, res1] = await executeMySqlQuery(Isolated,
