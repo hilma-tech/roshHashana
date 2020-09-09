@@ -35,8 +35,8 @@ const Home = (props) => {
                     <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
                         <div className="stuckHouse">{stuckHouse}</div>
                     </div>
-                    <div className="buttonAll justify-content-center align-items-center">
-                        <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} ` + ' row justify-content-center '} style={{ width: isBrowser && '56vw', marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
+                    <div className="buttonAll ">
+                        <div className={`${isBrowser ? "browserButtonForRegister" : "mobileButtonForRegister"} `} style={{ marginTop: isBrowser && "3%", margin: !isBrowser && "0% auto", }}>
                             <button style={{ marginBottom: !isBrowser && '5%' }} className={`${isBrowser ? "browserRegisterIsolator" : "mobileRegisterIsolator"}`} value="isolator" onClick={(e) => onClickRegister(e.target.value)}>
                                 אני רוצה לשמוע תקיעת שופר  </button>
                             <button className={`${isBrowser ? "browserRegisterBlower" : "mobileRegisterBlower"}`} value="blower" onClick={(e) => onClickRegister(e.target.value)}>
@@ -51,11 +51,11 @@ const Home = (props) => {
                             <div onClick={() => setOpenMap(true)} className="text-light" style={{ fontSize: "3vh", marginTop: "5%", whiteSpace: "pre-line", lineHeight: "1.2" }}>{allMeeting}</div>
                             <div onClick={() => setOpenMap(true)} className="img-container"><img alt="" style={{ width: '12vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div></>
                     }
-                                        <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
+                    <button onClick={() => { props.history.push("/a") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
 
-                    <div className="contactUs" style={{ whiteSpace: "nowrap" , marginTop: isBrowser? "0":"2vh"}} >
+                    <div className="contactUs" style={{ whiteSpace: "nowrap", marginTop: isBrowser ? "0" : "2vh" }} >
                         <img style={{ width: "12%", marginLeft: "3%" }} src="/icons/envelope.svg" />
-                        <a style={{ fontSize: "2.5vh"}}className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
+                        <a style={{ fontSize: "2.5vh" }} className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
                     </div>
                     <div className="bottomLine" style={{ fontSize: isBrowser ? "2.3vh" : "1.3vh", padding: isBrowser ? "0 0 0 0" : "1.5% 0 1.5% 0", justifyContent: isBrowser ? "center" : "space-evenly" }}>
 
