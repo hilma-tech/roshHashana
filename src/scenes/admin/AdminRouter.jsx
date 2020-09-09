@@ -21,7 +21,7 @@ const AdminRouter = (props) => {
                 <AdminMainProvider>
                     <Switch>
                         <Route exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs`} compName="AdminLogin" component={(props) => <AdminLogin {...props} />} />
-                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/blasts`} compName="BlastsPage" component={(props) => <BlastsPage {...props} />} />
+                        <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/meetings`} compName="BlastsPage" component={(props) => <BlastsPage {...props} />} />
                         <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/home`} compName="AdminHome" component={(props) => <AdminHome {...props} />} />
                         <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searchings`} compName="IsolatedTable" component={(props) => <IsolatedsPage {...props} />} />
                         <PrivateRoute exact path={`/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher`} compName="SingleIsolator" component={(props) => <SingleIsolatorPage {...props} />} />

@@ -17,7 +17,7 @@ const SideNavBar = (props) => {
         { name: "ראשי", path: '/home' },
         { name: "מחפשים", path: '/searchings' },
         { name: "בעלי תקיעה", path: '/shofar-blowers' },
-        { name: "תקיעות", path: '/blasts' }
+        { name: "תקיעות", path: '/meetings' }
     ]
 
     const logOut = async () => {

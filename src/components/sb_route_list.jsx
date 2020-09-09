@@ -118,7 +118,7 @@ const SBRouteList = (props) => {
             </div>
             <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">
-                    <div className="meeting-in-route-title" >{index == -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "קריאה ציבורית" : (isAdmin ? value.isolatedName : value.name))}</div>
+                    <div className="meeting-in-route-title" >{index == -1 ? "נקודת יציאה" : (value.isPublicMeeting ? "תקיעה ציבורית" : (isAdmin ? value.isolatedName : value.name))}</div>
                     <div className="meeting-in-route-location" >{typeof value.address === "string" ? splitJoinAddressOnIsrael(value.address) : ""}</div>
                     <div className="meeting-in-route-comments" >{value.comments || ""}</div>
                     {isAdmin && value.isPublicMeeting && !isNaN(Number(value.signedCnt)) ? <div className="meeting-in-route-comments" >{`${value.signedCnt} משתתפים`}</div> : null}

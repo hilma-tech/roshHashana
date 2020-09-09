@@ -39,6 +39,10 @@ const Settings = (props) => {
                                 <div id="about" className="clickAble" onClick={() => setAbout(true)} >אודות</div>
                                 <div className="clickAble" onClick={() => Auth.logout(logOut)}>התנתק</div>
                             </div>
+                            <div className="contactUs-settings" >
+                                <img src="/icons/envelope.svg" />
+                                <a className="emailUs-settings" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
+                            </div>
                         </div>
                     </>
                 }
