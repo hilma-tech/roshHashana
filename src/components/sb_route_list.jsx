@@ -46,6 +46,7 @@ const SBRouteList = (props) => {
         let meetingStartTime;
 
         //fill routeStops, constStopsb4 and constStopsAfter
+        console.log('myMeetings: ', myMeetings);
         for (let i in myMeetings) {
             meetingStartTime = new Date(myMeetings[i].startTime).getTime()
             if (myMeetings[i].constMeeting && (meetingStartTime < userStartTime || meetingStartTime > userEndTime)) {
@@ -129,7 +130,7 @@ const SBRouteList = (props) => {
                 </div>
                 <div className="meeting-in-route-info-2">
                     <img src={index == -1 ? "/icons/shofar-blue.svg" : value.isPublicMeeting ? "/icons/group-orange.svg" : "/icons/single-blue.svg"} alt={value.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"} />
-                    <div className="meeting-in-route-time">{moment(isAdmin ? value.volunteering_start_time : value.startTime).format("HH:mm")}</div>
+                    <div className="meeting-in-route-time">{moment(isAdmin && index == -1 ? value.volunteering_start_time : value.startTime).format("HH:mm")}</div>
                 </div>
             </div>
             <div className="trash-icon">
