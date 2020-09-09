@@ -216,7 +216,7 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                 let [res, err] = await Auth.superAuthFetch(`/api/shofarBlowers/deleteMeeting`, {
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     method: "POST",
-                    body: JSON.stringify({ meetToDelete: assignMeetingInfo, blowerId: null })
+                    body: JSON.stringify({ meetToDelete: assignMeetingInfo, blowerId: null }) // blowerId is null on purpose
                 });
                 if (err || !res) { //open alert of something went wrong
                     openGenAlert({ text: "אירעה שגיאה, אנא נסו שנית מאוחר יותר" })
@@ -248,14 +248,17 @@ const SBAssignMeeting = ({ history, inRoute }) => {
             })
     }
 
-    let iconSrc;
+    let iconSrcBlue;
+    let iconSrcOrange;
     let iconText;
     if (assignMeetingInfo.isPublicMeeting) {
-        iconSrc = "/icons/group-orange.svg"
+        iconSrcBlue = "/icons/group-blue.svg"
+        iconSrcOrange = "/icons/group-orange.svg"
         iconText = "תקיעה ציבורית"
     }
     else {
-        iconSrc = "/icons/single-blue.svg"
+        iconSrcBlue = "/icons/single-blue.svg"
+        iconSrcOrange = "/icons/singleOrange.svg"
         iconText = "תקיעה פרטית"
     }
 
@@ -272,9 +275,9 @@ const SBAssignMeeting = ({ history, inRoute }) => {
 
             <div className="assign-title-container" style={{ marginBottom: isBrowser ? "6%" : "3%", marginTop: isBrowser ? "3%" : "3%" }} >
                 <div id="assign-title" style={{ marginBottom: isBrowser ? "10%" : "5%" }} className="width100" >{inRoute ? 'אלו הם פרטי מפגש תקיעת שופר' : 'שיבוץ תקיעה בשופר'}</div>
-
+                
                 <div id="assign-icon-and-text-cont" className="width100" >
-                    <img alt="" id="assign-icon" src={iconSrc} />
+                    <img alt="" id="assign-icon" src={inRoute ?   iconSrcBlue : iconSrcOrange} />
                     <div id="assign-text" >{iconText}</div>
                 </div>
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}

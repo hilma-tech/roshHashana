@@ -91,7 +91,10 @@ module.exports = function (ShofarBlower) {
         if (!options.accessToken || !options.accessToken.userId) {
             return false;
         }
-        
+        if (blowerId !== null && isNaN(Number(blowerId))) {
+            return false;
+        }
+
         try {
             let isolatedConnected = null; //the phone number of the isolated connected to the meeting (role 1)
             let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
@@ -149,7 +152,7 @@ module.exports = function (ShofarBlower) {
         http: { verb: 'post' },
         accepts: [
             { arg: 'meetToDelete', type: 'object' },
-            { arg: 'blowerId', type: 'number' },
+            { arg: 'blowerId', type: 'any' },
             { arg: 'options', type: 'object', http: "optionsFromRequest" }
         ],
         returns: { arg: 'res', type: 'object', root: true }
