@@ -278,11 +278,13 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                     <div id="assign-text" >{iconText}</div>
                 </div>
                 {inRoute && assignMeetingInfo.isPublicMeeting ? <div id="signedCount">{assignMeetingInfo.signedCount ? assignMeetingInfo.signedCount === 1 ? `רשום אחד לתקיעה` : `${assignMeetingInfo.signedCount} רשומים לתקיעה` : "טרם קיימים רשומים לתקיעה"}</div> : null}
+                {assignMeetingInfo.isPublicMeeting ? <div className="public-meeting-explanation">* בחלון או במרפסת הפונה לרחוב </div> : null}
             </div>
 
             <div style={{ margin: isBrowser ? "10% 0" : "2% 0" }} className="sb-assign-content-container">
-                <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? "תקיעה ציבורית" : assignMeetingInfo.name}</div>
-                {assignMeetingInfo.isPublicMeeting ? null : < div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone ? assignMeetingInfo.phone : 'אין מספר פלאפון להציג'}</div>}
+                <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isPublicMeeting ? (inRoute ? assignMeetingInfo.isolatedName : "תקיעה ציבורית") : assignMeetingInfo.name}</div>
+                {inRoute && assignMeetingInfo.isPublicMeeting ? <div className="inputDiv" id="meeting-name" >{assignMeetingInfo.isolatedPhone}</div> : null}
+                {inRoute && !assignMeetingInfo.isPublicMeeting ? <div className={`inputDiv ${!assignMeetingInfo.phone ? 'no-value-text' : ''}`} id="meeting-phone" >{assignMeetingInfo.phone || 'אין מספר פלאפון להציג'}</div> : null}
                 <div className="inputDiv" id="meeting-address" >{assignMeetingInfo.address}</div>
                 {assignMeetingInfo.startTime ? <><div className="inputDiv" style={{ marginBottom: "0" }} >{`${startDate.toLocaleDateString("en-US")}, ${startDate.getHours().toString().padStart(2, 0)}:${startDate.getMinutes().toString().padStart(2, 0)}`}</div><div style={{ marginBottom: "5%" }}>ייתכנו שינויים בזמני התקיעות</div></> : null}
                 <div className={`inputDiv ${gotComments ? "" : "no-value-text"}`} id="meeting-comments" >{gotComments ? assignMeetingInfo.comments : "אין הערות"}</div>
