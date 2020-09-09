@@ -1494,7 +1494,7 @@ module.exports = function (CustomUser) {
             try { waypoints = stops.map(s => (`${s.lat},${s.lng}`)) } catch (e) { waypoints = [] }
             let destination;
             try { destination = waypoints.pop() } catch (e) { destination = {}; console.log("urnc"); return cb(true) }
-
+            console.log('1')
             let url = ""
             let result
             try {
@@ -1508,6 +1508,7 @@ module.exports = function (CustomUser) {
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
                     if (!leg) return cb(true)
+                    console.log('2')
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
                         if (!sbData || !new Date(sbData.startTime).getTime) continue;
