@@ -58,7 +58,7 @@ export const SBMarkerGenerator = ({ iconUrl: iconUrlProps, location, info, marke
     let lngNum = Number(location.lng)
     if (isNaN(latNum) || isNaN(lngNum)) return null
 
-    let iconUrl = iconUrlProps || ((iconType === PRIVATE_MEETING) ? '/icons/single-blue.svg' : '/icons/group-orange.svg')
+    let iconUrl = iconUrlProps || ((iconType === PRIVATE_MEETING) ? '/icons/singleOrange.svg' : '/icons/group-orange.svg')
 
     const icon = markerIcon || {
         url: iconUrl,
