@@ -27,6 +27,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     useJoinLeave('blower-events', (err) => {
         if (err) console.log("failed to join room blower-events");
     })
+    
     useEffect(() => {
         socket.on('newMeetingAssigned', handleNewMeeting)
         const input = document.getElementById('search-input');
@@ -63,10 +64,10 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             }
         })
     };
-    const zoomPlace = (place, userId = -1) => {
+    const zoomPlace = (place, userId = '') => {
         setZoom(18)
         setCenter(place);
-        if (userId !== -1) setSelectedMarkerId(userId)
+        if (userId !== '') setSelectedMarkerId(userId)
     }
 
     // const zoomOut = () => {
@@ -266,9 +267,9 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 }}
                 position={{ lat: Number(isolated.lat), lng: Number(isolated.lng) }}
                 zIndex={0}
-                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, 'isolated-' + isolated.id) }}
+                onClick={() => { zoomPlace({ lat: Number(isolated.lat), lng: Number(isolated.lng) }, 'isolated-' + isolated.isolatedId) }}
             >
-                {selectedMarkerId.split('-')[0] === 'isolated' && isolated.id === Number(selectedMarkerId.split('-')[1]) &&
+                {selectedMarkerId.split('-')[0] === 'isolated' && isolated.isolatedId === Number(selectedMarkerId.split('-')[1]) &&
                     <InfoWindow onCloseClick={() => { setSelectedMarkerId('') }}>
                         <div className="infoWindowContainer">
                             <div className="infoWindowTitle bold blueText">מחפש/ת</div>

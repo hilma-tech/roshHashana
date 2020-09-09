@@ -15,7 +15,7 @@ const IsolatedTable = (props) => {
     const [tr, setTr] = useState(null)
     const [showDeletePopup, setShowDeletePopup] = useState(false)
 
-    const th = [['name', 'שם'], ['phone', 'פלאפון'], ['address', 'כתובת'], ['road tableIcons', ''], ['location tableIcons', ''], ['delete tableIcons', '']]
+    const th = [['name', 'שם'], ['phone', 'פלאפון'], ['address', 'כתובת'], props.haveMeeting ? ['shofarBlowerName', 'שם בעל התוקע'] : ['',''], ['road tableIcons', ''], !props.haveMeeting ?['location tableIcons', ''] : ['', ''], ['delete tableIcons', '']]
 
     useEffect(() => {
         if (isolateds) setTr(isolateds.map((isolated, index) => {
@@ -23,11 +23,12 @@ const IsolatedTable = (props) => {
                 isolated.name,
                 isolated.phone,
                 isolated.address || '*משתמש ציבורי*',
+                props.haveMeeting && isolated.shofarBlowerName,
                 isolated.comments && <div className='tooltipContainer'>
                     <FontAwesomeIcon icon='comment' color='#A5A4BF' />
                     <div className='myTooltip'>{isolated.comments}</div>
                 </div>,
-                <FontAwesomeIcon className='pointer' icon={['fas', 'map-marker-alt']} color='#A5A4BF' onClick={() => handleIsolatorClick(isolated)} />,
+                !props.haveMeeting && <FontAwesomeIcon className='pointer' icon={['fas', 'map-marker-alt']} color='#A5A4BF' onClick={() => handleIsolatorClick(isolated)} />,
                 <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.isolatedId, index)} />,
             ]
         }))

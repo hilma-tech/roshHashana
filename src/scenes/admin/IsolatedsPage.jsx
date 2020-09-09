@@ -61,7 +61,7 @@ const IsolatedPage = function (props) {
             pervFilters.name = value
             return pervFilters
         })
-
+        getIsolateds(filters)
     }
 
     const onSearchAddress = function (value) {
@@ -94,7 +94,7 @@ const IsolatedPage = function (props) {
                     <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
                     <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
                 </div>
-                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} />
+                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} haveMeeting={filters.haveMeeting} />
             </div>
         </div>
     );
