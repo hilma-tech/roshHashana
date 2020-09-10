@@ -34,7 +34,7 @@ SELECT * FROM
 
 let smsMsgsArr = []
 let meetingsMsg = "";
-let secondMsg = `המסלול שלך מוכן ומחכה לך באתר שלנו https://shofar2all.com/?p=t שם תוכל/י לצפות בו ולהדפיסו.\nבברכה, מיזם "יום תרועה".`;
+let secondMsg = `ניתן לצפות במסלול המלא ולהדפיס אותו באתר שלנו https://shofar2all.com/?p=t \nבברכה, מיזם "יום תרועה".`;
 let meetingStartTime;
 let meetingDate; //temp, to get hours and minutes for meetingStartTime
 useQuery(query, (err, meetings, _fields) => {
@@ -44,11 +44,11 @@ useQuery(query, (err, meetings, _fields) => {
         meetingDate = new Date(meetings[i].meetingStartTime);
         meetingStartTime = String(meetingDate.getHours()).padStart(2, 0) + ":" + String(meetingDate.getMinutes()).padStart(2, 0);
         if (typeof meetings[i].meetingAddress === "string" && meetingStartTime && meetings[i].isPublicMeeting !== null && meetings[i].isPublicMeeting !== undefined)
-            meetingsMsg += `\n\n${meetingStartTime}, ${meetings[i].isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}, ${meetings[i].meetingAddress.split(", ישראל").join("")}`
+            meetingsMsg += `\n\n${meetingStartTime} - ${meetings[i].isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}, ב${meetings[i].meetingAddress.split(", ישראל").join("")}`
 
         if (!meetings[Number(i) + 1] || !meetings[Number(i) + 1].blowerId || meetings[Number(i) + 1].blowerId != meetings[i].blowerId) {
             //in curr blower but next one is a new blower
-            smsMsgsArr.push([meetings[i].blowerPhone, `שלום ${meetings[i].blowerName || ""}, כאן יום תרועה מדבר אלייך. מסלול תקיעת השופר שלך בראש השנה הוא:` + meetingsMsg + "\n\n" + secondMsg])
+            smsMsgsArr.push([meetings[i].blowerPhone, `שלום ${meetings[i].blowerName || ""}, תודה על הנכונות שלך לעזור!\n מסלול תקיעות השופר שלך ביום השני של ראש השנה (ב' בתשרי) הוא:` + meetingsMsg + "\n\n" + secondMsg])
             meetingsMsg = ``
         }
     }
@@ -56,7 +56,7 @@ useQuery(query, (err, meetings, _fields) => {
     let msg;
     for (let i = 0; i < smsMsgsArr.length; i++) {
         msg = smsMsgsArr[i]
-        console.log('sendMsg to: ', msg);
+        console.log('sendMsg to: ', msg[1]);
         sendMsg(msg[0], msg[1])
         cnt++
         if (smsMsgsArr.length - 1 == i) //in last place 
