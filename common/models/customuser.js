@@ -933,32 +933,50 @@ module.exports = function (CustomUser) {
                     pubReqs.push(r)
                 } else if (r.blowerStatus === "route") myPubRoutes.push(r)
             }
-            
+
             allRes.openReqs = [...priReqRes, ...pubReqs]
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
             if (!myPubRoutes || !myPubRoutes.length) {
+                console.log('!myPubRoutes || !myPubRoutes.length: ', !myPubRoutes || !myPubRoutes.length);
                 return cb(null, allRes)
             }
-            for (let i in myPubRoutes) {
-                if (!myPubRoutes[i].meetingId || isNaN(myPubRoutes[i].meetingId) || myPubRoutes[i].meetingId < 1) continue
-                let [errrrBlah, isolatorPublicInRoute] = await executeMySqlQuery(CustomUser, `
-                SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone"
-                FROM isolated
-                LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
-                LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
-                WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId = ${myPubRoutes[i].meetingId}
-                `)
-                if (errrrBlah || !Array.isArray(isolatorPublicInRoute) || isolatorPublicInRoute.length != 1) {
-                    continue;
-                }
-                myPubRoutes[i].isolatedName = isolatorPublicInRoute[0].isolatedName
-                myPubRoutes[i].isolatedPhone = isolatorPublicInRoute[0].isolatedPhone
-
-                if (i == myPubRoutes.length - 1) {
-                    allRes.myRoute = [...myPubRoutes, ...priRouteRes]
-                    return cb(null, allRes)
+            let myPubMeetingIds = []
+            for (let i = 0; i < myPubRoutes.length; i++) {
+                if (myPubRoutes[i].meetingId && !isNaN(Number(myPubRoutes[i].meetingId)) && myPubRoutes[i].meetingId > 0) {
+                    myPubMeetingIds.push(myPubRoutes[i].meetingId) //get all meeting ids of my public meetings (in my route)
                 }
             }
+
+            if (!myPubMeetingIds.length) {
+                return cb(null, allRes)
+            }
+
+            // get name and phone of all isolators with a public meeting in my route
+            let [errrrBlah, isolatorPublicInRoute] = await executeMySqlQuery(CustomUser, `
+            SELECT isCU.name AS "isolatedName", isCU.username AS "isolatedPhone", isolated.blowerMeetingId AS "pubMeetingId" 
+            FROM isolated
+            LEFT JOIN CustomUser AS isCU on isolated.userIsolatedId = isCU.id
+            LEFT JOIN RoleMapping on RoleMapping.principalId = isCU.id
+            WHERE isolated.public_meeting = 1 AND isolated.blowerMeetingId IN (${myPubMeetingIds.join(", ")})
+            `)
+            let doneLoopingIsolatorPublicInRoute = false
+            let myPubIndex;
+            if (Array.isArray(isolatorPublicInRoute) && isolatorPublicInRoute.length) {
+                for (let j = 0; j < isolatorPublicInRoute.length; j++) {
+                    myPubIndex = myPubRoutes.findIndex(myPub => myPub.meetingId == isolatorPublicInRoute[j].pubMeetingId)
+                    if (!isNaN(Number(myPubIndex))) {
+                        myPubRoutes[myPubIndex].isolatedName = isolatorPublicInRoute[j].isolatedName
+                        myPubRoutes[myPubIndex].isolatedPhone = isolatorPublicInRoute[j].isolatedPhone
+                    }
+                    if (j == isolatorPublicInRoute.length - 1) {
+                        allRes.myRoute = [...myPubRoutes, ...priRouteRes]
+                        doneLoopingIsolatorPublicInRoute = true
+                        return cb(null, allRes)
+                    }
+                }
+                if (doneLoopingIsolatorPublicInRoute) return cb(null, allRes) //in case there was no return cb in for loop ^ 
+            } else { console.log("mapInfoSb, no isolators in my public meetings, or error with sql:", errrrBlah || isolatorPublicInRoute); return cb(null, allRes) }
+            if (doneLoopingIsolatorPublicInRoute) return cb(null, allRes) //in case there was no return cb in for loop  ^ 
         })();
     }
     CustomUser.myPublicIsolatedQuery = (publicMeetingId) => {
@@ -1165,7 +1183,7 @@ module.exports = function (CustomUser) {
             }
 
             // find name and phone number of isolater
-            const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            const findIsolatedQ = `SELECT isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name AS isolatedName, username AS 'phoneNumber' FROM isolated LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId WHERE public_meeting=${meetingObj.isPublicMeeting ? 1 : 0} AND isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
             let [isolatedErr, isolatedRes] = await executeMySqlQuery(CustomUser, findIsolatedQ)
             //call socket
             let socketObj = {
@@ -1183,7 +1201,7 @@ module.exports = function (CustomUser) {
             }
             await blowerEvents.assignMeetingSb(CustomUser, socketObj);
 
-            return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
+            return cb(null, { ...newAssignMeetingObj, isolatedName: isolatedRes && isolatedRes[0] && isolatedRes[0].isolatedName || null, isolatedPhone: isolatedRes && isolatedRes[0] && isolatedRes[0].phoneNumber || null }) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }
 
