@@ -64,7 +64,7 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
                     leg = result.routes[0].legs[i]
                     legDuration = Number(leg.duration.value) * 1000
                     if (!res.startTimes[i - 1]) {
-                        if (!extraData.userData || !new Date(extraData.userData.startTime || extraData.userData.volunteering_start_time).getTime) continue;
+                        if (!extraData.userData || !new Date(extraData.userData.startTime || extraData.userData.volunteering_start_time).getTime()) continue;
                         prevStartTimeVal = new Date(extraData.userData.startTime || extraData.userData.volunteering_start_time).getTime()
                     } else {
                         prevStartTimeVal = res.startTimes[i - 1].startTime + CONSTS.SHOFAR_BLOWING_DURATION_MS

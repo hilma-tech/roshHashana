@@ -13,6 +13,7 @@ import SBSideInfo from '../components/sb_side_info';
 
 import './mainPages/MainPage.scss';
 import './sb.scss'
+import { isBrowser } from 'react-device-detect';
 
 let fetching = false
 const SBHomePage = (props) => {
@@ -50,7 +51,7 @@ const SBHomePage = (props) => {
             }
         }
         return () => {
-            if(userData){
+            if (userData) {
                 socket.off(`adminAddMeetingToMyRoute-${userData.username}`, addMeetingToMyRoute)
                 socket.off(`blower_true_confirmQ_${userData.username}`, onConfirmed);
             }
@@ -162,7 +163,6 @@ const SBHomePage = (props) => {
     const updateMyMeet = (newReqData) => {
         setMyMeetings(reqs => !Array.isArray(reqs) ? [] :
             reqs.map((req) => {
-                console.log('req: ', req)
                 return (req.meetingId == newReqData.oldMeetingId
                     && req.isPublicMeeting == newReqData.oldIsPublicMeeting) ? { ...req, ...newReqData, meetingId: newReqData.newMeetingId } : req
             })
@@ -170,7 +170,7 @@ const SBHomePage = (props) => {
     }
 
     const addMeetingToMyRoute = (req) => {
-        console.log('addMeetingToMyRoute: ', req);
+        openGenAlert({ text: "מנהל המערכת שיבץ לך פגישה נוספת! הפגישה נוספה למסלול תקיעות השופר שלך כאן " + (isBrowser ? "מימין" : "למטה"), isPopup: { okayText: "סגור" } })
         setMyMeetings(meetings => Array.isArray(meetings) ? [...meetings, req] : [req]);
     }
     //SOCKET CALLBACKFS --END ----------------------------------------------------------------------------------------

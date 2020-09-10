@@ -1595,36 +1595,6 @@ module.exports = function (CustomUser) {
                 return cb(true)
             }
             // what info the shofar blower client needs
-            `
-            isolated.id AS "meetingId", 
-            false AS "isPublicMeeting", 
-            IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
-            CustomUser.name, 
-            CustomUser.address,
-            CustomUser.lng,
-            CustomUser.lat
-
-            shofar_blower_pub.id AS "meetingId", 
-                shofar_blower_pub.constMeeting, 
-                start_time AS "startTime", 
-                shofar_blower_pub.address, 
-                shofar_blower_pub.comments, 
-                shofar_blower_pub.lng, 
-                shofar_blower_pub.lat,
-                true AS "isPublicRoute", 
-                COUNT(isolated.id) AS "signedCount",  
-                true AS isPublicMeeting 
-
-                isolated.id AS "meetingId", 
-                isolated.meeting_time AS "startTime", 
-                CustomUser.address,
-                CustomUser.lng,
-                CustomUser.lat,
-                CustomUser.comments, 
-                CustomUser.name,
-                IF(isolated.public_phone, CustomUser.username, null) AS "phone", 
-                IF(isolated.public_meeting = 1, true, false) AS "isPublicMeeting" 
-            `
             let sbDataForSocket
             try { sbDataForSocket = await CustomUser.findOne({ where: { id: sbId } }); } catch (e) { }
             if (sbDataForSocket) {

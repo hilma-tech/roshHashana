@@ -62,7 +62,6 @@ const SingleShofarBlowerPage = (props) => {
         cleanUp()
     }
     const handleForceAssign = (va, iso) => { //lol
-        console.log(iso, 'isoooo')
         if (va !== "PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I" && (!selectedSB || !selectedIsolator || typeof selectedSB !== "object" || typeof selectedIsolator !== "object")) {
             openGenAlert({ text: "לא ניתן לשבץ" }); // not supposed to get here came to this page to assign (should get here only by mistake when not meaning to assign).. or when some data is missing bu mistake(idk)
             return
@@ -76,14 +75,12 @@ const SingleShofarBlowerPage = (props) => {
         }
 
         (async () => {
-            console.log('adminAssignSBToIsolator: ', selectedIsolator || iso);
-            console.log('selectedSB: ', selectedSB);
-            let [assignErr, assignRes] = await adminAssignSBToIsolator(selectedSB, selectedIsolator || iso)
+            let [assignErr, assignRes] = await adminAssignSBToIsolator(selectedSB, iso || selectedIsolator)
             if (assignErr || !assignRes) {
                 openGenAlert({ text: assign_default_error })
                 return
             }
-            checkAssignResForError(assignRes, selectedIsolator || iso)
+            checkAssignResForError(assignRes, iso || selectedIsolator)
         })()
     }
     const checkAssignResForError = (assignRes, iso) => {
@@ -133,7 +130,7 @@ const SingleShofarBlowerPage = (props) => {
         if (!updateMaxRouteDuration) {
             return;
         }
-        adminUpdateMaxDurationAndAssign(selectedSB, selectedIsolator || iso, data.newTotalTime,
+        adminUpdateMaxDurationAndAssign(selectedSB, iso || selectedIsolator, data.newTotalTime,
             err => {
                 if (err) {
                     // if (err === CONSTS.CURRENTLY_BLOCKED_ERR) { openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן להשתבץ יותר' }); return; }
@@ -154,7 +151,7 @@ const SingleShofarBlowerPage = (props) => {
             return;
         }
         // if (checkDateBlock('DATE_TO_BLOCK_BLOWER')) { openGenAlert({ text: 'מועד התקיעה מתקרב, לא ניתן לעדכן יותר את מספר התקיעות', block: true }); return; }
-        adminUpdateMaxRouteLengthAndAssign(selectedSB, selectedIsolator || iso,
+        adminUpdateMaxRouteLengthAndAssign(selectedSB, iso || selectedIsolator,
             (error, res) => {
                 if (error || !res) {
                     openGenAlert({ text: typeof error === "string" ? error : assign_default_error })
@@ -171,7 +168,7 @@ const SingleShofarBlowerPage = (props) => {
         if (showIsolators && Array.isArray(isolators)) {
             setIsolatorsLocations(isos => isos.filter(i => assignRes ? (i.id != assignRes.id || i.isPublicMeeting != assignRes.isPublicMeeting) : (i.id != iso.id || i.isPublicMeeting != iso.isPublicMeeting)))
         }
-        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, selectedIsolator || assignRes || iso] : [selectedIsolator || assignRes || iso]))
+        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, iso || selectedIsolator || assignRes ] : [iso || selectedIsolator || assignRes]))
         setSelectedIsolator(null)
     }
 

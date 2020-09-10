@@ -99,7 +99,7 @@ module.exports = function (ShofarBlower) {
             let isolatedConnected = null; //the phone number of the isolated connected to the meeting (role 1)
             let isMeetingDeleted = false; //A variable that identifies whether the meeting has been completely deleted
             const userId = blowerId ? blowerId : options.accessToken.userId; //the blower id
-            const { meetingId } = meetToDelete;
+            const meetingId = meetToDelete.meetingId || meetToDelete.id;
             if (!userId || isNaN(Number(userId)) || !meetingId || isNaN(Number(meetingId))) {
                 return false;
             }
@@ -267,7 +267,7 @@ module.exports = function (ShofarBlower) {
                 const findPhone = `select username from CustomUser, shofar_blower where shofar_blower.id = ${id} and CustomUser.id = shofar_blower.userBlowerId`
                 let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
                 let objToSocketEvent = { "id": id };
-                ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username} `)
+                try { ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`) } catch (e) { console.log("emit blower_true_confirmQ_ error, findPhoneRes:", findPhoneRes || findPhoneErr); }
                 return cb(null, true)
             } catch (err) {
                 cb(err);
