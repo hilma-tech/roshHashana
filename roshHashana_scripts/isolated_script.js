@@ -24,7 +24,7 @@ useQuery(q, (err, isolated) => {
     let isolator;
     let count = 0;
     for (let i = 0; i < isolated.length; i++) {
-        isolator = isolated[i];
+        isolater = isolated[i];
         date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
         msg = isolater.blowerName ?
             `שלום ${isolater.name}\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""}\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}\nשעת תקיעה משוערת ${date}\nבריאות טובה\nשנה טובה ומתוקה!`

@@ -71,6 +71,8 @@ thead th {
 }
 
 .tableNavigation {
+    -webkit-user-select: none;
+    -moz-user-select: none;
     width: 100%;
     display: flex;
     align-items: center;

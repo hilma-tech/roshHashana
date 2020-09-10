@@ -27,7 +27,7 @@ const PRIVATE_MEETING = 'private meeting';
 const ShofarBlowerMap = (props) => {
     let isAdmin = props.admin
 
-    const { openGenAlert, center, setCenter, setDefaultCenter } = useContext(MainContext)
+    const { openGenAlert, center, setCenter, setDefaultCenter, defaultCenter } = useContext(MainContext)
     const adminctx = useContext(AdminMainContext)
     const sbctx = useContext(SBContext)
     let userData,
@@ -181,6 +181,7 @@ const ShofarBlowerMap = (props) => {
         if (userData && typeof userData === "object" && !Array.isArray(userData) && userOriginLoc && typeof userOriginLoc === "object") {
             handleSetAllMapData()
         }
+        setCenter(defaultCenter)
     }, [myMeetings, meetingsReqs])
 
     useEffect(() => {

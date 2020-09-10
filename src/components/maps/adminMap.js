@@ -27,7 +27,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
     useJoinLeave('blower-events', (err) => {
         if (err) console.log("failed to join room blower-events");
     })
-    
+
     useEffect(() => {
         socket.on('newMeetingAssigned', handleNewMeeting)
         const input = document.getElementById('search-input');
@@ -52,7 +52,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
             socket.off('newMeetingAssigned', handleNewMeeting);
         }
     }, []);
-   
+
     const handleNewMeeting = (req) => {
         setIsolateds(prevIsolateds => {
             if (prevIsolateds.length !== 0) {
@@ -125,7 +125,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
 
     const handleSBClick = (sb) => {
         setSelectedSB({ userId: sb.userId })
-        // props.history.push('/shofar-blower')
+        selectedIsolator && typeof selectedIsolator === "object" && props.history.push('/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/shofar-blower')
         zoomPlace({ lat: Number(sb.lat), lng: Number(sb.lng) }, 'shofarBlower-' + sb.userId)
     }
 
@@ -185,7 +185,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
                 <div className='textInHover orangeBackground bold'>מחפשים</div>
             </div>
         </div>
-        
+
         {showShofarBlowers && shofarBlowers.map((shofarBlower, index) =>
             <Marker
                 key={index}

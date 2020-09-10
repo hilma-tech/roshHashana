@@ -243,7 +243,7 @@ export const adminGetSBRoute = async (sbId, withSBInfo = false) => {
     if (!sbId || isNaN(Number(sbId)) || sbId < 1) return [true];
 
     let [res, err] = await Auth.superAuthFetch('/api/ShofarBlowers/adminGetSBRoute', {
-        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId:Number(sbId), withSBInfo: withSBInfo ? true : false })
+        headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sbId: Number(sbId), withSBInfo: withSBInfo ? true : false })
     }, true);
     return new Promise((resolve, reject) => {
         if (err || !res) {
@@ -255,6 +255,7 @@ export const adminGetSBRoute = async (sbId, withSBInfo = false) => {
 }
 
 export const adminAssignSBToIsolator = async (sb, isolator) => {
+    if (!isolator || !isolator.id) return [true]
     let [res, err] = await Auth.superAuthFetch('/api/CustomUsers/adminAssignSBToIsolator', {
         headers: { Accept: "application/json", "Content-Type": "application/json" }, method: "POST", body: JSON.stringify({ sb, isolator })
     }, true);
