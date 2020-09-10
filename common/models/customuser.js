@@ -1121,7 +1121,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
@@ -1553,7 +1553,7 @@ module.exports = function (CustomUser) {
             let url = ""
             let result
             try {
-                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY}&mode=walking&language=iw`
+                url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoints.join("|")}&destination=${destination}&key=${process.env.REACT_APP_GOOGLE_KEY_SECOND}&mode=walking&language=iw`
                 let res = await Axios.get(url);
                 result = res.data
                 result.startTimes = []
