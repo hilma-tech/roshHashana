@@ -101,7 +101,9 @@ class Register extends React.Component {
 
             break;
           case "blower with data":
-            this.props.history.push('/');
+            let p;
+            try { p = new URLSearchParams(this.props.location.search).get("p") } catch (e) { }
+            this.props.history.push(p === "t" ? '/?p=t' : '/');
 
             break;
           case "isolator new":

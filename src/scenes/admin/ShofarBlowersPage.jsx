@@ -10,12 +10,13 @@ import './styles/shofarBlowerPage.scss'
 let status = 0 // 0 is not confirmed, 1 is confirmed shofar blowers
 
 const ShofarBlowerPage = function (props) {
-    const { selectedSB, setSelectedSB, setLoading, setShofarBlowers } = useContext(AdminMainContext)
+    const { selectedSB, setSelectedSB, setLoading, setShofarBlowers, setSelectedIsolator } = useContext(AdminMainContext)
     const [filters, setFilters] = useState({})
     const [resultNum, setResultNum] = useState('')
 
     useEffect(() => {
         getShofarBlowers()
+        setSelectedIsolator(null)
     }, [])
 
     const getShofarBlowers = function (filter = filters, startRow = 0) {
@@ -58,7 +59,7 @@ const ShofarBlowerPage = function (props) {
 
     return (
         <div className="isolatedsContainer" >
-            <TopNavBar history={props.history}  />
+            <TopNavBar history={props.history} />
             <div style={{ padding: '0 10vw' }}>
                 <div className='orangeTitle'>מתנדבים לתקוע בשופר</div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -31,6 +31,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const adminctx = useContext(AdminMainContext)
 
     const mapRef = useRef()
+    console.log('jdkasjdlas');
 
     let userData,
         setStartTimes, startTimes,
@@ -321,7 +322,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
 
 const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators, isolators, handleForceAssign, setSelectedIsolator }) => (
     <>
-        {/* {console.log('routePath: ', routePath)} */}
         {/* reqsLocs */
             Array.isArray(data.reqsLocs) && data.reqsLocs.length ?
                 data.reqsLocs.map((m, index) => !m.location ? null : <SBMarkerGenerator key={index} iconType={m.iconType} location={m.location} defaultInfoState={false} info={m.info} />)
@@ -360,7 +360,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
                     scaledSize: { width: 25, height: 25 },
                     anchor: { x: 12.5, y: 12.5 }
                 }}
-                onClick={() => { setSelectedIsolator(isolator) }}
+                onClick={() => { }}
                 location={{ lat: Number(isolator.lat), lng: Number(isolator.lng) }}
                 info={<div className="infoWindowContainer">
                     <div className="infoWindowTitle bold blueText">{`מחפש/ת ${isolator.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}`}</div>
@@ -373,7 +373,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
                         <div>{isolator.address}</div>
                     </div>
                     {/* <div className="pub-address-container" ><FontAwesomeIcon className="icon-on-map-locationInfo" icon="phone" /><div>{shofarBlower.username}</div></div> */}
-                    <div className='infoWindowButton pointer' onClick={() => { handleForceAssign("PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I", isolator) }}>שבץ</div>
+                    <div className='infoWindowButton pointer' onClick={() => { setSelectedIsolator(isolator); handleForceAssign("PLEASE_TAKE_ME_I_CAME_FROM_SB_MAP_AND_HAVE_NO_SELECTED_ISOLATOR_COS_IT_IS_I", isolator) }}>שבץ</div>
                 </div>}
             />
         )}
