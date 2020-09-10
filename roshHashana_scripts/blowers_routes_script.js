@@ -57,7 +57,7 @@ useQuery(query, (err, meetings, _fields) => {
     for (let i = 0; i < smsMsgsArr.length; i++) {
         msg = smsMsgsArr[i]
         console.log('sendMsg to: ', msg[1]);
-        if(cnt === 0) sendMsg('0556642205' || msg[0], msg[1])
+        sendMsg(msg[0], msg[1])
         cnt++
         if (smsMsgsArr.length - 1 == i) //in last place 
             console.log("script is done, send msg to", cnt, ' shofar blowers')
