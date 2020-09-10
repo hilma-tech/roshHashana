@@ -1183,8 +1183,9 @@ module.exports = function (CustomUser) {
             }
 
             // find name and phone number of isolater
-            const findIsolatedQ = `select isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name, username AS 'phoneNumber' from isolated left join CustomUser on CustomUser.id = isolated.userIsolatedId where public_meeting = ${meetingObj.isPublicMeeting ? 1 : 0} and isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
+            const findIsolatedQ = `SELECT isolated.id AS 'isolatedId' ,isolated.userIsolatedId AS 'id', name AS isolatedName, username AS 'phoneNumber' FROM isolated LEFT JOIN CustomUser ON CustomUser.id = isolated.userIsolatedId WHERE public_meeting=${meetingObj.isPublicMeeting ? 1 : 0} AND isolated.${meetingObj.isPublicMeeting ? "blowerMeetingId" : "id"} = ${meetingObj.meetingId}`
             let [isolatedErr, isolatedRes] = await executeMySqlQuery(CustomUser, findIsolatedQ)
+            console.log('isolatedRes: ', isolatedRes);
             //call socket
             let socketObj = {
                 isolatedId: (isolatedRes && isolatedRes[0] && isolatedRes[0].isolatedId) ? isolatedRes[0].isolatedId : null,
@@ -1201,7 +1202,7 @@ module.exports = function (CustomUser) {
             }
             await blowerEvents.assignMeetingSb(CustomUser, socketObj);
 
-            return cb(null, newAssignMeetingObj) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
+            return cb(null, { ...newAssignMeetingObj, isolatedName: isolatedRes && isolatedRes[0] && isolatedRes[0].isolatedName || null, isolatedPhone: isolatedRes && isolatedRes[0] && isolatedRes[0].phoneNumber || null }) //success, return new meeting obj, to add to myMeetings on client-side SBCtx
         })();
     }
 
