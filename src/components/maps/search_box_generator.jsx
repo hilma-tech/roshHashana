@@ -10,10 +10,6 @@ export const SBSearchBoxGenerator = (props) => {
         autocomplete.addListener("place_changed", () => {
             let place = autocomplete.getPlace();
             if (place.geometry) props.changeCenter(place.geometry.location);
-            // else if (!place.geometry && place.name) {
-            //find the lat and lng of the place
-            // props.findLocationCoords(place.name);
-            // }
             else return;
         })
     }, []);

@@ -44,7 +44,7 @@ export const SBProvider = ({ children }) => {
         if (Array.isArray(myMeetings) && myMeetings.length) setTotalTime(getTotalTime())
     }, [startTimes, myMeetings])
 
-    const ctxValue = window.sbctx = {
+    const ctxValue = {
         userData, myMeetings, meetingsReqs,
         setUserData, setMyMeetings, setMeetingsReqs,
         assignMeetingInfo, setAssignMeetingInfo,

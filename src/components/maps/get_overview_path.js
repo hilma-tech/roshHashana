@@ -32,10 +32,6 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
         destination = {}
     }
 
-    // console.log('> origin: ', { ...origin });
-    // console.log('> waypoints: ', [...waypoints]);
-    // console.log('> destination: ', { ...destination });
-
     let directionsService = new google.maps.DirectionsService();
 
     if (!directionsService || !directionsService.route || typeof directionsService.route !== "function") {
@@ -74,7 +70,6 @@ export const getOverviewPath = async (google, origin, stops, extraData) => {
             }
             res.overviewPath = result.routes[0].overview_path
 
-            // console.log('Promise.resolve([null, res]): ', [null, res]);
             resolve([null, res])
         })
     })

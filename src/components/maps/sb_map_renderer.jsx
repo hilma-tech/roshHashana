@@ -209,7 +209,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             //const meeting b4 -- get path
             let [constB4Err, constB4Res] = await getOverviewPath(window.google, constStopsB4.pop().location, constStopsB4.length ? [...constStopsB4, userOrigin] : [userOrigin], null)
             if (constB4Err) {
-                // console.log("err getoverviewpath 2 : ", constStopsB4, " err: ", constB4Err);
                 if (typeof constB4Err === "string") { openGenAlert({ text: constB4Err }); }
             }
             if (constB4Res) {
@@ -221,14 +220,12 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             //const meeting after -- get path
             let [constAfterErr, constAfterRes] = await getOverviewPath(window.google, origin.location, constStopsAfter, null)
             if (constAfterErr) {
-                // console.log("err getoverviewpath 3 : ", constStopsAfter, " err: ", constAfterErr);
                 if (typeof constAfterErr === "string") { openGenAlert({ text: constAfterErr }); }
             }
             if (constAfterRes) {
                 constOverviewPaths.push(constAfterRes.overviewPath)
             }
         }
-        // console.log('final constOverviewPaths: ', constOverviewPaths);
         Array.isArray(constOverviewPaths) && setB4OrAfterRoutePath(constOverviewPaths)
     }
 
