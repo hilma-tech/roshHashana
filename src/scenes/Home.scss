@@ -67,7 +67,7 @@
       align-items: center;
       justify-content: center;
       #shivuki-credit,
-      #contact-us {
+      .contact-us {
          margin-top: 1%;
          float: left;
          font-weight: bold;
@@ -186,6 +186,11 @@
          .browserRegisterIsolator,
          .browserRegisterBlower {
             width: 20rem;
+         }
+      }
+      .content-container {
+         .contactUs {
+            min-width: 22% !important;
          }
       }
    }
