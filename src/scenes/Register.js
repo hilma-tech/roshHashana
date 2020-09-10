@@ -101,7 +101,9 @@ class Register extends React.Component {
 
             break;
           case "blower with data":
-            this.props.history.push('/');
+            let p;
+            try { p = new URLSearchParams(this.props.location.search).get("p") } catch (e) { }
+            this.props.history.push(p === "t" ? '/?p=t' : '/');
 
             break;
           case "isolator new":
@@ -172,7 +174,7 @@ class Register extends React.Component {
           <img id="go-back" alt="" className="clickAble" src="/icons/go-back.svg" onClick={() => { this.setState({ status: "start", alart: null, phone: "", name: "", key: "" }) }} />
         }
         {/* <div className="allDataRegisterPage"> */}
-        <div className=""><img alt="" style={{ width: isBrowser ? '21vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
+        <div className=""><img alt="" style={{ width: isBrowser ? '18vw' : '55vw', marginTop: isBrowser ? "6%" : "10%" }} src="/images/header.svg" onLoad={this.updateImgLoadedNum} /></div>
         {(this.props.location && this.props.location.state && this.props.location.state.type === 'blower') ?
           <div className={`${isBrowser ? "browserinputTextAndPhone" : "mobileinputTextAndPhone"}`} >{this.blower}</div>
           :

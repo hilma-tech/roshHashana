@@ -44,6 +44,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         startTimes = sbctx.startTimes;
         setMyMeetings = sbctx.setMyMeetings;
         setIsPrint = sbctx.setIsPrint;
+        isPrint = sbctx.isPrint
         totalLength = sbctx.totalLength;
         setSelectedIsolator = () => { }
     } else if (adminctx && typeof adminctx === "object") {
@@ -98,6 +99,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
+        setIsPrint(true);
         window.onafterprint = (_e) => {
             window.history.replaceState({}, document.title, "/");
             setIsPrint(false);
@@ -359,7 +361,7 @@ const BringAllSBMapInfo = ({ data, b4OrAfterRoutePath, routePath, showIsolators,
                     scaledSize: { width: 25, height: 25 },
                     anchor: { x: 12.5, y: 12.5 }
                 }}
-                onClick={() => {  }}
+                onClick={() => { }}
                 location={{ lat: Number(isolator.lat), lng: Number(isolator.lng) }}
                 info={<div className="infoWindowContainer">
                     <div className="infoWindowTitle bold blueText">{`מחפש/ת ${isolator.isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}`}</div>
