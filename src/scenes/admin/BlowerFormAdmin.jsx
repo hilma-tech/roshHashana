@@ -70,7 +70,6 @@ export default function BlowerFormAdmin(props) {
             else if (shofarBlowerIdToEdit) {
                 await getShofarBlowerByIdAdmin(shofarBlowerIdToEdit, (err, res) => {
                     if (!err) {
-                        console.log(res)
                         setName(res.name)
                         setPhone(res.phone)
                         setBlastsNum(Number(res.blastsNum))
