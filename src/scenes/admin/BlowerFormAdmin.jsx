@@ -170,7 +170,6 @@ export default function BlowerFormAdmin(props) {
     }
 
     const handleAddressChange = (address) => {
-        console.log(address)
         setAddress(address)
     }
 

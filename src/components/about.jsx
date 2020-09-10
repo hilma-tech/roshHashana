@@ -16,7 +16,7 @@ const About = () => (
         <div className="about-content">
             <p>{a1}<strong>{carmel6000}</strong>{a2}</p>
         </div>
-        <button onClick={() => window.open("https://www.hilma.tech/", '_system', 'location=yes')}>www.hilma.tech</button>
+        <a target="_blank" href="https://www.hilma.tech/"><button>www.hilma.tech</button></a>
     </div>
 );
 

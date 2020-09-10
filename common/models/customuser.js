@@ -1436,7 +1436,7 @@ module.exports = function (CustomUser) {
 
 
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
-        console.log('adminAssignSBToIsolator: ', sb, isolator);
+        console.log('adminAssignSBToIsolator: ', sb, '\n', isolator);
         (async () => {
             if (!sb || typeof (sb) !== "object" || Array.isArray(sb)) return cb(true)
             if (!isolator || typeof (isolator) !== "object" || Array.isArray(isolator)) return cb(true)
@@ -1562,7 +1562,7 @@ module.exports = function (CustomUser) {
                 let legDuration
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
-                    if (!leg) return cb(true)
+                    if (!leg) { console.log("no leg, google res:", result); return cb(true) }
                     console.log('2')
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
