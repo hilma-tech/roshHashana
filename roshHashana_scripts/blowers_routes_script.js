@@ -44,11 +44,11 @@ useQuery(query, (err, meetings, _fields) => {
         meetingDate = new Date(meetings[i].meetingStartTime);
         meetingStartTime = String(meetingDate.getHours()).padStart(2, 0) + ":" + String(meetingDate.getMinutes()).padStart(2, 0);
         if (typeof meetings[i].meetingAddress === "string" && meetingStartTime && meetings[i].isPublicMeeting !== null && meetings[i].isPublicMeeting !== undefined)
-            meetingsMsg += `\n\n${meetingStartTime} - ${meetings[i].isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}, ${meetings[i].meetingAddress.split(", ישראל").join("")}`
+            meetingsMsg += `\n\n${meetingStartTime} - ${meetings[i].isPublicMeeting ? "תקיעה ציבורית" : "תקיעה פרטית"}, ב${meetings[i].meetingAddress.split(", ישראל").join("")}`
 
         if (!meetings[Number(i) + 1] || !meetings[Number(i) + 1].blowerId || meetings[Number(i) + 1].blowerId != meetings[i].blowerId) {
             //in curr blower but next one is a new blower
-            smsMsgsArr.push([meetings[i].blowerPhone, `שלום ${meetings[i].blowerName || ""}, תודה על הנכונות שלך לעזור! מסלול תקיעות השופר שלך ביום השני של ראש השנה (ב' בתשרי) הוא:` + meetingsMsg + "\n\n" + secondMsg])
+            smsMsgsArr.push([meetings[i].blowerPhone, `שלום ${meetings[i].blowerName || ""}, תודה על הנכונות שלך לעזור!\n מסלול תקיעות השופר שלך ביום השני של ראש השנה (ב' בתשרי) הוא:` + meetingsMsg + "\n\n" + secondMsg])
             meetingsMsg = ``
         }
     }
@@ -56,8 +56,8 @@ useQuery(query, (err, meetings, _fields) => {
     let msg;
     for (let i = 0; i < smsMsgsArr.length; i++) {
         msg = smsMsgsArr[i]
-        console.log('sendMsg to: ', msg);
-        sendMsg(msg[0], msg[1])
+        console.log('sendMsg to: ', msg[1]);
+        if(cnt === 0) sendMsg('0556642205' || msg[0], msg[1])
         cnt++
         if (smsMsgsArr.length - 1 == i) //in last place 
             console.log("script is done, send msg to", cnt, ' shofar blowers')
