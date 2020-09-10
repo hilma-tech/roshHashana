@@ -38,6 +38,7 @@ const SBRouteList = (props) => {
     const disableEdit = !isAdmin && checkDateBlock('DATE_TO_BLOCK_BLOWER');
     useEffect(() => {
         //sort all meetings and Separation between const meetings and the route
+        if (isAdmin && (!selectedSB || typeof selectedSB !== "object")) return
         const userStartTime = isAdmin ? new Date(selectedSB.volunteering_start_time).getTime() : new Date(userData.startTime).getTime()
         const userEndTime = isAdmin ? (userStartTime + (Number(selectedSB.volunteering_max_time) * 60000)) : (userStartTime + userData.maxRouteDuration);
         const routeStops = [];
@@ -60,11 +61,13 @@ const SBRouteList = (props) => {
             else {
                 routeStops.push(myMeetings[i])
             }
+            if (Number(i) == myMeetings.length - 1) {
+                setConstAfter(constStopsAfter);
+                setConstB4(constStopsB4);
+                setMyRoute(routeStops);
+            }
         }
-        setConstAfter(constStopsAfter);
-        setConstB4(constStopsB4);
-        setMyRoute(routeStops);
-    }, [myMeetings]);
+    }, [myMeetings, selectedSB]);
 
     if (!userData && !isAdmin) return null;
 
@@ -114,11 +117,10 @@ const SBRouteList = (props) => {
     const createItemContent = (value, index, uniqueKey) => {
         return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={isAdmin ? undefined : () => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
-                {index !== CONST_MEETING ? <div className="meeting-in-route-img">
-                    {index == -1 ?
-                        <img src="/icons/white_shofar.svg" />
-                        : Number(index) + 1}
-                </div> : null}
+                {index !== CONST_MEETING ?
+                    <div className="meeting-in-route-img">
+                        {index == -1 ? <img src="/icons/white_shofar.svg" /> : Number(index) + 1}
+                    </div> : null}
             </div>
             <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">

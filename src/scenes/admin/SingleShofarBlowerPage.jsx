@@ -19,7 +19,7 @@ const SingleShofarBlowerPage = (props) => {
     const [showIsolators, setShowIsolators] = useState(false)
     const [isolators, setIsolatorsLocations] = useState([])
 
-    const { selectedSB, setSelectedSB, totalLength,
+    const { selectedSB, setSelectedSB, totalLength, startTimes,
         selectedIsolator, setSelectedIsolator // came from isolator
     } = useContext(AdminMainContext)
     const { openGenAlert, openGenAlertSync } = useContext(MainContext)
@@ -168,7 +168,12 @@ const SingleShofarBlowerPage = (props) => {
         if (showIsolators && Array.isArray(isolators)) {
             setIsolatorsLocations(isos => isos.filter(i => assignRes ? (i.id != assignRes.id || i.isPublicMeeting != assignRes.isPublicMeeting) : (i.id != iso.id || i.isPublicMeeting != iso.isPublicMeeting)))
         }
-        setMeetingsOfSelectedSB(route => (Array.isArray(route) ? [...route, iso || selectedIsolator || assignRes ] : [iso || selectedIsolator || assignRes]))
+        let newIsolator = iso || selectedIsolator || assignRes
+        let newIsolatorStartT = Array.isArray(startTimes) && startTimes.find(st => (st.meetingId == newIsolator.meetingId || st.meetingId == newIsolator.id))
+        if (newIsolatorStartT && newIsolatorStartT.startTime) newIsolator.startTime = newIsolatorStartT.startTime
+
+        setMeetingsOfSelectedSB(route =>
+            (Array.isArray(route) ? [...route, newIsolator] : [newIsolator]))
         setSelectedIsolator(null)
     }
 

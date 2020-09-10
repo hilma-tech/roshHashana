@@ -210,11 +210,11 @@ module.exports = function (CustomUser) {
                         break;
 
                     case 3:
-                        CustomUser.app.models.isolated.findOne({ where: { userIsolatedId: res.id } }, (errIsolated, resIsolated) => {
+                        CustomUser.app.models.Isolated.findOne({ where: { userIsolatedId: res.id } }, (errIsolated, resIsolated) => {
                             if (errIsolated) console.log("errIsolated", errIsolated);
                             if (!resIsolated && meetingId !== null) {
                                 //isolated with new public meeting 
-                                CustomUser.app.models.isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
+                                CustomUser.app.models.Isolated.create({ userIsolatedId: res.id, public_meeting: 1, blowerMeetingId: meetingId, public_phone: 0 }, (errPM, resPM) => {
                                     if (errPM) console.log("errPM", errPM);
                                     if (resPM) {
                                         cb(null, { ok: "isolated with new public meeting", data: { name: res.name } })
@@ -513,7 +513,7 @@ module.exports = function (CustomUser) {
                 };
 
                 //if the user changed his address and he has a public meeting
-                if ((isolatedInfo.public_meeting && (data.public_meeting == undefined || data.public_meeting == null || data.public_meeting)) && data.address) {
+                if ((isolatedInfo.public_meeting && (data.public_meeting == undefined || data.public_meeting == null || data.public_meeting)) && data.address) { //היה ונשאר תקיעה ציבורית
                     let meetingId = isolatedInfo.blowerMeetingId;
                     let canEditPubMeeting = await shofarBlowerPub.checkIfCanDeleteMeeting(meetingId);
                     //we can update the meeting so update the address of the meeting
@@ -586,7 +586,7 @@ module.exports = function (CustomUser) {
                     userIsolatedId: userId,
                     public_phone: data.public_phone,
                     public_meeting: data.public_meeting,
-                    blowerMeetingId: data.blowerMeetingId ? data.blowerMeetingId : pubMeetId ? (typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId : isolatedInfo.blowerMeetingId
+                    blowerMeetingId: data.blowerMeetingId ? data.blowerMeetingId : pubMeetId ? ((typeof pubMeetId === 'object') ? pubMeetId.id : pubMeetId) : (isolatedInfo.public_meeting && (data.public_meeting == 0 || data.public_meeting === false) ? null : isolatedInfo.blowerMeetingId) // should be null only when changed from public to private
                 }
                 if (meetingChanged) newIsoData.meeting_time = null;
                 if (Object.values(newIsoData).find(d => d)) {
@@ -838,6 +838,7 @@ module.exports = function (CustomUser) {
     });
 
     CustomUser.mapInfoSB = function (options, withoutUserData = false, cb) { // might make sense to move this to ShofarBlower.js BUT..
+        // console.log('CustomUser.app.models.ShofarBlowerPub == CustomUser.app.models.ShofarBlowerPub: ', CustomUser.app.models.shofarBlowerPub == CustomUser.app.models.ShofarBlowerPub);
         (async () => {
             const allRes = {}
             if (!options || !options.accessToken || !options.accessToken.userId) {
@@ -937,7 +938,6 @@ module.exports = function (CustomUser) {
             allRes.openReqs = [...priReqRes, ...pubReqs]
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
             if (!myPubRoutes || !myPubRoutes.length) {
-                console.log('!myPubRoutes || !myPubRoutes.length: ', !myPubRoutes || !myPubRoutes.length);
                 return cb(null, allRes)
             }
             let myPubMeetingIds = []
@@ -1436,7 +1436,7 @@ module.exports = function (CustomUser) {
 
 
     CustomUser.adminAssignSBToIsolator = function (options, sb, isolator, cb) {
-        console.log('adminAssignSBToIsolator: ', sb, isolator);
+        console.log('adminAssignSBToIsolator: ', sb, '\n', isolator);
         (async () => {
             if (!sb || typeof (sb) !== "object" || Array.isArray(sb)) return cb(true)
             if (!isolator || typeof (isolator) !== "object" || Array.isArray(isolator)) return cb(true)
@@ -1562,7 +1562,7 @@ module.exports = function (CustomUser) {
                 let legDuration
                 for (let i in stops) {
                     try { leg = result.routes[0].legs[i] } catch (e) { leg = null }
-                    if (!leg) return cb(true)
+                    if (!leg) { console.log("no leg, google res:", result); return cb(true) }
                     console.log('2')
                     legDuration = Number(leg.duration.value) * 1000
                     if (!result.startTimes[i - 1]) {
