@@ -36,8 +36,8 @@ const Home = (props) => {
                 </div>
                 <div className="content-container" style={{ marginTop: isBrowser ? '0%' : '15%', height: isBrowser ? '80vh' : 'unset' }} >
 
-                    <img alt="" style={{ width: isBrowser ? '21vw' : '55vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
-                    <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold" }} >
+                    <img alt="" style={{ width: isBrowser ? '18vw' : '55vw' }} src="/images/header.svg" onLoad={updateNumImgLoaded} />
+                    <div className="  text-light " style={{ fontSize: "150%", fontWeight: "bold", marginTop: '0.5%' }} >
                         <div className="stuckHouse">{stuckHouse}</div>
                     </div>
                     <div className="buttonAll ">
@@ -49,7 +49,7 @@ const Home = (props) => {
                         </div>
                     </div>
                     {isBrowser ? <>
-                        <div className="clickAble" style={{ marginTop: '2%' }} onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
+                        <div className="clickAble" style={{ marginTop: '4%' }} onClick={() => setOpenMap(true)}><img alt="" style={{ width: '3.5vw' }} src="/images/map.svg" onLoad={updateNumImgLoaded} /></div>
                         <div className="text-light clickAble" id="text1" onClick={() => setOpenMap(true)}>{allMeeting}</div>
                     </>
                         : <>
@@ -58,7 +58,7 @@ const Home = (props) => {
                     }
                     <button onClick={() => { props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs") }} style={{ position: "absolute", top: 0, right: 0, backgroundColor: "yellow", color: "black", borderRadius: "40%" }} >וואו כפתור נסתר לוקלית</button>
 
-                    <div className="contactUs" style={{ marginTop: isBrowser ? "0" : "2vh", minWidth: isBrowser ? '20%' : '45%' }} >
+                    <div className="contactUs" style={{ marginTop: isBrowser ? "0" : "2vh", minWidth: isBrowser ? '16%' : '45%' }} >
                         <img style={{ width: "12%" }} src="/icons/envelope.svg" />
                         <a style={{ fontSize: "2.5vh" }} className="regularLink" href="mailto:shofar2all@gmail.com "> לפניות ובקשות </a>
                     </div>
