@@ -31,7 +31,6 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
     const adminctx = useContext(AdminMainContext)
 
     const mapRef = useRef()
-    console.log('jdkasjdlas');
 
     let userData,
         setStartTimes, startTimes,
@@ -45,6 +44,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         startTimes = sbctx.startTimes;
         setMyMeetings = sbctx.setMyMeetings;
         setIsPrint = sbctx.setIsPrint;
+        isPrint = sbctx.isPrint
         totalLength = sbctx.totalLength;
         setSelectedIsolator = () => { }
     } else if (adminctx && typeof adminctx === "object") {
@@ -99,6 +99,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
+        setIsPrint(true);
         window.onafterprint = (_e) => {
             window.history.replaceState({}, document.title, "/");
             setIsPrint(false);
