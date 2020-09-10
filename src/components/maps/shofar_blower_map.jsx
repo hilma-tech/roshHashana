@@ -103,9 +103,9 @@ const ShofarBlowerMap = (props) => {
                 else {
                     newCenter = { lat: latNum, lng: lngNum };
                 }
+                setDefaultCenter(newCenter) //for context
                 if (newCenter !== center) setCenter(newCenter)
                 setUserOriginLoc(newCenter)
-                setDefaultCenter(newCenter) //for context
                 // console.log('setDefaultCenter: ', newCenter);
             }
         })();
@@ -181,7 +181,11 @@ const ShofarBlowerMap = (props) => {
         if (userData && typeof userData === "object" && !Array.isArray(userData) && userOriginLoc && typeof userOriginLoc === "object") {
             handleSetAllMapData()
         }
-        setCenter(defaultCenter)
+        console.log(myMeetings)
+        if (myMeetings.length){
+
+            setCenter(defaultCenter)
+        }
     }, [myMeetings, meetingsReqs])
 
     useEffect(() => {
