@@ -28,7 +28,7 @@ useQuery(q, (err, isolated) => {
         date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
         msg = isolater.blowerName ?
             `שלום ${isolater.name}\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""}\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}\nשעת תקיעה משוערת ${date}\nבריאות טובה\nשנה טובה ומתוקה!`
-            : `שלום ${isolater.name}, טרם נמצא לך תוקע, צוות "יום תרועה" על זה (;`
+            : `שלום ${isolater.name}, לא הצלחנו למצוא לך בעל תוקע, עמך הסליחה , צוות "יום תרועה"  (;`
         sendMsg(isolater.phoneNumber, msg)
         console.log(`-> \ncalling send msg to _isolater_ with: phoneNumber:${isolater.phoneNumber}, msg: ${msg}\n<-\n`);
         count++;

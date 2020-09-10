@@ -64,7 +64,7 @@ const Home = (props) => {
 
                         <div style={{ width: "fit-content" }}>
                             האתר פותח כתרומה לחברה ע"י  <a className="underlineLink" href="https://www.hilma.tech/" target="_blank"> הילמה</a> |
-                       התמונה באדיבות: <a className="underlineLink" href="https://www.thekotel.org//" target="_blank" >הקרן למורשת הכותל המערבי </a> |
+                       התמונה באדיבות: <a className="underlineLink" href="https://www.thekotel.org/" target="_blank" >הקרן למורשת הכותל המערבי </a> |
                          תוכן שיווקי:  <a className="underlineLink" href="http://www.my-idea.co.il/" target="_blank"> אפרת שפירא</a>
                         </div>
                     </div>
