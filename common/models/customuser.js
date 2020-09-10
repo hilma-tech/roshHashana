@@ -938,7 +938,6 @@ module.exports = function (CustomUser) {
             allRes.openReqs = [...priReqRes, ...pubReqs]
             allRes.myRoute = [...myPubRoutes, ...priRouteRes]
             if (!myPubRoutes || !myPubRoutes.length) {
-                console.log('!myPubRoutes || !myPubRoutes.length: ', !myPubRoutes || !myPubRoutes.length);
                 return cb(null, allRes)
             }
             let myPubMeetingIds = []
