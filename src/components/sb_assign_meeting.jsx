@@ -135,7 +135,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
                     return;
                 }
                 checkAssignResForError(res)
-                console.log('checkAssignResForError: ', res);
             })
     }
 
@@ -189,7 +188,6 @@ const SBAssignMeeting = ({ history, inRoute }) => {
         setMeetingsReqs(reqs => reqs.filter(r => r.meetingId != newMeeting.meetingId))
 
         setTimeout(() => { setCenter(defaultCenter) }, 1000)
-        console.log('setCenter: ', defaultCenter);
 
         if (!genMapMeetings) return
         if (newMeeting.isPublicMeeting && Array.isArray(genMapMeetings.publicMeetings)) {
