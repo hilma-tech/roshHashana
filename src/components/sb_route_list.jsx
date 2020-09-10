@@ -60,11 +60,13 @@ const SBRouteList = (props) => {
             else {
                 routeStops.push(myMeetings[i])
             }
+            if(Number(i) == myMeetings.length - 1){
+                setConstAfter(constStopsAfter);
+                setConstB4(constStopsB4);
+                setMyRoute(routeStops);
+            }
         }
-        setConstAfter(constStopsAfter);
-        setConstB4(constStopsB4);
-        setMyRoute(routeStops);
-    }, [myMeetings]);
+    }, [myMeetings, selectedSB]);
 
     if (!userData && !isAdmin) return null;
 
@@ -114,11 +116,10 @@ const SBRouteList = (props) => {
     const createItemContent = (value, index, uniqueKey) => {
         return (<div key={`sb-route-list-${uniqueKey !== undefined && uniqueKey !== null ? uniqueKey : index}`} className={`meeting-in-route ${(index !== -1) ? 'clickAble' : ''}`} onClick={isAdmin ? undefined : () => index !== -1 && openOrCloseMeetingInfo(value)}>
             <div className="meeting-in-route-img-container" >
-                {index !== CONST_MEETING ? <div className="meeting-in-route-img">
-                    {index == -1 ?
-                        <img src="/icons/white_shofar.svg" />
-                        : Number(index) + 1}
-                </div> : null}
+                {index !== CONST_MEETING ?
+                    <div className="meeting-in-route-img">
+                        {index == -1 ? <img src="/icons/white_shofar.svg" /> : Number(index) + 1}
+                    </div> : null}
             </div>
             <div className="meeting-in-route-info-container" id={index}>
                 <div className="meeting-in-route-info-1">

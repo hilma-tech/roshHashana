@@ -521,7 +521,7 @@ module.exports = function (Isolated) {
 
     Isolated.deleteConectionToMeeting = function (id, cb) {
         (async () => {
-            let [err, res] = await to(Isolated.upsertWithWhere({ id }, { blowerMeetingId: null, meeting_time: null }));
+            let [err, res] = await to(Isolated.upsertWithWhere({ and: [{ public_meeting: 0 }, { id }] }, { blowerMeetingId: null, meeting_time: null }));
             if (err) cb(err);
             if (res) {
                 return cb(null, res);
@@ -616,5 +616,4 @@ module.exports = function (Isolated) {
         ],
         returns: { arg: 'res', type: 'boolean', root: true }
     });
-
 }
