@@ -21,7 +21,7 @@ const moment = require('moment');
 
 useQuery(q, (err, isolated) => {
     if (err) throw err;
-    let isolator;
+    let isolater;
     let count = 0;
     for (let i = 0; i < isolated.length; i++) {
         isolater = isolated[i];
