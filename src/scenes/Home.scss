@@ -98,7 +98,7 @@
 
    .browserButtonForRegister {
       margin: auto;
-      margin-top: 3%;
+      margin-top: 3.5%;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -111,7 +111,7 @@
          // margin: 0 2vw;
          color: white;
          border: none;
-         width: 20rem;
+         width: 17rem;
       }
       .browserRegisterBlower {
          margin: 0 2vw 0 0;
@@ -121,7 +121,7 @@
          font-size: 3vh;
          font-weight: bold;
          background-color: #489fb5;
-         width: 20rem;
+         width: 17rem;
       }
    }
    .mobileButtonForRegister {
@@ -177,6 +177,16 @@
          height: fit-content;
          margin-left: auto;
          margin-right: auto;
+      }
+   }
+}
+@media only screen and (min-width: 1280px) and (min-height: 800px) {
+   .HomePage {
+      .browserButtonForRegister {
+         .browserRegisterIsolator,
+         .browserRegisterBlower {
+            width: 20rem;
+         }
       }
    }
 }
