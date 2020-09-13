@@ -13,7 +13,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    overflow: hidden;
+    overflow: auto;
     .settings {
         z-index: 5;
         width: fit-content;
@@ -106,7 +106,7 @@
             color: black;
             font-size: 1.3rem;
             line-height: normal;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             flex-direction: row;
             .clock {
                 margin-bottom: 2rem;
