@@ -37,7 +37,6 @@ const GenericTable = (props) => {
 
     const nextPageClicked = () => {
         if (Math.ceil(props.resaultsNum / props.rowsNum) === page) return
-        console.log('next')
         setPage(prev => {
             props.nextPage(prev + 1)
             return prev + 1

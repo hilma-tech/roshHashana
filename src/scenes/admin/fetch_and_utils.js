@@ -148,7 +148,6 @@ export const getNumberOfMeetings = async (cb = () => { }) => {
 }
 
 export const getParticipantsMeeting = async (id, startRow, filter = '', cb = () => { }) => {
-    console.log(id, startRow, filter)
     let [res, err] = await Auth.superAuthFetch(`/api/isolateds/getParticipantsMeeting`, {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         method: "POST",
@@ -231,7 +230,7 @@ export const createAdminUser = async (email, password, code, cb = () => { }) => 
     }, true);
 
     if (err || !res) {
-        console.log(err)
+        // console.log(err)
         return cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : "אירעה שגיאה בזמן הבאת הנתונים, אנא נסו שנית מאוחר יותר")
     }
     else {
@@ -345,7 +344,6 @@ export const getShofarBlowerByIdAdmin = async (id, cb) => {
         method: "POST",
         body: JSON.stringify({ id })
     })
-    console.log(res)
     if (err || !res) {
         typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
     }

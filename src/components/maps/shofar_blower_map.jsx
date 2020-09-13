@@ -181,8 +181,7 @@ const ShofarBlowerMap = (props) => {
         if (userData && typeof userData === "object" && !Array.isArray(userData) && userOriginLoc && typeof userOriginLoc === "object") {
             handleSetAllMapData()
         }
-        console.log(myMeetings)
-        if (myMeetings.length){
+        if (Array.isArray(myMeetings) && myMeetings.length) {
 
             setCenter(defaultCenter)
         }
