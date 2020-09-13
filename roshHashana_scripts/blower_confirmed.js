@@ -15,11 +15,11 @@ useQuery(query, (err, data, _fields) => {
     let cnt = 0;
     for (let i = 0; i < data.length; i++) {
         let blower = data[i];
-        msg = `שלום ${blower.name},\nאנו שמחים להודיעך כי אושרת לתקוע בשופר באתר יום תרועה.\nתוכל כעת להיכנס לאתר ולשבץ את עצמך למחפשים ולתקיעות https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
+        msg = `שלום ${blower.name},\nאנו שמחים להודיעך כי אושרת לתקוע בשופר באתר יום תרועה.\nתוכל כעת להיכנס לאתר ולשבץ את עצמך למחפשים, בכתובת https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
         sendMsg(blower.phoneNumber, msg)
         console.log('sendMsg to: ', blower.phoneNumber);
         cnt++
         if (data.length - 1 == i) //in last place 
-            console.log("script is done, send msg to", cnt, ' shofar blowers')
+            console.log("script is done, sent msg to", cnt, ' shofar blowers')
     }
 });
