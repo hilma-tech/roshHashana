@@ -44,7 +44,7 @@ module.exports = function (CustomUser) {
                 let roleMapping = {
                     "principalType": "User",
                     "principalId": ResCustom.id,
-                    "roleId": role
+                    "roleId": role !== -1 ? role : 2
                 }
                 console.log('RoleMapping.create: ', roleMapping);
                 let ResRole = await CustomUser.app.models.RoleMapping.create(roleMapping);
@@ -1357,6 +1357,32 @@ module.exports = function (CustomUser) {
         if (!role) return;
 
         try {
+
+            let userData = {}
+            if (data.name) userData.name = data.name
+            if (data.username) userData.username = data.username
+            if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
+            if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
+            if (data.comments && data.comments.length < 255) userData.comments = data.comments
+            else userData.comments = '';
+
+            if (data.address && data.address[0]) {
+                userData.address = data.address[0]
+                let addressArr = data.address[0]
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                    userData.city = city || addressArr[addressArr.length - 1];
+                }
+            }
+
+            if (Object.keys(userData).length) {
+                let resCustomUser
+                try {
+                    resCustomUser = await CustomUser.upsertWithWhere({ id: userId }, userData);
+                } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
+            }
+
             //create object with blower info and update ShofarBlower table with this info
             let newBloData = {}
             if (data.volunteering_max_time) newBloData.volunteering_max_time = data.volunteering_max_time
