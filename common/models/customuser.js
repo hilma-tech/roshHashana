@@ -1308,7 +1308,7 @@ module.exports = function (CustomUser) {
                     isolatedUser.lat AS lat,
                     isolatedUser.lng AS lng,
                     blowerUser.name AS blowerName,
-                    false AS publicMeeting,
+                    false AS isPublicMeeting,
                     isolated.id AS id
                 FROM isolated 
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId 
