@@ -258,7 +258,7 @@ export default function BlowerFormAdmin(props) {
         const userData = {
             phone: phone,
             name: name,
-            role: 2
+            role: -1
         }
 
         if (shofarBlowerIdToEdit) {
