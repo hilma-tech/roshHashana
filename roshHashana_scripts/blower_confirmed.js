@@ -1,5 +1,5 @@
 
-//send msg to all confirmed blowers before they are blocked and can't edit their detalis
+//send msg to all confirmed blowers that they are confirmed
 const query =
     `SELECT CustomUser.name , CustomUser.username AS 'phoneNumber'
      FROM CustomUser 
@@ -15,12 +15,11 @@ useQuery(query, (err, data, _fields) => {
     let cnt = 0;
     for (let i = 0; i < data.length; i++) {
         let blower = data[i];
-        msg = `שלום ${blower.name}, שים לב, היום בשעה 00:00 תיסגר האפשרות לערוך את פרטייך ואת פרטי המסלול. בברכה, מיזם "יום תרועה"`;
-        sendMsg(blower.phoneNumber, msg);
+        msg = `שלום ${blower.name},\nאנו שמחים להודיעך כי אושרת לתקוע בשופר באתר יום תרועה.\nתוכל כעת להיכנס לאתר ולשבץ את עצמך למחפשים ולתקיעות https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
+        sendMsg(blower.phoneNumber, msg)
         console.log('sendMsg to: ', blower.phoneNumber);
         cnt++
         if (data.length - 1 == i) //in last place 
             console.log("script is done, send msg to", cnt, ' shofar blowers')
     }
 });
-// 16.9
