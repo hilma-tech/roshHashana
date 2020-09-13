@@ -67,7 +67,7 @@ const IsolatedTable = (props) => {
 
     return (
         <div className='isolatedTable'>
-            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={10} resaultsNum={props.resultNum} />
+            <GenericTable th={th} tr={tr} loading={loading} navigation={true} nextPage={setPage} prevPage={setPage} rowsNum={7} resaultsNum={props.resultNum} />
 
             {showDeletePopup &&
                 <DeletePopup
