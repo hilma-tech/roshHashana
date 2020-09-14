@@ -3,7 +3,7 @@ const CONSTS = require('../../server/common/consts/consts');
 const checkDateBlock = require('../../server/common/checkDateBlock');
 const blowerEvents = require('../../server/common/socket/blowerEvents');
 const to = require('../../server/common/to');
-
+const { sendMsg } = require('../../server/sendSms/SendSms');
 const executeMySqlQuery = async (Model, query) =>
     await to(new Promise((resolve, reject) => {
         Model.dataSource.connector.query(query, (err, res) => {
@@ -264,8 +264,10 @@ module.exports = function (ShofarBlower) {
                     throw shofarBlowerErr
                 }
 
-                const findPhone = `select username from CustomUser, shofar_blower where shofar_blower.id = ${id} and CustomUser.id = shofar_blower.userBlowerId`
+                const findPhone = `select name, username from CustomUser, shofar_blower where shofar_blower.id = ${id} and CustomUser.id = shofar_blower.userBlowerId`
                 let [findPhoneErr, findPhoneRes] = await executeMySqlQuery(ShofarBlower, findPhone);
+                const msg = `שלום ${findPhoneRes[0].name},\nאנו שמחים להודיעך כי אושרת לתקוע בשופר באתר יום תרועה.\nתוכל כעת להיכנס לאתר ולשבץ את עצמך למחפשים ולתקיעות https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
+                sendMsg(findPhoneRes[0].username, msg);
                 let objToSocketEvent = { "id": id };
                 try { ShofarBlower.app.io.to('admin-blower-events').emit(`blower_true_confirmQ_${findPhoneRes[0].username}`) } catch (e) { console.log("emit blower_true_confirmQ_ error, findPhoneRes:", findPhoneRes || findPhoneErr); }
                 return cb(null, true)
