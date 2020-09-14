@@ -122,14 +122,14 @@ export default function BlowerFormAdmin(props) {
     //create another public place
     const addPublicPlace = () => {
         setPublicPlacesChanged(true)
-        if (publicPlaces.length < 4) {
+        if (publicPlaces.length < 5) {
             setPublicPlaces(prev => {
                 keyId++
                 prev.push({ keyId: 'key' + keyId })
                 return [...prev]
             })
         }
-        else setPublicMeetErr('מועד התקיעה מתקרב, לא ניתן להוסיף עוד תקיעות ציבוריות ');
+        else setPublicMeetErr(' לא ניתן להוסיף עוד תקיעות ציבוריות ');
     }
 
     //remove the public meeting

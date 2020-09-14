@@ -114,12 +114,12 @@ export default class BlowerForm extends Component {
 
     //create another public place
     addPublicPlace = () => {
-        if (this.state.publicPlaces.length < 4) {
+        if (this.state.publicPlaces.length < 5) {
             let publicPlaces = this.state.publicPlaces;
             publicPlaces.push({ id: this.state.publicPlaces.length });
             this.setState({ publicPlaces });
         }
-        else this.setState({ publicMeetErr: 'מועד התקיעה מתקרב, לא ניתן להוסיף עוד תקיעות ציבוריות ' });
+        else this.setState({ publicMeetErr: ' לא ניתן להוסיף עוד תקיעות ציבוריות ' });
     }
 
     //remove the public meeting
