@@ -1353,9 +1353,6 @@ module.exports = function (CustomUser) {
 
         const userId = data.userId;
 
-        let role = await getUserRole(userId);
-        if (!role) return;
-
         try {
 
             let userData = {}
@@ -1431,7 +1428,6 @@ module.exports = function (CustomUser) {
                 meetings.forEach(async (meet) => {
                     const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
                     if (!isExist) {
-                        console.log(meet.id)
                         await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
                     }
                 });
@@ -1457,6 +1453,39 @@ module.exports = function (CustomUser) {
     CustomUser.remoteMethod('updateUserInfoAdmin', {
         http: { verb: 'POST' },
         accepts: [{ arg: 'data', type: 'object' }],
+        returns: { arg: 'res', type: 'object', root: true }
+    });
+
+    CustomUser.updateIsolatedAddressAdmin = async (userId, address) => {
+        try {
+            let userData = {}
+            if (address && address[1] && address[1].lng) userData.lng = address[1].lng
+            if (address && address[1] && address[1].lat) userData.lat = address[1].lat
+
+            if (address && address[0]) {
+                userData.address = address[0]
+                let addressArr = address[0]
+                if (typeof addressArr === "string" && addressArr.length) {
+                    addressArr = addressArr.split(", ")
+                    let city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                    userData.city = city || addressArr[addressArr.length - 1];
+                }
+            }
+
+            if (Object.keys(userData).length) {
+                try {
+                    await CustomUser.upsertWithWhere({ id: userId }, userData);
+                } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    CustomUser.remoteMethod('updateIsolatedAddressAdmin', {
+        http: { verb: 'POST' },
+        accepts: [{ arg: 'userId', type: 'number' }, { arg: 'address', type: 'array' }],
         returns: { arg: 'res', type: 'object', root: true }
     });
 

@@ -4,6 +4,7 @@ import { fetchIsolateds } from './fetch_and_utils';
 import IsolatedTable from './tables/IsolatedTable';
 import TopNavBar from './TopNavBar';
 import Search from './Search';
+import IsolatedInfo from './IsolatedInfo';
 
 import { useSocket, useJoinLeave } from "@hilma/socket.io-react";
 
@@ -81,20 +82,25 @@ const IsolatedPage = function (props) {
     return (
         <div className='isolatedsContainer'>
             <TopNavBar history={props.history} />
-            <div style={{ padding: '0 10vw' }}>
-                <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
-                <div style={{ display: 'flex' }}>
-                    <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
-                    <div style={{ margin: '0 1vw' }}></div>
-                    <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' regex={/^[A-Zא-תa-z '"-()0-9,]{1,}$/} />
+            <div>
+                <div style={{ display: 'flex', width: '100vw' }}>
+                    <div style={{ padding: '0 4vw', width: '75%' }}>
+                        <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
+                        <div style={{ display: 'flex' }}>
+                            <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
+                            <div style={{ margin: '0 1vw' }}></div>
+                            <Search onSearch={onSearchAddress} placeholder='חיפוש לפי כתובת' regex={/^[A-Zא-תa-z '"-()0-9,]{1,}$/} />
+                        </div>
+                        <div className='statusNavContainer'>
+                            <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
+                            <div style={{ width: '3.5vw' }}></div>
+                            <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
+                            <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
+                        </div>
+                        <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} haveMeeting={filters.haveMeeting} />
+                    </div>
+                    <IsolatedInfo />
                 </div>
-                <div className='statusNavContainer'>
-                    <div className={'orangeText subTitle pointer' + (status === 0 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(0)}>מחפשים בלי בעל תוקע</div>
-                    <div style={{ width: '3.5vw' }}></div>
-                    <div className={'orangeText subTitle pointer' + (status === 1 ? ' bold orangeBorderBottom' : '')} onClick={() => statusCliked(1)}>מחפשים עם בעל תוקע</div>
-                    <div className='blueText subTitle resultNum bold'>{`סה"כ ${resultNum} תוצאות`}</div>
-                </div>
-                <IsolatedTable resultNum={resultNum} getIsolateds={getIsolateds} setSelectedIsolator={setSelectedIsolator} haveMeeting={filters.haveMeeting} />
             </div>
         </div>
     );
