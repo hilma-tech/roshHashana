@@ -1389,7 +1389,7 @@ module.exports = function (CustomUser) {
             if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
 
                 //filter the public meetings -> only meetings with address, and start time
-                let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
+                let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time))
 
                 //update or create meetings
                 let city;
@@ -1421,6 +1421,7 @@ module.exports = function (CustomUser) {
 
                 //go through all const meetings of the shofar blower and check if there is a meeting that was deleted
                 const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                console.log("db ", meetings, "publicMeetingsArr ", publicMeetingsArr)
                 meetings.forEach(async (meet) => {
                     const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
                     if (!isExist) {
