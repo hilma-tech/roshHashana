@@ -1359,12 +1359,8 @@ module.exports = function (CustomUser) {
         try {
 
             let userData = {}
-            if (data.name) userData.name = data.name
-            if (data.username) userData.username = data.username
             if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
             if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-            if (data.comments && data.comments.length < 255) userData.comments = data.comments
-            else userData.comments = '';
 
             if (data.address && data.address[0]) {
                 userData.address = data.address[0]
