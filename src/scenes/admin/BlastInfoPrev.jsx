@@ -1,11 +1,11 @@
 import React from 'react';
-import './styles/blastInfoPrev.scss'
+import './styles/sideInfoPrev.scss'
 
 const BlastInfoPrev = (props) => {
     return (
-        <div className="BlastInfoPrev">
-            <img className="iconBlastInfoPrev" src="/icons/blueShofar.svg" />
-            <div className="textBlastInfoPrev">פרטי מפגש תקיעה בשופר</div>
+        <div className="sideInfoPrev">
+            <img className="iconInfo" src="/icons/blueShofar.svg" />
+            <div className="textInfo">פרטי מפגש תקיעה בשופר</div>
         </div>
     );
 }

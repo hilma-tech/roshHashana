@@ -15,7 +15,7 @@ const IsolatedTable = (props) => {
     const [tr, setTr] = useState(null)
     const [showDeletePopup, setShowDeletePopup] = useState(false)
 
-    const th = [['name', 'שם'], ['phone', 'פלאפון'], ['address', 'כתובת'], props.haveMeeting ? ['shofarBlowerName', 'שם בעל התוקע'] : ['',''], ['road tableIcons', ''], !props.haveMeeting ?['location tableIcons', ''] : ['', ''], ['delete tableIcons', '']]
+    const th = [['name', 'שם'], ['phone', 'פלאפון'], ['address', 'כתובת'], props.haveMeeting ? ['shofarBlowerName', 'שם בעל התוקע'] : ['', ''], ['road tableIcons', ''], !props.haveMeeting ? ['location tableIcons', ''] : ['', ''], ['edit tableIcons', ''], ['delete tableIcons', '']]
 
     useEffect(() => {
         if (isolateds) setTr(isolateds.map((isolated, index) => {
@@ -29,12 +29,23 @@ const IsolatedTable = (props) => {
                     <div className='myTooltip'>{isolated.comments}</div>
                 </div>,
                 !props.haveMeeting && <FontAwesomeIcon className='pointer' icon={['fas', 'map-marker-alt']} color='#A5A4BF' onClick={() => handleIsolatorClick(isolated)} />,
-                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.isolatedId, index)} />,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'pen']} color='#A5A4BF' onClick={() => handlePenClick(isolated)} />,
+                <FontAwesomeIcon className='pointer' icon={['fas', 'trash']} color='#A5A4BF' onClick={() => handleTrashClick(isolated.isolatedId, index)} />
             ]
         }))
     }, [isolateds])
 
+    const handleIsolatorClick = (isolator) => {
+        typeof props.setSelectedIsolator === "function" && props.setSelectedIsolator(isolator)
+        props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher")
+    }
 
+    const handlePenClick = (isolator) => {
+        if (typeof props.setSelectedIsolator === "function") {
+            props.setSelectedIsolator(null)
+            setTimeout(() => props.setSelectedIsolator(isolator), 0)
+        }
+    }
 
     const handleTrashClick = (id, index) => {
         setShowDeletePopup(true)
@@ -58,11 +69,6 @@ const IsolatedTable = (props) => {
 
     const setPage = (page) => {
         props.getIsolateds(null, (page - 1) * 7)
-    }
-
-    const handleIsolatorClick = (isolator) => {
-        typeof props.setSelectedIsolator === "function" && props.setSelectedIsolator(isolator)
-        props.history.push("/skerdsgfkjs9889cdfcis596jtrgd7yfuszygs/searcher")
     }
 
     return (
