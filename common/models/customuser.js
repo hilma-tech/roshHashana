@@ -1351,17 +1351,13 @@ module.exports = function (CustomUser) {
     CustomUser.updateUserInfoAdmin = async (data, options) => {
         const { ShofarBlower } = CustomUser.app.models;
 
-        const userId = data.userId;
+        const { userId } = data
 
         try {
 
             let userData = {}
-            if (data.name) userData.name = data.name
-            if (data.username) userData.username = data.username
             if (data.address && data.address[1] && data.address[1].lng) userData.lng = data.address[1].lng
             if (data.address && data.address[1] && data.address[1].lat) userData.lat = data.address[1].lat
-            if (data.comments && data.comments.length < 255) userData.comments = data.comments
-            else userData.comments = '';
 
             if (data.address && data.address[0]) {
                 userData.address = data.address[0]
@@ -1393,7 +1389,7 @@ module.exports = function (CustomUser) {
             if (data.publicMeetings && Array.isArray(data.publicMeetings)) {
 
                 //filter the public meetings -> only meetings with address, and start time
-                let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time) && userId)
+                let publicMeetingsArr = data.publicMeetings.filter(publicMeeting => publicMeeting.address && Array.isArray(publicMeeting.address) && publicMeeting.address[0] && publicMeeting.address[1] && typeof publicMeeting.address[1] === "object" && (publicMeeting.time || publicMeeting.start_time))
 
                 //update or create meetings
                 let city;
@@ -1425,6 +1421,7 @@ module.exports = function (CustomUser) {
 
                 //go through all const meetings of the shofar blower and check if there is a meeting that was deleted
                 const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                console.log("db ", meetings, "publicMeetingsArr ", publicMeetingsArr)
                 meetings.forEach(async (meet) => {
                     const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
                     if (!isExist) {
