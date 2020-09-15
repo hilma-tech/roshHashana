@@ -211,7 +211,7 @@ export default function BlowerFormAdmin(props) {
             return;
         }
         else setErrorMsg('')
-        if (name.length < 2 || !/^[א-תa-z '"-]{2,}$/.test(name)) {
+        if (name.length < 2 || !/^[א-תa-zA-Z '"-]{2,}$/.test(name)) {
             setNameErr('השם צריך להכיל אותיות בלבד')
             return;
         }
