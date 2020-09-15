@@ -108,7 +108,7 @@ module.exports = function (shofarBlowerPub) {
                     LEFT JOIN CustomUser blowerUser ON blowerUser.id = shofar_blower_pub.blowerId
                     LEFT JOIN shofar_blower ON blowerUser.id = shofar_blower.userBlowerId
                 ${where}
-                ${orderBy}
+                ${orderBy.length > 0 ? orderBy : 'ORDER BY participantsNum'}
                 LIMIT ${startRow}, 7`); //confirm change
 
             if (errPublic) cb(errPublic);

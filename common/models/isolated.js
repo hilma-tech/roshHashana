@@ -258,6 +258,7 @@ module.exports = function (Isolated) {
                     cu.lat, 
                     cu.lng, 
                     cu.comments,
+                    cu.id,
                     sbUser.name AS shofarBlowerName
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id
@@ -430,10 +431,10 @@ module.exports = function (Isolated) {
                 CASE WHEN blowerUser.name LIKE '${name}%' THEN 0 ELSE 1 END`
             }
 
-            let [err, res] = await executeMySqlQuery(Isolated,
-                `SELECT 
+            let [err, res] = await executeMySqlQuery(Isolated, `
+            SELECT 
                 isolatedUser.name AS "isolatedName",
-                isolatedUser.username AS "isolatedphone", 
+                isolatedUser.username AS "isolatedPhone", 
                 isolatedUser.address,
                 isolatedUser.comments,
                 blowerUser.name AS "blowerName",
@@ -497,7 +498,7 @@ module.exports = function (Isolated) {
                     RoleMapping.roleId AS "role" 
                 FROM isolated
                     LEFT JOIN CustomUser isolatedUser ON isolatedUser.id = isolated.userIsolatedId
-                    LEFT join RoleMapping on RoleMapping.principalId= isolatedUser.id
+                    LEFT JOIN RoleMapping on RoleMapping.principalId= isolatedUser.id
                 ${where}
                 LIMIT ${startRow}, 7;
             `);

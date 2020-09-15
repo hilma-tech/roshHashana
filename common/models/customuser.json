@@ -197,7 +197,8 @@
         "adminAssignSBToIsolator",
         "adminUpdateMaxRouteLengthAndAssign",
         "adminUpdateMaxDurationAndAssign",
-        "updateUserInfoAdmin"
+        "updateUserInfoAdmin",
+        "updateIsolatedAddressAdmin"
       ]
     }
   ],

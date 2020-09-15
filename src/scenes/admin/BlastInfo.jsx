@@ -2,24 +2,13 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AdminMainContext } from './ctx/AdminMainContext';
 import ParticipantsPopup from "./popups/ParticipantsPopup"
-import { getTime, getParticipantsMeeting, deletePublicMeeting, deleteConectionToMeeting } from './fetch_and_utils';
-import './styles/blastInfo.scss'
+import { getTime, getParticipantsMeeting } from './fetch_and_utils';
+import './styles/sideInfo.scss'
 
 
 const BlastInfo = (props) => {
 
     const { blastInfo, setOpenParticipantsPopUp, setParticipantsPublicMeeting } = useContext(AdminMainContext)
-
-    // const handleTrashClick = (id) => {
-    //     (async () => {
-    //         // await deletePublicMeeting(id, (err, res) => {
-    //         //     console.log(err, res)
-    //         // })
-    //         await deleteConectionToMeeting(id, (err, res) => {
-    //             console.log(err, res)
-    //         })
-    //     })()
-    // }
 
     const handleParticipantsClick = (id, startRow = 0, filter = {}) => {
         (async () => {
@@ -34,7 +23,7 @@ const BlastInfo = (props) => {
     }
 
     return (
-        <div className="BlastInfo">
+        <div className="sideInfo">
 
             <div className="flexContainer leftdives">
                 <div className="bold fonttkia">תקיעה {blastInfo.type}</div>
@@ -64,8 +53,8 @@ const BlastInfo = (props) => {
                         <img className="icon" src="/icons/peopleBlue.svg" />
                     </div>
                     <div className="width75">
-                        <div className="info">מוטי לוי</div>
-                        <div className="info">052-4773888</div>
+                        <div className="info">{blastInfo.isolatedName}</div>
+                        <div className="info">{blastInfo.isolatedPhone}</div>
                     </div>
                 </div>}
                 <div className="flexRow">

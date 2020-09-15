@@ -1,4 +1,4 @@
-.BlastInfoPrev {
+.sideInfoPrev {
     height: 90vh;
     background: #e5e5e6 0% 0% no-repeat padding-box;
     width: 25vw;
@@ -10,17 +10,15 @@
     justify-content: center;
     justify-items: center;
     align-items: center;
+
+    .iconInfo {
+        width: 12vh;
+        margin-bottom: 3vh;
+    }
+
+    .textInfo {
+        padding: 0;
+        width: 10vw;
+        font-size: 3vh;
+    }
 }
-
-.iconBlastInfoPrev {
-    width: 12vh;
-    margin-bottom: 3vh;
-}
-
-.textBlastInfoPrev {
-    padding: 0;
-    width: 10vw;
-    font-size: 3vh;
-}
-
-
