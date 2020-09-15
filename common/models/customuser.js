@@ -1351,7 +1351,7 @@ module.exports = function (CustomUser) {
     CustomUser.updateUserInfoAdmin = async (data, options) => {
         const { ShofarBlower } = CustomUser.app.models;
 
-        const userId = data.userId;
+        const { userId } = data
 
         try {
 
