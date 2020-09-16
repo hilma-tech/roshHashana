@@ -1453,7 +1453,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.updateIsolatedAddressAdmin = async (userId, address) => {
+    CustomUser.updateIsolatedAdmin = async (userId, { address, comments }) => {
         try {
             let userData = {}
             if (address && address[1] && address[1].lng) userData.lng = address[1].lng
@@ -1469,6 +1469,8 @@ module.exports = function (CustomUser) {
                 }
             }
 
+            userData.comments = comments
+
             if (Object.keys(userData).length) {
                 try {
                     await CustomUser.upsertWithWhere({ id: userId }, userData);
@@ -1480,9 +1482,12 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.remoteMethod('updateIsolatedAddressAdmin', {
+    CustomUser.remoteMethod('updateIsolatedAdmin', {
         http: { verb: 'POST' },
-        accepts: [{ arg: 'userId', type: 'number' }, { arg: 'address', type: 'array' }],
+        accepts: [
+            { arg: 'userId', type: 'number' },
+            { arg: 'data', type: 'object' }
+        ],
         returns: { arg: 'res', type: 'object', root: true }
     });
 
