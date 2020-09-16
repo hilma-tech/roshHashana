@@ -1453,7 +1453,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.updateIsolatedAddressAdmin = async (userId, address) => {
+    CustomUser.updateIsolatedAddressAdmin = async (userId, address, isPublicMeeting) => {
         try {
             let userData = {}
             if (address && address[1] && address[1].lng) userData.lng = address[1].lng
@@ -1474,6 +1474,11 @@ module.exports = function (CustomUser) {
                     await CustomUser.upsertWithWhere({ id: userId }, userData);
                 } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
             }
+
+            if (isPublicMeeting == 1 || isPublicMeeting == true){
+                // await CustomUser.app.models.shofarBlowerPub.upsertWithWhere()
+            }
+
 
         } catch (error) {
             throw error;
