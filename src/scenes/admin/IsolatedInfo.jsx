@@ -87,7 +87,7 @@ const IsolatedInfo = (props) => {
             </div>
             <div className="flexRow">
                 <div className="width25">
-                    <FontAwesomeIcon icon='comment' color='#A5A4BF' />
+                    <FontAwesomeIcon icon='comment' color='#156879' />
                 </div>
                 <div className="width75">
                     <input className="info comments"
@@ -101,7 +101,7 @@ const IsolatedInfo = (props) => {
                 <div className="width25">
                     <img className="icon" style={{ width: "2.4vh" }} src="/icons/location.svg" />
                 </div>
-                <div>
+                <div className="width75">
                     <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={Array.isArray(address) && address.length > 0 ? address[0] : address} />
                     <div className="err-msg ">{addressErr}</div>
                 </div>

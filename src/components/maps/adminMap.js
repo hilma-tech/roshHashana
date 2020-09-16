@@ -65,7 +65,7 @@ const AdminMap = withScriptjs(withGoogleMap((props) => {
         })
     };
     const zoomPlace = (place, userId = '') => {
-        setZoom(18)
+        // setZoom(18)
         setCenter(place);
         if (userId !== '') setSelectedMarkerId(userId)
     }
