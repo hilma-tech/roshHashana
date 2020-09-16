@@ -975,7 +975,7 @@ module.exports = function (CustomUser) {
                     }
                 }
                 if (doneLoopingIsolatorPublicInRoute) return cb(null, allRes) //in case there was no return cb in for loop ^ 
-            } else { console.log("mapInfoSb, no isolators in my public meetings, or error with sql:", errrrBlah || isolatorPublicInRoute); return cb(null, allRes) }
+            } else { return cb(null, allRes) }
             if (doneLoopingIsolatorPublicInRoute) return cb(null, allRes) //in case there was no return cb in for loop  ^ 
         })();
     }
@@ -1393,41 +1393,57 @@ module.exports = function (CustomUser) {
 
                 //update or create meetings
                 let city;
-                publicMeetingsArr.forEach(async (publicMeeting) => {
-                    if (publicMeeting.address && publicMeeting.address[0]) {
-                        let addressArr = publicMeeting.address[0]
-                        if (typeof addressArr === "string" && addressArr.length) {
-                            addressArr = addressArr.split(", ")
-                            city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                let publicMeeting;
+                if (publicMeetingsArr.length) {
+                    for (let i = 0; i < publicMeetingsArr.length; i++) {
+                        publicMeeting = publicMeetingsArr[i]
+                        if (publicMeeting.address && publicMeeting.address[0]) {
+                            let addressArr = publicMeeting.address[0]
+                            if (typeof addressArr === "string" && addressArr.length) {
+                                addressArr = addressArr.split(", ")
+                                city = CustomUser.getLastItemThatIsNotIsrael(addressArr, addressArr.length - 1);
+                            }
+                        }
+                        const obj = {
+                            address: publicMeeting.address && publicMeeting.address[0],
+                            lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
+                            lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
+                            city,
+                            constMeeting: true,
+                            comments: publicMeeting.placeDescription || publicMeeting.comments,
+                            start_time: publicMeeting.time || publicMeeting.start_time,
+                            blowerId: userId
+                        }
+                        //update the public meeting
+                        if (publicMeeting.id) await CustomUser.app.models.shofarBlowerPub.upsertWithWhere({ id: publicMeeting.id }, obj);
+                        else {
+                            let res = await CustomUser.app.models.shofarBlowerPub.create(obj); //create new pub meeting
+                            publicMeeting.id = res.id
+                        }
+
+                        if (i == publicMeetingsArr.length - 1) {
+                            //only when finished this for loop (updating new public meeting),
+                            // go over all const meetings of the shofar blower and check if there is a meeting that was deleted now
+                            const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                            let meet;
+                            for (let m = 0; m < meetings.length; m++) {
+                                meet = meetings[m]
+                                const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
+                                if (!isExist) {
+                                    await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
+                                }
+                            }
                         }
                     }
-                    const obj = {
-                        address: publicMeeting.address && publicMeeting.address[0],
-                        lng: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lng,
-                        lat: publicMeeting.address && publicMeeting.address[1] && publicMeeting.address[1].lat,
-                        city,
-                        constMeeting: true,
-                        comments: publicMeeting.placeDescription || publicMeeting.comments,
-                        start_time: publicMeeting.time || publicMeeting.start_time,
-                        blowerId: userId
-                    }
-                    //update the public meeting
-                    if (publicMeeting.id) await CustomUser.app.models.shofarBlowerPub.upsertWithWhere({ id: publicMeeting.id }, obj);
-                    else {
-                        let res = await CustomUser.app.models.shofarBlowerPub.create(obj); //create new pub meeting
-                        publicMeeting.id = res.id
-                    }
-                });
-
-                //go through all const meetings of the shofar blower and check if there is a meeting that was deleted
-                const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
-                console.log("db ", meetings, "publicMeetingsArr ", publicMeetingsArr)
-                meetings.forEach(async (meet) => {
-                    const isExist = publicMeetingsArr.some((pubMeet) => pubMeet.id == meet.id);
-                    if (!isExist) {
+                }
+                else {
+                    const meetings = await CustomUser.app.models.shofarBlowerPub.find({ where: { and: [{ constMeeting: 1 }, { blowerId: userId }] } });
+                    let meet;
+                    for (let m = 0; m < meetings.length; m++) {
+                        meet = meetings[m]
                         await CustomUser.app.models.shofarBlowerPub.destroyById(meet.id);
                     }
-                });
+                }
             }
 
             if (data.address) {
