@@ -325,6 +325,8 @@ const ShofarBlowerMap = (props) => {
                 center={center && typeof center === "object" && Object.keys(center).length ? center : { lat: 31.7767257, lng: 35.2346218 }}
                 onCenterChanged={(s) => { setCenter(s); setBackToCenterBtn(true) }}
 
+                disableEdit={disableEdit}
+
                 err={err}
                 isAdmin={isAdmin}
                 handleForceAssign={isAdmin ? props.handleForceAssign : undefined}

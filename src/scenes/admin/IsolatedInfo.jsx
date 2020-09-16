@@ -66,7 +66,7 @@ const IsolatedInfo = (props) => {
                     <img className="icon" style={{ width: "2.4vh" }} src="/icons/location.svg" />
                 </div>
                 <div>
-                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={typeof selectedIsolator.address !== 'string' && selectedIsolator.address.length > 0 ? selectedIsolator.address[0] : selectedIsolator.address} />
+                    <FormSearchBoxGenerator onAddressChange={handleAddressChange} uId='form-search-input-1' defaultValue={Array.isArray(selectedIsolator.address) && selectedIsolator.address.length > 0 ? selectedIsolator.address[0] : selectedIsolator.address} />
                     <div className="err-msg ">{addressErr}</div>
                 </div>
             </div>

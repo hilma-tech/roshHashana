@@ -99,17 +99,21 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         let p
         try { p = new URLSearchParams(props.location.search).get("p") } catch (e) { }
         if (p !== "t") return
+        handlePrint()
+    }, [totalLength])
+
+    useEffect(() => {
+        if (isPrint) { print() }
+    }, [isPrint])
+
+    const handlePrint = () => {
         setIsPrint(true);
         window.onafterprint = (_e) => {
             window.history.replaceState({}, document.title, "/");
             setIsPrint(false);
         };
         setIsPrint(true);
-    }, [totalLength])
-    useEffect(() => {
-        if (isPrint) { handlePrint() }
-    }, [isPrint])
-
+    }
     useEffect(() => {
         if (data && Array.isArray(data.myMLocs)) {
             if (!data.myMLocs.length) {
@@ -120,7 +124,7 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
         }
     }, [data.myMLocs])
 
-    const handlePrint = () => {
+    const print = () => {
         document.scrollTop = 0
         window.print()
     }
@@ -296,7 +300,8 @@ export const SBMapComponent = withScriptjs(withGoogleMap((props) => {
             }
             {isAdmin ? null :
                 <div className={isBrowser ? "sb-overmap-container" : "sb-overmap-container sb-overmap-container-mobile"}>
-                    {isBrowser ? null : <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src="/icons/settings.svg" /></div>}
+                    {isBrowser ? null : <div className="settings clickAble print-button-jkl-container" ><img onClick={() => props.history.push('/settings')} alt="" src="/icons/settings.svg" />{!isAdmin && props.disableEdit ? <div className="print-button-jkl settings" onClick={handlePrint} ><FontAwesomeIcon icon="print" /></div> : null}</div>}
+
                     <div className={`map-change-all ${isBrowser ? "map-change" : "map-change-mobile"} clickAble`} onClick={changeMap} >
                         <div>{genMap ? "מפה אישית" : "מפה כללית"}</div>
                     </div>
