@@ -549,7 +549,7 @@ module.exports = function (ShofarBlower) {
                 const shofarBlowerPubQ = `
                 SELECT id, address, comments, start_time ,lat, lng
                 FROM shofar_blower_pub 
-                WHERE blowerId = ${shofarBlowerRes[0].userId}
+                WHERE blowerId = ${shofarBlowerRes[0].userId} AND shofar_blower_pub.constMeeting = 1
                 `
                 let [shofarBlowerPubErr, shofarBlowerPubRes] = await executeMySqlQuery(ShofarBlower, shofarBlowerPubQ);
                 if (shofarBlowerPubErr || !shofarBlowerPubRes) {

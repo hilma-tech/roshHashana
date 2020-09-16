@@ -20,6 +20,9 @@ const IsolatedInfo = (props) => {
             setAddress(selectedIsolator.address || '')
             setComments(selectedIsolator.comments || '')
         }
+        else {
+            setAddress('')
+        }
     }, [selectedIsolator])
     const handleAddressChange = (address) => {
         setAddress(address)

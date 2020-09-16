@@ -345,7 +345,7 @@ export const getShofarBlowerByIdAdmin = async (id, cb) => {
         body: JSON.stringify({ id })
     })
     if (err || !res) {
-        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : false) //yes error
+        typeof cb === "function" && cb(err === "NO_INTERNET" ? CONSTS.NO_INTERNET_ACTION : err === "ONE_UPDATE_ERROR_AT_LEAST" ? "קרתה בעיה, ייתכן וחלק מהשינויים לא נשמרו כראוי, נא רעננו ובמידת הצורך חזרו על פעולתכם האחרונה" : true) //yes error
     }
     else
         return cb(null, res)
