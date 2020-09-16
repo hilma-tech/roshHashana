@@ -84,7 +84,7 @@ const IsolatedPage = function (props) {
             <TopNavBar history={props.history} />
             <div>
                 <div style={{ display: 'flex', width: '100vw' }}>
-                    <div style={{ padding: '0 4vw', width: '75%' }}>
+                    <div style={{ padding: '0 4vw', width: '65%' }}>
                         <div className='orangeTitle'>מחפשים בעלי תקיעה</div>
                         <div style={{ display: 'flex' }}>
                             <Search onSearch={onSearchName} placeholder='חיפוש לפי שם' regex={/^[A-Zא-תa-z '"-]{1,}$/} />
