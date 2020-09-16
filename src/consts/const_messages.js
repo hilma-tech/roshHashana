@@ -26,6 +26,6 @@ export const CONSTS = {
             { featureType: "transit", stylers: [{ visibility: "off" }] }]
     },
     JERUSALEM_POSITION: { lat: 31.771959, lng: 35.217018 },
-    DATE_TO_BLOCK_ISOLATED: new Date(2020, 8, 16, 23, 59, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }), // 16/9/2020 23:58
-    DATE_TO_BLOCK_BLOWER: new Date(2020, 8, 16, 23, 59, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }) // 16/9/2020 23:58
+    DATE_TO_BLOCK_ISOLATED: new Date(2020, 8, 17, 10, 0, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }), // 17/9/2020 10:58
+    DATE_TO_BLOCK_BLOWER: new Date(2020, 8, 17, 10, 0, 0).toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }) // 17/9/2020 10:58
 }
