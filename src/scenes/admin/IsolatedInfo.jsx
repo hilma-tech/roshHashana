@@ -48,16 +48,21 @@ const IsolatedInfo = (props) => {
         let [res, error] = await Auth.superAuthFetch(`/api/CustomUsers/updateIsolatedAdmin`, {
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             method: "POST",
-            body: JSON.stringify({ userId: selectedIsolator.id, data })
+            body: JSON.stringify({ userId: selectedIsolator.id, data, isPublicMeeting: Boolean(selectedIsolator.isPublicMeeting) })
         }, true);
         if (!res) {
             setAddressErr(typeof error === "string" ? error : 'אירעה שגיאה בעת ההרשמה, נא נסו שנית מאוחר יותר, תודה')
         }
         else {
-            setIsolateds(prevIsolateds => prevIsolateds.map(i => {
-                if (i.id === selectedIsolator.id) i.address = address[0]
-                return i
-            }))
+            
+                setIsolateds(prevIsolateds => prevIsolateds.map(i => {
+                    if (i.id === selectedIsolator.id){
+                        if (address !== selectedIsolator.address) i.address = address[0]
+                        if (comments !== selectedIsolator.comments) i.comments = comments
+                    } 
+                    return i
+                }))
+            
         }
     }
 

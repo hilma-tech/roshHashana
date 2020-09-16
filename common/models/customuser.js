@@ -1453,7 +1453,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.updateIsolatedAdmin = async (userId, { address, comments }) => {
+    CustomUser.updateIsolatedAdmin = async (userId, { address, comments }, isPublicMeeting) => {
         try {
             let userData = {}
             if (address && address[1] && address[1].lng) userData.lng = address[1].lng
@@ -1486,7 +1486,8 @@ module.exports = function (CustomUser) {
         http: { verb: 'POST' },
         accepts: [
             { arg: 'userId', type: 'number' },
-            { arg: 'data', type: 'object' }
+            { arg: 'data', type: 'object' },
+            { arg: 'isPublicMeeting', type: 'boolean' }
         ],
         returns: { arg: 'res', type: 'object', root: true }
     });
