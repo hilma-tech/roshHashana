@@ -198,7 +198,7 @@
         "adminUpdateMaxRouteLengthAndAssign",
         "adminUpdateMaxDurationAndAssign",
         "updateUserInfoAdmin",
-        "updateIsolatedAddressAdmin"
+        "updateIsolatedAdmin"
       ]
     }
   ],

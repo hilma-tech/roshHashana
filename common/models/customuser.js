@@ -1453,7 +1453,7 @@ module.exports = function (CustomUser) {
         returns: { arg: 'res', type: 'object', root: true }
     });
 
-    CustomUser.updateIsolatedAddressAdmin = async (userId, address, isPublicMeeting) => {
+    CustomUser.updateIsolatedAdmin = async (userId, { address, comments, meetingId }, isPublicMeeting) => {
         try {
             let userData = {}
             if (address && address[1] && address[1].lng) userData.lng = address[1].lng
@@ -1469,14 +1469,16 @@ module.exports = function (CustomUser) {
                 }
             }
 
+            userData.comments = comments
+
             if (Object.keys(userData).length) {
                 try {
                     await CustomUser.upsertWithWhere({ id: userId }, userData);
                 } catch (e) { if (e.details && e.details.codes && Array.isArray(e.details.codes.username) && e.details.codes.username[0] === "uniqueness") { throw 'PHONE_EXISTS' } else { throw true } }
             }
 
-            if (isPublicMeeting == 1 || isPublicMeeting == true){
-                // await CustomUser.app.models.shofarBlowerPub.upsertWithWhere()
+            if (isPublicMeeting == 1 || isPublicMeeting == true) {
+                await CustomUser.app.models.shofarBlowerPub.upsertWithWhere({ id: meetingId }, userData);
             }
 
 
@@ -1485,9 +1487,13 @@ module.exports = function (CustomUser) {
         }
     }
 
-    CustomUser.remoteMethod('updateIsolatedAddressAdmin', {
+    CustomUser.remoteMethod('updateIsolatedAdmin', {
         http: { verb: 'POST' },
-        accepts: [{ arg: 'userId', type: 'number' }, { arg: 'address', type: 'array' }],
+        accepts: [
+            { arg: 'userId', type: 'number' },
+            { arg: 'data', type: 'object' },
+            { arg: 'isPublicMeeting', type: 'boolean' }
+        ],
         returns: { arg: 'res', type: 'object', root: true }
     });
 
