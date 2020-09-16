@@ -249,7 +249,7 @@ module.exports = function (Isolated) {
                 //todo check if need to add to select here: IF(isolated.public_meeting, sbp.id, isolated.id) AS id,isolated.public_meeting (for adminAssignSBToIsolator)
                 const isolatedQ = `SELECT 
                     isolated.id AS "isolatedId", 
-                    IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS id, 
+                    IF(isolated.public_meeting = 1, sbp.id, isolated.id) AS meetingId, 
                     isolated.public_meeting AS "isPublicMeeting",
                     cu.name, 
                     isolated.public_phone, 
@@ -258,7 +258,7 @@ module.exports = function (Isolated) {
                     cu.lat, 
                     cu.lng, 
                     cu.comments,
-                    cu.id,
+                    cu.id AS id,
                     sbUser.name AS shofarBlowerName
                 FROM isolated 
                     LEFT JOIN CustomUser cu ON isolated.userIsolatedId = cu.id

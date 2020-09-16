@@ -13,6 +13,15 @@ const SBSideInfo = (props) => {
     const [openRouteList, setOpenRouteList] = useState(null);
     const { isPrint, setIsPrint } = useContext(SBContext);
 
+    const handlePrint = () => {
+        setIsPrint(true);
+        window.onafterprint = (_e) => {
+            window.history.replaceState({}, document.title, "/");
+            setIsPrint(false);
+        };
+        setIsPrint(true);
+    }
+
     const switchBool = (state) => state(prev => !prev)
 
     const disableEdit = checkDateBlock('DATE_TO_BLOCK_BLOWER');
@@ -35,7 +44,7 @@ const SBSideInfo = (props) => {
                 routeDis
                     ?
                     <div id="sb-route-list-top" >
-                        <div className="settings clickAble" onClick={() => props.history.push('/settings')} ><img alt="" src=" /icons/settings.svg" /></div>
+                        <div className="settings clickAble print-button-jkl-container-browser" ><img alt="" src=" /icons/settings.svg" onClick={() => props.history.push('/settings')} />{disableEdit ? <div className="print-button-jkl settings" onClick={handlePrint} ><FontAwesomeIcon icon="print" /></div> : null}</div>
                         {!disableEdit ? <div className="list-switch-container clickAble" onClick={() => switchBool(setRouteDis)} >
                             <FontAwesomeIcon icon="list-ul" className="list-switch-icon" />
                             <div className="list-switch-text">הצג מחפשים ברשימה</div>
