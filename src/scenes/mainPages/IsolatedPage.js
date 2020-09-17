@@ -111,7 +111,7 @@ const IsolatedPage = (props) => {
                                     <img alt="" className="icon" src='/icons/blueClock.svg' />
                                     <div>
                                         <div>{`בשעה ${meetingTime}`}</div>
-                                        <div className="msg">הודעה סופית על זמן התקיעה תשלח ביום חמישי, כ"ח באלול 17.9</div>
+                                        <div className="msg">הודעה סופית על זמן התקיעה תשלח ביום שישי, כ"ט באלול 18.9</div>
                                     </div>
                                 </div>
                             </div>
