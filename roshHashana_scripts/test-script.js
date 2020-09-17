@@ -10,7 +10,7 @@ const q = `
         LEFT JOIN CustomUser blowerUser ON blowerUser.id= shofar_blower_pub.blowerId
         LEFT JOIN shofar_blower ON shofar_blower.id=isolated.blowerMeetingId
         LEFT JOIN RoleMapping ON RoleMapping.principalId = CustomUser.id
-    WHERE isolated.public_meeting=1
+    WHERE isolated.public_meeting=1 AND (userIsolatedId=160 OR userIsolatedId=601)
 UNION 
     SELECT
         false AS "isPublicMeeting", RoleMapping.roleId, CustomUser.name, CustomUser.username AS "phoneNumber", CustomUser.address AS "meetingAddress",CustomUser.comments AS "addressComments", isolated.meeting_time AS "meetingStartTime" ,blowerUser.name AS "blowerName"
