@@ -35,7 +35,6 @@ export default class IsolatedForm extends Component {
                     this.props.history.push('/');
                     return;
                 });
-                this.props.history.push('/');
                 return;
             }
             if ((res && res.address)) {
