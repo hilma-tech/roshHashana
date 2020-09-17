@@ -43,7 +43,7 @@ useQuery(q, (err, isolated) => {
         // msg = `שלום ${isolater.name},\nנרשמת לתקיעה ציבורית בכתובת: ${isolater.meetingAddress}, ${isolater.addressComments || ""}.\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע בשופר בתקיעה ציבורית זו.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`;
 
         console.log(`(isolator) sending msg to:${isolater.phoneNumber}`);
-        sendMsg('0547443860', msg)
+        sendMsg(isolater.phoneNumber, msg)
         count++;
         if (isolated.length - 1 == i) { //in last place 
             console.log('script is done, sent msg to ', count, ' isolators');
