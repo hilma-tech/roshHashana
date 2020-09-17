@@ -34,7 +34,7 @@ SELECT * FROM
 
 let smsMsgsArr = []
 let meetingsMsg = "";
-let secondMsg = `ניתן לצפות במסלול המלא ולהדפיס אותו באתר שלנו https://shofar2all.com/?p=t \nבברכה, מיזם "יום תרועה".`;
+let secondMsg = `ניתן לצפות במסלול המלא ולהדפיס אותו באתר שלנו https://shofar2all.com/?p=t \n אנו ממליצים ליצור קשר עם המחפשים לפני החג.\nבברכה, מיזם "יום תרועה".`;
 let meetingStartTime;
 let meetingDate; //temp, to get hours and minutes for meetingStartTime
 useQuery(query, (err, meetings, _fields) => {
