@@ -16,7 +16,8 @@ useQuery(query, (err, data, _fields) => {
     for (let i = 0; i < data.length; i++) {
         let blower = data[i];
         // msg = `שלום ${blower.name},\nאנו שמחים להודיעך כי אושרת לתקוע בשופר באתר יום תרועה.\nתוכל כעת להיכנס לאתר ולשבץ את עצמך למחפשים, בכתובת https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
-        msg = `שלום ${blower.name},\nראש השנה קרב ובא!\nאם עוד לא השתבצת למחפשי תקיעת שופר בסביבתך תוכל לעשות זאת בכתובת https://shofar2all.com ("אתר יום תרועה").\nבברכת שנה טובה,\nצוות יום תרועה`;
+        msg = `שלום ${blower.name} כדי שתוכל לקבל אישור רשמי מול משטרת ישראל לצאת לתקוע בשופר בזמן הסגר עליך להיכנס לקישור הבא של משרד הדתות ולמלא את הפרטים עד היום בשעה 19:00-\nhttps://survey.gov.il/he/PassRequest.\n בעת מילוי השאלון הכנס בשדה שם בית הכנסת:'הילמ"ה תקיעה למבודדים' ובשדה כתובת בית הכנסת הכנס: 'כל הארץ'.\n `
+        // msg = `לאחר מילוי השאלון תתבקש להעלות קובץ של אישור בית הכנסת.\n אנא העלה את הקובץ שנמצא בקישור הבא: https://drive.google.com/file/d/1sXjuaEsqFoy97JsFUnoTSEzkE-iGiZnL/view?usp=sharing.\n במקרה של תקלה ניתן לפנות אלינו במייל ולצרף מספר פלאפון: shofar2all@gmail.com\n בברכת שנה טובה,\nצוות יום תרועה`;
         sendMsg(blower.phoneNumber, msg)
         console.log('sendMsg to: ', blower.phoneNumber);
         cnt++
