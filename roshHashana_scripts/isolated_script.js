@@ -32,15 +32,18 @@ useQuery(q, (err, isolated) => {
     let count = 0;
     for (let i = 0; i < isolated.length; i++) {
         isolater = isolated[i];
-        date = isolater.meetingStartTime ? moment(isolater.meetingStartTime).format('HH:mm') : null
-        msg = isolater.blowerName ?
-            `שלום ${isolater.name},\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""},\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`
-            : `שלום ${isolater.name},\nלא הצלחנו למצוא לך בעל תוקע, עמך הסליחה, צוות יום תרועה`;
-        if (isolater.roleId == 3 && isolater.isPublicMeeting)
-            msg = `שלום ${isolater.name},\nנרשמת לתקיעה ציבורית בכתובת: ${isolater.meetingAddress}, ${isolater.addressComments || ""}.\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע בשופר בתקיעה ציבורית זו.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`;
+        date = isolater.meetingStartTime ? moment(new Date(isolater.meetingStartTime)).format('HH:mm') : null
+        msg = `שעת התקיעה המעודכנת היא: ${date},\nבברכה,\nצוות יום תרועה`;
+        if (!isolater.blowerName)
+            continue;
+        // isolater.blowerName ?
+        //     `שלום ${isolater.name},\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""},\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`
+        //     : `שלום ${isolater.name},\nלא הצלחנו למצוא לך בעל תוקע, עמך הסליחה, צוות יום תרועה`;
+        // if (isolater.roleId == 3 && isolater.isPublicMeeting)
+        // msg = `שלום ${isolater.name},\nנרשמת לתקיעה ציבורית בכתובת: ${isolater.meetingAddress}, ${isolater.addressComments || ""}.\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע בשופר בתקיעה ציבורית זו.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`;
 
         console.log(`(isolator) sending msg to:${isolater.phoneNumber}`);
-        sendMsg(isolater.phoneNumber, msg)
+        sendMsg('0547443860', msg)
         count++;
         if (isolated.length - 1 == i) { //in last place 
             console.log('script is done, sent msg to ', count, ' isolators');
