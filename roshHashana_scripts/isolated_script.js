@@ -32,17 +32,22 @@ useQuery(q, (err, isolated) => {
     let count = 0;
     for (let i = 0; i < isolated.length; i++) {
         isolater = isolated[i];
-        date = isolater.meetingStartTime ? moment(new Date(isolater.meetingStartTime)).format('HH:mm') : null
-        msg = `שעת התקיעה המעודכנת היא: ${date},\nבברכה,\nצוות יום תרועה`;
+        let dt = new Date(isolater.meetingStartTime)
+        date = isolater.meetingStartTime ? moment(dt.setHours(dt.getHours() + 3)).format('HH:mm') : null
+        msg = `שעת התקיעה שונתה ל: ${date},\nחג שמח ושנה טובה!`;
+
         if (!isolater.blowerName)
             continue;
+        console.log(isolater.name)
+        console.log('date', moment(dt.setHours(dt.getHours() + 3)).format('HH:mm'))
+        console.log('wrong date', isolater.meetingStartTime)
         // isolater.blowerName ?
         //     `שלום ${isolater.name},\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע עבורך בשופר.\nבכתובת: ${isolater.meetingAddress} ${isolater.addressComments || ""},\n${isolater.isPublicMeeting ? "מתחת לחלון ביתך" : "בפתח ביתך"}.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`
         //     : `שלום ${isolater.name},\nלא הצלחנו למצוא לך בעל תוקע, עמך הסליחה, צוות יום תרועה`;
         // if (isolater.roleId == 3 && isolater.isPublicMeeting)
         // msg = `שלום ${isolater.name},\nנרשמת לתקיעה ציבורית בכתובת: ${isolater.meetingAddress}, ${isolater.addressComments || ""}.\n${isolater.blowerName}, בעל תוקע ממיזם "יום תרועה" יגיע אליך בעז"ה בראש השנה לתקוע בשופר בתקיעה ציבורית זו.\nשעת תקיעה משוערת ${date}.\nשנה טובה ומתוקה, צוות יום תרועה!`;
 
-        console.log(`(isolator) sending msg to:${isolater.phoneNumber}`);
+        // console.log(`(isolator) sending msg to:${isolater.phoneNumber}`);
         sendMsg(isolater.phoneNumber, msg)
         count++;
         if (isolated.length - 1 == i) { //in last place 
