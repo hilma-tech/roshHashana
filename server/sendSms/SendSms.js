@@ -16,7 +16,7 @@ const sendMsg = async (phoneNum, msg) => {
     const messageText = encodeURIComponent(`${msg}`);//"איזה יופי שאתה מצטרף למאגר המתנדבים, הנה קוד האימות שלך: " + pincode;
     const data = `<?xml version="1.0" encoding="UTF-8"?><sms><user><username>Fb9KF2fX</username><password>${password}</password></user><source>Shofar2all</source><destinations><phone>${phoneNum}</phone></destinations><message>${messageText}</message><response>0</response></sms>`;
     const options = { hostname: 'www.019sms.co.il', port: 443, path: '/api', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': data.length } };
-
+    console.log("not sending sms");
     // const req = https.request(options, res => {
 
     //     res.on('data', d => {
